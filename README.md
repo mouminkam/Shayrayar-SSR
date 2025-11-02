@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Magic Show Project - Next.js
 
-## Getting Started
+هذا مشروع Next.js جاهز للنشر على Vercel.
 
-First, run the development server:
+## البدء السريع
+
+لتشغيل المشروع محلياً:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+افتح [http://localhost:3000](http://localhost:3000) في المتصفح لعرض المشروع.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## النشر على Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### الطريقة الأولى: من خلال واجهة Vercel (موصى بها)
 
-## Learn More
+1. **الذهاب إلى صفحة Vercel:**
+   - افتح الرابط: https://vercel.com/new?teamSlug=mo2min2001-2274s-projects
 
-To learn more about Next.js, take a look at the following resources:
+2. **ربط المشروع:**
+   - اختر "Import Git Repository" (استيراد مستودع Git)
+   - إذا كان المشروع موجوداً على GitHub/GitLab/Bitbucket، قم بربط المستودع
+   - أو استخدم "Clone Template" إذا كان لديك قالب
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **إذا لم يكن المشروع على Git:**
+   - قم بإنشاء مستودع على GitHub/GitLab/Bitbucket أولاً
+   - ادفع الكود إلى المستودع:
+     ```bash
+     git add .
+     git commit -m "Initial commit"
+     git branch -M main
+     git remote add origin <your-repo-url>
+     git push -u origin main
+     ```
+   - ثم عد إلى صفحة Vercel واربط المستودع
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **إعدادات النشر:**
+   - Vercel سيكتشف تلقائياً أنه مشروع Next.js
+   - اضغط "Deploy" (نشر)
 
-## Deploy on Vercel
+### الطريقة الثانية: من خلال Vercel CLI
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# تثبيت Vercel CLI
+npm i -g vercel
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# النشر
+vercel
+
+# أو النشر للإنتاج مباشرة
+vercel --prod
+```
+
+## متطلبات المشروع
+
+- Node.js 18 أو أحدث
+- npm أو yarn أو pnpm
+
+## البناء والإنتاج
+
+```bash
+# بناء المشروع
+npm run build
+
+# تشغيل نسخة الإنتاج
+npm start
+```
+
+## معلومات إضافية
+
+- Framework: Next.js 16
+- React: 19.2.0
+- Styling: Tailwind CSS 4
+- Package Manager: npm
