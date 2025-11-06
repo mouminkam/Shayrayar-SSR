@@ -1,0 +1,71 @@
+"use client";
+import Image from "next/image";
+import Link from "next/link";
+import { Facebook, Twitter, Youtube, Linkedin } from "lucide-react";
+
+export default function CompanyInfo() {
+  return (
+    <div className="mt-6 sm:mt-8 md:mt-0 sm:col-span-2 lg:col-span-1">
+      {/* Logo */}
+      <div className="mb-6 sm:mb-8">
+        <Link href="/" className="inline-block">
+          <Image
+            src="/img/logo/logoWhite.svg"
+            alt="logo"
+            width={180}
+            height={72}
+            className="h-12 sm:h-14 md:h-16 w-auto object-contain"
+            priority
+          />
+        </Link>
+      </div>
+
+      {/* Description */}
+      <p className="text-white/85 text-sm leading-relaxed mb-6 sm:mb-8 lg:mb-10 max-w-md">
+        Phasellus ultricies aliquam volutpat ullamcorper laoreet neque, a
+        lacinia curabitur lacinia mollis
+      </p>
+
+      {/* Social Media Icons */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        <a
+          href="https://facebook.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-9 h-9 border border-white/20 rounded flex items-center justify-center hover:bg-[#EB0029] hover:border-[#EB0029] transition-all duration-300"
+          aria-label="Facebook"
+        >
+          <Facebook className="w-4 h-4 text-white" />
+        </a>
+        <a
+          href="https://twitter.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-9 h-9 border border-white/20 rounded flex items-center justify-center hover:bg-[#EB0029] hover:border-[#EB0029] transition-all duration-300"
+          aria-label="Twitter"
+        >
+          <Twitter className="w-4 h-4 text-white" />
+        </a>
+        <a
+          href="https://linkedin.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-9 h-9 border border-white/20 rounded flex items-center justify-center hover:bg-[#EB0029] hover:border-[#EB0029] transition-all duration-300"
+          aria-label="LinkedIn"
+        >
+          <Linkedin className="w-4 h-4 text-white" />
+        </a>
+        <a
+          href="https://youtube.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-9 h-9 border border-white/20 rounded flex items-center justify-center hover:bg-[#EB0029] hover:border-[#EB0029] transition-all duration-300"
+          aria-label="YouTube"
+        >
+          <Youtube className="w-4 h-4 text-white" />
+        </a>
+      </div>
+    </div>
+  );
+}
+
