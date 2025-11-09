@@ -11,7 +11,7 @@ export default function Breadcrumb({ title = "Contact us" }) {
           minHeight: "400px",
         }}
       >
-        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="absolute inset-0 "></div>
         <div className="relative container mx-auto px-4 sm:px-6 md:px-8">
           <div className="flex flex-col items-center justify-center min-h-[400px] py-20 sm:py-32">
             <h1 className="text-white font-['Epilogue',sans-serif] text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight text-center mb-6 uppercase">
@@ -21,13 +21,13 @@ export default function Breadcrumb({ title = "Contact us" }) {
               <li>
                 <Link
                   href="/"
-                  className="text-white font-['Roboto',sans-serif] text-base font-medium hover:text-[#EB0029] transition-colors duration-300"
+                  className="text-white font-['Roboto',sans-serif] text-base font-medium hover:text-theme transition-colors duration-300"
                 >
                   Home
                 </Link>
               </li>
               <li className="text-white">/</li>
-              <li className="text-[#EB0029]">{title}</li>
+              <li className="text-theme">{title}</li>
             </ul>
           </div>
         </div>

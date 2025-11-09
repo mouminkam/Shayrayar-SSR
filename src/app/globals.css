@@ -54,10 +54,10 @@
     transform: translateX(0px);
   }
   50% {
-    transform: translateX(10px);
+    transform: translateX(20px);
   }
   100% {
-    transform: translateX(30px);
+    transform: translateX(0px);
   }
 }
 
@@ -105,4 +105,61 @@
 
 .animate-rotate {
   animation: rotate 10s linear infinite;
+}
+
+/* Slow Spin Animation for Circle Shape */
+@keyframes spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+/* Range Slider Styles */
+.range__barcustom input[type="range"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.range__barcustom input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--theme);
+  border: 2px solid var(--theme);
+  cursor: pointer;
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
+}
+
+.range__barcustom input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--theme);
+  border: 2px solid var(--theme);
+  cursor: pointer;
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
+}
+
+.range__barcustom input[type="number"]::-webkit-outer-spin-button,
+.range__barcustom input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.range__barcustom input[type="number"] {
+  -moz-appearance: textfield;
 }

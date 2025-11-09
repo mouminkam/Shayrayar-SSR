@@ -19,13 +19,13 @@ export default function Breadcrumb({ title = "About Us 02" }) {
               <li>
                 <Link
                   href="/"
-                  className="text-white font-['Roboto',sans-serif] text-base font-medium hover:text-[#EB0029] transition-colors duration-300"
+                  className="text-white font-['Roboto',sans-serif] text-base font-medium hover:text-theme transition-colors duration-300"
                 >
                   Home
                 </Link>
               </li>
               <li className="text-white">/</li>
-              <li className="text-[#EB0029]">{title}</li>
+              <li className="text-theme">{title}</li>
             </ul>
           </div>
         </div>

@@ -6,7 +6,7 @@ import Map from "../../components/pages/contact/Map";
 
 export default function ContactPage() {
   return (
-    <div className="bg-[#F4F1EA] min-h-screen">
+    <div className="bg-bg2 min-h-screen">
       <Breadcrumb title="Contact us" />
       <ContactBoxes />
       <ContactForm />

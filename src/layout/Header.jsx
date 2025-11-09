@@ -20,6 +20,7 @@ const FreshHeatHeader = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeHeader, setActiveHeader] = useState(null); // لتتبع آخر header تم عمل hover عليه
   const cartTimeoutRef = useRef(null);
 
   // Sample cart items - يمكن استبدالها بـ state management أو context
@@ -53,8 +54,22 @@ const FreshHeatHeader = () => {
     setIsSearchOpen(true);
   };
 
-  const handleCartMouseEnter = (isHeaderActive) => {
-    if (!isHeaderActive) return;
+  const handleCartClick = (headerId) => {
+    setActiveHeader(headerId);
+    if (cartTimeoutRef.current) {
+      clearTimeout(cartTimeoutRef.current);
+      cartTimeoutRef.current = null;
+    }
+    // Toggle cart - إذا كان مفتوح يغلق، وإذا كان مغلق يفتح
+    setIsCartOpen((prev) => !prev);
+    // إلغاء focus بعد click لتجنب ظهور border
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
+  };
+
+  const handleCartMouseEnter = (headerId) => {
+    setActiveHeader(headerId); // تحديث آخر header تم عمل hover عليه
     if (cartTimeoutRef.current) {
       clearTimeout(cartTimeoutRef.current);
       cartTimeoutRef.current = null;
@@ -62,21 +77,19 @@ const FreshHeatHeader = () => {
     setIsCartOpen(true);
   };
 
-  const handleCartMouseLeave = (isHeaderActive) => {
-    if (!isHeaderActive) return;
+  const handleCartMouseLeave = () => {
     if (cartTimeoutRef.current) {
       clearTimeout(cartTimeoutRef.current);
     }
     cartTimeoutRef.current = setTimeout(() => {
       setIsCartOpen(false);
       cartTimeoutRef.current = null;
+      setActiveHeader(null); // إعادة تعيين عند الإغلاق
     }, 300);
   };
 
-  const handleMenuClick = (isHeaderActive) => {
-    if (isHeaderActive) {
-      setIsMobileMenuOpen(!isMobileMenuOpen);
-    }
+  const handleMenuClick = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   // Cleanup timeout عند unmount
@@ -92,7 +105,7 @@ const FreshHeatHeader = () => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      setIsScrolled(scrollTop > 50);
+      setIsScrolled(scrollTop > 150);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -103,16 +116,15 @@ const FreshHeatHeader = () => {
     <>
       {/* Header الأول - يظهر فقط عند التحميل ويختفي عند السكرول */}
       <header
-        className={`w-full hidden lg:block bg-white border-b border-gray-200 transition-all duration-300 ${
-          isScrolled
-            ? "lg:fixed lg:-translate-y-full lg:top-0 lg:z-40"
-            : "relative"
-        }`}
+        className={`w-full hidden lg:block bg-white  transition-all duration-300 ${isScrolled
+          ? "lg:-translate-y-full "
+          : "relative"
+          }`}
       >
         {/* Logo and Navigation */}
         <div className="flex items-center">
           {/* Logo Section */}
-          <div className="px-2 md:mb-0 w-1/4">
+          <div className="px-3 md:mb-0 w-1/4">
             <div className="p-5">
               <Image
                 src="/img/logo/logo.svg"
@@ -127,7 +139,7 @@ const FreshHeatHeader = () => {
           {/* القسم اليميني كامل */}
           <div className="w-full flex flex-col">
             {/* Top Bar */}
-            <div className="py-2 pr-16 pl-10 bg-[#EB0029] flex justify-between items-center text-lg text-white">
+            <div className="py-2 pr-16 pl-10 bg-theme flex justify-between items-center text-lg text-white">
               <div className="flex items-center">
                 <span className="mr-2">©</span>
                 <span>09:00 am - 06:00 pm</span>
@@ -139,88 +151,81 @@ const FreshHeatHeader = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Visit our Facebook page"
-                  className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-[#EB0029] transition-all duration-300"
+                  className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-theme transition-all duration-300"
                 >
-                  <Facebook className="w-4 h-4 text-white group-hover:text-[#EB0029] transition-colors duration-300" />
+                  <Facebook className="w-4 h-4 text-white group-hover:text-theme transition-colors duration-300" />
                 </a>
                 <a
                   href="https://twitter.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Visit our Twitter page"
-                  className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-[#EB0029] transition-all duration-300"
+                  className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-theme transition-all duration-300"
                 >
-                  <Twitter className="w-4 h-4 text-white group-hover:text-[#EB0029] transition-colors duration-300" />
+                  <Twitter className="w-4 h-4 text-white group-hover:text-theme transition-colors duration-300" />
                 </a>
                 <a
                   href="https://youtube.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Visit our YouTube channel"
-                  className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-[#EB0029] transition-all duration-300"
+                  className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-theme transition-all duration-300"
                 >
-                  <Youtube className="w-4 h-4 text-white group-hover:text-[#EB0029] transition-colors duration-300" />
+                  <Youtube className="w-4 h-4 text-white group-hover:text-theme transition-colors duration-300" />
                 </a>
                 <a
                   href="https://linkedin.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Visit our LinkedIn page"
-                  className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-[#EB0029] transition-all duration-300"
+                  className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-theme transition-all duration-300"
                 >
-                  <Linkedin className="w-4 h-4 text-white group-hover:text-[#EB0029] transition-colors duration-300" />
+                  <Linkedin className="w-4 h-4 text-white group-hover:text-theme transition-colors duration-300" />
                 </a>
               </div>
             </div>
             {/* Navigation */}
-            <nav className="w-full flex justify-between items-center md:w-auto py-8 px-10 bg-[#010F1C] text-white">
-              <ul className="flex flex-wrap justify-center md:justify-start gap-10 font-medium">
+            <nav className="w-full flex justify-between items-center md:w-auto py-8 px-10 bg-title/90 text-white">
+              <ul className="flex justify-around items-center font-medium w-full">
                 <li className="transition-all duration-300 hover:translate-x-1">
                   <Link
                     href="/"
-                    className="hover:text-[#EB0029] transition-colors duration-300 cursor-pointer"
+                    className="hover:text-theme transition-colors duration-300 cursor-pointer"
                   >
                     Home
                   </Link>
                 </li>
                 <li className="transition-all duration-300 hover:translate-x-1">
                   <Link
-                    href="/about"
-                    className="hover:text-[#EB0029] transition-colors duration-300 cursor-pointer"
-                  >
-                    AboutUs
-                  </Link>
-                </li>
-                <li className="transition-all duration-300 hover:translate-x-1">
-                  <Link
                     href="/shop"
-                    className="hover:text-[#EB0029] transition-colors duration-300 cursor-pointer"
+                    className="hover:text-theme transition-colors duration-300 cursor-pointer"
                   >
                     Shop
                   </Link>
                 </li>
-                <li className="transition-all duration-300 hover:translate-x-1">
-                  <Link
-                    href="/pages"
-                    className="hover:text-[#EB0029] transition-colors duration-300 cursor-pointer"
-                  >
-                    Pages
-                  </Link>
-                </li>
+
                 <li className="transition-all duration-300 hover:translate-x-1">
                   <Link
                     href="/blog"
-                    className="hover:text-[#EB0029] transition-colors duration-300 cursor-pointer"
+                    className="hover:text-theme transition-colors duration-300 cursor-pointer"
                   >
                     Blog
                   </Link>
                 </li>
                 <li className="transition-all duration-300 hover:translate-x-1">
                   <Link
-                    href="/contact"
-                    className="hover:text-[#EB0029] transition-colors duration-300 cursor-pointer"
+                    href="/contact-us"
+                    className="hover:text-theme transition-colors duration-300 cursor-pointer"
                   >
-                    ContactUs
+                    Contact Us
+                  </Link>
+                </li>
+                <li className="transition-all duration-300 hover:translate-x-1">
+                  <Link
+                    href="/about-us"
+                    className="hover:text-theme transition-colors duration-300 cursor-pointer"
+                  >
+                    About US
                   </Link>
                 </li>
               </ul>
@@ -231,39 +236,36 @@ const FreshHeatHeader = () => {
                 <button
                   onClick={handleSearchClick}
                   aria-label="Open search"
-                  className="focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-black rounded cursor-pointer"
+                  className="focus:outline-none focus:ring-2 focus:ring-theme2 focus:ring-offset-2 focus:ring-offset-title rounded cursor-pointer"
                 >
                   <Search
-                    className="h-6 w-6 text-gray-400 hover:text-[#EB0029] transition-colors duration-300"
+                    className="h-6 w-6 text-text hover:text-theme transition-colors duration-300"
                     strokeWidth={2}
                   />
                 </button>
                 {/* Cart Icon with Badge */}
                 <div
                   className="relative"
-                  onMouseEnter={() => handleCartMouseEnter(!isScrolled)}
-                  onMouseLeave={() => handleCartMouseLeave(!isScrolled)}
+                  onMouseEnter={() => handleCartMouseEnter("header1")}
+                  onMouseLeave={handleCartMouseLeave}
                 >
                   <button
+                    onClick={() => handleCartClick("header1")}
                     aria-label={`Open cart with ${cartCount} items`}
-                    className={`focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-black rounded ${
-                      !isScrolled
-                        ? "cursor-pointer"
-                        : "cursor-not-allowed opacity-50"
-                    }`}
-                    disabled={isScrolled}
+                    className="outline-none focus:outline-none rounded cursor-pointer relative"
                   >
                     <ShoppingCart
-                      className="h-6 w-6 text-gray-400 hover:text-[#EB0029] transition-colors duration-300"
+                      className="h-6 w-6 text-text hover:text-theme transition-colors duration-300"
                       strokeWidth={2}
                     />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-theme2 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                        {cartCount}
+                      </span>
+                    )}
                   </button>
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-[#FC791A] text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                      {cartCount}
-                    </span>
-                  )}
-                  {!isScrolled && (
+                  {/* CartDropdown يظهر فقط إذا كان Header الأول هو النشط وكان ظاهر */}
+                  {activeHeader === "header1" && !isScrolled && (
                     <CartDropdown
                       cartOpen={isCartOpen}
                       setCartOpen={setIsCartOpen}
@@ -273,17 +275,12 @@ const FreshHeatHeader = () => {
                 </div>
                 {/* Menu Icon */}
                 <button
-                  onClick={() => handleMenuClick(!isScrolled)}
-                  aria-label="Open mobile menu"
-                  className={`focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-black rounded ${
-                    !isScrolled
-                      ? "cursor-pointer"
-                      : "cursor-not-allowed opacity-50"
-                  }`}
-                  disabled={isScrolled}
+                  onClick={handleMenuClick}
+                  aria-label="Open sidebar menu"
+                  className="focus:outline-none focus:ring-2 focus:ring-theme2 focus:ring-offset-2 focus:ring-offset-title rounded cursor-pointer"
                 >
                   <Menu
-                    className="h-6 w-6 text-gray-400 hover:text-[#EB0029] transition-colors duration-300"
+                    className="h-6 w-6 text-text hover:text-theme transition-colors duration-300"
                     strokeWidth={2}
                   />
                 </button>
@@ -293,110 +290,44 @@ const FreshHeatHeader = () => {
         </div>
       </header>
 
-      {/* Header الثاني - يظهر دائماً على الأجهزة المتوسطة والصغيرة، وعند السكرول على الشاشات الكبيرة */}
-      {/* Version للشاشات المتوسطة والصغيرة - يظهر دائماً */}
-      <header className="block lg:hidden fixed top-0 left-0 right-0 w-full bg-white border-b border-gray-200 z-50">
-        <div className="mx-auto flex flex-row items-center justify-between gap-4 px-4 py-4 w-full">
-          {/* Logo Section */}
-          <div className="flex items-center min-w-[100px]">
-            <Image
-              src="/img/logo/logo.svg"
-              alt="logo"
-              width={100}
-              height={40}
-              className="h-10 w-auto object-contain"
-            />
-          </div>
-
-          {/* Icons */}
-          <div className="flex items-center gap-4 shrink-0">
-            {/* Search Icon */}
-            <button
-              onClick={handleSearchClick}
-              aria-label="Open search"
-              className="flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-500 rounded cursor-pointer"
-            >
-              <Search
-                className="h-5 w-5 text-gray-600 hover:text-[#EB0029] transition-colors duration-300"
-                strokeWidth={2}
-              />
-            </button>
-
-            {/* Cart Icon with Badge */}
-            <div
-              className="relative flex items-center"
-              onMouseEnter={() => handleCartMouseEnter(true)}
-              onMouseLeave={() => handleCartMouseLeave(true)}
-            >
-              <button
-                aria-label={`Open cart with ${cartCount} items`}
-                className="flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-500 rounded cursor-pointer"
-              >
-                <ShoppingCart
-                  className="h-5 w-5 text-gray-600 hover:text-[#EB0029] transition-colors duration-300"
-                  strokeWidth={2}
-                />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-[#FC791A] text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                    {cartCount}
-                  </span>
-                )}
-              </button>
-              <CartDropdown
-                cartOpen={isCartOpen}
-                setCartOpen={setIsCartOpen}
-                cartItems={cartItems}
-              />
-            </div>
-
-            {/* Menu Icon */}
-            <button
-              onClick={() => handleMenuClick(true)}
-              aria-label="Open mobile menu"
-              className="flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-500 rounded cursor-pointer"
-            >
-              <Menu
-                className="h-5 w-5 text-gray-600 hover:text-[#EB0029] transition-colors duration-300"
-                strokeWidth={2}
-              />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Header الثاني - Version للشاشات الكبيرة - يظهر عند السكرول */}
+      {/* Header الثاني - يظهر دائماً على الأجهزة الصغيرة، وعند السكرول على الشاشات الكبيرة */}
       <header
-        className={`hidden lg:block fixed top-0 left-0 right-0 w-full bg-white border-b border-gray-200 z-50 transition-transform duration-300 ${
-          isScrolled ? "translate-y-0" : "-translate-y-full"
-        }`}
+        className={`fixed top-0 left-0 right-0 w-full bg-white border-b border-gray-200 z-50 transition-transform duration-300 ${
+          // للأجهزة الصغيرة: يظهر دائماً (translate-y-0)
+          // للشاشات الكبيرة: يظهر فقط عند السكرول
+          isScrolled ? "translate-y-0" : "translate-y-0 lg:-translate-y-full"
+          }`}
       >
-        <div className="mx-auto flex flex-row items-center justify-between gap-10 px-15 py-4 w-full">
+        <div className="mx-auto flex flex-row items-center justify-between gap-4 lg:gap-10 px-4 lg:px-15 py-4 w-full">
           {/* Logo Section */}
-          <div className="flex items-center min-w-[120px]">
-            <Image
-              src="/img/logo/logo.svg"
-              alt="logo"
-              width={120}
-              height={48}
-              className="h-12 w-auto object-contain"
-            />
+          <div className="flex items-center min-w-[100px] lg:min-w-[120px]">
+            <Link href="/">
+              <Image
+                src="/img/logo/logo.svg"
+                alt="logo"
+                width={100}
+                height={40}
+                className="h-10 lg:h-12 w-auto object-contain"
+                unoptimized={true}
+              />
+            </Link>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 flex justify-center">
-            <ul className="flex items-center gap-8 font-medium text-gray-900">
+          {/* Navigation - للشاشات الكبيرة فقط */}
+          <nav className="hidden lg:flex flex-1 justify-center">
+            <ul className="flex items-center gap-15 font-medium text-title">
               <li>
                 <Link
                   href="/"
-                  className="hover:text-[#EB0029] transition-colors duration-300 cursor-pointer"
+                  className="hover:text-theme transition-colors duration-300 cursor-pointer"
                 >
                   Home
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/about"
-                  className="hover:text-[#EB0029] transition-colors duration-300 cursor-pointer"
+                  href="/about-us"
+                  className="hover:text-theme transition-colors duration-300 cursor-pointer"
                 >
                   About Us
                 </Link>
@@ -404,31 +335,23 @@ const FreshHeatHeader = () => {
               <li>
                 <Link
                   href="/shop"
-                  className="hover:text-[#EB0029] transition-colors duration-300 cursor-pointer"
+                  className="hover:text-theme transition-colors duration-300 cursor-pointer"
                 >
                   Shop
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/pages"
-                  className="hover:text-[#EB0029] transition-colors duration-300 cursor-pointer"
-                >
-                  Pages
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/blog"
-                  className="hover:text-[#EB0029] transition-colors duration-300 cursor-pointer"
+                  className="hover:text-theme transition-colors duration-300 cursor-pointer"
                 >
                   Blog
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/contact"
-                  className="hover:text-[#EB0029] transition-colors duration-300 cursor-pointer"
+                  href="/contact-us"
+                  className="hover:text-theme transition-colors duration-300 cursor-pointer"
                 >
                   Contact Us
                 </Link>
@@ -437,15 +360,15 @@ const FreshHeatHeader = () => {
           </nav>
 
           {/* Icons */}
-          <div className="flex items-center gap-6 shrink-0">
+          <div className="flex items-center gap-4 lg:gap-6 shrink-0">
             {/* Search Icon */}
             <button
               onClick={handleSearchClick}
               aria-label="Open search"
-              className="flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-500 rounded cursor-pointer"
+              className="flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-theme2 rounded cursor-pointer"
             >
               <Search
-                className="h-5 w-5 text-gray-600 hover:text-[#EB0029] transition-colors duration-300"
+                className="h-5 w-5 text-text hover:text-theme transition-colors duration-300"
                 strokeWidth={2}
               />
             </button>
@@ -453,29 +376,26 @@ const FreshHeatHeader = () => {
             {/* Cart Icon with Badge */}
             <div
               className="relative flex items-center"
-              onMouseEnter={() => handleCartMouseEnter(isScrolled)}
-              onMouseLeave={() => handleCartMouseLeave(isScrolled)}
+              onMouseEnter={() => handleCartMouseEnter("header2")}
+              onMouseLeave={handleCartMouseLeave}
             >
               <button
+                onClick={() => handleCartClick("header2")}
                 aria-label={`Open cart with ${cartCount} items`}
-                className={`flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-500 rounded ${
-                  isScrolled
-                    ? "cursor-pointer"
-                    : "cursor-not-allowed opacity-50"
-                }`}
-                disabled={!isScrolled}
+                className="flex items-center justify-center outline-none focus:outline-none rounded cursor-pointer relative"
               >
                 <ShoppingCart
-                  className="h-5 w-5 text-gray-600 hover:text-[#EB0029] transition-colors duration-300"
+                  className="h-5 w-5 text-text hover:text-theme transition-colors duration-300"
                   strokeWidth={2}
                 />
                 {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-[#FC791A] text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                  <span className="absolute -top-2 -right-2 bg-theme2 text-white text-xs rounded-full w-4 h-4 lg:w-5 lg:h-5 flex items-center justify-center font-bold">
                     {cartCount}
                   </span>
                 )}
               </button>
-              {isScrolled && (
+              {/* CartDropdown يظهر فقط إذا كان Header الثاني هو النشط */}
+              {activeHeader === "header2" && (
                 <CartDropdown
                   cartOpen={isCartOpen}
                   setCartOpen={setIsCartOpen}
@@ -486,17 +406,12 @@ const FreshHeatHeader = () => {
 
             {/* Menu Icon */}
             <button
-              onClick={() => handleMenuClick(isScrolled)}
-              aria-label="Open mobile menu"
-              className={`flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-500 rounded ${
-                isScrolled
-                  ? "cursor-pointer"
-                  : "cursor-not-allowed opacity-50"
-              }`}
-              disabled={!isScrolled}
+              onClick={handleMenuClick}
+              aria-label="Open sidebar menu"
+              className="flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-theme2 rounded cursor-pointer"
             >
               <Menu
-                className="h-5 w-5 text-gray-600 hover:text-[#EB0029] transition-colors duration-300"
+                className="h-5 w-5 text-text hover:text-theme transition-colors duration-300"
                 strokeWidth={2}
               />
             </button>
