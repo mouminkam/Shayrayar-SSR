@@ -127,7 +127,7 @@ const FreshHeatHeader = () => {
           <div className="px-10 w-1/5 flex">
             <div className="p-0 transform ">
               <Image
-                src="/img/logo/logowhite.svg"
+                src={`/img/logo/logowhite.svg` || `/img/logo/logo.svg`}
                 alt="logo"
                 width={100}
                 height={100}
