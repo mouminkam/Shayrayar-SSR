@@ -12,20 +12,20 @@ export default function ProductAbout() {
   };
 
   return (
-    <div className="product-about">
+    <div className="product-about h-full flex flex-col">
       {/* Title and Price */}
-      <div className="title-wrapper flex items-center justify-between mb-5">
-        <h2 className="product-title text-title font-['Epilogue',sans-serif] text-2xl font-bold">
+      <div className="title-wrapper flex items-center justify-between mb-2">
+        <h2 className="product-title text-white font-['Epilogue',sans-serif] text-2xl font-bold">
           Chicken Pizza
         </h2>
-        <div className="price text-title font-['Epilogue',sans-serif] text-3xl sm:text-4xl font-bold">
+        <div className="price text-white font-['Epilogue',sans-serif] text-3xl sm:text-4xl font-bold">
           $69
         </div>
       </div>
 
       {/* Rating */}
-      <div className="product-rating pb-5 mb-5 border-b border-gray-200">
-        <div className="star-rating relative w-24 h-5 mb-2 flex items-center">
+      <div className="product-rating pb-5 mb-3 border-b border-gray-200">
+        <div className="star-rating relative w-30 h-5 mb-5 flex items-center">
           <Image
             src="/img/icon/star2.svg"
             alt="rating"
@@ -37,14 +37,14 @@ export default function ProductAbout() {
         </div>
         <Link
           href="/shop-details"
-          className="woocommerce-review-link text-text text-sm hover:text-theme transition-colors duration-300"
+          className="woocommerce-review-link text-text text-md hover:text-theme transition-colors duration-300"
         >
           (2 customer reviews)
         </Link>
       </div>
 
       {/* Description */}
-      <p className="text text-text font-['Roboto',sans-serif] text-base font-normal leading-relaxed mb-8">
+      <p className="text text-text text-lg font-['Roboto',sans-serif]  font-normal leading-relaxed mb-8">
         Aliquam hendrerit a augue insuscipit. Etiam aliquam massa quis des mauris commodo venenatis
         ligula commodo leez sed blandit convallis dignissim onec vel pellentesque neque.
       </p>
@@ -52,7 +52,7 @@ export default function ProductAbout() {
       {/* Actions */}
       <div className="actions mb-6">
         <div className="quantity flex items-center gap-8 mb-8">
-          <p className="text-text font-['Roboto',sans-serif] text-base font-normal m-0">
+          <p className="text-white text-lg font-['Roboto',sans-serif]  font-normal mb-0">
             Quantity
           </p>
 
@@ -82,7 +82,7 @@ export default function ProductAbout() {
             </button>
           </div>
         </div>
-        <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex  items-center gap-4 flex-wrap mt-15">
           <Link
             href="/cart"
             className="theme-btn inline-block px-6 py-3 bg-theme text-white font-['Roboto',sans-serif] text-sm font-normal hover:bg-theme2 transition-all duration-300 rounded-md"
@@ -101,8 +101,8 @@ export default function ProductAbout() {
       </div>
 
       {/* Share */}
-      <div className="share flex items-center gap-5">
-        <h6 className="text-title font-['Epilogue',sans-serif] text-base font-semibold m-0">
+      <div className="share flex items-center gap-5 mt-auto">
+        <h6 className="text-white font-['Epilogue',sans-serif] text-base font-semibold m-0">
           share with friends
         </h6>
         <ul className="social-media flex items-center gap-2.5">

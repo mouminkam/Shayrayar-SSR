@@ -5,7 +5,7 @@ import PopularDishes from "../../components/pages/shop-details/PopularDishes";
 
 export default function ShopDetailsPage() {
   return (
-    <div className="bg-bg2 min-h-screen">
+    <div className="bg-bg3 min-h-screen">
       <Breadcrumb title="Shop details" />
       <ShopDetailsContent />
       <PopularDishes />

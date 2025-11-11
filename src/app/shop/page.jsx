@@ -18,7 +18,7 @@ function ShopSectionFallback() {
 
 export default function ShopPage() {
   return (
-    <div className="bg-bg2 min-h-screen">
+    <div className="bg-bg3 min-h-screen">
       <Breadcrumb title="Shop" />
       <Suspense fallback={<ShopSectionFallback />}>
         <ShopSection />

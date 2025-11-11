@@ -35,13 +35,13 @@ export default function OfferCards() {
   ];
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 lg:py-24 pb-0">
+    <section className="py-12 mb-12 sm:mb-0 sm:py-16 bg-bg3 ">
       <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {offers.map((offer, index) => (
             <div
               key={index}
-              className="relative rounded-3xl overflow-hidden min-h-[300px] flex items-center p-8 sm:p-10"
+              className="relative rounded-3xl overflow-hidden min-h-[300px] flex items-center p-8 sm:p-10 border-2 border-theme2"
               style={{
                 backgroundImage: `url(${offer.bgImage})`,
                 backgroundSize: "cover",

@@ -26,7 +26,7 @@ export default function ProductReviews() {
 
   return (
     <div className="product-review mb-12">
-      <h3 className="text-title font-['Epilogue',sans-serif] text-3xl font-black mb-10 capitalize">
+      <h3 className="text-white font-['Epilogue',sans-serif] text-3xl font-black mb-10 capitalize">
         {reviews.length} Reviews
       </h3>
       <ul className="comment-list">
@@ -47,7 +47,7 @@ export default function ProductReviews() {
                 />
               </div>
               <div className="comment-content flex-1 relative">
-                <h4 className="name text-title font-['Epilogue',sans-serif] text-xl font-bold mb-1 capitalize">
+                <h4 className="name text-white font-['Epilogue',sans-serif] text-xl font-bold mb-1 capitalize">
                   {review.author}
                 </h4>
                 <div className="commented-on text-text text-sm mb-4">{review.date}</div>

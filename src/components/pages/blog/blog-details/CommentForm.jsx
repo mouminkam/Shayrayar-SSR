@@ -24,8 +24,8 @@ export default function CommentForm() {
   };
 
   return (
-    <div className="comment-form-wrap mt-10 pt-5">
-      <h3 className="text-title font-['Epilogue',sans-serif] text-2xl sm:text-3xl lg:text-4xl font-bold mb-8">
+    <div className="comment-form-wrap my-10 pt-5">
+      <h3 className="text-white font-['Epilogue',sans-serif] text-2xl sm:text-3xl lg:text-4xl font-bold mb-8">
         Leave a comments
       </h3>
       <form onSubmit={handleSubmit} id="contact-form" method="POST">
@@ -70,7 +70,7 @@ export default function CommentForm() {
         <div className="form-clt">
           <button
             type="submit"
-            className="theme-btn inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-theme text-white font-['Roboto',sans-serif] text-sm sm:text-base font-normal rounded-none hover:bg-theme2 transition-colors duration-300"
+            className="theme-btn inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-theme text-white font-['Roboto',sans-serif] text-sm sm:text-base font-normal rounded-sm hover:bg-theme2 transition-colors duration-300"
           >
             Post a Comment
             <ArrowRight className="w-4 h-4 bg-transparent text-white" />

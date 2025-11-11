@@ -44,9 +44,9 @@ export default function BlogDetailsSidebar() {
   return (
     <div className="main-sidebar2">
       {/* Search Widget */}
-      <div className="single-sidebar-widget bg-white p-6 sm:p-8 lg:p-10 rounded-lg shadow-lg mb-8">
+      <div className="single-sidebar-widget bg-bgimg p-6 sm:p-8 lg:p-10 rounded-lg shadow-lg mb-8">
         <div className="wid-title mb-6">
-          <h3 className="text-title font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold relative pb-4 capitalize">
+          <h3 className="text-white font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold relative pb-4 capitalize">
             Search
             <span className="absolute bottom-0 left-0 h-0.5 w-20 bg-theme"></span>
           </h3>
@@ -58,7 +58,7 @@ export default function BlogDetailsSidebar() {
               placeholder="Search here"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-bg2 px-5 py-5 rounded-lg border-none outline-none text-text font-['Roboto',sans-serif] text-sm sm:text-base pr-20"
+              className="w-full bg-white px-5 py-5 rounded-lg font-medium border-none outline-none  font-['Roboto',sans-serif] text-sm sm:text-base pr-20"
             />
             <button
               type="submit"
@@ -71,9 +71,9 @@ export default function BlogDetailsSidebar() {
       </div>
 
       {/* Categories Widget */}
-      <div className="single-sidebar-widget bg-white p-6 sm:p-8 lg:p-10 rounded-lg shadow-lg mb-8">
+      <div className="single-sidebar-widget bg-bgimg p-6 sm:p-8 lg:p-10 rounded-lg shadow-lg mb-8">
         <div className="wid-title mb-6">
-          <h3 className="text-title font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold relative pb-4 capitalize">
+          <h3 className="text-white font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold relative pb-4 capitalize">
             Categories
             <span className="absolute bottom-0 left-0 h-0.5 w-20 bg-theme"></span>
           </h3>
@@ -111,9 +111,9 @@ export default function BlogDetailsSidebar() {
       </div>
 
       {/* Recent Posts Widget */}
-      <div className="single-sidebar-widget bg-white p-6 sm:p-8 lg:p-10 rounded-lg shadow-lg mb-8">
+      <div className="single-sidebar-widget bg-bgimg p-6 sm:p-8 lg:p-10 rounded-lg shadow-lg mb-8">
         <div className="wid-title mb-6">
-          <h3 className="text-title font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold relative pb-4 capitalize">
+          <h3 className="text-white font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold relative pb-4 capitalize">
             Recent Post
             <span className="absolute bottom-0 left-0 h-0.5 w-20 bg-theme"></span>
           </h3>
@@ -152,7 +152,7 @@ export default function BlogDetailsSidebar() {
                 <h6 className="font-['Epilogue',sans-serif] text-base font-bold leading-6">
                   <Link
                     href="/blog-details"
-                    className="text-title hover:text-theme transition-colors duration-300"
+                    className="text-white hover:text-theme transition-colors duration-300"
                   >
                     {post.title}
                   </Link>
@@ -164,9 +164,9 @@ export default function BlogDetailsSidebar() {
       </div>
 
       {/* Tags Widget */}
-      <div className="single-sidebar-widget bg-white p-6 sm:p-8 lg:p-10 rounded-lg shadow-lg">
+      <div className="single-sidebar-widget bg-bgimg p-6 sm:p-8 lg:p-10 rounded-lg shadow-lg">
         <div className="wid-title mb-6">
-          <h3 className="text-title font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold relative pb-4 capitalize">
+          <h3 className="text-white font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold relative pb-4 capitalize">
             Tags
             <span className="absolute bottom-0 left-0 h-0.5 w-20 bg-theme"></span>
           </h3>

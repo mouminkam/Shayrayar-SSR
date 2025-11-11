@@ -18,7 +18,7 @@ function BlogSectionFallback() {
 
 export default function BlogPage() {
   return (
-    <div className="bg-bg2 min-h-screen">
+    <div className="bg-bg3 min-h-screen">
       <Breadcrumb title="Blog" />
       <Suspense fallback={<BlogSectionFallback />}>
         <BlogSection />

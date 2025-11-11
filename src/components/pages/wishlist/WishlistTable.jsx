@@ -98,7 +98,7 @@ export default function WishlistTable() {
     <div className="hidden lg:block overflow-x-auto mb-8">
       <table className="tinvwl-table-manage-list w-full border-collapse">
         <thead>
-          <tr className="bg-bg2 border-b-2 border-gray-200">
+          <tr className="border-b-2 border-gray-200">
             <th className="product-cb w-12 text-center py-4 px-4">
               <input
                 type="checkbox"
@@ -108,22 +108,22 @@ export default function WishlistTable() {
                 onChange={(e) => handleSelectAll(e.target.checked)}
               />
             </th>
-            <th className="product-thumbnail w-32 text-center py-4 px-4 font-epilogue text-title font-bold">
+            <th className="product-thumbnail w-32 text-center py-4 px-4 font-epilogue text-white font-bold">
               Image
             </th>
-            <th className="product-name text-left py-4 px-4 font-epilogue text-title font-bold">
+            <th className="product-name text-left py-4 px-4 font-epilogue text-white font-bold">
               Product Name
             </th>
-            <th className="product-price text-center py-4 px-4 font-epilogue text-title font-bold">
+            <th className="product-price text-center py-4 px-4 font-epilogue text-white font-bold">
               Price
             </th>
-            <th className="product-date text-center py-4 px-4 font-epilogue text-title font-bold">
+            <th className="product-date text-center py-4 px-4 font-epilogue text-white font-bold">
               Date Added
             </th>
-            <th className="product-stock text-center py-4 px-4 font-epilogue text-title font-bold">
+            <th className="product-stock text-center py-4 px-4 font-epilogue text-white font-bold">
               Stock
             </th>
-            <th className="product-action text-center py-4 px-4 font-epilogue text-title font-bold">
+            <th className="product-action text-center py-4 px-4 font-epilogue text-white font-bold">
               Action
             </th>
             <th className="product-remove w-12 text-center py-4 px-4"></th>
@@ -131,7 +131,7 @@ export default function WishlistTable() {
         </thead>
         <tbody>
           {wishlistItems.map((item) => (
-            <tr key={item.id} className="wishlist_item border-b border-gray-100 hover:bg-bg2/50 transition-colors duration-300">
+            <tr key={item.id} className="wishlist_item transition-colors duration-300">
               <td className="product-cb text-center py-6 px-4 align-middle">
                 <input
                   type="checkbox"
@@ -145,7 +145,7 @@ export default function WishlistTable() {
               </td>
               <td className="product-thumbnail text-center py-6 px-4 align-middle">
                 <Link href="/shop-details" className="inline-block group">
-                  <div className="relative w-24 h-24 rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-shadow duration-300">
+                  <div className="relative w-24 h-24 rounded-xl overflow-hidden transition-shadow duration-300">
                     <Image
                       src={item.image}
                       alt={item.name}
@@ -159,7 +159,7 @@ export default function WishlistTable() {
               <td className="product-name py-6 px-4 align-middle">
                 <Link
                   href="/shop-details"
-                  className="text-title font-epilogue text-lg font-bold hover:text-theme transition-colors duration-300"
+                  className="text-white font-epilogue text-lg font-bold hover:text-theme transition-colors duration-300"
                 >
                   {item.name}
                 </Link>

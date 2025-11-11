@@ -122,12 +122,12 @@ const FreshHeatHeader = () => {
           }`}
       >
         {/* Logo and Navigation */}
-        <div className="flex items-center">
+        <div className="flex items-center bg-bg3">
           {/* Logo Section */}
-          <div className="px-3 md:mb-0 w-1/4">
-            <div className="p-5">
+          <div className="px-10 w-1/5 flex">
+            <div className="p-0 transform ">
               <Image
-                src="/img/logo/logo.svg"
+                src="/img/logo/logowhite.svg"
                 alt="logo"
                 width={100}
                 height={100}
@@ -135,7 +135,6 @@ const FreshHeatHeader = () => {
               />
             </div>
           </div>
-
           {/* القسم اليميني كامل */}
           <div className="w-full flex flex-col">
             {/* Top Bar */}
@@ -185,7 +184,7 @@ const FreshHeatHeader = () => {
               </div>
             </div>
             {/* Navigation */}
-            <nav className="w-full flex justify-between items-center md:w-auto py-8 px-10 bg-title/90 text-white">
+            <nav className="w-full flex justify-between items-center md:w-auto py-6 px-10 bg-bgimg text-white">
               <ul className="flex justify-around items-center font-medium w-full">
                 <li className="transition-all duration-300 hover:translate-x-1">
                   <Link

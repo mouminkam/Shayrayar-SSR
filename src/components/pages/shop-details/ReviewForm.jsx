@@ -17,16 +17,16 @@ export default function ReviewForm() {
   };
 
   return (
-    <div className="comment-form mt-12 p-12 sm:p-16 bg-bg2 rounded-xl">
+    <div className="comment-form mt-12 p-12 sm:p-16 bg-bgimg rounded-xl">
       <div className="form-title mb-6">
-        <h3 className="inner-title text-title font-['Epilogue',sans-serif] text-3xl font-black mb-6 capitalize">
+        <h3 className="inner-title text-white font-['Epilogue',sans-serif] text-3xl font-black mb-6 capitalize">
           Add a Review
         </h3>
         <p className="text-text text-sm mb-5">
           Your email address will not be published. Required fields are marked *
         </p>
         <div className="rating flex items-center gap-6 mt-4 mb-9">
-          <p className="text-title font-semibold m-0">Rate this product? *</p>
+          <p className="text-white font-semibold m-0">Rate this product? *</p>
           <ul className="star flex items-center gap-1.5">
             {[1, 2, 3, 4, 5].map((star) => (
               <li key={star}>

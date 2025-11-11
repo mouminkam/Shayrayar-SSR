@@ -1,9 +1,47 @@
 "use client";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
 import Image from "next/image";
 import Link from "next/link";
 import MarqueeSection from "./MarqueeSection";
 
+import "swiper/swiper-bundle.css";
+
 export default function TestimonialSection() {
+  const testimonials = [
+    {
+      id: 1,
+      name: "Albert Flores",
+      role: "Web Designer",
+      image: "/img/shape/testimonialProfile1_1.png",
+      rating: "/img/icon/star.svg",
+      text: "Penatibus magnis dis point parturient montes nascetur ridiculus mus Ut id lorem ac enim the vestibulum blandit nec sit amet felis. Fusce quis diam odio Cras mattis mi quis tincidunt",
+    },
+    {
+      id: 2,
+      name: "Sarah Johnson",
+      role: "Marketing Manager",
+      image: "/img/shape/testimonialProfile1_1.png",
+      rating: "/img/icon/star.svg",
+      text: "Excellent service and amazing food quality! The team is professional and always delivers on time. Highly recommended for anyone looking for great food.",
+    },
+    {
+      id: 3,
+      name: "Michael Chen",
+      role: "Business Owner",
+      image: "/img/shape/testimonialProfile1_1.png",
+      rating: "/img/icon/star.svg",
+      text: "Outstanding experience from start to finish. The food is fresh, delicious, and the customer service is top-notch. Will definitely order again!",
+    },
+    {
+      id: 4,
+      name: "Emily Davis",
+      role: "Food Blogger",
+      image: "/img/shape/testimonialProfile1_1.png",
+      rating: "/img/icon/star.svg",
+      text: "I've tried many restaurants, but this one stands out. The flavors are incredible and the presentation is beautiful. A true culinary delight!",
+    },
+  ];
   return (
     <section className="bg-bg3 relative overflow-hidden">
       {/* Testimonial Wrapper */}
@@ -34,7 +72,7 @@ export default function TestimonialSection() {
                     alt="icon"
                     width={80}
                     height={80}
-                className="w-16 h-16 sm:w-40 sm:h-40 animate-rotate"
+                    className="w-26 h-26 sm:w-40 sm:h-40 animate-rotate"
                   />
                 </Link>
               </div>
@@ -68,58 +106,76 @@ export default function TestimonialSection() {
                 </h2>
               </div>
 
-              {/* Slider Area - Testimonial Card */}
-              <div>
-                <div className="bg-white rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 border-t-4 border-theme2 shadow-lg">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 mb-6 relative">
-                    {/* Profile Image */}
-                    <div className="shrink-0">
-                      <Image
-                        src="/img/shape/testimonialProfile1_1.png"
-                        alt="thumb"
-                        width={70}
-                        height={70}
-                        className="rounded-full w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover"
-                      />
-                    </div>
+              {/* Slider Area - Testimonial Cards */}
+              <div className="slider-area">
+                <Swiper
+                  modules={[Autoplay]}
+                  spaceBetween={30}
+                  slidesPerView={1}
+                  loop={true}
+                  autoplay={{
+                    delay: 3000,
+                    disableOnInteraction: false,
+                  }}
+                  className="testimonialSlider"
+                >
+                  {testimonials.map((testimonial) => (
+                    <SwiperSlide key={testimonial.id}>
+                      <div className="bg-white rounded-2xl p-4 sm:p-5 md:p-6 border-t-4 border-theme2 shadow-lg h-[250px] md:h-[250px] lg:h-[250px] flex flex-col overflow-hidden">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-3 sm:mb-4 relative shrink-0">
+                          {/* Profile Image */}
+                          <div className="shrink-0">
+                            <Image
+                              src={testimonial.image}
+                              alt={testimonial.name}
+                              width={70}
+                              height={70}
+                              className="rounded-full w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-cover"
+                              unoptimized={true}
+                            />
+                          </div>
 
-                    {/* User Info */}
-                    <div className="flex-1">
-                      <h6 className="text-title font-['Epilogue',sans-serif] text-lg sm:text-xl md:text-2xl font-bold mb-1">
-                        Albert Flores
-                      </h6>
-                      <p className="text-text font-['Roboto',sans-serif] text-sm sm:text-base mb-2">
-                        Web Designer
-                      </p>
-                      <div className="mt-2">
-                        <Image
-                          src="/img/icon/star.svg"
-                          alt="icon"
-                          width={100}
-                          height={20}
-                          className="w-auto h-3 sm:h-4"
-                        />
+                          {/* User Info */}
+                          <div className="flex-1 min-w-0">
+                            <h6 className="text-title font-['Epilogue',sans-serif] text-base sm:text-lg md:text-xl font-bold mb-0.5 truncate">
+                              {testimonial.name}
+                            </h6>
+                            <p className="text-text font-['Roboto',sans-serif] text-xs sm:text-sm mb-1.5 truncate">
+                              {testimonial.role}
+                            </p>
+                            <div className="mt-1">
+                              <Image
+                                src={testimonial.rating}
+                                alt="rating"
+                                width={100}
+                                height={20}
+                                className="w-auto h-2.5 sm:h-3"
+                                unoptimized={true}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Quote Icon */}
+                          <div className="absolute top-0 right-0">
+                            <Image
+                              src="/img/icon/quote.svg"
+                              alt="icon"
+                              width={40}
+                              height={40}
+                              className="w-6 h-6 sm:w-7 sm:h-7"
+                              unoptimized={true}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex-1 overflow-y-auto pr-1">
+                          <p className="text-text font-['Roboto',sans-serif] text-sm sm:text-base md:text-lg leading-relaxed">
+                            {testimonial.text}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Quote Icon */}
-                    <div className="absolute top-0 right-0">
-                      <Image
-                        src="/img/icon/quote.svg"
-                        alt="icon"
-                        width={40}
-                        height={40}
-                        className="w-8 h-8 sm:w-10 sm:h-10"
-                      />
-                    </div>
-                  </div>
-                  <p className="text-text font-['Roboto',sans-serif] text-base sm:text-lg md:text-xl lg:text-2xl leading-relaxed">
-                    Penatibus magnis dis point parturient montes nascetur
-                    ridiculus mus Ut id lorem ac enim the vestibulum blandit nec
-                    sit amet felis. Fusce quis diam odio Cras mattis mi quis
-                    tincidunt
-                  </p>
-                </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
               </div>
             </div>
           </div>

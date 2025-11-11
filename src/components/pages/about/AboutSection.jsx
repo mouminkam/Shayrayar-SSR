@@ -17,11 +17,11 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 lg:py-24 pt-0 relative">
+    <section className="py-12 sm:py-16 md:py-20 lg:py-24 pt-0 relative bg-bg3 ">
       <div className="container mx-auto  ">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Image */}
-          <div className="relative">
+          <div className="relative border-r-3 border-y-2 border-theme2 rounded-r-full ">
             <Image
               src="/img/about/aboutThumb2_1.png"
               alt="About Us"
@@ -50,14 +50,14 @@ export default function AboutSection() {
 
           {/* Content */}
           <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center justify-center sm:justify-start gap-2 mb-4">
               <Image
                 src="/img/icon/titleIcon.svg"
                 alt="icon"
                 width={20}
                 height={20}
               />
-              <span className="text-[#FC791A] font-['Epilogue',sans-serif] text-base font-bold uppercase">
+              <span className="text-theme2 font-['Epilogue',sans-serif] text-base font-bold uppercase">
                 About US
               </span>
               <Image
@@ -67,12 +67,12 @@ export default function AboutSection() {
                 height={20}
               />
             </div>
-            <h2 className="text-[#010F1C] font-['Epilogue',sans-serif] text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4">
+            <h2 className="text-white font-['Epilogue',sans-serif] text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4 text-center sm:text-left">
               Variety of flavours from american cuisine
             </h2>
-            <p className="text-[#5C6574] font-['Roboto',sans-serif] text-base leading-relaxed mb-12">
+            <p className="text-text font-['Roboto',sans-serif] text-lg sm:text-xl text-center sm:text-left leading-relaxed mb-12">
               Every dish is not just prepared it's a crafted with a savor the a
-              utmost precision and a deep understanding sdf of flavor harmony.
+              utmost <br className="hidden sm:block" /> precision and a deep understanding sdf of flavor harmony. <br className="hidden sm:block" />
               The experienced hands of our chefs
             </p>
 
@@ -90,10 +90,10 @@ export default function AboutSection() {
                     />
                   </div>
                   <div>
-                    <h6 className="text-[#010F1C] font-['Epilogue',sans-serif] text-lg font-bold mb-1 capitalize">
+                    <h6 className="text-white font-['Epilogue',sans-serif] text-lg font-bold mb-1 capitalize">
                       {feature.title}
                     </h6>
-                    <p className="text-[#5C6574] font-['Roboto',sans-serif] text-base">
+                    <p className="text-text font-['Roboto',sans-serif] text-base">
                       {feature.description}
                     </p>
                   </div>

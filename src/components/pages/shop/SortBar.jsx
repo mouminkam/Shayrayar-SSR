@@ -9,20 +9,23 @@ export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage 
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="mb-6">
-      <div className="flex items-center justify-between">
-        <div className="">
-          <p className="woocommerce-result-count text-text text-base font-['Roboto',sans-serif] mb-0">
-            Showing {startItem} - {endItem} of {totalItems} Results
+    <div className="w-full">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6">
+        {/* Results Count */}
+        <div className="shrink-0">
+          <p className="text-white text-sm sm:text-base font-['Roboto',sans-serif]">
+            Showing <span className="font-semibold">{startItem}</span> - <span className="font-semibold">{endItem}</span> of <span className="font-semibold">{totalItems}</span> Results
           </p>
         </div>
 
-        <div className="flex items-center justify-center gap-2">
-          <div className="col-md-auto">
+        {/* Sort & View Controls */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+          {/* Sort Select */}
+          <div className="shrink-0">
             <form className="woocommerce-ordering" method="get">
               <select
                 name="orderby"
-                className="single-select h-12 leading-[46px] border border-gray-200 w-full sm:w-auto min-w-[209px] text-base m-0 px-5 pr-10 rounded transition-all duration-300 hover:border-theme focus:border-theme outline-none appearance-none bg-white"
+                className="h-12 leading-[46px] border border-gray-200 w-full sm:w-auto min-w-[200px] text-sm sm:text-base px-4 pr-10 rounded-lg transition-all duration-300 hover:border-theme focus:border-theme focus:outline-none appearance-none bg-white text-title font-['Roboto',sans-serif] cursor-pointer"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
@@ -36,37 +39,38 @@ export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage 
             </form>
           </div>
 
-          <div className="col-md-auto">
-            <ul className="nav nav-pills flex items-center gap-2" role="tablist">
-              <li className="nav-item" role="presentation">
-                <button
-                  className={`nav-link p-2 border-none bg-transparent transition-all duration-300 ${viewMode === "grid"
-                    ? "text-theme"
-                    : "text-text hover:text-theme"
-                    }`}
-                  onClick={() => onViewChange("grid")}
-                  type="button"
-                  role="tab"
-                  aria-label="Grid view"
-                >
-                  <Grid className="w-5 h-5" />
-                </button>
-              </li>
-              <li className="nav-item" role="presentation">
-                <button
-                  className={`nav-link p-2 border-none bg-transparent transition-all duration-300 ${viewMode === "list"
-                    ? "text-theme"
-                    : "text-text hover:text-theme"
-                    }`}
-                  onClick={() => onViewChange("list")}
-                  type="button"
-                  role="tab"
-                  aria-label="List view"
-                >
-                  <List className="w-5 h-5" />
-                </button>
-              </li>
-            </ul>
+          {/* View Mode Toggle */}
+          <div className="flex-shrink-0">
+            <div className="flex items-center gap-2 bg-white rounded-lg p-1 border border-gray-200">
+              <button
+                className={`p-2 rounded transition-all duration-300 ${
+                  viewMode === "grid"
+                    ? "bg-theme text-white"
+                    : "text-text hover:text-theme hover:bg-gray-50"
+                }`}
+                onClick={() => onViewChange("grid")}
+                type="button"
+                role="tab"
+                aria-label="Grid view"
+                aria-selected={viewMode === "grid"}
+              >
+                <Grid className="w-5 h-5" />
+              </button>
+              <button
+                className={`p-2 rounded transition-all duration-300 ${
+                  viewMode === "list"
+                    ? "bg-theme text-white"
+                    : "text-text hover:text-theme hover:bg-gray-50"
+                }`}
+                onClick={() => onViewChange("list")}
+                type="button"
+                role="tab"
+                aria-label="List view"
+                aria-selected={viewMode === "list"}
+              >
+                <List className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

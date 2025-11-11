@@ -4,9 +4,10 @@ import WishlistSection from "../../components/pages/wishlist/WishlistSection";
 
 export default function WishlistPage() {
   return (
-    <div className="bg-bg2 min-h-screen">
+    <div className="bg-bg3 min-h-screen">
       <Breadcrumb title="Wishlist" />
       <WishlistSection />
+
     </div>
   );
 }

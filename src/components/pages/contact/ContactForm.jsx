@@ -34,7 +34,7 @@ export default function ContactForm() {
           <div className="flex flex-col lg:flex-row lg:items-stretch gap-8 lg:gap-12 xl:gap-16">
             {/* Image Section */}
             <div className="w-full lg:w-1/2 xl:w-[55%] lg:-ml-[30px]">
-              <div className="contact-form-thumb h-full relative">
+              <div className="contact-form-thumb  relative border-r-4 border-y-2 border-theme rounded-r-full">
                 <Image
                   src="/img/contact/contactThumb2_1.png"
                   alt="Contact form illustration"
@@ -48,7 +48,7 @@ export default function ContactForm() {
             </div>
 
             {/* Form Section */}
-            <div className="w-full lg:w-1/2 xl:w-[45%] flex">
+            <div className="w-full lg:w-1/2 xl:w-[45%] flex border-2 ">
               <div className="contact-form style2 bg-white rounded-2xl p-6 sm:p-8 lg:p-10 shadow-lg w-full">
                 <h2 className="text-title font-['Epilogue',sans-serif] text-2xl sm:text-3xl lg:text-4xl font-black mb-6 capitalize">
                   Get in Touch
@@ -102,7 +102,7 @@ export default function ContactForm() {
                         onChange={handleChange}
                         className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text font-['Roboto',sans-serif] text-sm sm:text-base bg-white focus:outline-none focus:border-theme transition-colors duration-300 cursor-pointer"
                       >
-                        <option value="subject" selected="selected">Subject</option>
+                        <option value="subject">Subject</option>
                         <option value="complain">Complain</option>
                         <option value="greetings">Greetings</option>
                         <option value="date">Expire Date</option>

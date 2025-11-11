@@ -94,7 +94,7 @@ export default function AboutUsSection() {
                       unoptimized={true}
                     />
                   </div>
-                  <h2 className="title text-title font-epilogue text-3xl sm:text-4xl lg:text-5xl font-black mb-10 sm:w-1/2 text-center mx-auto">
+                  <h2 className="title text-white font-epilogue text-3xl sm:text-4xl lg:text-5xl font-black mb-10 sm:w-1/2 text-center mx-auto">
                     Variety of flavours from american cuisine
                   </h2>
                   <div className="text text-text font-roboto text-base leading-relaxed mb-8 max-w-3xl mx-auto sm:w-1/3 text-center ">

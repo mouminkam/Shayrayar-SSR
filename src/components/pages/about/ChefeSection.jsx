@@ -65,16 +65,19 @@ export default function ChefeSection() {
               height={20}
             />
           </div>
-          <h2 className="text-title font-['Epilogue',sans-serif] text-3xl sm:text-4xl lg:text-5xl font-black">
+          <h2 className="text-white font-['Epilogue',sans-serif] text-3xl sm:text-4xl lg:text-5xl font-black">
             Meet Our Expert Chefe
           </h2>
         </div>
 
         {/* Chef Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12 lg:mb-16 px-30">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-15 mb-12 lg:mb-16 px-10 ">
           {chefs.map((chef, index) => (
-            <div key={index} className="relative text-center group">
-              <div className="relative mb-5  rounded-3xl">
+            <div key={index} className="relative text-center group ">
+              <p className="text-white font-['Roboto',sans-serif] text-base mb-2 sm:mb-5 sm:text-xl font-bold">
+                {chef.role}
+              </p>
+              <div className="relative mb-5 rounded-3xl ">
                 <Image
                   src={chef.image}
                   alt={chef.name}
@@ -107,38 +110,35 @@ export default function ChefeSection() {
                 </div>
               </div>
               <Link href="/chef-details">
-                <h3 className="text-title font-['Epilogue',sans-serif] text-2xl font-bold mb-1 hover:text-theme transition-colors duration-300">
+                <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-bold mb-1 hover:text-theme transition-colors duration-300">
                   {chef.name}
                 </h3>
               </Link>
-              <p className="text-text font-['Roboto',sans-serif] text-base">
-                {chef.role}
-              </p>
+
             </div>
           ))}
         </div>
 
         {/* Client Logos Slider */}
-        <div className="pt-8">
+        <div className="pt-8 ">
           <div className="relative overflow-hidden">
             <div className="marquee-wrapper">
               <div
                 className="marquee-inner flex items-center gap-0 transition-transform duration-700 ease-in-out"
                 style={{
-                  transform: `translateX(-${
-                    currentIndex * (100 / itemsPerView)
-                  }%)`,
+                  transform: `translateX(-${currentIndex * (100 / itemsPerView)
+                    }%)`,
                 }}
               >
                 {/* Duplicate logos for infinite seamless loop */}
                 {[...logos, ...logos, ...logos].map((item, index) => (
                   <div
                     key={`logo-${index}`}
-                    className="shrink-0 p-2 sm:p-3 transition-opacity duration-300"
+                    className="shrink-0 py-2 px-7 transition-opacity duration-300"
                     style={{ minWidth: `${100 / itemsPerView}%` }}
                   >
                     <Image
-                      src={`/img/logo/clientLogo1_1.png`}
+                      src={`/img/logo/clientLogoDark1_1.png`}
                       alt={`Client ${item}`}
                       width={120}
                       height={60}

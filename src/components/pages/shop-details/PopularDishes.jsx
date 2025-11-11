@@ -47,7 +47,7 @@ export default function PopularDishes() {
       <div className="popular-dishes-wrapper style1">
         <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
           <div className="title-area mb-12 sm:mb-14">
-            <div className="sub-title text-center text-theme2 font-['Epilogue',sans-serif] text-base font-bold uppercase mb-4 flex items-center justify-center gap-2">
+            <div className="sub-title text-center text-theme2 font-['Epilogue',sans-serif] text-lg font-bold uppercase mb-4 flex items-center justify-center gap-2">
               <Image
                 src="/img/icon/titleIcon.svg"
                 alt="icon"
@@ -66,16 +66,16 @@ export default function PopularDishes() {
                 unoptimized={true}
               />
             </div>
-            <div className="title text-center text-title font-['Epilogue',sans-serif] text-3xl sm:text-4xl font-black capitalize">
+            <div className="title text-center text-white font-['Epilogue',sans-serif] text-3xl sm:text-5xl font-black capitalize">
               Best selling Dishes
             </div>
           </div>
 
-          <div className="dishes-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 sm:gap-8">
+          <div className="dishes-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 sm:gap-8 ">
             {dishes.map((dish) => (
               <div
                 key={dish.id}
-                className="dishes-card style1 group relative p-6 rounded-2xl mt-8 bg-white text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 overflow-hidden"
+                className="dishes-card style1 group relative p-6 rounded-2xl mt-8 border-2 border-theme2 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 overflow-hidden"
               >
                 {/* Background Image Overlay */}
                 <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0 bg-[url('/img/bg/dishesThumbBG.png')]" />
@@ -105,8 +105,6 @@ export default function PopularDishes() {
                 {/* Content */}
                 <div className="relative z-10">
                   <div className="social-profile absolute right-4 top-4 z-20">
-
-
                   </div>
 
                   <div className="dishes-thumb mb-8 mt-5 flex items-center justify-center">
@@ -121,7 +119,7 @@ export default function PopularDishes() {
                   </div>
 
                   <Link href="/menu">
-                    <h3 className="text-title group-hover:text-white font-['Epilogue',sans-serif] text-xl font-bold mb-4 hover:text-theme transition-colors duration-300">
+                    <h3 className="text-white group-hover:text-white font-['Epilogue',sans-serif] text-xl font-bold mb-4 hover:text-theme transition-colors duration-300">
                       {dish.title}
                     </h3>
                   </Link>

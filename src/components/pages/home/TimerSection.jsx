@@ -41,7 +41,7 @@ export default function TimerSection() {
   };
 
   return (
-    <div className="timer-section fix py-12  sm:py-16 md:py-20 lg:py-24 relative overflow-hidden"
+    <div className="timer-section fix relative overflow-hidden"
       style={{ backgroundImage: "url('/img/bg/ctaBG1_1.jpg') ", backgroundSize: "cover", backgroundPosition: "center" }}
     >
       <div className="timer-wrapper style1">
@@ -76,8 +76,8 @@ export default function TimerSection() {
               />
             </div>
 
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center h-[450px]">
+            <div className="container mx-auto pt-10 px-4 sm:px-6 lg:px-8 xl:px-12">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ">
                 {/* Image */}
                 <div className="timer-thumb flex justify-center lg:justify-start">
                   <Image
@@ -149,7 +149,7 @@ export default function TimerSection() {
                   {/* Button */}
                   <div className="btn-wrap flex justify-center lg:justify-start">
                     <Link
-                      className="theme-btn px-8 py-3 bg-theme text-white font-roboto text-base font-medium hover:bg-theme2 transition-all duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
+                      className="theme-btn px-8 py-3 mb-8 bg-theme text-white font-roboto text-base font-medium hover:bg-theme2 transition-all duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
                       href="/menu"
                     >
                       ORDER NOW

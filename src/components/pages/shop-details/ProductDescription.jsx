@@ -3,7 +3,7 @@
 export default function ProductDescription() {
   return (
     <div className="product-description py-12 sm:py-14 border-b border-gray-200 mb-12">
-      <h3 className="text-title font-['Epilogue',sans-serif] text-3xl font-black mb-6 capitalize">
+      <h3 className="text-white font-['Epilogue',sans-serif] text-3xl font-black mb-6 capitalize">
         product Description
       </h3>
       <div className="desc">

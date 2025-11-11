@@ -24,18 +24,18 @@ export default function CartTotals() {
   };
 
   return (
-    <div className="cart-totals-wrapper bg-white rounded-2xl shadow-lg p-6 lg:p-8 border border-gray-100">
-      <h2 className="summary-title text-title font-epilogue text-2xl font-bold mb-6 pb-4 border-b-2 border-gray-200">
+    <div className="cart-totals-wrapper bg-bgimg rounded-2xl shadow-lg p-6 lg:p-8 border border-gray-100">
+      <h2 className="summary-title text-white font-epilogue text-2xl font-bold mb-6 pb-4 border-b-2 border-gray-200">
         Cart Totals
       </h2>
 
       <div className="space-y-6">
         {/* Subtotal */}
         <div className="flex justify-between items-center py-4 border-b border-gray-100">
-          <span className="text-title font-epilogue text-base font-semibold">
+          <span className="text-white font-epilogue text-base font-semibold">
             Subtotal
           </span>
-          <span className="amount text-title font-bold text-lg">
+          <span className="amount text-white font-bold text-lg">
             ${cartSubtotal.toFixed(2)}
           </span>
         </div>
@@ -43,14 +43,14 @@ export default function CartTotals() {
         {/* Shipping */}
         <div className="shipping-section py-4 border-b border-gray-100">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-title font-epilogue text-base font-semibold flex items-center gap-2">
+            <span className="text-white font-epilogue text-base font-semibold flex items-center gap-2">
               <Truck className="w-5 h-5 text-theme" />
               Shipping
             </span>
           </div>
 
           <div className="space-y-3 mb-4">
-            <label className="cursor-pointer flex items-center gap-3 p-3 rounded-lg border-2 border-gray-200 hover:border-theme/50 transition-all duration-300 group">
+            <label className="cursor-pointer flex items-center gap-3 p-3 rounded-lg border-2 border-gray-200 hover:border-theme transition-all duration-300 group">
               <input
                 type="radio"
                 id="free_shipping"
@@ -60,7 +60,7 @@ export default function CartTotals() {
                 onChange={() => setShippingMethod("free_shipping")}
               />
               <div className="flex-1">
-                <span className="text-title font-epilogue text-sm font-semibold block">
+                <span className="text-white font-epilogue text-sm font-semibold block">
                   Free Shipping
                 </span>
                 <span className="text-text text-xs">$0.00</span>
@@ -70,7 +70,7 @@ export default function CartTotals() {
               )}
             </label>
 
-            <label className="cursor-pointer flex items-center gap-3 p-3 rounded-lg border-2 border-gray-200 hover:border-theme/50 transition-all duration-300 group">
+            <label className="cursor-pointer flex items-center gap-3 p-3 rounded-lg border-2 border-gray-200 hover:border-theme transition-all duration-300 group">
               <input
                 type="radio"
                 id="flat_rate"
@@ -80,7 +80,7 @@ export default function CartTotals() {
                 onChange={() => setShippingMethod("flat_rate")}
               />
               <div className="flex-1">
-                <span className="text-title font-epilogue text-sm font-semibold block">
+                <span className="text-white font-epilogue text-sm font-semibold block">
                   Flat Rate
                 </span>
                 <span className="text-text text-xs">$5.00</span>
@@ -106,9 +106,9 @@ export default function CartTotals() {
             </button>
 
             {showShippingForm && (
-              <div className="shipping-calculator-form mt-4 space-y-4 p-4 bg-bg2 rounded-xl">
+              <div className="shipping-calculator-form mt-4 space-y-4 p-4 bg-bgimg rounded-xl">
                 <div className="form-row">
-                  <label className="block text-title font-epilogue text-sm font-semibold mb-2">
+                  <label className="block text-white font-epilogue text-sm font-semibold mb-2">
                     Country
                   </label>
                   <select
@@ -125,7 +125,7 @@ export default function CartTotals() {
                 </div>
 
                 <div className="form-row">
-                  <label className="block text-title font-epilogue text-sm font-semibold mb-2">
+                  <label className="block text-white font-epilogue text-sm font-semibold mb-2">
                     State
                   </label>
                   <select
@@ -144,7 +144,7 @@ export default function CartTotals() {
                 </div>
 
                 <div className="form-row">
-                  <label className="block text-title font-epilogue text-sm font-semibold mb-2">
+                  <label className="block text-white font-epilogue text-sm font-semibold mb-2">
                     City
                   </label>
                   <input
@@ -159,7 +159,7 @@ export default function CartTotals() {
                 </div>
 
                 <div className="form-row">
-                  <label className="block text-title font-epilogue text-sm font-semibold mb-2">
+                  <label className="block text-white font-epilogue text-sm font-semibold mb-2">
                     Postcode
                   </label>
                   <input
@@ -187,7 +187,7 @@ export default function CartTotals() {
 
         {/* Order Total */}
         <div className="order-total flex justify-between items-center py-4 bg-theme/5 rounded-xl px-4">
-          <span className="text-title font-epilogue text-lg font-bold">
+          <span className="text-white font-epilogue text-lg font-bold">
             Order Total
           </span>
           <strong>

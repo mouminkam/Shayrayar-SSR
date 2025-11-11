@@ -5,9 +5,10 @@
   --color-theme: #EB0029;
   --color-theme2: #FC791A;
   --color-title: #010F1C;
-  --color-text: #5C6574;
+  --color-text: #99A1AF;
   --color-bg2: #F4F1EA;
-  --color-bg3: #181818;
+  --color-bg3: black;
+  --color-bgimg: #1E1E1E;
 }
 
 /* Custom CSS Variables */
@@ -16,9 +17,9 @@
   --theme: #EB0029;
   --theme2: #FC791A;
   --title: #010F1C;
-  --text: #5C6574;
+  --text: #99A1AF;
   --bg2: #F4F1EA;
-  --bg3: #181818;
+  --bg3: #030D19;
   --white: #ffffff;
   --black: #000000;
   
@@ -119,47 +120,4 @@
 
 .animate-spin-slow {
   animation: spin-slow 20s linear infinite;
-}
-
-/* Range Slider Styles */
-.range__barcustom input[type="range"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
-
-.range__barcustom input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  background: var(--theme);
-  border: 2px solid var(--theme);
-  cursor: pointer;
-  pointer-events: auto;
-  position: relative;
-  z-index: 10;
-}
-
-.range__barcustom input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  background: var(--theme);
-  border: 2px solid var(--theme);
-  cursor: pointer;
-  pointer-events: auto;
-  position: relative;
-  z-index: 10;
-}
-
-.range__barcustom input[type="number"]::-webkit-outer-spin-button,
-.range__barcustom input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.range__barcustom input[type="number"] {
-  -moz-appearance: textfield;
 }

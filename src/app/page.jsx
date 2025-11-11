@@ -15,7 +15,7 @@ import MarqueeSection from "../components/pages/about/MarqueeSection";
 
 export default function HomePage() {
   return (
-    <div className="bg-bg2 min-h-screen">
+    <div className="bg-bg3 min-h-screen">
 
       <BannerSection />
       <BestFoodItemsSection />

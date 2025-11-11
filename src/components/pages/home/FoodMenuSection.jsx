@@ -92,7 +92,7 @@ export default function FoodMenuSection() {
                   unoptimized={true}
                 />
               </div>
-              <h2 className="title text-title font-epilogue text-3xl sm:text-4xl lg:text-5xl font-black">
+              <h2 className="title text-white font-epilogue text-3xl sm:text-4xl lg:text-5xl font-black">
                 Fresheat Foods Menu
               </h2>
             </div>
@@ -101,11 +101,11 @@ export default function FoodMenuSection() {
             <div className="food-menu-tab mb-8">
               <ul className="nav nav-pills flex flex-wrap justify-center gap-4 mb-8" role="tablist">
                 {tabs.map((tab) => (
-                  <li key={tab.id} className="nav-item" role="presentation">
+                  <li key={tab.id} className="nav-item mb-10" role="presentation">
                     <button
                       className={`nav-link px-6 py-3 rounded-xl font-epilogue text-base font-medium transition-all duration-300 flex items-center gap-2 ${activeTab === tab.id
                         ? "bg-theme text-white"
-                        : "bg-white text-title hover:bg-theme hover:text-white"
+                        : "text-white hover:bg-theme hover:text-white"
                         }`}
                       onClick={() => setActiveTab(tab.id)}
                       type="button"
@@ -125,14 +125,14 @@ export default function FoodMenuSection() {
               </ul>
 
               {/* Tab Content */}
-              <div className="tab-content">
+              <div className="tab-content px-20">
                 <div
                   className={`tab-pane ${activeTab === "FastFood" ? "show active" : ""}`}
                   role="tabpanel"
                 >
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {currentItems.map((item) => (
-                      <div key={item.id} className="single-menu-items flex items-center gap-6 p-4 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300">
+                      <div key={item.id} className="single-menu-items  flex items-center gap-6 p-4 rounded-2xl  shadow-lg hover:shadow-xl transition-all duration-300">
                         <div className="menu-item-thumb shrink-0">
                           <Image
                             src={item.image}
@@ -145,7 +145,7 @@ export default function FoodMenuSection() {
                         </div>
                         <div className="menu-content flex-1">
                           <Link href="/menu">
-                            <h3 className={`text-title font-epilogue text-lg font-bold mb-2 hover:text-theme transition-colors duration-300 ${activeTab === "FastFood" && item.id === 1 ? "text-theme" : ""}`}>
+                            <h3 className={`text-white font-epilogue text-lg font-bold mb-2 hover:text-theme transition-colors duration-300 ${activeTab === "FastFood" && item.id === 1 ? "text-theme" : ""}`}>
                               {item.title}
                             </h3>
                           </Link>

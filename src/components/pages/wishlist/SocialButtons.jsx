@@ -19,7 +19,7 @@ export default function SocialButtons() {
           <div className="w-10 h-10 bg-theme/10 rounded-lg flex items-center justify-center">
             <Share className="w-5 h-5 text-theme" />
           </div>
-          <span className="font-epilogue text-title text-lg font-bold">
+          <span className="font-epilogue text-white text-lg font-bold">
             Share Wishlist
           </span>
         </div>

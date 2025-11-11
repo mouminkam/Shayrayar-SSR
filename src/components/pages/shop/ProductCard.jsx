@@ -3,10 +3,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShoppingBasket, Heart } from "lucide-react";
 
+// Format price to always show 2 decimal places
+const formatPrice = (price) => {
+  return Number(price).toFixed(2);
+};
+
 export default function ProductCard({ product, viewMode = "grid" }) {
   if (viewMode === "list") {
     return (
-      <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8 p-5 sm:p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+      <div className="relative flex flex-col sm:flex-row mt-0 items-start sm:items-center gap-6 sm:gap-8 p-5 sm:p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
         <div className="dishes-thumb relative shrink-0">
           <Image
             src={product.image}
@@ -55,7 +60,7 @@ export default function ProductCard({ product, viewMode = "grid" }) {
             {product.longDescription || "Neque porro est qui dolorem ipsum quia quaed inventor veritatis et quasi architecto beatae vitae dicta sunt explicabo. Aelltes port lacus quis enim var sed efficitur turpis gilla sed sit amet finibus eros. Lorem Ipsum is simply dummy text of the printing and typesetting industry.When an unknown printer took a galley of type"}
           </div>
           <h6 className="text-theme font-['Epilogue',sans-serif] text-lg font-bold mb-6">
-            ${product.price}
+            ${formatPrice(product.price)}
           </h6>
           <Link
             href="/shop-details"
@@ -70,7 +75,7 @@ export default function ProductCard({ product, viewMode = "grid" }) {
 
   // Grid View
   return (
-    <div className="dishes-card style2 p-6 sm:p-7 mt-36 rounded-2xl bg-white shadow-lg hover:shadow-xl text-center transition-all duration-300 hover:-translate-y-2">
+    <div className="dishes-card style2 p-6 sm:p-7 mt-0 rounded-2xl bg-white shadow-lg hover:shadow-xl text-center transition-all duration-300 hover:-translate-y-2">
       <div className="relative flex justify-center items-center shrink-0">
         <Image
           src={product.image}
@@ -111,7 +116,7 @@ export default function ProductCard({ product, viewMode = "grid" }) {
           {product.description}
         </div>
         <h6 className="text-theme font-['Epilogue',sans-serif] text-lg font-bold mb-6">
-          ${product.price}
+        ${formatPrice(product.price)}
         </h6>
         <Link
           href="/shop-details"
