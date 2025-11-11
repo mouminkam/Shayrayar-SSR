@@ -122,7 +122,7 @@ const FreshHeatHeader = () => {
           }`}
       >
         {/* Logo and Navigation */}
-        <div className="flex items-center bg-bg3">
+        <div className="flex items-center bg-bg2">
           {/* Logo Section */}
           <div className="px-10 w-1/5 flex">
             <div className="p-0 transform ">
