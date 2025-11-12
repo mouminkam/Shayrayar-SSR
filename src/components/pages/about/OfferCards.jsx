@@ -41,7 +41,7 @@ export default function OfferCards() {
           {offers.map((offer, index) => (
             <div
               key={index}
-              className="relative rounded-3xl overflow-hidden min-h-[300px] flex items-center p-8 sm:p-10 border-2 border-theme2"
+              className="relative rounded-3xl overflow-hidden min-h-[300px] flex items-center p-8 sm:p-10 border-2 border-bgimg hover:translate-y-2 transition-all duration-300"
               style={{
                 backgroundImage: `url(${offer.bgImage})`,
                 backgroundSize: "cover",
@@ -49,21 +49,17 @@ export default function OfferCards() {
               }}
             >
               {/* Content */}
-              <div className="relative z-10">
+              <div className="relative z-10 w-1/2">
                 <h6 className="text-theme text-sm font-extrabold uppercase mb-2">
                   {offer.subtitle}
                 </h6>
                 <h3 className="text-white text-2xl sm:text-3xl font-black mb-2">
                   {offer.title}
                 </h3>
-                <p className="text-theme2 font-extrabold mb-5">{offer.description}</p>
+                <p className="text-theme3 font-extrabold mb-5">{offer.description}</p>
                 <Link
                   href="/menu"
-                  className={`inline-block px-6 py-3 text-sm font-normal transition-all duration-300 ${
-                    offer.buttonStyle === "style4"
-                      ? "bg-theme2 text-white hover:bg-theme2/90"
-                      : "bg-white text-theme hover:bg-white/90"
-                  }`}
+                  className={`inline-block px-4 py-3 text-xs sm:text-sm font-normal rounded-md transition-all duration-300 bg-theme3 text-white hover:bg-theme`}
                 >
                   ORDER NOW <ArrowRight className="inline-block w-4 h-4 ml-2" />
                 </Link>

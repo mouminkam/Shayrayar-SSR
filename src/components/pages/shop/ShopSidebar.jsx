@@ -97,12 +97,7 @@ export default function ShopSidebar() {
     console.log("Search:", searchQuery);
   }, [searchQuery]);
 
-  // Handle filter
-  const handleFilter = useCallback((e) => {
-    e.preventDefault();
-    // TODO: Implement filter functionality
-    console.log("Filter:", { minPrice, maxPrice });
-  }, [minPrice, maxPrice]);
+ 
 
   return (
     <aside className="main-sidebar space-y-6 lg:space-y-8">
@@ -148,107 +143,6 @@ export default function ShopSidebar() {
             </li>
           ))}
         </ul>
-      </div>
-
-      {/* Price Filter Widget */}
-      <div className="bg-white p-5 sm:p-6 lg:p-8 rounded-2xl shadow-sm">
-        <h5 className="text-title font-['Epilogue',sans-serif] text-base sm:text-lg lg:text-xl font-bold relative pb-2 sm:pb-3 mb-4 sm:mb-6 capitalize">
-          Filter By Price
-          <span className="absolute bottom-0 left-0 h-0.5 w-14 sm:w-16 lg:w-20 bg-theme"></span>
-        </h5>
-
-        {/* Price Range Slider */}
-        <div className="mb-5 sm:mb-6">
-          <div className="relative h-1 bg-gray-200 rounded-full">
-            {/* Progress bar */}
-            <div
-              className="absolute h-full bg-theme rounded-full"
-              style={{
-                left: `${priceRange.minPercent}%`,
-                width: `${priceRange.maxPercent - priceRange.minPercent}%`,
-              }}
-            ></div>
-          </div>
-
-          {/* Range inputs - Simplified with just circles */}
-          <div className="relative mt-5 h-6">
-            <input
-              type="range"
-              min={MIN_PRICE}
-              max={MAX_PRICE}
-              step={1}
-              value={minPrice}
-              onChange={(e) => handleMinPriceChange(e.target.value)}
-              className="absolute w-full h-1 bg-transparent appearance-none cursor-pointer z-20 
-                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 
-                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-theme [&::-webkit-slider-thumb]:border-2 
-                [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-none [&::-webkit-slider-thumb]:cursor-pointer 
-                [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full 
-                [&::-moz-range-thumb]:bg-theme [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white 
-                [&::-moz-range-thumb]:shadow-none [&::-moz-range-thumb]:cursor-pointer"
-            />
-            <input
-              type="range"
-              min={MIN_PRICE}
-              max={MAX_PRICE}
-              step={1}
-              value={maxPrice}
-              onChange={(e) => handleMaxPriceChange(e.target.value)}
-              className="absolute w-full h-1 bg-transparent appearance-none cursor-pointer z-10 
-                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 
-                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-theme [&::-webkit-slider-thumb]:border-2 
-                [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-none [&::-webkit-slider-thumb]:cursor-pointer 
-                [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full 
-                [&::-moz-range-thumb]:bg-theme [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white 
-                [&::-moz-range-thumb]:shadow-none [&::-moz-range-thumb]:cursor-pointer"
-            />
-          </div>
-        </div>
-
-        {/* Price Inputs */}
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
-            {/* Min Price */}
-            <div className="flex items-center gap-2 flex-1">
-              <span className="text-title font-medium text-xs sm:text-sm lg:text-base whitespace-nowrap">Price:</span>
-              <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                <span className="text-title font-semibold text-sm sm:text-base">$</span>
-                <input
-                  type="number"
-                  min={MIN_PRICE}
-                  max={MAX_PRICE}
-                  value={minPrice}
-                  onChange={(e) => handleMinPriceChange(e.target.value)}
-                  className="flex-1 min-w-0 max-w-[90px] bg-bg2 px-2 sm:px-3 py-2 rounded-lg border border-gray-200 text-title font-semibold text-sm sm:text-base text-center outline-none focus:border-theme focus:ring-2 focus:ring-theme/20 transition-all"
-                />
-              </div>
-            </div>
-
-            {/* Separator */}
-            <span className="text-title font-semibold text-base sm:text-lg lg:text-xl self-center">-</span>
-
-            {/* Max Price */}
-            <div className="flex items-center gap-1.5 flex-1 min-w-0">
-              <span className="text-title font-semibold text-sm sm:text-base">$</span>
-              <input
-                type="number"
-                min={MIN_PRICE}
-                max={MAX_PRICE}
-                value={maxPrice}
-                onChange={(e) => handleMaxPriceChange(e.target.value)}
-                className="flex-1 min-w-0 max-w-[90px] bg-bg2 px-2 sm:px-3 py-2 rounded-lg border border-gray-200 text-title font-semibold text-sm sm:text-base text-center outline-none focus:border-theme focus:ring-2 focus:ring-theme/20 transition-all"
-              />
-            </div>
-          </div>
-
-          {/* Filter Button */}
-          <button
-            onClick={handleFilter}
-            className="w-full py-2.5 sm:py-3 lg:py-3.5 bg-theme text-white font-['Epilogue',sans-serif] text-xs sm:text-sm lg:text-base font-bold uppercase rounded-lg transition-all duration-300 hover:bg-theme2 hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-theme/50"
-          >
-            Filter
-          </button>
-        </div>
       </div>
 
       {/* Recent Products Widget - Desktop Only */}

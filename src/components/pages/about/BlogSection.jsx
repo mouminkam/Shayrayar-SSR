@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, User, Tag } from "lucide-react";
 
 import "swiper/swiper-bundle.css";
 
@@ -65,21 +65,21 @@ export default function BlogSection() {
         {/* Title */}
         <div className="text-center mb-12 lg:mb-16">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Image
+            {/* <Image
               src="/img/icon/titleIcon.svg"
               alt="icon"
               width={20}
               height={20}
-            />
-            <span className="text-theme2 font-['Epilogue',sans-serif] text-base font-bold uppercase">
+            /> */}
+            <span className="text-theme3 font-['Epilogue',sans-serif] text-2xl font-bold uppercase">
               LATEST NEWS
             </span>
-            <Image
+            {/* <Image
               src="/img/icon/titleIcon.svg"
               alt="icon"
               width={20}
               height={20}
-            />
+            /> */}
           </div>
           <h2 className="text-white font-['Epilogue',sans-serif] text-3xl sm:text-4xl lg:text-5xl font-black">
             Our Latest Foods News
@@ -107,7 +107,7 @@ export default function BlogSection() {
           >
             {blogs.map((blog, index) => (
               <SwiperSlide key={index} className="h-auto">
-                <div className="bg-white rounded-3xl overflow-hidden shadow-lg transition-all duration-300 hover:-translate-y-2 group h-full flex flex-col">
+                <div className="bg-bgimg rounded-3xl overflow-hidden shadow-lg transition-all duration-300 hover:-translate-y-2 group h-full flex flex-col">
                   {/* Image */}
                   <div className="relative overflow-hidden h-64 shrink-0">
                     <Image
@@ -125,35 +125,23 @@ export default function BlogSection() {
                   <div className="p-6 sm:p-8 flex flex-col flex-1">
                     {/* Meta */}
                     <div className="flex items-center gap-5 mb-5">
-                      <div className="bg-theme text-white px-4 py-2 rounded-xl text-center">
+                      <div className="bg-theme3 text-white px-4 py-2 rounded-xl text-center">
                         <h6 className="text-2xl font-bold">{blog.date}</h6>
                         <p className="text-sm">{blog.month}</p>
                       </div>
-                      <div className="flex items-center gap-2 text-text text-sm">
-                        <Image
-                          src="/img/icon/user.svg"
-                          alt="icon"
-                          width={16}
-                          height={16}
-                          className="w-5 h-5"
-                        />
+                      <div className="flex items-center gap-2 text-white text-sm">
+                        <User className="w-5 h-5 text-theme3" />
                         <span>{blog.author}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-text text-sm">
-                        <Image
-                          src="/img/icon/tag.svg"
-                          alt="icon"
-                          width={16}
-                          height={16}
-                          className="w-5 h-5"
-                        />
+                      <div className="flex items-center gap-2 text-white text-sm">
+                        <Tag className="w-5 h-5 text-theme3 " />
                         <span>{blog.category}</span>
                       </div>
                     </div>
 
                     {/* Title */}
                     <Link href="/blog-details" className="flex-1">
-                      <h3 className="text-title font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold mb-4 hover:text-theme transition-colors duration-300 line-clamp-2">
+                      <h3 className="text-white font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold mb-4 hover:text-theme transition-colors duration-300 line-clamp-2">
                         {blog.title}
                       </h3>
                     </Link>
@@ -161,10 +149,10 @@ export default function BlogSection() {
                     {/* Read More */}
                     <Link
                       href="/blog-details"
-                      className="text-theme font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all duration-300 mt-auto"
+                      className="text-theme3 font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all duration-300 mt-auto"
                     >
                       <span>Read More</span>
-                      <ArrowRight className="w-5 h-5 text-theme" />
+                      <ArrowRight className="w-5 h-5 text-theme3" />
                     </Link>
                   </div>
                 </div>

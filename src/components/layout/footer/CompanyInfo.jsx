@@ -32,37 +32,37 @@ export default function CompanyInfo() {
           href="https://facebook.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-9 h-9 border border-white/20 rounded flex items-center justify-center hover:bg-[#EB0029] hover:border-[#EB0029] transition-all duration-300"
+          className="w-9 h-9 border border-white/20 rounded flex items-center justify-center hover:bg-white hover:border-theme3 transition-all duration-300 group"
           aria-label="Facebook"
         >
-          <Facebook className="w-4 h-4 text-white" />
+          <Facebook className="w-4 h-4 text-white group-hover:text-theme3 transition-colors duration-300" />
         </a>
         <a
           href="https://twitter.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-9 h-9 border border-white/20 rounded flex items-center justify-center hover:bg-[#EB0029] hover:border-[#EB0029] transition-all duration-300"
+          className="w-9 h-9 border border-white/20 rounded flex items-center justify-center hover:bg-white hover:border-theme3 transition-all duration-300 group"
           aria-label="Twitter"
         >
-          <Twitter className="w-4 h-4 text-white" />
+          <Twitter className="w-4 h-4 text-white group-hover:text-theme3 transition-colors duration-300" />
         </a>
         <a
           href="https://linkedin.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-9 h-9 border border-white/20 rounded flex items-center justify-center hover:bg-[#EB0029] hover:border-[#EB0029] transition-all duration-300"
+          className="w-9 h-9 border border-white/20 rounded flex items-center justify-center hover:bg-white hover:border-theme3 transition-all duration-300 group"
           aria-label="LinkedIn"
         >
-          <Linkedin className="w-4 h-4 text-white" />
+          <Linkedin className="w-4 h-4 text-white group-hover:text-theme3 transition-colors duration-300" />
         </a>
         <a
           href="https://youtube.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-9 h-9 border border-white/20 rounded flex items-center justify-center hover:bg-[#EB0029] hover:border-[#EB0029] transition-all duration-300"
+          className="w-9 h-9 border border-white/20 rounded flex items-center justify-center hover:bg-white hover:border-theme3 transition-all duration-300 group"
           aria-label="YouTube"
         >
-          <Youtube className="w-4 h-4 text-white" />
+          <Youtube className="w-4 h-4 text-white group-hover:text-theme3 transition-colors duration-300" />
         </a>
       </div>
     </div>

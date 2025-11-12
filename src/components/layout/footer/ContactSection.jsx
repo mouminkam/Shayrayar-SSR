@@ -9,7 +9,7 @@ export default function ContactSection() {
         <h3 className="text-white text-xl sm:text-2xl font-bold inline-block relative pb-4 sm:pb-5">
           Contact Us
           {/* Orange Line */}
-          <span className="absolute bottom-0 left-0 w-6 h-0.5 bg-[#FC791A]"></span>
+          <span className="absolute bottom-0 left-0 w-6 h-0.5 bg-theme3"></span>
           {/* White Line */}
           <span className="absolute bottom-0 left-10 w-12 sm:w-14 h-0.5 bg-white"></span>
         </h3>
@@ -20,13 +20,13 @@ export default function ContactSection() {
         <li className="mb-2">
           <span className="text-white text-sm sm:text-base">
             Monday – Friday:{" "}
-            <span className="text-[#FC791A] font-semibold">8am – 4pm</span>
+            <span className="text-theme3 font-semibold">8am – 4pm</span>
           </span>
         </li>
         <li>
           <span className="text-white text-sm sm:text-base">
             Saturday:{" "}
-            <span className="text-[#FC791A] font-semibold">8am – 12am</span>
+            <span className="text-theme3 font-semibold">8am – 12am</span>
           </span>
         </li>
       </ul>
@@ -41,7 +41,7 @@ export default function ContactSection() {
           />
           <button
             type="submit"
-            className="bg-[#FC791A] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#FC791A]/90 transition-colors shrink-0"
+            className="bg-theme3 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-theme transition-colors shrink-0"
             aria-label="Subscribe"
           >
             <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -53,7 +53,7 @@ export default function ContactSection() {
           <input
             type="checkbox"
             id="privacy-checkbox"
-            className="mt-1 w-4 h-4 rounded border-gray-400 text-[#EB0029] focus:ring-[#EB0029] cursor-pointer shrink-0"
+            className="mt-1 w-4 h-4 rounded border-gray-400 text-theme3 focus:ring-theme3 cursor-pointer shrink-0"
           />
           <label
             htmlFor="privacy-checkbox"
@@ -62,7 +62,7 @@ export default function ContactSection() {
             I agree to the{" "}
             <Link
               href="/privacy-policy"
-              className="text-white underline hover:text-[#FC791A] transition-colors"
+              className="text-white underline hover:text-theme3 transition-colors"
             >
               Privacy Policy.
             </Link>

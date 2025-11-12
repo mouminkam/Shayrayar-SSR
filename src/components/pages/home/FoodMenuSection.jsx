@@ -3,7 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function FoodMenuSection() {
+export default function fFoodMenuSection() {
   const [activeTab, setActiveTab] = useState("FastFood");
 
   const menuItems = {
@@ -73,24 +73,24 @@ export default function FoodMenuSection() {
           <div className="food-menu-tab-wrapper">
             {/* Title Area */}
             <div className="title-area text-center mb-12 lg:mb-16">
-              <div className="sub-title text-theme2 font-epilogue text-base font-bold uppercase mb-4 flex items-center justify-center gap-2">
-                <Image
+              <div className="sub-title text-theme3 font-epilogue text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
+                {/* <Image
                   className="me-1"
                   src="/img/icon/titleIcon.svg"
                   alt="icon"
                   width={20}
                   height={20}
                   unoptimized={true}
-                />
+                /> */}
                 FOOD MENU
-                <Image
+                {/* <Image
                   className="ms-1"
                   src="/img/icon/titleIcon.svg"
                   alt="icon"
                   width={20}
                   height={20}
                   unoptimized={true}
-                />
+                /> */}
               </div>
               <h2 className="title text-white font-epilogue text-3xl sm:text-4xl lg:text-5xl font-black">
                 Fresheat Foods Menu
@@ -103,7 +103,7 @@ export default function FoodMenuSection() {
                 {tabs.map((tab) => (
                   <li key={tab.id} className="nav-item mb-10" role="presentation">
                     <button
-                      className={`nav-link px-6 py-3 rounded-xl font-epilogue text-base font-medium transition-all duration-300 flex items-center gap-2 ${activeTab === tab.id
+                      className={`nav-link px-6 py-3 rounded-xl font-epilogue text-base cursor-pointer font-medium transition-all duration-300 flex items-center gap-2 ${activeTab === tab.id
                         ? "bg-theme text-white"
                         : "text-white hover:bg-theme hover:text-white"
                         }`}
@@ -125,14 +125,14 @@ export default function FoodMenuSection() {
               </ul>
 
               {/* Tab Content */}
-              <div className="tab-content px-20">
+              <div className="tab-content sm:px-20">
                 <div
                   className={`tab-pane ${activeTab === "FastFood" ? "show active" : ""}`}
                   role="tabpanel"
                 >
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 ">
                     {currentItems.map((item) => (
-                      <div key={item.id} className="single-menu-items  flex items-center gap-6 p-4 rounded-2xl  shadow-lg hover:shadow-xl transition-all duration-300">
+                      <div key={item.id} className="single-menu-items border-2 border-bgimg flex items-center gap-6 p-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
                         <div className="menu-item-thumb shrink-0">
                           <Image
                             src={item.image}

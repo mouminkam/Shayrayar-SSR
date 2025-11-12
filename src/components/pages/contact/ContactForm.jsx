@@ -48,7 +48,7 @@ export default function ContactForm() {
             </div>
 
             {/* Form Section */}
-            <div className="w-full lg:w-1/2 xl:w-[45%] flex border-2 ">
+            <div className="w-full lg:w-1/2 xl:w-[45%] flex border-2">
               <div className="contact-form style2 bg-white rounded-2xl p-6 sm:p-8 lg:p-10 shadow-lg w-full">
                 <h2 className="text-title font-['Epilogue',sans-serif] text-2xl sm:text-3xl lg:text-4xl font-black mb-6 capitalize">
                   Get in Touch

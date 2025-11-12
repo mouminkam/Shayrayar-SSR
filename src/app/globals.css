@@ -4,10 +4,12 @@
 @theme {
   --color-theme: #EB0029;
   --color-theme2: #FC791A;
+  --color-theme3: #FFBA00;
   --color-title: #010F1C;
   --color-text: #99A1AF;
   --color-bg2: #F4F1EA;
   --color-bg3: black;
+  /* --color-bg3: #131313; */
   --color-bgimg: #1E1E1E;
 }
 

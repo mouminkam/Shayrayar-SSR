@@ -49,21 +49,21 @@ export default function ChefeSection() {
         {/* Title */}
         <div className="text-center mb-12 lg:mb-16">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Image
+            {/* <Image
               src="/img/icon/titleIcon.svg"
               alt="icon"
               width={20}
               height={20}
-            />
-            <span className="text-theme2 font-['Epilogue',sans-serif] text-base font-bold uppercase">
+            /> */}
+            <span className="text-theme3 font-['Epilogue',sans-serif] text-3xl font-bold uppercase">
               OUR CHEFE
             </span>
-            <Image
+            {/* <Image
               src="/img/icon/titleIcon.svg"
               alt="icon"
               width={20}
               height={20}
-            />
+            /> */}
           </div>
           <h2 className="text-white font-['Epilogue',sans-serif] text-3xl sm:text-4xl lg:text-5xl font-black">
             Meet Our Expert Chefe

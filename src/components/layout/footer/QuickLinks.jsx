@@ -17,7 +17,7 @@ export default function QuickLinks() {
         <h3 className="text-white text-xl sm:text-2xl font-bold inline-block relative pb-4 sm:pb-5">
           Quick Links
           {/* Orange Line */}
-          <span className="absolute bottom-0 left-0 w-6 h-0.5 bg-[#FC791A]"></span>
+          <span className="absolute bottom-0 left-0 w-6 h-0.5 bg-theme3"></span>
           {/* White Line */}
           <span className="absolute bottom-0 left-10 w-12 sm:w-14 h-0.5 bg-white"></span>
         </h3>
@@ -27,7 +27,7 @@ export default function QuickLinks() {
           <li key={index} className="transition-all duration-300 hover:translate-x-1">
             <Link
               href={link.href}
-              className="flex items-center gap-2 text-white hover:text-[#EB0029] transition-colors duration-300"
+              className="flex items-center gap-2 text-white hover:text-theme3 transition-colors duration-300"
             >
               <ChevronsRight className="w-4 h-4" />
               <span>{link.label}</span>

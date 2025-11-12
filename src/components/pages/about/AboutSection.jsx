@@ -19,7 +19,7 @@ export default function AboutSection() {
   return (
     <section className="py-12 sm:py-16 md:py-20 lg:py-24 pt-0 relative bg-bg3 ">
       <div className="container mx-auto  ">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 sm:gap-8 lg:gap-12 items-center">
           {/* Image */}
           <div className="relative border-r-3 border-y-2 border-theme2 rounded-r-full ">
             <Image
@@ -49,7 +49,7 @@ export default function AboutSection() {
           </div>
 
           {/* Content */}
-          <div className="relative z-10">
+          <div className="relative z-10 ">
             <div className="flex items-center justify-center sm:justify-start gap-2 mb-4">
               <Image
                 src="/img/icon/titleIcon.svg"
@@ -77,7 +77,7 @@ export default function AboutSection() {
             </p>
 
             {/* Features */}
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-5 px-15 sm:px-0">
               {features.map((feature, index) => (
                 <div key={index} className="flex items-center gap-5">
                   <div className="shrink-0">

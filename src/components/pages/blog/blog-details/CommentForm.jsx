@@ -38,7 +38,7 @@ export default function CommentForm() {
               placeholder="Your Name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-5 py-4 border border-gray-200 rounded-lg bg-transparent text-text font-['Roboto',sans-serif] text-base focus:outline-none focus:border-theme transition-colors duration-300"
+              className="w-full px-5 py-4 border border-gray-200 rounded-lg bg-transparent text-white font-['Roboto',sans-serif] text-base focus:outline-none focus:border-theme transition-colors duration-300"
               required
             />
           </div>
@@ -50,7 +50,7 @@ export default function CommentForm() {
               placeholder="Your Email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-5 py-4 border border-gray-200 rounded-lg bg-transparent text-text font-['Roboto',sans-serif] text-base focus:outline-none focus:border-theme transition-colors duration-300"
+              className="w-full px-5 py-4 border border-gray-200 rounded-lg bg-transparent text-white font-['Roboto',sans-serif] text-base focus:outline-none focus:border-theme transition-colors duration-300"
               required
             />
           </div>
@@ -63,7 +63,7 @@ export default function CommentForm() {
             rows="6"
             value={formData.message}
             onChange={handleChange}
-            className="w-full px-5 py-4 pb-24 border border-gray-200 rounded-lg bg-transparent text-text font-['Roboto',sans-serif] text-base resize-y focus:outline-none focus:border-theme transition-colors duration-300"
+            className="w-full px-5 py-4 pb-24 border border-gray-200 rounded-lg bg-transparent text-white font-['Roboto',sans-serif] text-base resize-y focus:outline-none focus:border-theme transition-colors duration-300"
             required
           ></textarea>
         </div>

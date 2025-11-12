@@ -83,23 +83,23 @@ export default function TestimonialSection() {
               {/* Title Area */}
               <div className="mb-8 sm:mb-10 lg:mb-12">
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <Image
+                  {/* <Image
                     src="/img/icon/titleIcon.svg"
                     alt="icon"
                     width={20}
                     height={20}
                     className="w-4 h-4 sm:w-5 sm:h-5"
-                  />
-                  <span className="text-theme2 font-['Epilogue',sans-serif] text-sm sm:text-base font-bold uppercase">
+                  /> */}
+                  <span className="text-theme3 font-['Epilogue',sans-serif] text-2xl font-bold uppercase">
                     Testimonials
                   </span>
-                  <Image
+                  {/* <Image
                     src="/img/icon/titleIcon.svg"
                     alt="icon"
                     width={20}
                     height={20}
                     className="w-4 h-4 sm:w-5 sm:h-5"
-                  />
+                  /> */}
                 </div>
                 <h2 className="text-white font-['Epilogue',sans-serif] text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-center">
                   What our Clients Say

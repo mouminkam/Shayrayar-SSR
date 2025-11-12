@@ -11,7 +11,7 @@ import BlogSection from "../../components/pages/about/BlogSection";
 export default function AboutUsPage() {
   return (
     <div className="bg-bg3 min-h-screen">
-      <Breadcrumb title="About Us 02" />
+      <Breadcrumb title="About Us" />
       <OfferCards />
       <AboutSection />
       <MarqueeSection />

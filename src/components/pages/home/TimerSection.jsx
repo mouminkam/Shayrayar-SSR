@@ -94,24 +94,24 @@ export default function TimerSection() {
                 {/* Content */}
                 <div className="timer-card style1">
                   <div className="title-area text-center lg:text-left mb-8">
-                    <div className="sub-title text-theme2 font-epilogue text-base font-bold uppercase mb-4 flex items-center justify-center lg:justify-start gap-2">
-                      <Image
+                    <div className="sub-title text-theme2 font-epilogue text-2xl font-bold uppercase mb-4 flex items-center justify-center lg:justify-start gap-2">
+                      {/* <Image
                         className="me-1"
                         src="/img/icon/titleIcon.svg"
                         alt="icon"
                         width={20}
                         height={20}
                         unoptimized={true}
-                      />
+                      /> */}
                       Special Offer
-                      <Image
+                      {/* <Image
                         className="ms-1"
                         src="/img/icon/titleIcon.svg"
                         alt="icon"
                         width={20}
                         height={20}
                         unoptimized={true}
-                      />
+                      /> */}
                     </div>
                     <h2 className="title text-white font-epilogue text-3xl sm:text-4xl lg:text-5xl font-black">
                       Get 30% Discount Every Item
@@ -149,7 +149,7 @@ export default function TimerSection() {
                   {/* Button */}
                   <div className="btn-wrap flex justify-center lg:justify-start">
                     <Link
-                      className="theme-btn px-8 py-3 mb-8 bg-theme text-white font-roboto text-base font-medium hover:bg-theme2 transition-all duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
+                      className="theme-btn px-8 py-3 mb-8 bg-theme2 text-white font-roboto text-base font-medium hover:bg-theme transition-all duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
                       href="/menu"
                     >
                       ORDER NOW

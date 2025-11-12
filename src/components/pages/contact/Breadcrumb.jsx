@@ -1,23 +1,35 @@
 "use client";
 import Link from "next/link";
 
-export default function Breadcrumb({ title = "Contact us" }) {
+export default function Breadcrumb({ title }) {
   return (
-    <div className="relative">
+    <section className="relative">
       <div
         className="relative bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: "url('/img/bg/breadcumb.jpg')",
-          minHeight: "400px",
         }}
       >
-        <div className="absolute inset-0 "></div>
-        <div className="relative container mx-auto px-4 sm:px-6 md:px-8">
-          <div className="flex flex-col items-center justify-center min-h-[400px] py-20 sm:py-32">
-            <h1 className="text-white font-['Epilogue',sans-serif] text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight text-center mb-6 uppercase">
+        {/* Overlay للتظليل من الجوانب والأسفل فقط */}
+        <div 
+          className="absolute inset-0 pointer-events-none z-5"
+          style={{
+            background: `
+              linear-gradient(to left, rgba(0,0,0,0.7) 0%, transparent 30%),
+              linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 30%),
+              linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 40%)
+            `,
+            backgroundBlendMode: 'normal'
+          }}
+        ></div>
+
+        {/* محتوى البريدكرامب */}
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10">
+          <div className="py-40 text-center">
+            <h1 className="text-white font-['Epilogue',sans-serif] text-4xl sm:text-5xl lg:text-6xl font-black leading-tight uppercase mb-4">
               {title}
             </h1>
-            <ul className="flex items-center justify-center gap-4">
+            <ul className="flex justify-center items-center gap-4">
               <li>
                 <Link
                   href="/"
@@ -32,7 +44,7 @@ export default function Breadcrumb({ title = "Contact us" }) {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 

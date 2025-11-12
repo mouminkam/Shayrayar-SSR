@@ -1,7 +1,8 @@
 "use client";
-import { useRef } from "react";
+import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay, EffectFade } from "swiper/modules";
+import { Autoplay, EffectFade } from "swiper/modules";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -9,7 +10,8 @@ import { ArrowRight } from "lucide-react";
 import "swiper/swiper-bundle.css";
 
 export default function BannerSection() {
-  const swiperRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
   const slides = [
     {
       id: 1,
@@ -40,34 +42,23 @@ export default function BannerSection() {
     },
   ];
 
+  const currentSlide = slides[activeIndex];
+
   return (
     <section className="banner-section fix mb-8">
-      <div className="slider-area">
+      <div className="slider-area relative">
         <Swiper
-          modules={[Navigation, Pagination, Autoplay, EffectFade]}
+          modules={[Autoplay, EffectFade]}
           spaceBetween={0}
           slidesPerView={1}
           loop={true}
           effect="fade"
-          speed={4000}
+          speed={800}
           autoplay={{
-            delay: 5000,
+            delay: 3000,
             disableOnInteraction: false,
           }}
-          navigation={{
-            nextEl: ".arrow-next",
-            prevEl: ".arrow-prev",
-          }}
-          pagination={{
-            el: ".pagination-class",
-            clickable: true,
-            renderBullet: function (index, className) {
-              return `<span class="${className}">${index + 1}</span>`;
-            },
-          }}
-          onSwiper={(swiper) => {
-            swiperRef.current = swiper;
-          }}
+          onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
           className="banner-slider"
         >
           {slides.map((slide) => (
@@ -134,59 +125,96 @@ export default function BannerSection() {
 
                 {/* Overlay */}
                 <div className="overlay absolute inset-0 bg-title opacity-30"></div>
-
-                {/* Content */}
-                <div className="banner-container relative z-50 py-12 sm:py-16 md:py-20 lg:py-32 xl:py-40 mt-18 sm:mt-20 md:mt-0 lg:mt-0">
-                  <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
-                      {/* Image - Right Side (Top on Mobile/Tablet) */}
-                      <div className="col-span-1 lg:col-span-1 order-1 lg:order-2 flex justify-center lg:justify-end items-center">
-                        <div className="banner-thumb-area relative z-50 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl">
-                          <Image
-                            src={slide.image}
-                            alt="banner"
-                            width={600}
-                            height={600}
-                            className="w-full h-auto object-contain"
-                            unoptimized={true}
-                            priority={true}
-                          />
-                        </div>
-                      </div>
-                      {/* Text Content - Left Side (Bottom on Mobile/Tablet) */}
-                      <div className="col-span-1 lg:col-span-1 order-2 lg:order-1 mt-15 sm:mt-0 w-full lg:w-auto">
-                        <div className="banner-title-area w-full lg:w-auto">
-                          <div className="banner-style1 w-full lg:w-auto">
-                            <div className="section-title text-center lg:text-left w-full lg:w-auto">
-                              <h6 className="sub-title text-theme2 font-epilogue text-sm sm:text-2xl font-extrabold uppercase mb-3 sm:mb-1">
-                                {slide.subtitle}
-                              </h6>
-                              <h1 className="title text-white font-epilogue text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-black leading-tight mb-4 sm:mb-6">
-                                {slide.title}
-                              </h1>
-                              <div className="flex justify-center lg:justify-start">
-                                <Link
-                                  className="theme-btn px-6 py-2.5 sm:px-8 sm:py-3 bg-theme text-white font-roboto text-sm sm:text-base font-medium hover:bg-theme2 transition-all duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
-                                  href={slide.link}
-                                >
-                                  ORDER NOW
-                                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                                </Link>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </SwiperSlide>
           ))}
         </Swiper>
 
+        {/* Fixed Content Container */}
+        <div className="banner-container absolute inset-0 z-50 py-12 sm:py-16 md:py-20 lg:py-32 xl:py-40 mt-18 sm:mt-20 md:mt-0 lg:mt-0 pointer-events-none">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 h-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center h-full">
+              {/* Image - Right Side */}
+              <div className="col-span-1 lg:col-span-1 order-1 lg:order-2 flex justify-center lg:justify-end items-center overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentSlide.id}
+                    initial={{ x: "100%", opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: "100%", opacity: 0 }}
+                    transition={{ type: "tween", duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+                    className="banner-thumb-area relative z-50 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl pointer-events-auto"
+                  >
+                    <Image
+                      src={currentSlide.image}
+                      alt="banner"
+                      width={600}
+                      height={600}
+                      className="w-full h-auto object-contain"
+                      unoptimized={true}
+                      priority={activeIndex === 0}
+                    />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Text Content - Left Side - Fixed Container */}
+              <div className="col-span-1 lg:col-span-1 order-2 lg:order-1 mt-15 sm:mt-0 w-full lg:w-auto">
+                <div className="banner-title-area w-full lg:w-auto relative min-h-[200px] sm:min-h-[250px] lg:min-h-[300px]">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentSlide.id}
+                      initial={{ x: "-100%", opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: "-100%", opacity: 0 }}
+                      transition={{ type: "tween", duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+                      className="banner-style1 w-full lg:w-auto pointer-events-auto"
+                    >
+                      <div className="section-title text-center lg:text-left w-full lg:w-auto">
+                        <motion.h6
+                          initial={{ y: -20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+                          className="sub-title text-theme font-epilogue text-sm sm:text-2xl font-extrabold uppercase mb-3 sm:mb-1"
+                        >
+                          {currentSlide.subtitle}
+                        </motion.h6>
+                        <motion.h1
+                          initial={{ y: -20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
+                          className="title text-white font-epilogue text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-black leading-tight mb-4 sm:mb-6"
+                        >
+                          {currentSlide.title}
+                        </motion.h1>
+                        <motion.div
+                          initial={{ y: 20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+                          className="flex justify-center lg:justify-start"
+                        >
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <Link
+                              className="theme-btn px-6 py-2.5 sm:px-8 sm:py-3 bg-theme3 text-white font-roboto text-sm sm:text-base font-medium hover:bg-theme transition-colors duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
+                              href={currentSlide.link}
+                            >
+                              ORDER NOW
+                              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                            </Link>
+                          </motion.div>
+                        </motion.div>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
-

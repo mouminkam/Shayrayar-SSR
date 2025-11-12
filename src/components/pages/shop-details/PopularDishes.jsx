@@ -43,39 +43,39 @@ export default function PopularDishes() {
   ];
 
   return (
-    <section className="popular-dishes-section py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
+    <section className="popular-dishes-section py-0 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
       <div className="popular-dishes-wrapper style1">
         <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
           <div className="title-area mb-12 sm:mb-14">
-            <div className="sub-title text-center text-theme2 font-['Epilogue',sans-serif] text-lg font-bold uppercase mb-4 flex items-center justify-center gap-2">
-              <Image
+            <div className="sub-title text-center text-theme3 font-['Epilogue',sans-serif] text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
+              {/* <Image
                 src="/img/icon/titleIcon.svg"
                 alt="icon"
                 width={20}
                 height={20}
                 className="w-5 h-5"
                 unoptimized={true}
-              />
+              /> */}
               POPULAR DISHES
-              <Image
+              {/* <Image
                 src="/img/icon/titleIcon.svg"
                 alt="icon"
                 width={20}
                 height={20}
                 className="w-5 h-5"
                 unoptimized={true}
-              />
+              /> */}
             </div>
             <div className="title text-center text-white font-['Epilogue',sans-serif] text-3xl sm:text-5xl font-black capitalize">
               Best selling Dishes
             </div>
           </div>
 
-          <div className="dishes-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 sm:gap-8 ">
+          <div className="dishes-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 sm:gap-8 cursor-pointer">
             {dishes.map((dish) => (
               <div
                 key={dish.id}
-                className="dishes-card style1 group relative p-6 rounded-2xl mt-8 border-2 border-theme2 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 overflow-hidden"
+                className="dishes-card style1 group relative p-6 rounded-2xl mt-8 border-2 border-bgimg text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 overflow-hidden"
               >
                 {/* Background Image Overlay */}
                 <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0 bg-[url('/img/bg/dishesThumbBG.png')]" />
@@ -119,14 +119,14 @@ export default function PopularDishes() {
                   </div>
 
                   <Link href="/menu">
-                    <h3 className="text-white group-hover:text-white font-['Epilogue',sans-serif] text-xl font-bold mb-4 hover:text-theme transition-colors duration-300">
+                    <h3 className="text-theme3  font-['Epilogue',sans-serif] text-xl font-bold mb-4 transition-colors duration-300">
                       {dish.title}
                     </h3>
                   </Link>
-                  <p className="text-text group-hover:text-white text-center font-['Roboto',sans-serif] text-base font-normal mb-4 transition-colors duration-300">
+                  <p className="text-text  text-center font-['Roboto',sans-serif] text-base font-normal mb-4 transition-colors duration-300">
                     {dish.description}
                   </p>
-                  <h6 className="text-theme group-hover:text-white text-center font-['Epilogue',sans-serif] text-lg font-bold transition-colors duration-300">
+                  <h6 className="text-theme  text-center font-['Epilogue',sans-serif] text-lg font-bold transition-colors duration-300">
                     ${dish.price}
                   </h6>
                 </div>

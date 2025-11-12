@@ -78,25 +78,25 @@ export default function BestFoodItemsSection() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Title Area */}
           <div className="title-area text-center mt-10">
-            <div className="sub-title text-theme2 font-epilogue text-lg font-bold uppercase mb-4 flex items-center justify-center gap-2">
-              <Image
+            <div className="sub-title text-theme3 font-epilogue text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
+              {/* <Image
                 className="me-1"
                 src="/img/icon/titleIcon.svg"
                 alt="icon"
                 width={20}
                 height={20}
                 unoptimized={true}
-              />
+              /> */}
               Best Food
-              <Image
+              {/* <Image
                 src="/img/icon/titleIcon.svg"
                 alt="icon"
                 width={20}
                 height={20}
                 unoptimized={true}
-              />
+              /> */}
             </div>
-            <h2 className="title text-white font-epilogue text-3xl sm:text-4xl lg:text-5xl font-black">
+            <h2 className="title text-white mb-4 sm:mb-8 font-epilogue text-3xl sm:text-4xl lg:text-5xl font-black">
               Popular Food Items
             </h2>
           </div>
@@ -166,11 +166,11 @@ export default function BestFoodItemsSection() {
                     <div className="item-content mt-20 flex flex-col grow justify-between">
                       <div>
                         <Link href="/menu">
-                          <h3 className="text-white font-epilogue text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
+                          <h3 className="text-theme3 font-epilogue text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
                             {item.title}
                           </h3>
                         </Link>
-                        <p className="text-text font-roboto text-sm sm:text-base mb-4 line-clamp-2">{item.description}</p>
+                        <p className="text-white font-roboto text-sm sm:text-base mb-4 line-clamp-2">{item.description}</p>
                       </div>
                       <h6 className="text-theme font-epilogue text-base sm:text-lg font-bold mt-auto">${item.price.toFixed(2)}</h6>
                     </div>
