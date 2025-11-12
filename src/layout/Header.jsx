@@ -122,12 +122,12 @@ const FreshHeatHeader = () => {
           }`}
       >
         {/* Logo and Navigation */}
-        <div className="flex items-center bg-bg2">
+        <div className="flex items-center bg-bg3">
           {/* Logo Section */}
           <div className="px-10 w-1/5 flex">
             <div className="p-0 transform ">
               <Image
-                src={`/img/logo/logowhite.svg` || `/img/logo/logo.svg`}
+                src={`/img/logo/logowhite.svg`}
                 alt="logo"
                 width={100}
                 height={100}
