@@ -141,7 +141,7 @@ export default function BlogSection() {
 
                     {/* Title */}
                     <Link href="/blog-details" className="flex-1">
-                      <h3 className="text-white font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold mb-4 hover:text-theme transition-colors duration-300 line-clamp-2">
+                      <h3 className="text-white font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold mb-4  transition-colors duration-300 line-clamp-2">
                         {blog.title}
                       </h3>
                     </Link>

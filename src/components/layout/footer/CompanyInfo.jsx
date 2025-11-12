@@ -10,11 +10,11 @@ export default function CompanyInfo() {
       <div className="mb-6 sm:mb-8">
         <Link href="/" className="inline-block">
           <Image
-            src="/img/logo/logoWhite.svg"
+            src="/img/logo/mainlogo.png"
             alt="logo"
             width={180}
             height={72}
-            className="h-12 sm:h-14 md:h-16 w-auto object-contain"
+            className="h-14 sm:h-16 md:h-18 w-auto object-contain"
             priority
           />
         </Link>
