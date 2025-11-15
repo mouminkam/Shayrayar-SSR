@@ -1,7 +1,7 @@
 "use client";
 import { Suspense } from "react";
-import Breadcrumb from "../../components/pages/blog/Breadcrumb";
-import BlogSection from "../../components/pages/blog/BlogSection";
+import Breadcrumb from "../../components/ui/Breadcrumb";
+import BlogSection from "../../sections/blog/BlogSection";
 
 function BlogSectionFallback() {
   return (

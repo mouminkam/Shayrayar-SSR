@@ -7,6 +7,9 @@ import ShopSidebar from "./ShopSidebar";
 import SortBar from "./SortBar";
 import ProductCard from "./ProductCard";
 import Pagination from "../blog/Pagination";
+import { Star } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 
 // Constants
 const ITEMS_PER_PAGE_GRID = 12;
@@ -236,56 +239,94 @@ export default function ShopSection() {
               )}
 
               {/* Recent Products Widget - Mobile/Tablet Only */}
-              <div className="block lg:hidden w-full mt-8">
-                <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm">
-                  <h5 className="text-title font-['Epilogue',sans-serif] text-lg sm:text-xl font-bold relative pb-3 mb-6 capitalize">
-                    Recent Products
-                    <span className="absolute bottom-0 left-0 h-0.5 w-16 sm:w-20 bg-theme"></span>
+              <div className="block lg:hidden w-full mt-12">
+                <div className="bg-linear-to-br from-bgimg/80 via-bgimg to-bgimg/95 backdrop-blur-sm p-8 rounded-3xl shadow-2xl shadow-theme3/10 relative overflow-hidden">
+                  {/* Subtle gradient overlay */}
+                  <div className="absolute inset-0 bg-linear-to-br from-theme3/5 to-transparent opacity-20 pointer-events-none"></div>
+
+                  <h5 className="text-white font-['Epilogue',sans-serif] text-xl sm:text-2xl font-black relative pb-4 mb-8 capitalize text-center">
+                    <span className="relative z-10 bg-linear-to-r from-theme3 to-theme bg-clip-text text-transparent drop-shadow-lg">
+                      Recent Products
+                    </span>
+                    <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-1 w-20 bg-linear-to-r from-theme to-theme3 rounded-full"></span>
                   </h5>
-                  <div className="space-y-4 sm:space-y-5">
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10">
                     {RECENT_PRODUCTS.map((product, index) => (
-                      <div
+                      <motion.div
                         key={index}
-                        className="p-4 sm:p-5 border border-gray-200 rounded-xl flex  items-center gap-4 sm:gap-5 transition-all duration-300 hover:border-theme hover:shadow-md hover:-translate-y-0.5"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: index * 0.1 }}
+                        className="group bg-linear-to-br from-white/5 via-bgimg to-black/90 backdrop-blur-md p-5 rounded-2xl  transition-all duration-500 relative overflow-hidden"
+                        whileHover={{ y: -4 }}
                       >
-                        <div className="shrink-0">
-                          <Image
-                            src={product.image}
-                            alt={product.title}
-                            width={70}
-                            height={70}
-                            className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-full"
-                            unoptimized={true}
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <Link
-                            href="/shop-details"
-                            className="text-title font-['Roboto',sans-serif] text-sm sm:text-base font-normal hover:text-theme transition-colors duration-300 block mb-2 line-clamp-2"
-                          >
-                            {product.title}
-                          </Link>
-                          <div className="mb-2">
-                            <Image
-                              src={product.rating}
-                              alt="rating"
-                              width={80}
-                              height={16}
-                              className="h-3 sm:h-4"
-                              unoptimized={true}
-                            />
+
+                        <div className="flex flex-col items-center text-center space-y-4">
+                          {/* Product Image with Floating Effect */}
+                          <div className="relative w-full flex justify-center">
+                            <div className="w-20 h-20 rounded-full bg-linear-to-br transition-all duration-500">
+                              <div className="w-full h-full rounded-full bg-bgimg/80 backdrop-blur-sm border border-white/10 group-hover:border-theme3/30 transition-all duration-500 flex items-center justify-center">
+                                <Image
+                                  src={product.image}
+                                  alt={product.title}
+                                  width={80}
+                                  height={80}
+                                  className="w-16 h-16 object-cover rounded-full transform group-hover:scale-110 transition-transform duration-500"
+                                  unoptimized={true}
+                                />
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-theme font-['Epilogue',sans-serif] text-sm sm:text-base font-bold">
-                              ${product.offerPrice}
-                            </span>
-                            <span className="text-text font-['Epilogue',sans-serif] text-xs sm:text-sm font-medium line-through opacity-60">
-                              ${product.regularPrice}
-                            </span>
+
+                          {/* Product Content */}
+                          <div className="space-y-3 flex-1 w-full">
+                            <Link
+                              href="/shop-details"
+                              className="text-theme3 font-['Epilogue',sans-serif] text-lg font-extrabold hover:text-theme transition-all duration-300 block line-clamp-2 group-hover:-translate-y-px"
+                            >
+                              {product.title}
+                            </Link>
+
+                            {/* Stars Rating */}
+                            <div className="flex items-center justify-center gap-0.5">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className="w-4 h-4 fill-theme3 text-theme3 transform group-hover:scale-110 transition-transform duration-300"
+                                />
+                              ))}
+                            </div>
+
+                            {/* Price */}
+                            <div className="flex items-center justify-center gap-3">
+                              <span className="text-theme font-['Epilogue',sans-serif] text-lg font-black bg-linear-to-r from-theme/10 to-theme3/10 px-3 py-1 rounded-full">
+                                ${product.offerPrice}
+                              </span>
+                              <span className="text-text font-['Epilogue',sans-serif] text-sm font-medium line-through opacity-70">
+                                ${product.regularPrice}
+                              </span>
+                            </div>
+
+                            {/* Quick Add Button */}
+                            <button className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white font-['Epilogue',sans-serif] text-sm font-semibold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-theme3/30 border border-theme3/20">
+                              Quick Add +
+                            </button>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
+                  </div>
+
+                  {/* View All Link */}
+                  <div className="text-center mt-8 pt-6 border-t border-white/10">
+                    <Link
+                      href="/shop"
+                      className="inline-flex items-center text-theme3 font-['Epilogue',sans-serif] text-sm font-semibold hover:text-theme transition-all duration-300 group"
+                    >
+                      View All Products
+                      <ArrowRight className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
+                    </Link>
                   </div>
                 </div>
               </div>

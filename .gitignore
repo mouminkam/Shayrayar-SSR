@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# documentation files
+CART_STORE_EXPLANATION.md
+RESTRUCTURING_DOCUMENTATION.md

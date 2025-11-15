@@ -1,8 +1,8 @@
 "use client";
-import Breadcrumb from "../../components/pages/contact/Breadcrumb";
-import ContactBoxes from "../../components/pages/contact/ContactBoxes";
-import ContactForm from "../../components/pages/contact/ContactForm";
-import Map from "../../components/pages/contact/Map";
+import Breadcrumb from "../../components/ui/Breadcrumb";
+import ContactBoxes from "../../sections/contact/ContactBoxes";
+import ContactForm from "../../sections/contact/ContactForm";
+import Map from "../../sections/contact/Map";
 
 export default function ContactPage() {
   return (

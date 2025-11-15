@@ -10,45 +10,34 @@ import {
   Twitter,
   Youtube,
   Linkedin,
+  User,
 } from "lucide-react";
-import SearchModal from "../components/layout/header/SearchModal";
-import CartDropdown from "../components/layout/header/CartDropdown";
-import Sidebar from "../components/layout/header/Sidebar";
+import SearchModal from "./header/SearchModal";
+import CartDropdown from "./header/CartDropdown";
+import UserDropdown from "./header/UserDropdown";
+import Sidebar from "./header/Sidebar";
+import { useCart } from "../../hooks/useCart";
+import { useScroll } from "../../hooks/useScroll";
+import useAuthStore from "../../store/authStore";
+import { NAV_LINKS, SOCIAL_LINKS, BUSINESS_HOURS, IMAGE_PATHS } from "../../data/constants";
 
 const FreshHeatHeader = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isUserOpen, setIsUserOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [activeHeader, setActiveHeader] = useState(null); // لتتبع آخر header تم عمل hover عليه
+  const [activeHeader, setActiveHeader] = useState(null);
   const cartTimeoutRef = useRef(null);
+  const userTimeoutRef = useRef(null);
 
-  // Sample cart items - يمكن استبدالها بـ state management أو context
-  const cartItems = [
-    {
-      id: 1,
-      name: "Fried Chicken",
-      price: 80.0,
-      quantity: 1,
-      image: "/img/blog/blogRecentThumb3_1.png",
-    },
-    {
-      id: 2,
-      name: "Fried Noodles",
-      price: 60.0,
-      quantity: 1,
-      image: "/img/blog/blogRecentThumb3_2.png",
-    },
-    {
-      id: 3,
-      name: "Special Pasta",
-      price: 70.0,
-      quantity: 1,
-      image: "/img/blog/blogRecentThumb3_3.png",
-    },
-  ];
+  // Use cart hook instead of hardcoded data
+  const { items: cartItems, itemCount: cartCount } = useCart();
 
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  // Use auth store
+  const { isAuthenticated, user } = useAuthStore();
+
+  // Use scroll hook
+  const isScrolled = useScroll(150);
 
   const handleSearchClick = () => {
     setIsSearchOpen(true);
@@ -60,16 +49,14 @@ const FreshHeatHeader = () => {
       clearTimeout(cartTimeoutRef.current);
       cartTimeoutRef.current = null;
     }
-    // Toggle cart - إذا كان مفتوح يغلق، وإذا كان مغلق يفتح
     setIsCartOpen((prev) => !prev);
-    // إلغاء focus بعد click لتجنب ظهور border
     if (document.activeElement) {
       document.activeElement.blur();
     }
   };
 
   const handleCartMouseEnter = (headerId) => {
-    setActiveHeader(headerId); // تحديث آخر header تم عمل hover عليه
+    setActiveHeader(headerId);
     if (cartTimeoutRef.current) {
       clearTimeout(cartTimeoutRef.current);
       cartTimeoutRef.current = null;
@@ -84,7 +71,7 @@ const FreshHeatHeader = () => {
     cartTimeoutRef.current = setTimeout(() => {
       setIsCartOpen(false);
       cartTimeoutRef.current = null;
-      setActiveHeader(null); // إعادة تعيين عند الإغلاق
+      setActiveHeader(null);
     }, 300);
   };
 
@@ -92,50 +79,72 @@ const FreshHeatHeader = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Cleanup timeout عند unmount
+  const handleUserClick = (headerId) => {
+    setActiveHeader(headerId);
+    if (userTimeoutRef.current) {
+      clearTimeout(userTimeoutRef.current);
+      userTimeoutRef.current = null;
+    }
+    setIsUserOpen((prev) => !prev);
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
+  };
+
+  const handleUserMouseEnter = (headerId) => {
+    setActiveHeader(headerId);
+    if (userTimeoutRef.current) {
+      clearTimeout(userTimeoutRef.current);
+      userTimeoutRef.current = null;
+    }
+    setIsUserOpen(true);
+  };
+
+  const handleUserMouseLeave = () => {
+    if (userTimeoutRef.current) {
+      clearTimeout(userTimeoutRef.current);
+    }
+    userTimeoutRef.current = setTimeout(() => {
+      setIsUserOpen(false);
+      userTimeoutRef.current = null;
+      setActiveHeader(null);
+    }, 300);
+  };
+
+  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (cartTimeoutRef.current) {
         clearTimeout(cartTimeoutRef.current);
       }
+      if (userTimeoutRef.current) {
+        clearTimeout(userTimeoutRef.current);
+      }
     };
-  }, []);
-
-  // Scroll detection
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      setIsScrolled(scrollTop > 150);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <>
-      {/* Header الأول - يظهر فقط عند التحميل ويختفي عند السكرول */}
+      {/* First Header - Shows on load, hides on scroll */}
       <header
-        className={`w-full hidden lg:block bg-white z-100 transition-all duration-300 ${isScrolled
-          ? "lg:-translate-y-full "
-          : "relative"
+        className={`w-full hidden lg:block bg-white z-100 transition-all duration-300 ${isScrolled ? "lg:-translate-y-full " : "relative"
           }`}
       >
         {/* Logo and Navigation */}
         <div className="flex items-stretch bg-bg3">
           {/* Logo Section */}
-          <div className="w-1/5 relative flex items-center justify-center cursor-pointer overflow-visible self-stretch">
-            {/* decorative shape خلف اللوغو */}
+          <div className="w-1/6 relative flex items-center justify-center cursor-pointer overflow-visible self-stretch">
+            {/* Decorative shape behind logo */}
             <div
               className="absolute top-0 left-0 h-full w-[calc(100%+90px)] bg-bg3 z-10
               [clip-path:polygon(0_0,100%_0,calc(100%-80px)_100%,0_100%)]"
               aria-hidden="true"
             />
 
-            {/* اللوغو نفسو فوق الشكل */}
+            {/* Logo */}
             <Link href="/" className="relative z-20 transform">
               <Image
-                src={`/img/logo/mainlogo.png`}
+                src={IMAGE_PATHS.logo}
                 alt="logo"
                 width={100}
                 height={100}
@@ -144,101 +153,56 @@ const FreshHeatHeader = () => {
             </Link>
           </div>
 
-          {/* القسم اليميني كامل */}
+          {/* Right Section */}
           <div className="flex-1 flex flex-col">
             {/* Top Bar */}
-            <div className="py-1 pl-26 pr-16  bg-theme3 flex justify-between items-center text-lg text-white">
+            <div className="py-1 pl-26 pr-16 bg-theme3 flex justify-between items-center text-lg text-white">
               <div className="flex items-center">
                 <span className="mr-2">©</span>
-                <span>09:00 am - 06:00 pm</span>
+                <span>{BUSINESS_HOURS}</span>
               </div>
               <div className="flex items-center gap-3">
                 <span className="mr-2">FollowUs:</span>
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Visit our Facebook page"
-                  className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-theme3 transition-all duration-300"
-                >
-                  <Facebook className="w-4 h-4 text-white group-hover:text-theme3 transition-colors duration-300" />
-                </a>
-                <a
-                  href="https://twitter.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Visit our Twitter page"
-                  className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-theme3 transition-all duration-300"
-                >
-                  <Twitter className="w-4 h-4 text-white group-hover:text-theme3 transition-colors duration-300" />
-                </a>
-                <a
-                  href="https://youtube.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Visit our YouTube channel"
-                  className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-theme3 transition-all duration-300"
-                >
-                  <Youtube className="w-4 h-4 text-white group-hover:text-theme3 transition-colors duration-300" />
-                </a>
-                <a
-                  href="https://linkedin.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Visit our LinkedIn page"
-                  className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-theme3 transition-all duration-300"
-                >
-                  <Linkedin className="w-4 h-4 text-white group-hover:text-theme3 transition-colors duration-300" />
-                </a>
+                {SOCIAL_LINKS.map((social) => {
+                  const IconComponent = {
+                    Facebook,
+                    Twitter,
+                    Youtube,
+                    Linkedin,
+                  }[social.icon];
+
+                  return (
+                    <a
+                      key={social.href}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Visit our ${social.label} page`}
+                      className="w-9 h-9 border border-white/20 rounded group flex items-center justify-center hover:bg-white hover:border-theme3 transition-all duration-300"
+                    >
+                      <IconComponent className="w-4 h-4 text-white group-hover:text-theme3 transition-colors duration-300" />
+                    </a>
+                  );
+                })}
               </div>
             </div>
+
             {/* Navigation */}
             <nav className="w-full flex justify-between items-center md:w-auto py-5 px-10 bg-bgimg text-white">
               <ul className="flex justify-around items-center font-medium w-full">
-                <li className="transition-all duration-300 hover:translate-x-1">
-                  <Link
-                    href="/"
-                    className="hover:text-theme3 transition-colors duration-300 cursor-pointer"
-                  >
-                    Home
-                  </Link>
-                </li>
-                <li className="transition-all duration-300 hover:translate-x-1">
-                  <Link
-                    href="/shop"
-                    className="hover:text-theme3 transition-colors duration-300 cursor-pointer"
-                  >
-                    Shop
-                  </Link>
-                </li>
-
-                <li className="transition-all duration-300 hover:translate-x-1">
-                  <Link
-                    href="/blog"
-                    className="hover:text-theme3 transition-colors duration-300 cursor-pointer"
-                  >
-                    Blog
-                  </Link>
-                </li>
-                <li className="transition-all duration-300 hover:translate-x-1">
-                  <Link
-                    href="/contact-us"
-                    className="hover:text-theme3 transition-colors duration-300 cursor-pointer"
-                  >
-                    Contact Us
-                  </Link>
-                </li>
-                <li className="transition-all duration-300 hover:translate-x-1">
-                  <Link
-                    href="/about-us"
-                    className="hover:text-theme3 transition-colors duration-300 cursor-pointer"
-                  >
-                    About US
-                  </Link>
-                </li>
+                {NAV_LINKS.map((link) => (
+                  <li key={link.href} className="transition-all duration-300 hover:translate-x-1">
+                    <Link
+                      href={link.href}
+                      className="hover:text-theme3 transition-colors duration-300 cursor-pointer"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
 
-              {/* search and cart */}
+              {/* Search, Cart, and User */}
               <div className="flex items-center gap-8 mr-5">
                 {/* Search Icon */}
                 <button
@@ -251,6 +215,38 @@ const FreshHeatHeader = () => {
                     strokeWidth={2}
                   />
                 </button>
+
+                {/* User Icon with Dropdown */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => handleUserMouseEnter("header1")}
+                  onMouseLeave={handleUserMouseLeave}
+                >
+                  <button
+                    onClick={() => handleUserClick("header1")}
+                    aria-label={isAuthenticated ? `User menu for ${user?.name}` : "User menu"}
+                    className="outline-none focus:outline-none rounded cursor-pointer relative"
+                  >
+                    <User
+                      className={`h-6 w-6 transition-colors duration-300 ${
+                        isAuthenticated
+                          ? "text-theme3 hover:text-theme"
+                          : "text-text hover:text-theme3"
+                      }`}
+                      strokeWidth={2}
+                    />
+                    {isAuthenticated && (
+                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></span>
+                    )}
+                  </button>
+                  {activeHeader === "header1" && !isScrolled && (
+                    <UserDropdown
+                      userOpen={isUserOpen}
+                      setUserOpen={setIsUserOpen}
+                    />
+                  )}
+                </div>
+
                 {/* Cart Icon with Badge */}
                 <div
                   className="relative"
@@ -267,12 +263,11 @@ const FreshHeatHeader = () => {
                       strokeWidth={2}
                     />
                     {cartCount > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-theme2 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                      <span className="absolute -top-2 -right-2 bg-theme3 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
                         {cartCount}
                       </span>
                     )}
                   </button>
-                  {/* CartDropdown يظهر فقط إذا كان Header الأول هو النشط وكان ظاهر */}
                   {activeHeader === "header1" && !isScrolled && (
                     <CartDropdown
                       cartOpen={isCartOpen}
@@ -281,6 +276,7 @@ const FreshHeatHeader = () => {
                     />
                   )}
                 </div>
+
                 {/* Menu Icon */}
                 <button
                   onClick={handleMenuClick}
@@ -298,12 +294,9 @@ const FreshHeatHeader = () => {
         </div>
       </header>
 
-      {/* Header الثاني - يظهر دائماً على الأجهزة الصغيرة، وعند السكرول على الشاشات الكبيرة */}
+      {/* Second Header - Always visible on mobile, shows on scroll for desktop */}
       <header
-        className={`fixed top-0 left-0 right-0 w-full bg-bgimg z-100 transition-transform duration-300 shadow-sm ${
-          // للأجهزة الصغيرة: يظهر دائماً (translate-y-0)
-          // للشاشات الكبيرة: يظهر فقط عند السكرول
-          isScrolled ? "translate-y-0" : "translate-y-0 lg:-translate-y-full"
+        className={`fixed top-0 left-0 right-0 w-full bg-bgimg z-100 transition-transform duration-300 shadow-sm ${isScrolled ? "translate-y-0" : "translate-y-0 lg:-translate-y-full"
           }`}
       >
         <div className="container mx-auto flex flex-row items-center justify-between gap-4 lg:gap-8 px-4 sm:px-6 lg:px-8 xl:px-12 py-3 lg:py-4 w-full">
@@ -311,7 +304,7 @@ const FreshHeatHeader = () => {
           <div className="flex items-center justify-start shrink-0 lg:ml-10">
             <Link href="/" className="flex items-center">
               <Image
-                src="/img/logo/mainlogo.png"
+                src={IMAGE_PATHS.logo}
                 alt="logo"
                 width={120}
                 height={120}
@@ -321,54 +314,19 @@ const FreshHeatHeader = () => {
             </Link>
           </div>
 
-          {/* Navigation - للشاشات الكبيرة فقط */}
+          {/* Navigation - Desktop only */}
           <nav className="hidden lg:flex flex-1 justify-center">
             <ul className="flex items-center gap-8 xl:gap-12 font-medium text-white">
-              <li>
-                <Link
-                  href="/"
-                  className="text-sm xl:text-base hover:text-theme3 transition-colors duration-300 cursor-pointer relative group"
-                >
-                  Home
-
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/shop"
-                  className="text-sm xl:text-base hover:text-theme3 transition-colors duration-300 cursor-pointer relative group"
-                >
-                  Shop
-
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/blog"
-                  className="text-sm xl:text-base hover:text-theme3 transition-colors duration-300 cursor-pointer relative group"
-                >
-                  Blog
-
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact-us"
-                  className="text-sm xl:text-base hover:text-theme3 transition-colors duration-300 cursor-pointer relative group"
-                >
-                  Contact Us
-
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/about-us"
-                  className="text-sm xl:text-base hover:text-theme3 transition-colors duration-300 cursor-pointer relative group"
-                >
-                  About US
-
-                </Link>
-              </li>
+              {NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm xl:text-base hover:text-theme3 transition-colors duration-300 cursor-pointer relative group"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 
@@ -385,6 +343,37 @@ const FreshHeatHeader = () => {
                 strokeWidth={2}
               />
             </button>
+
+            {/* User Icon with Dropdown */}
+            <div
+              className="relative flex items-center"
+              onMouseEnter={() => handleUserMouseEnter("header2")}
+              onMouseLeave={handleUserMouseLeave}
+            >
+              <button
+                onClick={() => handleUserClick("header2")}
+                aria-label={isAuthenticated ? `User menu for ${user?.name}` : "User menu"}
+                className="flex items-center justify-center p-2 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-theme3 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer relative hover:bg-white/10 transition-all duration-300"
+              >
+                <User
+                  className={`h-5 w-5 sm:h-6 sm:w-6 transition-colors duration-300 ${
+                    isAuthenticated
+                      ? "text-theme3 hover:text-theme"
+                      : "text-white hover:text-theme3"
+                  }`}
+                  strokeWidth={2}
+                />
+                {isAuthenticated && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-bgimg"></span>
+                )}
+              </button>
+              {activeHeader === "header2" && (
+                <UserDropdown
+                  userOpen={isUserOpen}
+                  setUserOpen={setIsUserOpen}
+                />
+              )}
+            </div>
 
             {/* Cart Icon with Badge */}
             <div
@@ -407,7 +396,6 @@ const FreshHeatHeader = () => {
                   </span>
                 )}
               </button>
-              {/* CartDropdown يظهر فقط إذا كان Header الثاني هو النشط */}
               {activeHeader === "header2" && (
                 <CartDropdown
                   cartOpen={isCartOpen}
@@ -432,13 +420,14 @@ const FreshHeatHeader = () => {
         </div>
       </header>
 
-      {/* Sidebar - Fixed في كل الحالات */}
+      {/* Sidebar */}
       <Sidebar isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
 
-      {/* Search Modal - Fixed في كل الحالات */}
+      {/* Search Modal */}
       <SearchModal searchOpen={isSearchOpen} setSearchOpen={setIsSearchOpen} />
     </>
   );
 };
 
 export default FreshHeatHeader;
+

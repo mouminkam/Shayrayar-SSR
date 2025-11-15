@@ -1,7 +1,7 @@
 "use client";
-import Breadcrumb from "../../components/pages/shop/Breadcrumb";
-import ShopDetailsContent from "../../components/pages/shop-details/ShopDetailsContent";
-import PopularDishes from "../../components/pages/shop-details/PopularDishes";
+import Breadcrumb from "../../components/ui/Breadcrumb";
+import ShopDetailsContent from "../../sections/shop/ShopDetailsContent";
+import PopularDishes from "../../sections/shop/PopularDishes";
 
 export default function ShopDetailsPage() {
   return (

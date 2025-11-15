@@ -4,18 +4,16 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "../../../hooks/useCart";
+import { formatCurrency } from "../../../lib/utils/formatters";
+import { IMAGE_PATHS } from "../../../data/constants";
 
 export default function CartDropdown({
   cartOpen,
   setCartOpen,
-  cartItems = [],
 }) {
   const cartTimeoutRef = useRef(null);
-
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const { items: cartItems, subtotal, removeFromCart } = useCart();
 
   const handleMouseEnter = () => {
     if (cartTimeoutRef.current) {
@@ -137,7 +135,13 @@ export default function CartDropdown({
             </motion.div>
 
             {/* Cart Items */}
-            <div className="space-y-3 md:space-y-4 mb-4 max-h-64 overflow-hidden">
+            <div 
+              className="space-y-3 md:space-y-4 mb-4 max-h-64 overflow-y-auto overflow-x-hidden pr-2"
+              style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#cbd5e1 #f1f5f9'
+              }}
+            >
               {cartItems.length === 0 ? (
                 <motion.div
                   variants={itemVariants}
@@ -157,7 +161,7 @@ export default function CartDropdown({
                       <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center shrink-0 overflow-hidden">
                         {item.image ? (
                           <Image
-                            src={item.image}
+                            src={item.image || IMAGE_PATHS.placeholder}
                             alt={item.name}
                             width={48}
                             height={48}
@@ -175,12 +179,13 @@ export default function CartDropdown({
                         <p className="text-sm text-gray-600">
                           {item.quantity} x{" "}
                           <span className="text-theme3 font-semibold">
-                            ${item.price.toFixed(2)}
+                            {formatCurrency(item.price)}
                           </span>
                         </p>
                       </div>
                     </div>
                     <motion.button
+                      onClick={() => removeFromCart(item.id)}
                       className="text-gray-400 hover:text-theme shrink-0 ml-2 rounded-full p-1 flex items-center justify-center"
                       aria-label={`Remove ${item.name} from cart`}
                       whileHover={{ scale: 1.1 }}
@@ -202,7 +207,7 @@ export default function CartDropdown({
                 >
                   <span className="text-gray-600 font-medium">Total:</span>
                   <span className="text-lg font-semibold text-theme3">
-                    ${totalPrice.toFixed(2)}
+                    {formatCurrency(subtotal)}
                   </span>
                 </motion.div>
 

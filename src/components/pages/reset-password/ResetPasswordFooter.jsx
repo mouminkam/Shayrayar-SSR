@@ -1,0 +1,18 @@
+"use client";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
+export default function ResetPasswordFooter() {
+  return (
+    <div className="mt-6 text-center">
+      <Link
+        href="/login"
+        className="text-theme3 hover:text-theme text-sm font-medium transition-colors inline-flex items-center gap-1"
+      >
+        <ArrowRight className="w-4 h-4 rotate-180" />
+        Back to Login
+      </Link>
+    </div>
+  );
+}
+

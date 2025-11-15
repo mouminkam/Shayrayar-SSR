@@ -1,12 +1,12 @@
 "use client";
-import Breadcrumb from "../../components/pages/about/Breadcrumb";
-import OfferCards from "../../components/pages/about/OfferCards";
-import AboutSection from "../../components/pages/about/AboutSection";
-import MarqueeSection from "../../components/pages/about/MarqueeSection";
-import CTASection from "../../components/pages/about/CTASection";
-import ChefeSection from "../../components/pages/about/ChefeSection";
-import TestimonialSection from "../../components/pages/about/TestimonialSection";
-import BlogSection from "../../components/pages/about/BlogSection";
+import Breadcrumb from "../../components/ui/Breadcrumb";
+import OfferCards from "../../sections/about/OfferCards";
+import AboutSection from "../../sections/about/AboutSection";
+import MarqueeSection from "../../sections/about/MarqueeSection";
+import CTASection from "../../sections/about/CTASection";
+import ChefeSection from "../../sections/about/ChefeSection";
+import TestimonialSection from "../../sections/about/TestimonialSection";
+import BlogSection from "../../sections/about/BlogSection";
 
 export default function AboutUsPage() {
   return (

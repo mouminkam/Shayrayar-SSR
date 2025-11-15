@@ -1,7 +1,7 @@
 "use client";
 import { Suspense } from "react";
-import Breadcrumb from "../../components/pages/shop/Breadcrumb";
-import ShopSection from "../../components/pages/shop/ShopSection";
+import Breadcrumb from "../../components/ui/Breadcrumb";
+import ShopSection from "../../sections/shop/ShopSection";
 
 function ShopSectionFallback() {
   return (

@@ -1,9 +1,9 @@
 "use client";
-import Breadcrumb from "../../components/pages/blog/Breadcrumb";
-import BlogDetailsContent from "../../components/pages/blog/blog-details/BlogDetailsContent";
-import BlogDetailsSidebar from "../../components/pages/blog/blog-details/BlogDetailsSidebar";
-import CommentsSection from "../../components/pages/blog/blog-details/CommentsSection";
-import CommentForm from "../../components/pages/blog/blog-details/CommentForm";
+import Breadcrumb from "../../components/ui/Breadcrumb";
+import BlogDetailsContent from "../../sections/blog/blog-details/BlogDetailsContent";
+import BlogDetailsSidebar from "../../sections/blog/blog-details/BlogDetailsSidebar";
+import CommentsSection from "../../sections/blog/blog-details/CommentsSection";
+import CommentForm from "../../sections/blog/blog-details/CommentForm";
 
 export default function BlogDetailsPage() {
   return (

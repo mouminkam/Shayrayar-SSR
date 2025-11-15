@@ -1,293 +1,251 @@
 "use client";
-import { useState } from "react";
+import { memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Trash2, Plus, Minus, ShoppingBag, Tag } from "lucide-react";
+import { motion } from "framer-motion";
+import { Trash2, Plus, Minus } from "lucide-react";
+import useCartStore from "../../../store/cartStore";
 
-export default function CartTable() {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Brick Oven Pepperoni",
-      image: "/img/dishes/dishes4_1.png",
-      price: 18,
-      quantity: 1,
-    },
-    {
-      id: 2,
-      name: "Cheese Hand-Pizza",
-      image: "/img/dishes/dishes4_2.png",
-      price: 18,
-      quantity: 1,
-    },
-    {
-      id: 3,
-      name: "Over Loaded Vegan",
-      image: "/img/dishes/dishes4_3.png",
-      price: 18,
-      quantity: 1,
-    },
-    {
-      id: 4,
-      name: "Chicken Leg Piece",
-      image: "/img/dishes/dishes4_4.png",
-      price: 18,
-      quantity: 1,
-    },
-  ]);
+const CartTable = memo(() => {
+  const { items, removeFromCart, increaseQty, decreaseQty } = useCartStore();
 
-  const [couponCode, setCouponCode] = useState("");
-
-  const handleQuantityChange = (id, delta) => {
-    setCartItems((items) =>
-      items.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
-      )
+  if (items.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="empty-cart text-center py-16"
+      >
+        <motion.div
+          animate={{ rotate: [0, 10, -10, 0] }}
+          transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+          className="w-24 h-24 bg-linear-to-br from-theme/20 to-theme3/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-theme3/30"
+        >
+          <Trash2 className="w-12 h-12 text-theme3" />
+        </motion.div>
+        <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black mb-2">
+          Your cart is empty
+        </h3>
+        <p className="text-text text-base mb-6">
+          Start adding items to your cart!
+        </p>
+        <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white font-['Epilogue',sans-serif] text-base font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30"
+          >
+            Continue Shopping
+          </Link>
+        </motion.div>
+      </motion.div>
     );
-  };
+  }
 
-  const handleQuantityInput = (id, value) => {
-    const numValue = Math.max(1, Number(value) || 1);
-    setCartItems((items) =>
-      items.map((item) => (item.id === id ? { ...item, quantity: numValue } : item))
-    );
-  };
-
-  const handleRemove = (id) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
-  };
-
-  const handleApplyCoupon = (e) => {
-    e.preventDefault();
-    console.log("Apply coupon:", couponCode);
-  };
-
-  const handleUpdateCart = (e) => {
-    e.preventDefault();
-    console.log("Update cart");
-  };
-
-  // Calculate totals
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  return (
-    <div className="cart-table-wrapper">
-      {/* Desktop Table View */}
-      <div className="hidden lg:block overflow-x-auto mb-8 ">
-        <table className="cart_table w-full border-collapse">
-          <thead>
-            <tr className=" border-b-2 border-gray-200">
-              <th className="cart-col-image font-epilogue text-white font-bold py-6 px-4 text-left">
-                Product
-              </th>
-              <th className="cart-colname font-epilogue text-white font-bold py-6 px-4 text-left">
-                Name
-              </th>
-              <th className="cart-col-price font-epilogue text-white font-bold py-6 px-4 text-center">
-                Price
-              </th>
-              <th className="cart-col-quantity font-epilogue text-white font-bold py-6 px-4 text-center">
-                Quantity
-              </th>
-              <th className="cart-col-total font-epilogue text-white font-bold py-6 px-4 text-center">
-                Total
-              </th>
-              <th className="cart-col-remove font-epilogue text-white font-bold py-6 px-4 text-center">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {cartItems.map((item) => (
-              <tr key={item.id} className="cart_item transition-colors duration-300">
-                <td className="py-6 px-4">
-                  <Link href="/shop-details" className="cartimage inline-block group">
-                    <div className="relative w-20 h-20 rounded-xl overflow-hidden  transition-shadow duration-300">
+  // Desktop Table View
+  const DesktopTable = () => (
+    <div className="hidden lg:block overflow-x-auto mb-5">
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="border-b-2 border-white/10">
+            <th className="text-left py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold">
+              Product
+            </th>
+            <th className="text-center py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold">
+              Price
+            </th>
+            <th className="text-center py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold">
+              Quantity
+            </th>
+            <th className="text-center py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold">
+              Subtotal
+            </th>
+            <th className="text-center py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold w-12">
+              Action
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item, index) => (
+            <motion.tr
+              key={item.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+              className="border-b border-white/10 transition-colors duration-300 hover:bg-white/5"
+            >
+              <td className="py-6 px-4">
+                <div className="flex items-center gap-4">
+                  <Link href="/shop-details" className="shrink-0 group">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      className="relative w-20 h-20 rounded-xl overflow-hidden transition-all duration-300"
+                    >
                       <Image
-                        src={item.image}
+                        src={item.image || "/img/placeholder.png"}
                         alt={item.name}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-300"
                         unoptimized={true}
                       />
-                    </div>
+                    </motion.div>
                   </Link>
-                </td>
-                <td className="py-6 px-4">
                   <Link
                     href="/shop-details"
-                    className="cartname text-white font-epilogue text-lg font-bold hover:text-theme transition-colors duration-300"
+                    className="text-white font-['Epilogue',sans-serif] text-lg font-bold hover:text-theme transition-colors duration-300"
                   >
                     {item.name}
                   </Link>
-                </td>
-                <td className="py-6 px-4 text-center">
-                  <span className="amount text-white font-bold text-base">
-                    ${item.price.toFixed(2)}
-                  </span>
-                </td>
-                <td className="py-6 px-4">
-                  <div className="quantity flex items-center justify-center">
-                    <button
-                      type="button"
-                      className="quantity-minus qty-btn w-10 h-10 border border-gray-200 bg-white text-gray-600 rounded-l-lg hover:bg-theme hover:text-white hover:border-theme transition-all duration-300 flex items-center justify-center"
-                      onClick={() => handleQuantityChange(item.id, -1)}
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <input
-                      type="number"
-                      className="qty-input w-16 h-10 border-y border-gray-200 bg-white text-theme text-sm font-bold text-center outline-none focus:border-theme focus:ring-2 focus:ring-theme/20 transition-all duration-300"
-                      value={item.quantity}
-                      min="1"
-                      max="99"
-                      onChange={(e) => handleQuantityInput(item.id, e.target.value)}
-                    />
-                    <button
-                      type="button"
-                      className="quantity-plus qty-btn w-10 h-10 border border-gray-200 bg-white text-gray-600 rounded-r-lg hover:bg-theme hover:text-white hover:border-theme transition-all duration-300 flex items-center justify-center"
-                      onClick={() => handleQuantityChange(item.id, 1)}
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-                <td className="py-6 px-4 text-center">
-                  <span className="amount text-white font-bold text-lg ">
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </span>
-                </td>
-                <td className="py-6 px-4 text-center">
-                  <button
-                    onClick={() => handleRemove(item.id)}
-                    className="remove w-10 h-10 flex items-center justify-center text-gray-400 hover:text-theme hover:bg-theme/10 rounded-lg transition-all duration-300"
-                    aria-label="Remove item"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile Card View */}
-      <div className="lg:hidden space-y-4 mb-8">
-        {cartItems.map((item) => (
-          <div key={item.id} className="cart-item-card bg-white rounded-xl shadow-md p-4 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
-            <div className="flex gap-4">
-              <Link href="/shop-details" className="cartimage shrink-0 group">
-                <div className="relative w-24 h-24 rounded-xl overflow-hidden  transition-shadow duration-300">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-300"
-                    unoptimized={true}
-                  />
                 </div>
-              </Link>
-              <div className="flex-1 min-w-0">
-                <Link
-                  href="/shop-details"
-                  className="cartname text-title font-epilogue text-lg font-bold hover:text-theme transition-colors duration-300 block mb-2"
+              </td>
+              <td className="text-center py-6 px-4">
+                <span className="text-theme font-['Epilogue',sans-serif] font-bold text-lg">
+                  ${item.price.toFixed(2)}
+                </span>
+              </td>
+              <td className="text-center py-6 px-4">
+                <div className="flex items-center justify-center gap-3">
+                  <motion.button
+                    onClick={() => decreaseQty(item.id)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-theme text-white rounded-lg transition-all duration-300 border border-white/20 hover:border-theme"
+                    aria-label="Decrease quantity"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </motion.button>
+                  <span className="text-white font-['Epilogue',sans-serif] font-semibold text-base min-w-[2rem]">
+                    {item.quantity}
+                  </span>
+                  <motion.button
+                    onClick={() => increaseQty(item.id)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-theme text-white rounded-lg transition-all duration-300 border border-white/20 hover:border-theme"
+                    aria-label="Increase quantity"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </motion.button>
+                </div>
+              </td>
+              <td className="text-center py-6 px-4">
+                <span className="text-theme3 font-['Epilogue',sans-serif] font-bold text-lg">
+                  ${(item.price * item.quantity).toFixed(2)}
+                </span>
+              </td>
+              <td className="text-center py-6 px-4">
+                <motion.button
+                  onClick={() => removeFromCart(item.id)}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="w-10 h-10 flex items-center justify-center text-white/60 hover:text-theme hover:bg-theme/10 rounded-lg transition-all duration-300 mx-auto"
+                  aria-label={`Remove ${item.name} from cart`}
                 >
-                  {item.name}
-                </Link>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="amount text-title font-bold text-base">
-                    ${item.price.toFixed(2)}
-                  </span>
-                  <button
-                    onClick={() => handleRemove(item.id)}
-                    className="remove w-8 h-8 flex items-center justify-center text-gray-400 hover:text-theme hover:bg-theme/10 rounded-lg transition-all duration-300"
-                    aria-label="Remove item"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="quantity flex items-center">
-                    <button
-                      type="button"
-                      className="quantity-minus qty-btn w-9 h-9 border border-gray-200 bg-white text-gray-600 rounded-l-lg hover:bg-theme hover:text-white hover:border-theme transition-all duration-300 flex items-center justify-center"
-                      onClick={() => handleQuantityChange(item.id, -1)}
-                    >
-                      <Minus className="w-3.5 h-3.5" />
-                    </button>
-                    <input
-                      type="number"
-                      className="qty-input w-14 h-9 border-y border-gray-200 bg-white text-theme text-sm font-bold text-center outline-none focus:border-theme"
-                      value={item.quantity}
-                      min="1"
-                      max="99"
-                      onChange={(e) => handleQuantityInput(item.id, e.target.value)}
-                    />
-                    <button
-                      type="button"
-                      className="quantity-plus qty-btn w-9 h-9 border border-gray-200 bg-white text-gray-600 rounded-r-lg hover:bg-theme hover:text-white hover:border-theme transition-all duration-300 flex items-center justify-center"
-                      onClick={() => handleQuantityChange(item.id, 1)}
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  <span className="amount text-title font-bold text-lg ">
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Actions Section */}
-      <div className="actions-section space-y-6 pt-6 border-t border-gray-200">
-        {/* Coupon Code */}
-        <div className="th-cart-coupon">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                className="form-control text-white w-full pl-12 pr-5 py-3 border-2 border-gray-200 rounded-xl text-base outline-none focus:border-theme focus:ring-2 focus:ring-theme/20 transition-all duration-300"
-                placeholder="Enter coupon code..."
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-              />
-            </div>
-            <button
-              type="submit"
-              onClick={handleApplyCoupon}
-              className="theme-btn px-8 py-3 bg-theme text-white font-roboto text-base font-medium hover:bg-theme2 transition-all duration-300 rounded-xl whitespace-nowrap shadow-md hover:shadow-lg"
-            >
-              Apply Coupon
-            </button>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between">
-          <button
-            type="submit"
-            onClick={handleUpdateCart}
-            className="theme-btn px-8 py-3 bg-white border-2 border-theme text-theme font-roboto text-base font-medium hover:bg-theme hover:text-white transition-all duration-300 rounded-xl whitespace-nowrap"
-          >
-            Update Cart
-          </button>
-          <Link
-            href="/shop"
-            className="theme-btn px-8 py-3 bg-theme text-white font-roboto text-base font-medium hover:bg-theme2 transition-all duration-300 rounded-xl whitespace-nowrap shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-          >
-            <ShoppingBag className="w-5 h-5" />
-            Continue Shopping
-          </Link>
-        </div>
-      </div>
+                  <Trash2 className="w-5 h-5" />
+                </motion.button>
+              </td>
+            </motion.tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
-}
+
+  // Mobile Card View
+  const MobileCardView = () => (
+    <div className="lg:hidden space-y-4 mb-8">
+      {items.map((item, index) => (
+        <motion.div
+          key={item.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: index * 0.05 }}
+          className="cart-item-card relative bg-linear-to-br from-white/10 via-bgimg/50 to-bgimg/80 backdrop-blur-sm rounded-2xl shadow-xl p-4 border border-white/20 hover:border-theme3/50 hover:shadow-2xl transition-all duration-300"
+        >
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Image */}
+            <Link href="/shop-details" className="shrink-0 group">
+              <div className="relative w-full sm:w-24 h-50 rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-shadow duration-300">
+                <Image
+                  src={item.image || "/img/placeholder.png"}
+                  alt={item.name}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  unoptimized={true}
+                />
+              </div>
+            </Link>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <Link
+                href="/shop-details"
+                className="text-white font-['Epilogue',sans-serif] text-lg font-bold hover:text-theme transition-colors duration-300 block mb-2"
+              >
+                {item.name}
+              </Link>
+              <div className="text-theme font-['Epilogue',sans-serif] font-bold text-base mb-3">
+                ${item.price.toFixed(2)}
+              </div>
+
+              {/* Quantity Controls */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <motion.button
+                    onClick={() => decreaseQty(item.id)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-theme text-white rounded-lg transition-all duration-300 border border-white/20 hover:border-theme"
+                    aria-label="Decrease quantity"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </motion.button>
+                  <span className="text-white font-['Epilogue',sans-serif] font-semibold text-base min-w-[2rem] text-center">
+                    {item.quantity}
+                  </span>
+                  <motion.button
+                    onClick={() => increaseQty(item.id)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-theme text-white rounded-lg transition-all duration-300 border border-white/20 hover:border-theme"
+                    aria-label="Increase quantity"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </motion.button>
+                </div>
+                <div className="text-right">
+                  <div className="text-theme3 font-['Epilogue',sans-serif] font-bold text-lg">
+                    ${(item.price * item.quantity).toFixed(2)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Remove Button */}
+              <motion.button
+                onClick={() => removeFromCart(item.id)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-transparent border-2 border-theme text-theme text-sm font-semibold rounded-xl hover:bg-theme hover:text-white transition-all duration-300"
+                aria-label={`Remove ${item.name} from cart`}
+              >
+                <Trash2 className="w-4 h-4" />
+                Remove
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="cart-table-wrapper">
+      <DesktopTable />
+      <MobileCardView />
+    </div>
+  );
+});
+
+CartTable.displayName = "CartTable";
+
+export default CartTable;
 

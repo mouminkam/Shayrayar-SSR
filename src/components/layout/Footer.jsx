@@ -1,12 +1,11 @@
-"use client";
-import TopBar from "../components/layout/footer/TopBar";
-import CompanyInfo from "../components/layout/footer/CompanyInfo";
-import QuickLinks from "../components/layout/footer/QuickLinks";
-import OurMenu from "../components/layout/footer/OurMenu";
-import ContactSection from "../components/layout/footer/ContactSection";
-import BottomBar from "../components/layout/footer/BottomBar";
-import ScrollToTop from "../components/layout/footer/ScrollToTop";
-import BackgroundShapes from "../components/layout/footer/BackgroundShapes";
+import TopBar from "./footer/TopBar";
+import CompanyInfo from "./footer/CompanyInfo";
+import QuickLinks from "./footer/QuickLinks";
+import OurMenu from "./footer/OurMenu";
+import ContactSection from "./footer/ContactSection";
+import BottomBar from "./footer/BottomBar";
+import ScrollToTop from "./footer/ScrollToTop";
+import BackgroundShapes from "./footer/BackgroundShapes";
 
 function FreshHeatFooter() {
   return (
@@ -39,3 +38,4 @@ function FreshHeatFooter() {
 }
 
 export default FreshHeatFooter;
+

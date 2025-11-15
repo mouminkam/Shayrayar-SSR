@@ -1,5 +1,6 @@
-import FreshHeatHeader from "../layout/Header";
-import FreshHeatFooter from "../layout/Footer";
+import FreshHeatHeader from "../components/layout/Header";
+import FreshHeatFooter from "../components/layout/Footer";
+import Toast from "../components/ui/Toast";
 import "./globals.css";
 
 export const metadata = {
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
           {children}
         </main>
         <FreshHeatFooter />
+        <Toast />
       </body>
     </html>
   );

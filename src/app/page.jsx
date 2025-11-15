@@ -1,17 +1,16 @@
-"use client";
-import BannerSection from "../components/pages/home/BannerSection";
-import BestFoodItemsSection from "../components/pages/home/BestFoodItemsSection";
-import OfferCards from "../components/pages/about/OfferCards";
-import AboutUsSection from "../components/pages/home/AboutUsSection";
-import PopularDishes from "../components/pages/shop-details/PopularDishes";
-import CTASection from "../components/pages/about/CTASection";
-import FoodMenuSection from "../components/pages/home/FoodMenuSection";
-import TimerSection from "../components/pages/home/TimerSection";
-import ChefeSection from "../components/pages/about/ChefeSection";
-import TestimonialSection from "../components/pages/about/TestimonialSection";
-import BlogSection from "../components/pages/about/BlogSection";
-import GallerySection from "../components/pages/home/GallerySection";
-import MarqueeSection from "../components/pages/about/MarqueeSection";
+import BannerSection from "../sections/home/BannerSection";
+import BestFoodItemsSection from "../sections/home/BestFoodItemsSection";
+import OfferCards from "../sections/about/OfferCards";
+import AboutUsSection from "../sections/home/AboutUsSection";
+import PopularDishes from "../sections/shop/PopularDishes";
+import CTASection from "../sections/about/CTASection";
+import FoodMenuSection from "../sections/home/FoodMenuSection";
+import TimerSection from "../sections/home/TimerSection";
+import ChefeSection from "../sections/about/ChefeSection";
+import TestimonialSection from "../sections/about/TestimonialSection";
+import BlogSection from "../sections/about/BlogSection";
+import GallerySection from "../sections/home/GallerySection";
+import MarqueeSection from "../sections/about/MarqueeSection";
 
 export default function HomePage() {
   return (
