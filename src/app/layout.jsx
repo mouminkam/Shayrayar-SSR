@@ -18,12 +18,14 @@ export default function RootLayout({ children }) {
       </head>
 
       <body>
-        <FreshHeatHeader />
-        <main id="main" role="main">
-          {children}
-        </main>
-        <FreshHeatFooter />
-        <Toast />
+      
+          <FreshHeatHeader />
+          <main id="main" role="main">
+            {children}
+          </main>
+          <FreshHeatFooter />
+          <Toast />
+       
       </body>
     </html>
   );

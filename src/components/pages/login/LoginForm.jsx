@@ -62,7 +62,7 @@ export default function LoginForm() {
 
     if (result.success) {
       toastSuccess("Login successful! Welcome back!");
-      router.push("/profile");
+      router.push("/");
     } else {
       toastError(result.error || "Invalid email or password");
     }

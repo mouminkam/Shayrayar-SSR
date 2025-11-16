@@ -1,4 +1,3 @@
-"use client";
 import Breadcrumb from "../../components/ui/Breadcrumb";
 import WishlistTable from "../../components/pages/wishlist/WishlistTable";
 import WishlistSummary from "../../components/pages/wishlist/WishlistSummary";

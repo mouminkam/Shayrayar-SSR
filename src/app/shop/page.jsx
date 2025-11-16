@@ -1,20 +1,7 @@
-"use client";
 import { Suspense } from "react";
 import Breadcrumb from "../../components/ui/Breadcrumb";
-import ShopSection from "../../sections/shop/ShopSection";
-
-function ShopSectionFallback() {
-  return (
-    <section className="shop-section py-12 sm:py-16 md:py-20 lg:py-24">
-      <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-theme"></div>
-          <p className="mt-4 text-text">Loading shop products...</p>
-        </div>
-      </div>
-    </section>
-  );
-}
+import ShopSection from "../../components/shop/ShopSection";
+import ShopSectionFallback from "../../components/shop/ShopSectionFallback";
 
 export default function ShopPage() {
   return (

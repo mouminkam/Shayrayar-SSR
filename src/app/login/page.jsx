@@ -1,4 +1,4 @@
-"use client";
+
 import Breadcrumb from "../../components/ui/Breadcrumb";
 import LoginSection from "../../components/pages/login/LoginSection";
 

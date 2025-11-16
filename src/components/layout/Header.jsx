@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import {
   Search,
@@ -22,6 +23,7 @@ import useAuthStore from "../../store/authStore";
 import { NAV_LINKS, SOCIAL_LINKS, BUSINESS_HOURS, IMAGE_PATHS } from "../../data/constants";
 
 const FreshHeatHeader = () => {
+  const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
@@ -79,7 +81,15 @@ const FreshHeatHeader = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const handleUserClick = (headerId) => {
+  const handleUserClick = (headerId, e) => {
+    // If user is authenticated, go directly to profile
+    if (isAuthenticated) {
+      router.push("/profile");
+      return;
+    }
+    
+    // If not authenticated, show dropdown
+    e?.preventDefault();
     setActiveHeader(headerId);
     if (userTimeoutRef.current) {
       clearTimeout(userTimeoutRef.current);
@@ -222,28 +232,37 @@ const FreshHeatHeader = () => {
                   onMouseEnter={() => handleUserMouseEnter("header1")}
                   onMouseLeave={handleUserMouseLeave}
                 >
-                  <button
-                    onClick={() => handleUserClick("header1")}
-                    aria-label={isAuthenticated ? `User menu for ${user?.name}` : "User menu"}
-                    className="outline-none focus:outline-none rounded cursor-pointer relative"
-                  >
-                    <User
-                      className={`h-6 w-6 transition-colors duration-300 ${
-                        isAuthenticated
-                          ? "text-theme3 hover:text-theme"
-                          : "text-text hover:text-theme3"
-                      }`}
-                      strokeWidth={2}
-                    />
-                    {isAuthenticated && (
+                  {isAuthenticated ? (
+                    <Link
+                      href="/profile"
+                      aria-label={`Go to profile for ${user?.name}`}
+                      className="outline-none focus:outline-none rounded cursor-pointer relative"
+                    >
+                      <User
+                        className="h-6 w-6 transition-colors duration-300 text-theme3 hover:text-theme"
+                        strokeWidth={2}
+                      />
                       <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></span>
-                    )}
-                  </button>
-                  {activeHeader === "header1" && !isScrolled && (
-                    <UserDropdown
-                      userOpen={isUserOpen}
-                      setUserOpen={setIsUserOpen}
-                    />
+                    </Link>
+                  ) : (
+                    <>
+                      <button
+                        onClick={(e) => handleUserClick("header1", e)}
+                        aria-label="User menu"
+                        className="outline-none focus:outline-none rounded cursor-pointer relative"
+                      >
+                        <User
+                          className="h-6 w-6 transition-colors duration-300 text-text hover:text-theme3"
+                          strokeWidth={2}
+                        />
+                      </button>
+                      {activeHeader === "header1" && !isScrolled && (
+                        <UserDropdown
+                          userOpen={isUserOpen}
+                          setUserOpen={setIsUserOpen}
+                        />
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -350,28 +369,37 @@ const FreshHeatHeader = () => {
               onMouseEnter={() => handleUserMouseEnter("header2")}
               onMouseLeave={handleUserMouseLeave}
             >
-              <button
-                onClick={() => handleUserClick("header2")}
-                aria-label={isAuthenticated ? `User menu for ${user?.name}` : "User menu"}
-                className="flex items-center justify-center p-2 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-theme3 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer relative hover:bg-white/10 transition-all duration-300"
-              >
-                <User
-                  className={`h-5 w-5 sm:h-6 sm:w-6 transition-colors duration-300 ${
-                    isAuthenticated
-                      ? "text-theme3 hover:text-theme"
-                      : "text-white hover:text-theme3"
-                  }`}
-                  strokeWidth={2}
-                />
-                {isAuthenticated && (
+              {isAuthenticated ? (
+                <Link
+                  href="/profile"
+                  aria-label={`Go to profile for ${user?.name}`}
+                  className="flex items-center justify-center p-2 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-theme3 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer relative hover:bg-white/10 transition-all duration-300"
+                >
+                  <User
+                    className="h-5 w-5 sm:h-6 sm:w-6 transition-colors duration-300 text-theme3 hover:text-theme"
+                    strokeWidth={2}
+                  />
                   <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-bgimg"></span>
-                )}
-              </button>
-              {activeHeader === "header2" && (
-                <UserDropdown
-                  userOpen={isUserOpen}
-                  setUserOpen={setIsUserOpen}
-                />
+                </Link>
+              ) : (
+                <>
+                  <button
+                    onClick={(e) => handleUserClick("header2", e)}
+                    aria-label="User menu"
+                    className="flex items-center justify-center p-2 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-theme3 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer relative hover:bg-white/10 transition-all duration-300"
+                  >
+                    <User
+                      className="h-5 w-5 sm:h-6 sm:w-6 transition-colors duration-300 text-white hover:text-theme3"
+                      strokeWidth={2}
+                    />
+                  </button>
+                  {activeHeader === "header2" && (
+                    <UserDropdown
+                      userOpen={isUserOpen}
+                      setUserOpen={setIsUserOpen}
+                    />
+                  )}
+                </>
               )}
             </div>
 

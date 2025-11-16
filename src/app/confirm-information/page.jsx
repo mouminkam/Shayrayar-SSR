@@ -1,4 +1,4 @@
-"use client";
+
 import Breadcrumb from "../../components/ui/Breadcrumb";
 import ConfirmPasswordSection from "../../components/pages/confirm-information/ConfirmPasswordSection";
 

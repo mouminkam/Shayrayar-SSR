@@ -1,7 +1,7 @@
-"use client";
+
 import Breadcrumb from "../../components/ui/Breadcrumb";
-import CartTable from "../../sections/cart/CartTable";
-import CartSummary from "../../sections/cart/CartSummary";
+import CartTable from "../../components/cart/CartTable";
+import CartSummary from "../../components/cart/CartSummary";
 
 export default function CartPage() {
   return (

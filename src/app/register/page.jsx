@@ -1,4 +1,3 @@
-"use client";
 import Breadcrumb from "../../components/ui/Breadcrumb";
 import RegisterSection from "../../components/pages/register/RegisterSection";
 

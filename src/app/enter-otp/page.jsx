@@ -1,4 +1,4 @@
-"use client";
+
 import Breadcrumb from "../../components/ui/Breadcrumb";
 import OTPSection from "../../components/pages/enter-otp/OTPSection";
 

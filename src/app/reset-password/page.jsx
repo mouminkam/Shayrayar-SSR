@@ -1,4 +1,3 @@
-"use client";
 import Breadcrumb from "../../components/ui/Breadcrumb";
 import ResetPasswordSection from "../../components/pages/reset-password/ResetPasswordSection";
 

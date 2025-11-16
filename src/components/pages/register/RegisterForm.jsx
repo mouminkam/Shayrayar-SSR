@@ -84,7 +84,7 @@ export default function RegisterForm() {
 
     if (result.success) {
       toastSuccess("Account created successfully! Welcome!");
-      router.push("/profile");
+      router.push("/");
     } else {
       toastError(result.error || "Failed to create account. Please try again.");
     }
