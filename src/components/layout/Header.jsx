@@ -17,6 +17,7 @@ import SearchModal from "./header/SearchModal";
 import CartDropdown from "./header/CartDropdown";
 import UserDropdown from "./header/UserDropdown";
 import Sidebar from "./header/Sidebar";
+import BranchSelector from "./header/BranchSelector";
 import { useCart } from "../../hooks/useCart";
 import { useScroll } from "../../hooks/useScroll";
 import useAuthStore from "../../store/authStore";
@@ -172,6 +173,9 @@ const FreshHeatHeader = () => {
                 <span>{BUSINESS_HOURS}</span>
               </div>
               <div className="flex items-center gap-3">
+                {/* Branch Selector */}
+                <BranchSelector isMobile={false} />
+                
                 <span className="mr-2">FollowUs:</span>
                 {SOCIAL_LINKS.map((social) => {
                   const IconComponent = {
@@ -351,6 +355,11 @@ const FreshHeatHeader = () => {
 
           {/* Icons */}
           <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 xl:gap-6 shrink-0">
+            {/* Branch Selector - Mobile & Desktop */}
+            <div className="hidden sm:block">
+              <BranchSelector isMobile={true} />
+            </div>
+            
             {/* Search Icon */}
             <button
               onClick={handleSearchClick}

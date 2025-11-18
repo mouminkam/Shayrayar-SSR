@@ -11,11 +11,11 @@ export default function RegisterHeader() {
       >
         <UserPlus className="w-8 h-8 text-white fill-white" />
       </motion.div>
-      <h2 className="text-white font-['Epilogue',sans-serif] text-3xl font-black uppercase mb-2">
-        Create Account
+      <h2 className="text-theme3 font-['Epilogue',sans-serif] text-3xl font-black uppercase mb-2">
+        Sign Up to join us
       </h2>
       <p className="text-text text-base">
-        Sign up to get started with your account
+        Welcome Please enter your details.
       </p>
     </div>
   );

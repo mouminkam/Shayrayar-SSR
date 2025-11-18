@@ -1,5 +1,4 @@
-"use client";
-
+// Removed "use client" - This component only uses static JSX with an iframe which is SSR-compatible
 export default function Map() {
   return (
     <section className="relative w-full h-[550px]">

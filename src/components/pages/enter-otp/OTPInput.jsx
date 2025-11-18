@@ -1,5 +1,4 @@
 "use client";
-import { useRef } from "react";
 
 export default function OTPInput({ otp, setOtp, inputRefs }) {
   const handleChange = (index, value) => {
@@ -11,7 +10,7 @@ export default function OTPInput({ otp, setOtp, inputRefs }) {
     newOtp[index] = value;
     setOtp(newOtp);
 
-    if (value && index < 5) {
+    if (value && index < 3) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -23,15 +22,15 @@ export default function OTPInput({ otp, setOtp, inputRefs }) {
     if (e.key === "v" && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       navigator.clipboard.readText().then((text) => {
-        const digits = text.replace(/\D/g, "").slice(0, 6).split("");
+        const digits = text.replace(/\D/g, "").slice(0, 4).split("");
         const newOtp = [...otp];
         digits.forEach((digit, i) => {
-          if (i < 6) {
+          if (i < 4) {
             newOtp[i] = digit;
           }
         });
         setOtp(newOtp);
-        const nextIndex = Math.min(digits.length, 5);
+        const nextIndex = Math.min(digits.length, 3);
         inputRefs.current[nextIndex]?.focus();
       });
     }

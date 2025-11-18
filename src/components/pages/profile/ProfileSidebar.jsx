@@ -10,9 +10,14 @@ export default function ProfileSidebar({ user, orders }) {
   const { logout } = useAuthStore();
   const wishlistItems = useWishlistStore((state) => state.items);
 
-  const handleLogout = () => {
-    logout();
-    router.push("/");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push("/");
+    } catch (error) {
+      // Logout will still clear local state even if API call fails
+      router.push("/");
+    }
   };
 
   return (

@@ -1,5 +1,4 @@
-"use client";
-
+// Removed "use client" - This component only uses static JSX which is SSR-compatible
 export default function BackgroundShapes() {
   return (
     <>

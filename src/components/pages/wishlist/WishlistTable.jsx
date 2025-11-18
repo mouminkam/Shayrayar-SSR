@@ -77,7 +77,7 @@ const WishlistTable = memo(() => {
         <tbody>
           {items.map((item, index) => (
             <motion.tr
-              key={item.id}
+              key={item.id || `wishlist-item-${index}`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
@@ -85,7 +85,7 @@ const WishlistTable = memo(() => {
             >
               <td className="py-6 px-4">
                 <div className="flex items-center gap-4">
-                  <Link href="/shop-details" className="shrink-0 group">
+                  <Link href={`/shop/${item.id}`} className="shrink-0 group">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       className="relative w-20 h-20 rounded-xl overflow-hidden transition-all duration-300"
@@ -100,7 +100,7 @@ const WishlistTable = memo(() => {
                     </motion.div>
                   </Link>
                   <Link
-                    href="/shop-details"
+                    href={`/shop/${item.id}`}
                     className="text-white font-['Epilogue',sans-serif] text-lg font-bold hover:text-theme transition-colors duration-300"
                   >
                     {item.name}
@@ -158,7 +158,7 @@ const WishlistTable = memo(() => {
     <div className="lg:hidden space-y-4 mb-8">
       {items.map((item, index) => (
         <motion.div
-          key={item.id}
+          key={item.id || `wishlist-mobile-item-${index}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: index * 0.05 }}
@@ -166,7 +166,7 @@ const WishlistTable = memo(() => {
         >
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Image */}
-            <Link href="/shop-details" className="shrink-0 group">
+            <Link href={`/shop/${item.id}`} className="shrink-0 group">
               <div className="relative w-full sm:w-24 h-24 rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-shadow duration-300">
                 <Image
                   src={item.image || "/img/placeholder.png"}
@@ -181,7 +181,7 @@ const WishlistTable = memo(() => {
             {/* Content */}
             <div className="flex-1 min-w-0">
               <Link
-                href="/shop-details"
+                href={`/shop/${item.id}`}
                 className="text-white font-['Epilogue',sans-serif] text-lg font-bold hover:text-theme transition-colors duration-300 block mb-2"
               >
                 {item.name}

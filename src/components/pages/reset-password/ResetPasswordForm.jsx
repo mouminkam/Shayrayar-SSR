@@ -12,33 +12,62 @@ export default function ResetPasswordForm() {
   const { success: toastSuccess, error: toastError } = useToastStore();
 
   const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    // Clear error when user starts typing
+    if (errors.email) {
+      setErrors((prev) => ({
+        ...prev,
+        email: "",
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
-    if (!email) {
-      setError("Email is required");
+    if (!validateForm()) {
       return;
     }
 
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
+    try {
+      const result = await resetPasswordRequest(email);
 
-    const result = await resetPasswordRequest(email);
+      if (result.success) {
+        // Save email to sessionStorage for OTP verification
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("resetEmail", email);
+          // Clear any old token
+          sessionStorage.removeItem("resetToken");
+        }
 
-    if (result.success) {
-      toastSuccess("OTP sent to your email! Please check your inbox.");
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem("resetEmail", email);
+        toastSuccess(result.message || "OTP sent to your email! Please check your inbox.");
+        router.push("/enter-otp");
+      } else {
+        const errorMessage = result.error || "Failed to send OTP. Please try again.";
+        toastError(errorMessage);
+        setErrors({ email: errorMessage });
       }
-      router.push("/enter-otp");
-    } else {
-      toastError(result.error || "Failed to send OTP. Please try again.");
-      setError(result.error || "Failed to send OTP");
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred. Please try again.";
+      toastError(errorMessage);
+      setErrors({ email: errorMessage });
     }
   };
 
@@ -47,21 +76,20 @@ export default function ResetPasswordForm() {
       <div>
         <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
           <Mail className="w-4 h-4 inline mr-1" />
-          Email Address
+          Enter your email address
         </label>
         <input
           type="email"
           value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setError("");
-          }}
+          onChange={handleInputChange}
           className={`w-full px-4 py-3 bg-white/10 border ${
-            error ? "border-red-500" : "border-white/20"
+            errors.email ? "border-red-500" : "border-white/20"
           } rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300`}
           placeholder="your@email.com"
         />
-        {error && <p className="mt-1 text-red-400 text-sm">{error}</p>}
+        {errors.email && (
+          <p className="mt-1 text-red-400 text-sm">{errors.email}</p>
+        )}
       </div>
 
       <motion.button
@@ -78,11 +106,11 @@ export default function ResetPasswordForm() {
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
             />
-            Sending OTP...
+            Sending...
           </>
         ) : (
           <>
-            Send OTP
+            Send Code
             <ArrowRight className="w-5 h-5" />
           </>
         )}
@@ -90,4 +118,3 @@ export default function ResetPasswordForm() {
     </form>
   );
 }
-

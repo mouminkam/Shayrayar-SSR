@@ -1,6 +1,7 @@
 import FreshHeatHeader from "../components/layout/Header";
 import FreshHeatFooter from "../components/layout/Footer";
 import Toast from "../components/ui/Toast";
+import BranchInitializer from "../components/layout/BranchInitializer";
 import "./globals.css";
 
 export const metadata = {
@@ -17,15 +18,14 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/img/logo/mainlogo.png" type="image/png" />
       </head>
 
-      <body>
-      
+      <body suppressHydrationWarning>
+          <BranchInitializer />
           <FreshHeatHeader />
           <main id="main" role="main">
             {children}
           </main>
           <FreshHeatFooter />
           <Toast />
-       
       </body>
     </html>
   );

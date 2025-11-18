@@ -1,20 +1,88 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, MessageSquare, Star, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { User, Mail, MessageSquare, Star, ArrowRight, Loader2 } from "lucide-react";
+import useAuthStore from "../../store/authStore";
+import useToastStore from "../../store/toastStore";
+// import api from "../../api"; // TODO: Uncomment when review API is available
 
-export default function ReviewForm() {
+export default function ReviewForm({ productId }) {
+  const router = useRouter();
+  const { isAuthenticated, user } = useAuthStore();
+  const { success: toastSuccess, error: toastError } = useToastStore();
   const [rating, setRating] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    name: user?.name || "",
+    email: user?.email || "",
     message: "",
     saveInfo: false,
   });
 
-  const handleSubmit = (e) => {
+  // Update form data when user changes
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: prev.name || user.name || "",
+        email: prev.email || user.email || "",
+      }));
+    }
+  }, [user]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Review submitted:", { rating, ...formData });
+    
+    // Check authentication
+    if (!isAuthenticated) {
+      toastError("Please login to submit a review");
+      router.push("/login");
+      return;
+    }
+
+    // Validate rating
+    if (rating === 0) {
+      toastError("Please select a rating");
+      return;
+    }
+
+    // Validate message
+    if (!formData.message.trim()) {
+      toastError("Please write a review message");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // TODO: Replace with actual API call when review endpoint is available
+      // const response = await api.menu.submitReview(productId, {
+      //   rating,
+      //   comment: formData.message,
+      // });
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toastSuccess("Review submitted successfully!");
+      
+      // Reset form
+      setRating(0);
+      setFormData({
+        name: user?.name || "",
+        email: user?.email || "",
+        message: "",
+        saveInfo: formData.saveInfo,
+      });
+      
+      // TODO: Refresh reviews list after successful submission
+      // router.refresh();
+    } catch (error) {
+      toastError(error.message || "Failed to submit review. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -168,12 +236,24 @@ export default function ReviewForm() {
         >
           <motion.button
             type="submit"
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-            className="theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3 font-['Epilogue',sans-serif] text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30"
+            disabled={isSubmitting || rating === 0}
+            whileHover={!isSubmitting && rating > 0 ? { scale: 1.02, y: -2 } : {}}
+            whileTap={!isSubmitting && rating > 0 ? { scale: 0.98 } : {}}
+            className={`theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3 font-['Epilogue',sans-serif] text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30 ${
+              isSubmitting || rating === 0 ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
-            Post A Comment
-            <ArrowRight className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                Post A Comment
+                <ArrowRight className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
+              </>
+            )}
           </motion.button>
         </motion.div>
       </form>

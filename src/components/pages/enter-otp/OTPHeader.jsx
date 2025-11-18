@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { KeyRound } from "lucide-react";
 
-export default function OTPHeader({ email }) {
+export default function OTPHeader({ phone, email, flowType }) {
   return (
     <div className="text-center mb-8">
       <motion.div
@@ -11,14 +11,14 @@ export default function OTPHeader({ email }) {
       >
         <KeyRound className="w-8 h-8 text-white fill-white" />
       </motion.div>
-      <h2 className="text-white font-['Epilogue',sans-serif] text-3xl font-black uppercase mb-2">
-        Enter OTP
+      <h2 className="text-theme3 font-['Epilogue',sans-serif] text-3xl font-black uppercase mb-2">
+        Verify OTP
       </h2>
-      <p className="text-text text-base mb-1">
-        We've sent a 6-digit code to
+      <p className="text-text text-base">
+        {flowType === "registration"
+          ? `Enter your OTP which has been sent to your phone ${phone ? `(${phone})` : ""} and complete verify your account.`
+          : `Enter your OTP which has been sent to your email ${email ? `(${email})` : ""} and complete verify your account.`}
       </p>
-      <p className="text-theme3 font-semibold">{email}</p>
     </div>
   );
 }
-

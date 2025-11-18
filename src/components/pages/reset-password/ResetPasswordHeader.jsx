@@ -11,11 +11,11 @@ export default function ResetPasswordHeader() {
       >
         <KeyRound className="w-8 h-8 text-white fill-white" />
       </motion.div>
-      <h2 className="text-white font-['Epilogue',sans-serif] text-3xl font-black uppercase mb-2">
-        Reset Password
+      <h2 className="text-theme3 font-['Epilogue',sans-serif] text-3xl font-black uppercase mb-2">
+        Confirm your Information
       </h2>
       <p className="text-text text-base">
-        Enter your email address and we'll send you an OTP to reset your password
+        Enter the email address associated with your account and we'll send a code to reset your password
       </p>
     </div>
   );

@@ -1,11 +1,11 @@
+import Breadcrumb from "../../../components/ui/Breadcrumb";
+import BlogDetailsContent from "../../../components/blog/blog-details/BlogDetailsContent";
+import BlogDetailsSidebar from "../../../components/blog/blog-details/BlogDetailsSidebar";
+import CommentsSection from "../../../components/blog/blog-details/CommentsSection";
+import CommentForm from "../../../components/blog/blog-details/CommentForm";
 
-import Breadcrumb from "../../components/ui/Breadcrumb";
-import BlogDetailsContent from "../../components/blog/blog-details/BlogDetailsContent";
-import BlogDetailsSidebar from "../../components/blog/blog-details/BlogDetailsSidebar";
-import CommentsSection from "../../components/blog/blog-details/CommentsSection";
-import CommentForm from "../../components/blog/blog-details/CommentForm";
-
-export default function BlogDetailsPage() {
+export default async function BlogDetailsPage({ params }) {
+  const { slug } = await params;
   return (
     <div className="bg-bg3 min-h-screen">
       <Breadcrumb title="Blog Details" />
@@ -15,7 +15,7 @@ export default function BlogDetailsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
               {/* Main Content */}
               <div className="lg:col-span-8">
-                <BlogDetailsContent />
+                <BlogDetailsContent slug={slug} />
               </div>
 
               {/* Sidebar */}
@@ -24,8 +24,8 @@ export default function BlogDetailsPage() {
               </div>
             </div>
             <div className="px-0 md:px-0 lg:px-15 xl:px-30">
-              <CommentsSection />
-              <CommentForm />
+              <CommentsSection slug={slug} />
+              <CommentForm slug={slug} />
             </div>
           </div>
         </div>

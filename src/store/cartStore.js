@@ -5,37 +5,11 @@ import { persist, createJSONStorage } from "zustand/middleware";
 // Cart item structure
 // { id, name, price, quantity, image }
 
-// بيانات وهمية للاختبار
-const DUMMY_CART_ITEMS = [
-  {
-    id: 1,
-    name: "Fried Chicken",
-    price: 80.0,
-    quantity: 2,
-    image: "/img/blog/blogRecentThumb3_1.png",
-  },
-  {
-    id: 2,
-    name: "Fried Noodles",
-    price: 60.0,
-    quantity: 1,
-    image: "/img/blog/blogRecentThumb3_2.png",
-  },
-  {
-    id: 3,
-    name: "Special Pasta",
-    price: 70.0,
-    quantity: 3,
-    image: "/img/blog/blogRecentThumb3_3.png",
-  },
-];
-
 const useCartStore = create(
   persist(
     (set, get) => ({
       // State - الحالة الأساسية للـ cart
-      // items: [], // Cart فارغ افتراضياً
-      items: DUMMY_CART_ITEMS, // بيانات وهمية للاختبار - احذف هذا السطر لتفعيل cart فارغ
+      items: [], // Cart فارغ افتراضياً
 
       // Actions
       addToCart: (product) => {
@@ -111,11 +85,6 @@ const useCartStore = create(
 
       getItemCount: () => {
         return get().items.reduce((sum, item) => sum + item.quantity, 0);
-      },
-
-      // دالة لإضافة بيانات وهمية للاختبار
-      addDummyData: () => {
-        set({ items: DUMMY_CART_ITEMS });
       },
     }),
     {

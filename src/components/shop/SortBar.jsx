@@ -1,9 +1,34 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Grid, List } from "lucide-react";
 
 export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage = 12, onViewChange, viewMode = "grid" }) {
-  const [sortBy, setSortBy] = useState("menu_order");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentSort = searchParams.get("sort") || "menu_order";
+  const [sortBy, setSortBy] = useState(currentSort);
+
+  // Update sortBy when URL changes
+  useEffect(() => {
+    setSortBy(currentSort);
+  }, [currentSort]);
+
+  // Handle sort change
+  const handleSortChange = (e) => {
+    const newSort = e.target.value;
+    setSortBy(newSort);
+    
+    const params = new URLSearchParams(searchParams.toString());
+    if (newSort && newSort !== "menu_order") {
+      params.set("sort", newSort);
+    } else {
+      params.delete("sort");
+    }
+    params.delete("page"); // Reset to first page
+    
+    router.push(`/shop?${params.toString()}`);
+  };
 
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
@@ -34,7 +59,7 @@ export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage 
                 name="orderby"
                 className="h-12 leading-[46px] bg-bgimg border border-gray-200 w-3/4 sm:w-auto min-w-[200px] text-sm sm:text-base px-4 pr-10 rounded-lg transition-all duration-300 appearance-none  text-white font-['Roboto',sans-serif] cursor-pointer"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+                onChange={handleSortChange}
               >
                 <option value="menu_order">Default Sorting</option>
                 <option value="popularity">Sort by popularity</option>

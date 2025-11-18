@@ -1,5 +1,4 @@
-"use client";
-
+// Removed "use client" - This component only uses static JSX with CSS animations which are SSR-compatible
 export default function MarqueeSection() {
   const items = [
     "chicken pizza ",

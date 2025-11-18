@@ -40,7 +40,7 @@ export default function WishlistPreview({ wishlistItems }) {
         {wishlistItems.slice(0, 6).map((item) => (
           <Link
             key={item.id}
-            href="/shop-details"
+            href={`/shop/${item.id}`}
             className="group relative aspect-square rounded-xl overflow-hidden border border-white/10 hover:border-theme3/50 transition-all duration-300"
           >
             <Image

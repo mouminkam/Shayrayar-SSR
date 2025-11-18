@@ -1,16 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import useAuthStore from "../../../store/authStore";
 import useToastStore from "../../../store/toastStore";
 
-export default function ConfirmPasswordForm({ email }) {
+export default function ConfirmPasswordForm() {
   const router = useRouter();
   const { resetPassword, isLoading } = useAuthStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
 
+  const [resetToken, setResetToken] = useState("");
+  const [resetEmail, setResetEmail] = useState("");
   const [formData, setFormData] = useState({
     newPassword: "",
     confirmPassword: "",
@@ -19,12 +21,37 @@ export default function ConfirmPasswordForm({ email }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
+  useEffect(() => {
+    // Get token and email from sessionStorage
+    if (typeof window !== "undefined") {
+      const token = sessionStorage.getItem("resetToken");
+      const storedEmail = sessionStorage.getItem("resetEmail");
+      
+      if (token) {
+        setResetToken(token);
+      }
+      
+      if (storedEmail) {
+        setResetEmail(storedEmail);
+      }
+      
+      // Redirect if token or email is missing
+      if (!token || !storedEmail) {
+        toastError("Session expired. Please start the password reset process again.");
+        setTimeout(() => {
+          router.push("/reset-password");
+        }, 2000);
+      }
+    }
+  }, [router, toastError]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -59,18 +86,56 @@ export default function ConfirmPasswordForm({ email }) {
       return;
     }
 
-    const result = await resetPassword(email, formData.newPassword);
+    // Validate that we have token and email
+    if (!resetToken || !resetEmail) {
+      toastError("Session expired. Please start the password reset process again.");
+      router.push("/reset-password");
+      return;
+    }
 
-    if (result.success) {
-      toastSuccess("Password reset successfully! You can now login with your new password.");
-      if (typeof window !== "undefined") {
-        sessionStorage.removeItem("resetEmail");
+    // Prepare reset data according to API requirements
+    const resetData = {
+      token: resetToken,
+      email: resetEmail,
+      password: formData.newPassword,
+      password_confirmation: formData.confirmPassword,
+    };
+
+    try {
+      const result = await resetPassword(resetData);
+
+      if (result.success) {
+        toastSuccess("Password reset successfully! You can now login with your new password.");
+        // Clean up sessionStorage
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("resetEmail");
+          sessionStorage.removeItem("resetToken");
+        }
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+      } else {
+        // Handle API validation errors
+        const errorMessage = result.error || "Failed to reset password. Please try again.";
+        toastError(errorMessage);
+        
+        // Set field-specific errors if available from API
+        if (result.errors) {
+          const apiErrors = {};
+          Object.keys(result.errors).forEach((key) => {
+            // Map API error keys to form field names
+            const fieldName = key === "password" ? "newPassword" : 
+                             key === "password_confirmation" ? "confirmPassword" : key;
+            apiErrors[fieldName] = Array.isArray(result.errors[key]) 
+              ? result.errors[key][0] 
+              : result.errors[key];
+          });
+          setErrors({ ...errors, ...apiErrors });
+        }
       }
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
-    } else {
-      toastError(result.error || "Failed to reset password. Please try again.");
+    } catch (error) {
+      // Handle unexpected errors
+      toastError(error.message || "An unexpected error occurred. Please try again.");
     }
   };
 
@@ -80,7 +145,7 @@ export default function ConfirmPasswordForm({ email }) {
       <div>
         <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
           <Lock className="w-4 h-4 inline mr-1" />
-          New Password
+          Create new password
         </label>
         <div className="relative">
           <input
@@ -114,7 +179,7 @@ export default function ConfirmPasswordForm({ email }) {
       <div>
         <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
           <Lock className="w-4 h-4 inline mr-1" />
-          Confirm New Password
+          Confirm password
         </label>
         <div className="relative">
           <input
@@ -171,4 +236,3 @@ export default function ConfirmPasswordForm({ email }) {
     </form>
   );
 }
-

@@ -77,7 +77,7 @@ const CartTable = memo(() => {
             >
               <td className="py-6 px-4">
                 <div className="flex items-center gap-4">
-                  <Link href="/shop-details" className="shrink-0 group">
+                  <Link href={`/shop/${item.id}`} className="shrink-0 group">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       className="relative w-20 h-20 rounded-xl overflow-hidden transition-all duration-300"
@@ -92,7 +92,7 @@ const CartTable = memo(() => {
                     </motion.div>
                   </Link>
                   <Link
-                    href="/shop-details"
+                    href={`/shop/${item.id}`}
                     className="text-white font-['Epilogue',sans-serif] text-lg font-bold hover:text-theme transition-colors duration-300"
                   >
                     {item.name}
@@ -165,7 +165,7 @@ const CartTable = memo(() => {
         >
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Image */}
-            <Link href="/shop-details" className="shrink-0 group">
+            <Link href={`/shop/${item.id}`} className="shrink-0 group">
               <div className="relative w-full sm:w-24 h-50 rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-shadow duration-300">
                 <Image
                   src={item.image || IMAGE_PATHS.placeholder}
@@ -180,7 +180,7 @@ const CartTable = memo(() => {
             {/* Content */}
             <div className="flex-1 min-w-0">
               <Link
-                href="/shop-details"
+                href={`/shop/${item.id}`}
                 className="text-white font-['Epilogue',sans-serif] text-lg font-bold hover:text-theme transition-colors duration-300 block mb-2"
               >
                 {item.name}

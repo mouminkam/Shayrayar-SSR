@@ -140,7 +140,7 @@ export default function BlogSection() {
                     </div>
 
                     {/* Title */}
-                    <Link href="/blog-details" className="flex-1">
+                    <Link href={`/blog/${blog.slug || blog.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`} className="flex-1">
                       <h3 className="text-white font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold mb-4  transition-colors duration-300 line-clamp-2">
                         {blog.title}
                       </h3>
@@ -148,7 +148,7 @@ export default function BlogSection() {
 
                     {/* Read More */}
                     <Link
-                      href="/blog-details"
+                      href={`/blog/${blog.slug || blog.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`}
                       className="text-theme3 font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all duration-300 mt-auto"
                     >
                       <span>Read More</span>

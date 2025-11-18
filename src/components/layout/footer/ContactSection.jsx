@@ -1,4 +1,4 @@
-"use client";
+// Removed "use client" - This component only uses static JSX, Link, and an uncontrolled form without state management, which are SSR-compatible
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 

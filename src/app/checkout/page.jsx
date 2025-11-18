@@ -5,19 +5,27 @@ import Breadcrumb from "../../components/ui/Breadcrumb";
 import CheckoutSummary from "../../components/pages/checkout/CheckoutSummary";
 import BillingForm from "../../components/pages/checkout/BillingForm";
 import useCartStore from "../../store/cartStore";
+import useAuthStore from "../../store/authStore";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const items = useCartStore((state) => state.items);
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
+    // Redirect to login if not authenticated
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+    
     // Redirect to cart if cart is empty
     if (items.length === 0) {
       router.push("/cart");
     }
-  }, [items, router]);
+  }, [items, router, isAuthenticated]);
 
-  if (items.length === 0) {
+  if (!isAuthenticated || items.length === 0) {
     return null;
   }
 

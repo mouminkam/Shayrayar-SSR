@@ -1,4 +1,4 @@
-"use client";
+// Removed "use client" - This component only uses static JSX, Image, and Link components which are SSR-compatible
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";

@@ -1,69 +1,135 @@
 "use client";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import api from "../api";
+import useAuthStore from "./authStore";
 
 // Wishlist item structure
 // { id, name, price, image, originalPrice (optional), dateAdded (optional) }
-
-// Dummy data for testing
-const DUMMY_WISHLIST_ITEMS = [
-  {
-    id: 58,
-    name: "Egg and Cucumber",
-    image: "/img/dishes/dishes5_1.png",
-    price: 45.0,
-    originalPrice: null,
-  },
-  {
-    id: 60,
-    name: "Brick Oven Pepperoni",
-    image: "/img/dishes/dishes5_2.png",
-    price: 18.0,
-    originalPrice: 20.0,
-  },
-  {
-    id: 61,
-    name: "Double Patty Veg",
-    image: "/img/dishes/dishes5_3.png",
-    price: 18.0,
-    originalPrice: 20.0,
-  },
-];
 
 const useWishlistStore = create(
   persist(
     (set, get) => ({
       // State
-      // items: [], // Empty wishlist by default
-      items: DUMMY_WISHLIST_ITEMS, // بيانات وهمية للاختبار - احذف هذا السطر لتفعيل wishlist فارغ
+      items: [], // Empty wishlist by default
+      isLoading: false,
 
       // Actions
-      addToWishlist: (product) => {
-        const items = get().items;
-        const existingItem = items.find((item) => item.id === product.id);
+      addToWishlist: async (product) => {
+        const { isAuthenticated } = useAuthStore.getState();
+        
+        // If not authenticated, prevent adding to wishlist
+        if (!isAuthenticated) {
+          return { 
+            success: false, 
+            error: "Please login to add items to wishlist",
+            requiresAuth: true 
+          };
+        }
 
-        if (!existingItem) {
-          // Only add if item doesn't exist
-          set({
-            items: [
-              ...items,
-              {
-                ...product,
-                dateAdded: new Date().toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                }),
-              },
-            ],
-          });
+        // If authenticated, sync with API
+        set({ isLoading: true });
+        try {
+          const response = await api.customer.addToFavorites(product.id);
+          
+          if (response.success) {
+            // Add to local state
+            const items = get().items;
+            const existingItem = items.find((item) => item.id === product.id);
+
+            if (!existingItem) {
+              set({
+                items: [
+                  ...items,
+                  {
+                    ...product,
+                    dateAdded: new Date().toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }),
+                  },
+                ],
+                isLoading: false,
+              });
+            } else {
+              set({ isLoading: false });
+            }
+
+            return { success: true };
+          } else {
+            set({ isLoading: false });
+            return { success: false, error: response.message };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          return { success: false, error: error.message };
         }
       },
 
-      removeFromWishlist: (id) => {
-        set({
-          items: get().items.filter((item) => item.id !== id),
-        });
+      removeFromWishlist: async (id) => {
+        const { isAuthenticated } = useAuthStore.getState();
+        
+        // If not authenticated, prevent removing from wishlist
+        if (!isAuthenticated) {
+          return { 
+            success: false, 
+            error: "Please login to manage wishlist",
+            requiresAuth: true 
+          };
+        }
+
+        // If authenticated, sync with API
+        set({ isLoading: true });
+        try {
+          const response = await api.customer.removeFromFavorites(id);
+          
+          if (response.success) {
+            set({
+              items: get().items.filter((item) => item.id !== id),
+              isLoading: false,
+            });
+            return { success: true };
+          } else {
+            set({ isLoading: false });
+            return { success: false, error: response.message };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          return { success: false, error: error.message };
+        }
+      },
+
+      fetchFavorites: async () => {
+        const { isAuthenticated } = useAuthStore.getState();
+        
+        if (!isAuthenticated) {
+          return { success: false, error: "Not authenticated" };
+        }
+
+        set({ isLoading: true });
+        try {
+          const response = await api.customer.getFavorites();
+          
+          if (response.success && response.data) {
+            // Transform API response to match local structure
+            const favorites = Array.isArray(response.data) 
+              ? response.data 
+              : response.data.favorites || response.data.items || [];
+            
+            set({
+              items: favorites,
+              isLoading: false,
+            });
+            return { success: true, items: favorites };
+          } else {
+            set({ isLoading: false });
+            return { success: false, error: response.message };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          return { success: false, error: error.message };
+        }
       },
 
       clearWishlist: () => {
@@ -78,11 +144,6 @@ const useWishlistStore = create(
       // Derived state (computed values)
       getItemCount: () => {
         return get().items.length;
-      },
-
-      // Add dummy data for testing
-      addDummyData: () => {
-        set({ items: DUMMY_WISHLIST_ITEMS });
       },
     }),
     {

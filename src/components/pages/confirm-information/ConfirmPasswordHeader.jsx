@@ -11,11 +11,11 @@ export default function ConfirmPasswordHeader() {
       >
         <CheckCircle className="w-8 h-8 text-white fill-white" />
       </motion.div>
-      <h2 className="text-white font-['Epilogue',sans-serif] text-3xl font-black uppercase mb-2">
-        Set New Password
+      <h2 className="text-theme3 font-['Epilogue',sans-serif] text-3xl font-black uppercase mb-2">
+        Create new password
       </h2>
       <p className="text-text text-base">
-        Please enter your new password below
+        Welcome back! Please enter your details.
       </p>
     </div>
   );

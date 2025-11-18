@@ -8,20 +8,36 @@ import OTPFooter from "./OTPFooter";
 
 export default function OTPSection() {
   const router = useRouter();
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [flowType, setFlowType] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedEmail = sessionStorage.getItem("resetEmail");
-      if (storedEmail) {
-        setEmail(storedEmail);
+      const registrationPhone = sessionStorage.getItem("registrationPhone");
+      const resetEmail = sessionStorage.getItem("resetEmail");
+
+      // Load session data - necessary for client-side only data
+      if (registrationPhone) {
+        setPhone(registrationPhone);
+        setFlowType("registration");
+        setIsLoading(false);
+      } else if (resetEmail) {
+        setEmail(resetEmail);
+        setFlowType("reset");
+        setIsLoading(false);
       } else {
-        router.push("/reset-password");
+        // No flow data, redirect
+        router.push("/register");
       }
     }
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  if (!email) return null;
+  if (isLoading || !flowType) {
+    return null; // Loading state
+  }
 
   return (
     <motion.div
@@ -30,10 +46,9 @@ export default function OTPSection() {
       transition={{ duration: 0.3 }}
       className="bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 p-8 lg:p-10"
     >
-      <OTPHeader email={email} />
-      <OTPForm email={email} />
+      <OTPHeader phone={phone} email={email} flowType={flowType} />
+      <OTPForm />
       <OTPFooter />
     </motion.div>
   );
 }
-

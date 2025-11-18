@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 
-export default function CommentForm() {
+export default function CommentForm({ slug }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",

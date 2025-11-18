@@ -1,4 +1,4 @@
-"use client";
+// Removed "use client" - This component only uses static JSX which is SSR-compatible
 import { MapPin, Mail, Phone, Clock } from "lucide-react";
 
 export default function ContactBoxes() {

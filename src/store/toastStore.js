@@ -21,6 +21,7 @@ const useToastStore = create((set) => ({
     // Auto remove after duration
     if (duration > 0) {
       setTimeout(() => {
+        
         set((state) => ({
           toasts: state.toasts.filter((t) => t.id !== id),
         }));

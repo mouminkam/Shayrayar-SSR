@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Facebook, Twitter, Youtube, Linkedin } from "lucide-react";
 
-export default function CommentsSection() {
+export default function CommentsSection({ slug }) {
   const comments = [
     {
       id: 1,
@@ -33,19 +33,19 @@ export default function CommentsSection() {
               Tags:{" "}
             </h6>
             <Link
-              href="/blog-details"
+              href="/blog"
               className="inline-flex px-4 py-2 text-title font-['Epilogue',sans-serif] text-sm font-normal capitalize bg-white border border-gray-200 rounded transition-all duration-300 hover:bg-theme3 hover:text-white hover:border-theme3"
             >
               News
             </Link>
             <Link
-              href="/blog-details"
+              href="/blog"
               className="inline-flex px-4 py-2 text-white font-['Epilogue',sans-serif] text-sm font-normal capitalize bg-theme3 border border-theme3 rounded transition-all duration-300"
             >
               business
             </Link>
             <Link
-              href="/blog-details"
+              href="/blog"
               className="inline-flex px-4 py-2 text-title font-['Epilogue',sans-serif] text-sm font-normal capitalize bg-white border border-gray-200 rounded transition-all duration-300 hover:bg-theme3 hover:text-white hover:border-theme3"
             >
               marketing
@@ -118,22 +118,18 @@ export default function CommentsSection() {
             <div className="head flex flex-wrap gap-2 sm:gap-4 items-center justify-between mb-3">
               <div className="con">
                 <h5 className="mb-1">
-                  <Link
-                    href="/blog-details"
-                    className="text-white font-['Epilogue',sans-serif] text-lg sm:text-xl font-semibold capitalize hover:text-theme3 transition-colors duration-300"
-                  >
+                  <span className="text-white font-['Epilogue',sans-serif] text-lg sm:text-xl font-semibold capitalize">
                     {comment.author}
-                  </Link>
+                  </span>
                 </h5>
                 <span className="text-text font-['Roboto',sans-serif] text-sm">{comment.date}</span>
               </div>
               <div className="btn">
-                <Link
-                  href="/blog-details"
+                <button
                   className="inline-flex px-10 py-2 bg-theme3 text-white font-['Roboto',sans-serif] text-md rounded-full hover:bg-theme transition-colors duration-300"
                 >
                   Reply
-                </Link>
+                </button>
               </div>
             </div>
             <p className="text-text font-['Roboto',sans-serif] text-base leading-7 mb-0">{comment.comment}</p>

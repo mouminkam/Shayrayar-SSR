@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight, User, MessageCircle, Tag } from "lucide-react";
 
 
-export default function BlogDetailsContent() {
+export default function BlogDetailsContent({ slug }) {
   return (
     <div className="blog-post-details">
       <div className="single-blog-post">

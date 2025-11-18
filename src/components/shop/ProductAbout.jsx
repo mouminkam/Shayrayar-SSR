@@ -2,10 +2,95 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ShoppingCart, Heart, Facebook, Youtube, Twitter, Instagram, Plus, Minus, Star } from "lucide-react";
+import { formatCurrency } from "../../lib/utils/formatters";
+import useCartStore from "../../store/cartStore";
+import useWishlistStore from "../../store/wishlistStore";
+import useToastStore from "../../store/toastStore";
+import useAuthStore from "../../store/authStore";
 
-export default function ProductAbout() {
+export default function ProductAbout({ product }) {
+  const router = useRouter();
+  const { addToCart } = useCartStore();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistStore();
+  const { success: toastSuccess, error: toastError } = useToastStore();
+  const { isAuthenticated } = useAuthStore();
+  
   const [quantity, setQuantity] = useState(1);
+  const isInWishlistState = product?.id ? isInWishlist(product.id) : false;
+
+  // Handle add to cart
+  const handleAddToCart = () => {
+    if (!product) return;
+    
+    // Check authentication first
+    if (!isAuthenticated) {
+      toastError("Please login to add items to cart");
+      router.push("/login");
+      return;
+    }
+    
+    try {
+      for (let i = 0; i < quantity; i++) {
+        addToCart({
+          id: product.id,
+          name: product.title,
+          price: product.price,
+          image: product.image,
+          title: product.title,
+        });
+      }
+      toastSuccess(`${quantity} x ${product.title} added to cart`);
+      setQuantity(1);
+    } catch {
+      toastError("Failed to add product to cart");
+    }
+  };
+
+  // Handle wishlist toggle
+  const handleWishlistToggle = async () => {
+    if (!product) return;
+    
+    // Check authentication first
+    if (!isAuthenticated) {
+      toastError("Please login to add items to wishlist");
+      router.push("/login");
+      return;
+    }
+    
+    try {
+      if (isInWishlistState) {
+        const result = await removeFromWishlist(product.id);
+        if (result.success) {
+          toastSuccess(`${product.title} removed from wishlist`);
+        } else {
+          if (result.requiresAuth) {
+            router.push("/login");
+          }
+          toastError(result.error || "Failed to remove from wishlist");
+        }
+      } else {
+        const result = await addToWishlist({
+          id: product.id,
+          name: product.title,
+          price: product.price,
+          image: product.image,
+          title: product.title,
+        });
+        if (result.success) {
+          toastSuccess(`${product.title} added to wishlist`);
+        } else {
+          if (result.requiresAuth) {
+            router.push("/login");
+          }
+          toastError(result.error || "Failed to add to wishlist");
+        }
+      }
+    } catch {
+      toastError("Failed to update wishlist");
+    }
+  };
 
   const handleQuantityChange = (delta) => {
     setQuantity((prev) => Math.max(1, prev + delta));
@@ -26,7 +111,7 @@ export default function ProductAbout() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="product-title text-white font-['Epilogue',sans-serif] text-3xl sm:text-4xl lg:text-5xl font-black leading-tight"
         >
-          Chicken Pizza
+          {product?.title || "Product"}
         </motion.h2>
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -34,7 +119,7 @@ export default function ProductAbout() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="price text-theme font-['Epilogue',sans-serif] text-4xl sm:text-5xl lg:text-6xl font-black"
         >
-          $69
+          {product?.price ? formatCurrency(product.price) : "$0.00"}
         </motion.div>
       </div>
 
@@ -53,12 +138,9 @@ export default function ProductAbout() {
             />
           ))}
         </div>
-        <Link
-          href="/shop-details"
-          className="woocommerce-review-link text-text text-sm sm:text-base hover:text-theme3 transition-colors duration-300 inline-flex items-center gap-1"
-        >
+        <span className="woocommerce-review-link text-text text-sm sm:text-base inline-flex items-center gap-1">
           <span>(2 customer reviews)</span>
-        </Link>
+        </span>
       </motion.div>
 
       {/* Description */}
@@ -68,8 +150,7 @@ export default function ProductAbout() {
         transition={{ duration: 0.5, delay: 0.6 }}
         className="text text-white text-base sm:text-lg font-['Roboto',sans-serif] font-normal leading-relaxed mb-8"
       >
-        Aliquam hendrerit a augue insuscipit. Etiam aliquam massa quis des mauris commodo venenatis
-        ligula commodo leez sed blandit convallis dignissim onec vel pellentesque neque.
+        {product?.description || product?.longDescription || "No description available."}
       </motion.p>
 
       {/* Actions */}
@@ -116,26 +197,30 @@ export default function ProductAbout() {
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Link
-              href="/cart"
+            <button
+              onClick={handleAddToCart}
               className="theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3 font-['Epilogue',sans-serif] text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30"
             >
               <ShoppingCart className="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform duration-300" />
               Add to Cart
-            </Link>
+            </button>
           </motion.div>
           <motion.div
             whileHover={{ scale: 1.03, y: -2 }}
             whileTap={{ scale: 0.97 }}
             className="flex-1 sm:flex-none"
           >
-            <Link
-              href="/wishlist"
-              className="theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3 font-['Epilogue',sans-serif] text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30"
+            <button
+              onClick={handleWishlistToggle}
+              className={`theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3 font-['Epilogue',sans-serif] text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30 ${
+                isInWishlistState ? "bg-theme3/20" : ""
+              }`}
             >
-              <Heart className="w-5 h-5 mr-2 transform group-hover:scale-110 group-hover:fill-white transition-all duration-300" />
-              Add to Wishlist
-            </Link>
+              <Heart className={`w-5 h-5 mr-2 transform group-hover:scale-110 transition-all duration-300 ${
+                isInWishlistState ? "fill-white" : ""
+              }`} />
+              {isInWishlistState ? "Remove from Wishlist" : "Add to Wishlist"}
+            </button>
           </motion.div>
         </div>
       </motion.div>

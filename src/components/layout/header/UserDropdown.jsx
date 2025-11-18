@@ -36,11 +36,17 @@ export default function UserDropdown({
     }, 300);
   };
 
-  const handleLogout = () => {
-    logout();
-    setUserOpen(false);
-    toastSuccess("Logged out successfully");
-    router.push("/");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setUserOpen(false);
+      toastSuccess("Logged out successfully");
+      router.push("/");
+    } catch (error) {
+      // Logout will still clear local state even if API call fails
+      setUserOpen(false);
+      router.push("/");
+    }
   };
 
   // Animation variants

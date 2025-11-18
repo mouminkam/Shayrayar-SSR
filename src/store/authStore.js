@@ -1,9 +1,11 @@
 "use client";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import api from "../api";
+
 
 // User structure
-// { id, name, email, phone, address, orders: [] }
+// { id, name, email, phone, address, orders: [], token }
 
 // Order structure
 // { id, items: [], total, status, date, shippingAddress, paymentMethod }
@@ -20,88 +22,180 @@ const useAuthStore = create(
       login: async (email, password) => {
         set({ isLoading: true });
         try {
-          // Simulate API call
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          const response = await api.auth.login(email, password);
+          
+          if (response.success && response.data) {
+            const { user, token } = response.data;
+            
+            // Store user with token
+            const userData = {
+              ...user,
+              token: token,
+            };
 
-          // Mock user data - in real app, this would come from API
-          const mockUser = {
-            id: Date.now().toString(),
-            name: "John Doe",
-            email: email,
-            phone: "+1234567890",
-            address: {
-              street: "123 Main St",
-              city: "New York",
-              state: "NY",
-              zipCode: "10001",
-              country: "USA",
-            },
-            orders: [],
-          };
+            set({
+              user: userData,
+              isAuthenticated: true,
+              isLoading: false,
+            });
 
-          set({
-            user: mockUser,
-            isAuthenticated: true,
-            isLoading: false,
-          });
-
-          return { success: true, user: mockUser };
+            return { success: true, user: userData };
+          } else {
+            set({ isLoading: false });
+            return { 
+              success: false, 
+              error: response.message || "Login failed" 
+            };
+          }
         } catch (error) {
           set({ isLoading: false });
-          return { success: false, error: error.message };
+          // Extract error details from API response
+          const errorMessage = error.message || "An error occurred during login";
+          const apiErrors = error.data?.errors || null;
+          
+          return { 
+            success: false, 
+            error: errorMessage,
+            errors: apiErrors
+          };
         }
       },
 
       register: async (userData) => {
         set({ isLoading: true });
         try {
-          // Simulate API call
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-
-          const newUser = {
-            id: Date.now().toString(),
+          // Prepare registration data with password confirmation
+          const registerData = {
             name: userData.name,
             email: userData.email,
-            phone: userData.phone || "",
-            address: userData.address || {
-              street: "",
-              city: "",
-              state: "",
-              zipCode: "",
-              country: "",
-            },
-            orders: [],
+            phone: userData.phone,
+            password: userData.password,
+            password_confirmation: userData.password_confirmation || userData.password,
+            branch_id: userData.branch_id || 1, // Default branch_id if not provided
           };
 
-          set({
-            user: newUser,
-            isAuthenticated: true,
-            isLoading: false,
-          });
+          const response = await api.auth.register(registerData);
+          
+          if (response.success && response.data) {
+            const { user, token } = response.data;
+            
+            // Store user with token
+            const userDataWithToken = {
+              ...user,
+              token: token,
+            };
 
-          return { success: true, user: newUser };
+            set({
+              user: userDataWithToken,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+
+            return { success: true, user: userDataWithToken };
+          } else {
+            set({ isLoading: false });
+            return { 
+              success: false, 
+              error: response.message || "Registration failed" 
+            };
+          }
         } catch (error) {
           set({ isLoading: false });
-          return { success: false, error: error.message };
+          // Extract error details from API response
+          const errorMessage = error.message || "An error occurred during registration";
+          const apiErrors = error.data?.errors || null;
+          
+          return { 
+            success: false, 
+            error: errorMessage,
+            errors: apiErrors
+          };
         }
       },
 
-      logout: () => {
-        set({
-          user: null,
-          isAuthenticated: false,
-        });
+      logout: async () => {
+        try {
+          // Call logout API if user is authenticated
+          if (get().isAuthenticated) {
+            await api.auth.logout();
+          }
+        } catch (error) {
+          console.error("Logout error:", error);
+          // Continue with logout even if API call fails
+        } finally {
+          set({
+            user: null,
+            isAuthenticated: false,
+          });
+        }
       },
 
-      updateProfile: (updates) => {
-        const user = get().user;
-        if (user) {
-          set({
-            user: {
-              ...user,
-              ...updates,
-            },
-          });
+      updateProfile: async (updates) => {
+        set({ isLoading: true });
+        try {
+          const response = await api.auth.updateProfile(updates);
+          
+          if (response.success && response.data) {
+            const currentUser = get().user;
+            const updatedUser = {
+              ...currentUser,
+              ...response.data.user,
+            };
+
+            set({
+              user: updatedUser,
+              isLoading: false,
+            });
+
+            return { success: true, user: updatedUser };
+          } else {
+            set({ isLoading: false });
+            return { 
+              success: false, 
+              error: response.message || "Failed to update profile" 
+            };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          return { 
+            success: false, 
+            error: error.message || "An error occurred while updating profile" 
+          };
+        }
+      },
+
+      fetchProfile: async () => {
+        set({ isLoading: true });
+        try {
+          const response = await api.auth.getProfile();
+          
+          if (response.success && response.data) {
+            const currentUser = get().user;
+            const updatedUser = {
+              ...currentUser,
+              ...response.data.user,
+            };
+
+            set({
+              user: updatedUser,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+
+            return { success: true, user: updatedUser };
+          } else {
+            set({ isLoading: false });
+            return { 
+              success: false, 
+              error: response.message || "Failed to fetch profile" 
+            };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          return { 
+            success: false, 
+            error: error.message || "An error occurred while fetching profile" 
+          };
         }
       },
 
@@ -117,7 +211,7 @@ const useAuthStore = create(
                   ...order,
                   date: new Date().toISOString(),
                 },
-                ...user.orders,
+                ...(user.orders || []),
               ],
             },
           });
@@ -128,46 +222,302 @@ const useAuthStore = create(
       resetPasswordRequest: async (email) => {
         set({ isLoading: true });
         try {
-          // Simulate API call
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          const response = await api.auth.forgotPassword(email);
           set({ isLoading: false });
-          return { success: true, message: "OTP sent to your email" };
+          
+          if (response.success) {
+            return { 
+              success: true, 
+              message: response.message || "OTP sent to your email" 
+            };
+          } else {
+            return { 
+              success: false, 
+              error: response.message || "Failed to send OTP" 
+            };
+          }
         } catch (error) {
           set({ isLoading: false });
-          return { success: false, error: error.message };
+          // Extract error details from API response
+          const errorMessage = error.message || "An error occurred";
+          
+          return { 
+            success: false, 
+            error: errorMessage
+          };
         }
       },
 
       verifyOTP: async (email, otp) => {
+        // Note: The API doesn't have a separate verifyOTP endpoint
+        // We use the OTP as the token in reset-password endpoint
+        // Save OTP to sessionStorage for use in reset password step
         set({ isLoading: true });
         try {
-          // Simulate API call - in real app, verify OTP with backend
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          
-          // Mock verification - accept any 6-digit OTP for demo
-          if (otp.length === 6) {
+          if (!email || !otp) {
             set({ isLoading: false });
-            return { success: true };
-          } else {
-            set({ isLoading: false });
-            return { success: false, error: "Invalid OTP" };
+            return { success: false, error: "Email and OTP are required" };
           }
+
+          // Validate OTP format (should be 4 digits)
+          if (otp.length !== 4 || !/^\d{4}$/.test(otp)) {
+            set({ isLoading: false });
+            return { success: false, error: "OTP must be 4 digits" };
+          }
+
+          // Save OTP as token in sessionStorage for reset password step
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("resetToken", otp);
+            sessionStorage.setItem("resetEmail", email);
+          }
+
+          set({ isLoading: false });
+          return { success: true, token: otp };
         } catch (error) {
           set({ isLoading: false });
-          return { success: false, error: error.message };
+          return { success: false, error: error.message || "Failed to verify OTP" };
         }
       },
 
-      resetPassword: async (email, newPassword) => {
+      resetPassword: async (resetData) => {
         set({ isLoading: true });
         try {
-          // Simulate API call
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          const response = await api.auth.resetPassword(resetData);
           set({ isLoading: false });
-          return { success: true, message: "Password reset successfully" };
+          
+          if (response.success) {
+            return { 
+              success: true, 
+              message: response.message || "Password reset successfully" 
+            };
+          } else {
+            return { 
+              success: false, 
+              error: response.message || "Failed to reset password" 
+            };
+          }
         } catch (error) {
           set({ isLoading: false });
-          return { success: false, error: error.message };
+          // Extract error details from API response
+          const errorMessage = error.message || "An error occurred while resetting password";
+          const apiErrors = error.data?.errors || null;
+          
+          return { 
+            success: false, 
+            error: errorMessage,
+            errors: apiErrors
+          };
+        }
+      },
+
+      // Multi-step registration flow
+      registerPhone: async (phoneData) => {
+        set({ isLoading: true });
+        try {
+          const response = await api.auth.registerPhone(phoneData);
+          set({ isLoading: false });
+          
+          if (response.success) {
+            return { 
+              success: true, 
+              message: response.message || "OTP sent to your phone" 
+            };
+          } else {
+            return { 
+              success: false, 
+              error: response.message || "Failed to send OTP" 
+            };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          const errorMessage = error.message || "An error occurred";
+          const apiErrors = error.data?.errors || null;
+          
+          return { 
+            success: false, 
+            error: errorMessage,
+            errors: apiErrors
+          };
+        }
+      },
+
+      verifyPhoneOTP: async (phone, code) => {
+        set({ isLoading: true });
+        try {
+          const response = await api.auth.verifyPhone({ phone, code });
+          set({ isLoading: false });
+          
+          if (response.success && response.data) {
+            const { token } = response.data;
+            
+            // Store temporary token for completing registration
+            if (typeof window !== "undefined") {
+              sessionStorage.setItem("registrationToken", token);
+              sessionStorage.setItem("registrationPhone", phone);
+            }
+            
+            return { 
+              success: true, 
+              token: token,
+              message: response.message || "Phone verified successfully" 
+            };
+          } else {
+            return { 
+              success: false, 
+              error: response.message || "Invalid OTP code" 
+            };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          const errorMessage = error.message || "An error occurred while verifying OTP";
+          const apiErrors = error.data?.errors || null;
+          
+          return { 
+            success: false, 
+            error: errorMessage,
+            errors: apiErrors
+          };
+        }
+      },
+
+      completeRegistration: async (userData) => {
+        set({ isLoading: true });
+        try {
+          const response = await api.auth.completeRegistration(userData);
+          set({ isLoading: false });
+          
+          if (response.success && response.data) {
+            const { user, token } = response.data;
+            
+            // Store user with token
+            const userDataWithToken = {
+              ...user,
+              token: token,
+            };
+
+            set({
+              user: userDataWithToken,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+
+            // Clean up session storage
+            if (typeof window !== "undefined") {
+              sessionStorage.removeItem("registrationToken");
+              sessionStorage.removeItem("registrationPhone");
+            }
+
+            return { success: true, user: userDataWithToken };
+          } else {
+            return { 
+              success: false, 
+              error: response.message || "Failed to complete registration" 
+            };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          const errorMessage = error.message || "An error occurred while completing registration";
+          const apiErrors = error.data?.errors || null;
+          
+          return { 
+            success: false, 
+            error: errorMessage,
+            errors: apiErrors
+          };
+        }
+      },
+
+      getRegistrationBranches: async (lang = 'ar') => {
+        set({ isLoading: true });
+        try {
+          const response = await api.auth.getRegistrationBranches(lang);
+          set({ isLoading: false });
+          
+          if (response.success && response.data) {
+            return { 
+              success: true, 
+              branches: response.data.branches || response.data 
+            };
+          } else {
+            return { 
+              success: false, 
+              error: response.message || "Failed to fetch branches" 
+            };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          return { 
+            success: false, 
+            error: error.message || "An error occurred while fetching branches" 
+          };
+        }
+      },
+
+      // Google authentication
+      getGoogleAuthUrl: async () => {
+        set({ isLoading: true });
+        try {
+          const response = await api.auth.getGoogleAuthUrl();
+          set({ isLoading: false });
+          
+          if (response.success && response.data) {
+            return { 
+              success: true, 
+              url: response.data.url || response.data.auth_url 
+            };
+          } else {
+            return { 
+              success: false, 
+              error: response.message || "Failed to get Google auth URL" 
+            };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          return { 
+            success: false, 
+            error: error.message || "An error occurred while getting Google auth URL" 
+          };
+        }
+      },
+
+      loginWithGoogle: async (idToken) => {
+        set({ isLoading: true });
+        try {
+          const response = await api.auth.googleLogin(idToken);
+          set({ isLoading: false });
+          
+          if (response.success && response.data) {
+            const { user, token } = response.data;
+            
+            // Store user with token
+            const userData = {
+              ...user,
+              token: token,
+            };
+
+            set({
+              user: userData,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+
+            return { success: true, user: userData };
+          } else {
+            return { 
+              success: false, 
+              error: response.message || "Google login failed" 
+            };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          const errorMessage = error.message || "An error occurred during Google login";
+          const apiErrors = error.data?.errors || null;
+          
+          return { 
+            success: false, 
+            error: errorMessage,
+            errors: apiErrors
+          };
         }
       },
     }),

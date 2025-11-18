@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
@@ -7,34 +7,86 @@ import useAuthStore from "../../../store/authStore";
 import useToastStore from "../../../store/toastStore";
 import OTPInput from "./OTPInput";
 
-export default function OTPForm({ email }) {
+export default function OTPForm() {
   const router = useRouter();
-  const { verifyOTP, isLoading } = useAuthStore();
+  const { verifyPhoneOTP, verifyOTP, isLoading } = useAuthStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
-
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [flowType, setFlowType] = useState(""); // "registration" or "reset"
+
+  // Determine flow type and get phone/email from sessionStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const registrationPhone = sessionStorage.getItem("registrationPhone");
+      const resetEmail = sessionStorage.getItem("resetEmail");
+
+      if (registrationPhone) {
+        setPhone(registrationPhone);
+        setFlowType("registration");
+      } else if (resetEmail) {
+        setEmail(resetEmail);
+        setFlowType("reset");
+      } else {
+        // No flow data, redirect to appropriate page
+        router.push("/register");
+      }
+    }
+  }, [router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const otpString = otp.join("");
 
-    if (otpString.length !== 6) {
-      toastError("Please enter the complete 6-digit OTP");
+    if (otpString.length !== 4) {
+      toastError("Please enter the complete 4-digit OTP");
       return;
     }
 
-    const result = await verifyOTP(email, otpString);
+    // Validate OTP format (should be numeric)
+    if (!/^\d{4}$/.test(otpString)) {
+      toastError("OTP must contain only numbers");
+      return;
+    }
 
-    if (result.success) {
-      toastSuccess("OTP verified successfully!");
-      router.push("/confirm-information");
-    } else {
-      toastError(result.error || "Invalid OTP. Please try again.");
-      setOtp(["", "", "", "", "", ""]);
+    try {
+      if (flowType === "registration") {
+        // Registration flow
+        const result = await verifyPhoneOTP(phone, otpString);
+
+        if (result.success) {
+          toastSuccess("Phone verified successfully! Please complete your registration.");
+          router.push("/add-information");
+        } else {
+          const errorMessage = result.error || "Invalid OTP. Please try again.";
+          toastError(errorMessage);
+          setOtp(["", "", "", ""]);
+          inputRefs.current[0]?.focus();
+        }
+      } else if (flowType === "reset") {
+        // Reset password flow
+        const result = await verifyOTP(email, otpString);
+
+        if (result.success) {
+          toastSuccess("OTP verified successfully! You can now reset your password.");
+          router.push("/confirm-information");
+        } else {
+          const errorMessage = result.error || "Invalid OTP. Please try again.";
+          toastError(errorMessage);
+          setOtp(["", "", "", ""]);
+          inputRefs.current[0]?.focus();
+        }
+      }
+    } catch (error) {
+      const errorMessage = error.message || "An unexpected error occurred. Please try again.";
+      toastError(errorMessage);
+      setOtp(["", "", "", ""]);
       inputRefs.current[0]?.focus();
     }
   };
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -58,7 +110,7 @@ export default function OTPForm({ email }) {
           </>
         ) : (
           <>
-            Verify OTP
+            Continue
             <ArrowRight className="w-5 h-5" />
           </>
         )}
@@ -66,4 +118,3 @@ export default function OTPForm({ email }) {
     </form>
   );
 }
-

@@ -1,4 +1,4 @@
-"use client";
+// Removed "use client" - This component only uses static JSX and Link components which are SSR-compatible
 import Link from "next/link";
 
 export default function BottomBar() {

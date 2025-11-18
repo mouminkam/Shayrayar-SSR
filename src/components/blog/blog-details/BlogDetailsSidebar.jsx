@@ -89,7 +89,7 @@ export default function BlogDetailsSidebar() {
                   }`}
               >
                 <Link
-                  href="/blog-details"
+                  href="/blog"
                   className="flex items-center justify-between px-5 sm:px-6 py-5"
                 >
                   <span
@@ -149,7 +149,7 @@ export default function BlogDetailsSidebar() {
                 </ul>
                 <h6 className="font-['Epilogue',sans-serif] text-base font-bold leading-6">
                   <Link
-                    href="/blog-details"
+                    href={`/blog/${post.slug || post.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`}
                     className="text-white hover:text-theme transition-colors duration-300"
                   >
                     {post.title}
@@ -173,7 +173,7 @@ export default function BlogDetailsSidebar() {
           {tags.map((tag, index) => (
             <Link
               key={index}
-              href="/blog-details"
+              href="/blog"
               className={`inline-flex px-4 py-2 text-sm font-['Epilogue',sans-serif] font-normal capitalize rounded transition-all duration-300 ${index === 1
                 ? "bg-theme3 text-white"
                 : "text-white hover:bg-theme3 hover:text-white"
