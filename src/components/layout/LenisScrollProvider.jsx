@@ -7,6 +7,9 @@ const LenisScrollProvider = ({ children }) => {
   const rafIdRef = useRef(null);
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === "undefined") return;
+
     let lenisInstance = null;
     let rafId = null;
     let isMounted = true;
@@ -14,9 +17,12 @@ const LenisScrollProvider = ({ children }) => {
     // Dynamic import to ensure it only runs on client
     const initLenis = async () => {
       try {
+        // Check if already initialized
+        if (lenisRef.current) return;
+
         // Lazy load lenis only when needed
         const LenisModule = await import("lenis");
-        const Lenis = LenisModule.default;
+        const Lenis = LenisModule.default || LenisModule;
         
         if (!isMounted) return;
 
@@ -26,6 +32,8 @@ const LenisScrollProvider = ({ children }) => {
           duration: 1.0,
           smoothWheel: true,
           smoothTouch: false, // Disable on touch devices for better performance
+          wheelMultiplier: 1,
+          touchMultiplier: 2,
         });
 
         lenisRef.current = lenisInstance;
@@ -40,24 +48,34 @@ const LenisScrollProvider = ({ children }) => {
 
         rafId = requestAnimationFrame(raf);
         rafIdRef.current = rafId;
+
+        // Log success in development
+        if (process.env.NODE_ENV === "development") {
+          console.log("Lenis initialized successfully");
+        }
       } catch (error) {
         console.error("Failed to initialize Lenis:", error);
+        // Don't break the app if Lenis fails to load
       }
     };
 
-    // Delay initialization slightly to not block initial render
-    const timeoutId = setTimeout(initLenis, 0);
+    // Initialize immediately on client
+    initLenis();
 
     // Cleanup
     return () => {
       isMounted = false;
-      clearTimeout(timeoutId);
       if (rafId) {
         cancelAnimationFrame(rafId);
       }
       if (lenisInstance) {
-        lenisInstance.destroy();
+        try {
+          lenisInstance.destroy();
+        } catch (e) {
+          console.error("Error destroying Lenis:", e);
+        }
       }
+      lenisRef.current = null;
     };
   }, []);
 
