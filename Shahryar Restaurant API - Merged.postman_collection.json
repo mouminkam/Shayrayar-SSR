@@ -1,0 +1,3059 @@
+{
+	"info": {
+		"_postman_id": "a45c995e-ae00-428f-8e40-435144317b48",
+		"name": "Shahryar Restaurant API - Merged",
+		"description": "مجموعة API مدمجة لمشروع شهريار - بدون تكرارات / Merged API collection for Shahryar Restaurant - No duplicates",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42464701",
+		"_collection_link": "https://simicolon.postman.co/workspace/SimiColon-Workspace~4f5e2edf-c91e-498d-b347-48774da6fa44/collection/42464701-a45c995e-ae00-428f-8e40-435144317b48?action=share&source=collection_link&creator=42464701"
+	},
+	"item": [
+		{
+			"name": "التسجيل وإدارة الحساب",
+			"item": [
+				{
+					"name": "التسجيل على مراحل - إرسال رقم الهاتف",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+963933310888\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/auth/register-phone",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"register-phone"
+							]
+						},
+						"description": "المرحلة الأولى من التسجيل: إرسال رقم الهاتف للحصول على رمز التحقق"
+					},
+					"response": []
+				},
+				{
+					"name": "التسجيل على مراحل - التحقق من الرمز",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+963933310888\",\n    \"code\": \"1178\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/auth/verify-phone",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"verify-phone"
+							]
+						},
+						"description": "المرحلة الثانية من التسجيل: إرسال رمز التحقق للتأكد من صحة رقم الهاتف"
+					},
+					"response": []
+				},
+				{
+					"name": "الفروع",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}api/v1/auth/rbranches?lang=ar",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"rbranches"
+							],
+							"query": [
+								{
+									"key": "lang",
+									"value": "ar"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "التسجيل على مراحل - إكمال التسجيل",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \" محمد العزاوي \",\n    \"email\": \"user@example.com\",\n    \"branch_id\": 1,\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/auth/complete-registration",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"complete-registration"
+							]
+						},
+						"description": "المرحلة الثالثة من التسجيل: إكمال معلومات المستخدم بعد التحقق من رقم الهاتف"
+					},
+					"response": []
+				},
+				{
+					"name": "التسجيل التقليدي",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"اسم المستخدم\",\n    \"email\": \"user@example.com\",\n    \"phone\": \"+966500000000\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"branch_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						},
+						"description": "التسجيل التقليدي (تسجيل كامل في خطوة واحدة)"
+					},
+					"response": []
+				},
+				{
+					"name": "تسجيل الدخول",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/auth/login",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"login"
+							]
+						},
+						"description": "تسجيل الدخول باستخدام البريد الإلكتروني وكلمة المرور"
+					},
+					"response": []
+				},
+				{
+					"name": "تسجيل الخروج",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "تسجيل الخروج وإلغاء صلاحية الرمز الحالي"
+					},
+					"response": []
+				},
+				{
+					"name": "الملف الشخصي",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"profile"
+							]
+						},
+						"description": "عرض بيانات الملف الشخصي للمستخدم الحالي"
+					},
+					"response": []
+				},
+				{
+					"name": "تحديث الملف الشخصي",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|5AeVWIQHjIfVdBSkBT8XhwrNepyVJD77F5M9LdZ2f3ee2108",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"اسم جديد\",\n    \"email\": \"newemail@example.com\",\n    \"phone\": \"+966500000001\",\n    \"branch_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/auth/profile",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"profile"
+							]
+						},
+						"description": "تحديث بيانات الملف الشخصي للمستخدم الحالي"
+					},
+					"response": []
+				},
+				{
+					"name": "تغيير كلمة المرور",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"current_password\": \"password123\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/change-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"change-password"
+							]
+						},
+						"description": "تغيير كلمة المرور للمستخدم الحالي"
+					},
+					"response": []
+				},
+				{
+					"name": "نسيان كلمة المرور",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newemail@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/auth/forgot-password",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						},
+						"description": "طلب رابط إعادة تعيين كلمة المرور"
+					},
+					"response": []
+				},
+				{
+					"name": "إعادة تعيين كلمة المرور",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"TOKEN_FROM_EMAIL\",\n    \"email\": \"user@example.com\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/reset-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"reset-password"
+							]
+						},
+						"description": "إعادة تعيين كلمة المرور باستخدام الرمز المرسل عبر البريد الإلكتروني"
+					},
+					"response": []
+				}
+			],
+			"description": "عمليات تسجيل الحساب والتحقق وإدارة الملف الشخصي"
+		},
+		{
+			"name": "تسجيل الدخول عبر Google",
+			"item": [
+				{
+					"name": "الحصول على رابط التوجيه",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}api/v1/auth/google",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"google"
+							]
+						},
+						"description": "الحصول على رابط تسجيل الدخول باستخدام Google"
+					},
+					"response": []
+				},
+				{
+					"name": "التسجيل باستخدام ID Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_token\": \"GOOGLE_ID_TOKEN_FROM_MOBILE_APP\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/google/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"google",
+								"login"
+							]
+						},
+						"description": "تسجيل الدخول باستخدام رمز Google ID للتطبيقات المحمولة"
+					},
+					"response": []
+				}
+			],
+			"description": "واجهات برمجة التطبيقات للتسجيل وتسجيل الدخول باستخدام حساب Google"
+		},
+		{
+			"name": "الزبون",
+			"item": [
+				{
+					"name": "العناوين",
+					"item": [
+						{
+							"name": "جلب العناوين",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}api/v1/customer/addresses",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"v1",
+										"customer",
+										"addresses"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "حفظ عنوان",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"address\": \"123 Main St, New York, NY\",\n  \"latitude\": 40.7128,\n  \"longitude\": -74.0060,\n  \"label\": \"Home\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}api/v1/customer/addresses",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"v1",
+										"customer",
+										"addresses"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "الطلبات",
+					"item": [
+						{
+							"name": "جلب الكوبونات المتاحة لطلب",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"order_amount\": 110.00,\r\n  \"branch_id\": 1,\r\n  \"items\": [\r\n    {\r\n      \"menu_item_id\": 1,\r\n      \"quantity\": 1\r\n    },\r\n    {\r\n      \"menu_item_id\": 1,\r\n      \"quantity\": 1\r\n    }\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}api/v1/orders/available-coupons",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"v1",
+										"orders",
+										"available-coupons"
+									],
+									"query": [
+										{
+											"key": "from_date",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "to_date",
+											"value": "",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "انشاء طلب",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    const response = pm.response.json();",
+											"    if (response.success && response.data.order) {",
+											"        pm.collectionVariables.set('order_id', response.data.order.id);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "19|UwiWZlrwBqO8ce3BrcNS4NrXSWnSJ7rlc9P5LJ3Id87dcfb6",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"branch_id\": 1,\n//  \"address_id\": 1,  // رقم العنوان من جدول عناوين المستخدم\n  \"order_type\":\"pickup\",\n  \"delivery_address\": \"Pickup from Main Branch - Riyadh\",  // اختياري إذا تم تحديد address_id\n  \"latitude\": 24.7136,  // اختياري إذا تم تحديد address_id\n  \"longitude\": 46.6753,  // اختياري إذا تم تحديد address_id\n  \"payment_method\": \"stripe\",  // يمكن أن تكون cash, card, paypal, stripe\n  \"subtotal\": 89.50,\n  \"delivery_charge\": 10.00,\n  \"tax_amount\": 4.50,\n // المبلغ المخصوم من الكوبون\n\n  \"total_amount\": 95.05,\n  \"notes\": \"يرجى عدم وضع البصل في الساندويتش\",\n  \"scheduled_at\": \"2025-10-11 18:30:00\",  // اختياري للطلبات المجدولة\n  \"items\": [\n    {\n      \"menu_item_id\": 4,\n      \"size_id\": 10,  // اختياري، إذا كان للعنصر أحجام متعددة\n      \"quantity\": 2,\n      \"special_instructions\": \"حار جداً\",\n      \"ingredients\": [2,1]\n    }\n    \n  ]\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}api/v1/orders",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"v1",
+										"orders"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "سجل الطلبات",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}api/v1/customer/order-history?status=pending",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"v1",
+										"customer",
+										"order-history"
+									],
+									"query": [
+										{
+											"key": "from_date",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "to_date",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "status",
+											"value": "pending"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "المفضلة",
+					"item": [
+						{
+							"name": "المفضلة",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}api/v1/customer/favorites",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"v1",
+										"customer",
+										"favorites"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "إضافة إلى المفضلة",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "5|1JAj9mePBuCF14B0PAVIyIMIeJ6kQBQjqI6SMJjM6211598d",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}api/v1/customer/favorites/1",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"v1",
+										"customer",
+										"favorites",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "الفروع",
+			"item": [
+				{
+					"name": "كل االفروع موسع",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}api/v1/branches",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"branches"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "معلومات فرع",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}api/v1/branches/1",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"branches",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "الاشعارات",
+			"item": [
+				{
+					"name": "تحديث FCM_token",
+					"request": {
+						"auth": {
+							"type": "bearer"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fcm_token\": \"FCM_TOKEN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/notifications/update-fcm-token",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"notifications",
+								"update-fcm-token"
+							]
+						},
+						"description": "طلب رابط إعادة تعيين كلمة المرور"
+					},
+					"response": []
+				},
+				{
+					"name": "جلب الاشعارات",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fcm_token\": \"FCM_TOKEN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/notifications/",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"notifications",
+								""
+							]
+						},
+						"description": "طلب رابط إعادة تعيين كلمة المرور"
+					},
+					"response": []
+				},
+				{
+					"name": "قراءة اشعار",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fcm_token\": \"FCM_TOKEN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/notifications/{notification}/read",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"notifications",
+								"{notification}",
+								"read"
+							]
+						},
+						"description": "طلب رابط إعادة تعيين كلمة المرور"
+					},
+					"response": []
+				},
+				{
+					"name": "عدد الغير مقروء",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fcm_token\": \"FCM_TOKEN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/notifications/unread-count",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"notifications",
+								"unread-count"
+							]
+						},
+						"description": "طلب رابط إعادة تعيين كلمة المرور"
+					},
+					"response": []
+				},
+				{
+					"name": "تحديد الكل مقروء",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fcm_token\": \"FCM_TOKEN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/notifications/mark-all-read",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"notifications",
+								"mark-all-read"
+							]
+						},
+						"description": "طلب رابط إعادة تعيين كلمة المرور"
+					},
+					"response": []
+				},
+				{
+					"name": "حذف اشعار",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fcm_token\": \"FCM_TOKEN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/notifications/{notification}",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"notifications",
+								"{notification}"
+							]
+						},
+						"description": "طلب رابط إعادة تعيين كلمة المرور"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"johnmm@example.com\",\n  \"phone\": \"+1234567891\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\",\n  \"branch_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.success && response.data.token) {",
+									"        pm.collectionVariables.set('auth_token', response.data.token);",
+									"        pm.collectionVariables.set('user_id', response.data.user.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"johnmm@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|fNUTLsDOnoIeDKviO4WQOX0vZgZAv2Y25KPneLvj24feeda4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|Rk6E2Tsw72Xh8VMzCvHEUndbudOarm8ePPOrp5t9108e669c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|Rk6E2Tsw72Xh8VMzCvHEUndbudOarm8ePPOrp5t9108e669c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Smith يي\",\n  \"email\": \"johnsmith@example.com\",\n  \"phone\": \"+1234567891\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|Rk6E2Tsw72Xh8VMzCvHEUndbudOarm8ePPOrp5t9108e669c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"current_password\": \"password123\",\n  \"password\": \"newpassword123\",\n  \"password_confirmation\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/change-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"johnmm@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/forgot-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"reset_token_from_email\",\n  \"email\": \"john@example.com\",\n  \"password\": \"newpassword123\",\n  \"password_confirmation\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reset-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Branches",
+			"item": [
+				{
+					"name": "Get All Branches",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/branches?latitude=40.7128&longitude=-74.0060&radius=50",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"branches"
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "40.7128"
+								},
+								{
+									"key": "longitude",
+									"value": "-74.0060"
+								},
+								{
+									"key": "radius",
+									"value": "50"
+								},
+								{
+									"key": "city",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "country",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Nearest Branches",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/branches/nearest?latitude=40.7128&longitude=-74.0060&radius=50",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"branches",
+								"nearest"
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "40.7128"
+								},
+								{
+									"key": "longitude",
+									"value": "-74.0060"
+								},
+								{
+									"key": "radius",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Delivery Availability",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/branches/{{branch_id}}/check-delivery?latitude=40.7128&longitude=-74.0060",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"branches",
+								"{{branch_id}}",
+								"check-delivery"
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "40.7128"
+								},
+								{
+									"key": "longitude",
+									"value": "-74.0060"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Menu",
+			"item": [
+				{
+					"name": "Get Menu Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/menu-categories?branch_id=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"menu-categories"
+							],
+							"query": [
+								{
+									"key": "branch_id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Menu Items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/menu-items?branch_id={{branch_id}}&featured=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"menu-items"
+							],
+							"query": [
+								{
+									"key": "branch_id",
+									"value": "{{branch_id}}"
+								},
+								{
+									"key": "category_id",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "featured",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific Menu Item",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/menu-items/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"menu-items",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Menu Items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/menu-items/search?query=chicken&branch_id={{branch_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"menu-items",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "chicken"
+								},
+								{
+									"key": "branch_id",
+									"value": "{{branch_id}}"
+								},
+								{
+									"key": "category_id",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "جلب التصنيفات ضمن فرع محدد",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}api/v1/menu-categories?branch_id=1",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"menu-categories"
+							],
+							"query": [
+								{
+									"key": "branch_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "جلب كل الأطباق ضمن فرع",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}api/v1/menu-items?featured=true&branch_id=1",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"menu-items"
+							],
+							"query": [
+								{
+									"key": "category_id",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "featured",
+									"value": "true"
+								},
+								{
+									"key": "branch_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "جلب معلومات طبق محدد",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}api/v1/menu-items/1",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"menu-items",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Get User Orders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orders?status=pending",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "pending"
+								},
+								{
+									"key": "from_date",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "to_date",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.success && response.data.order) {",
+									"        pm.collectionVariables.set('order_id', response.data.order.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"branch_id\":1,\"order_type\":\"pickup\",\"subtotal\":2.5,\"total_amount\":2.75,\"customer_name\":\"testestt tests\",\"customer_phone\":\"0955565656\",\"customer_email\":\"test@testt.com\",\"delivery_address\":\"Pickup from Main Branch - Riyadh\",\"latitude\":0.0,\"longitude\":0.0,\"delivery_charge\":\"0.00\",\"tax_amount\":\"0.25\",\"discount_amount\":\"0.00\",\"items\":[{\"menu_item_id\":8,\"quantity\":1,\"ingredients\":[],\"size_id\":16}],\"payment_method\":\"cash\",\"notes\":\"\"}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reason\": \"Changed my mind\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders/{{order_id}}/cancel",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"{{order_id}}",
+								"cancel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Track Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orders/{{order_id}}/track",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"{{order_id}}",
+								"track"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Coupons",
+			"item": [
+				{
+					"name": "Validate Coupon",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/coupons/validate?code=WELCOME10&order_amount=25.98&branch_id={{branch_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"coupons",
+								"validate"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": "WELCOME10"
+								},
+								{
+									"key": "order_amount",
+									"value": "25.98"
+								},
+								{
+									"key": "branch_id",
+									"value": "{{branch_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Available Coupons",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/coupons?branch_id={{branch_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"coupons"
+							],
+							"query": [
+								{
+									"key": "branch_id",
+									"value": "{{branch_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Create Stripe Payment Intent",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"order_id\": 2,\n  \"amount\": 104,\n  \"currency\": \"USD\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payments/stripe/create-payment-intent",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"stripe",
+								"create-payment-intent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm Stripe Payment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"payment_intent_id\": \"pi_3SGixREtIof2nUvk0kZKWXNz\",\n  \"order_id\": 2 \n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payments/stripe/confirm-payment",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"stripe",
+								"confirm-payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create PayPal Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"order_id\": {{order_id}},\n  \"amount\": 30.87,\n  \"currency\": \"USD\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payments/paypal/create-order",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"paypal",
+								"create-order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Capture PayPal Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"paypal_order_id\": \"PAYPAL_ORDER_ID\",\n  \"order_id\": {{order_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payments/paypal/capture-order",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"paypal",
+								"capture-order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/test-payment",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"test-payment"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customer",
+			"item": [
+				{
+					"name": "Get Addresses",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/customer/addresses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"addresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save Address",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"address\": \"123 Main St, New York, NY\",\n  \"latitude\": 40.7128,\n  \"longitude\": -74.0060,\n  \"label\": \"Home\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customer/addresses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"addresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Favorites",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/customer/favorites",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"favorites"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add to Favorites",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/customer/favorites/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"favorites",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order History",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/customer/order-history?status=delivered",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customer",
+								"order-history"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "delivered"
+								},
+								{
+									"key": "from_date",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "to_date",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Delivery Boy",
+			"item": [
+				{
+					"name": "Login Delivery Boy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"delivery@restaurant.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/delivery-boy/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"delivery-boy",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dashboard",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/delivery-boy/dashboard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"delivery-boy",
+								"dashboard"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Orders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/delivery-boy/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"delivery-boy",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/delivery-boy/orders/{{order_id}}/accept",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"delivery-boy",
+								"orders",
+								"{{order_id}}",
+								"accept"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Location",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"latitude\": 40.7128,\n  \"longitude\": -74.0060\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/delivery-boy/location",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"delivery-boy",
+								"location"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Notifications",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/delivery-boy/notifications",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"delivery-boy",
+								"notifications"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Home",
+			"item": [
+				{
+					"name": "Slides",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/slides?branch_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"slides"
+							],
+							"query": [
+								{
+									"key": "branch_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "highlights",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/menu-items/highlights?branch_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"menu-items",
+								"highlights"
+							],
+							"query": [
+								{
+									"key": "branch_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "العناوين",
+			"item": [
+				{
+					"name": "جلب العناوين",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}api/v1/customer/addresses",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"customer",
+								"addresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "حفظ عنوان",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"address\": \"123 Main St, New York, NY\",\n  \"latitude\": 40.7128,\n  \"longitude\": -74.0060,\n  \"label\": \"Home\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/customer/addresses",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"customer",
+								"addresses"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "الطلبات",
+			"item": [
+				{
+					"name": "جلب الكوبونات المتاحة لطلب",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"order_amount\": 110.00,\r\n  \"branch_id\": 1,\r\n  \"items\": [\r\n    {\r\n      \"menu_item_id\": 1,\r\n      \"quantity\": 1\r\n    },\r\n    {\r\n      \"menu_item_id\": 1,\r\n      \"quantity\": 1\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/orders/available-coupons",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"orders",
+								"available-coupons"
+							],
+							"query": [
+								{
+									"key": "from_date",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "to_date",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "انشاء طلب",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.success && response.data.order) {",
+									"        pm.collectionVariables.set('order_id', response.data.order.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "19|UwiWZlrwBqO8ce3BrcNS4NrXSWnSJ7rlc9P5LJ3Id87dcfb6",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"branch_id\": 1,\n//  \"address_id\": 1,  // رقم العنوان من جدول عناوين المستخدم\n  \"order_type\":\"pickup\",\n  \"delivery_address\": \"Pickup from Main Branch - Riyadh\",  // اختياري إذا تم تحديد address_id\n  \"latitude\": 24.7136,  // اختياري إذا تم تحديد address_id\n  \"longitude\": 46.6753,  // اختياري إذا تم تحديد address_id\n  \"payment_method\": \"stripe\",  // يمكن أن تكون cash, card, paypal, stripe\n  \"subtotal\": 89.50,\n  \"delivery_charge\": 10.00,\n  \"tax_amount\": 4.50,\n // المبلغ المخصوم من الكوبون\n\n  \"total_amount\": 95.05,\n  \"notes\": \"يرجى عدم وضع البصل في الساندويتش\",\n  \"scheduled_at\": \"2025-10-11 18:30:00\",  // اختياري للطلبات المجدولة\n  \"items\": [\n    {\n      \"menu_item_id\": 4,\n      \"size_id\": 10,  // اختياري، إذا كان للعنصر أحجام متعددة\n      \"quantity\": 2,\n      \"special_instructions\": \"حار جداً\",\n      \"ingredients\": [2,1]\n    }\n    \n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}api/v1/orders",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "سجل الطلبات",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}api/v1/customer/order-history?status=pending",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"customer",
+								"order-history"
+							],
+							"query": [
+								{
+									"key": "from_date",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "to_date",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "pending"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "المفضلة",
+			"item": [
+				{
+					"name": "المفضلة",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|a39Nhgwp2fljafB3Gn97emBTk1j4c4dMSdVkAHlI47ab0821",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}api/v1/customer/favorites",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"customer",
+								"favorites"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "إضافة إلى المفضلة",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "5|1JAj9mePBuCF14B0PAVIyIMIeJ6kQBQjqI6SMJjM6211598d",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}api/v1/customer/favorites/1",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"v1",
+								"customer",
+								"favorites",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "order_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "branch_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "YOUR_AUTH_TOKEN",
+			"type": "string"
+		}
+	]
+}

@@ -15,18 +15,25 @@ export default function OTPForm() {
   const inputRefs = useRef([]);
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [flowType, setFlowType] = useState(""); // "registration" or "reset"
+  const [flowType, setFlowType] = useState(""); // "registration", "reset", or "google-login"
 
   // Determine flow type and get phone/email from sessionStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const googleFlow = sessionStorage.getItem("googleFlow");
       const registrationPhone = sessionStorage.getItem("registrationPhone");
       const resetEmail = sessionStorage.getItem("resetEmail");
 
-      if (registrationPhone) {
+      if (googleFlow && registrationPhone) {
+        // Google login flow
+        setPhone(registrationPhone);
+        setFlowType("google-login");
+      } else if (registrationPhone) {
+        // Regular registration flow
         setPhone(registrationPhone);
         setFlowType("registration");
       } else if (resetEmail) {
+        // Reset password flow
         setEmail(resetEmail);
         setFlowType("reset");
       } else {
@@ -52,7 +59,49 @@ export default function OTPForm() {
     }
 
     try {
-      if (flowType === "registration") {
+      if (flowType === "google-login") {
+        // Google login flow - verify OTP and complete login
+        const result = await verifyPhoneOTP(phone, otpString);
+
+        if (result.success) {
+          // Get Google user data from sessionStorage
+          if (typeof window !== "undefined") {
+            const googleUserStr = sessionStorage.getItem("googleUser");
+            const googleToken = sessionStorage.getItem("googleToken");
+
+            if (googleUserStr && googleToken) {
+              const googleUser = JSON.parse(googleUserStr);
+              
+              // Update user with verified phone
+              const updatedUser = {
+                ...googleUser,
+                phone: phone,
+              };
+
+              // Save user + token in authStore
+              const authStore = useAuthStore.getState();
+              authStore.setState({
+                user: { ...updatedUser, token: googleToken },
+                isAuthenticated: true,
+              });
+
+              // Cleanup sessionStorage
+              sessionStorage.removeItem("googleUser");
+              sessionStorage.removeItem("googleToken");
+              sessionStorage.removeItem("googleFlow");
+              sessionStorage.removeItem("registrationPhone");
+            }
+          }
+
+          toastSuccess("Phone verified successfully! Welcome!");
+          router.push("/");
+        } else {
+          const errorMessage = result.error || "Invalid OTP. Please try again.";
+          toastError(errorMessage);
+          setOtp(["", "", "", ""]);
+          inputRefs.current[0]?.focus();
+        }
+      } else if (flowType === "registration") {
         // Registration flow
         const result = await verifyPhoneOTP(phone, otpString);
 

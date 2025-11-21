@@ -6,7 +6,7 @@ export default function QuickLinks() {
   const links = [
     { href: "/about", label: "About Us" },
     { href: "/gallery", label: "Our Gallery" },
-    { href: "/blog", label: "Our Blogs" },
+    // { href: "/blog", label: "Our Blogs" }, // Blog section temporarily disabled
     { href: "/faq", label: "FAQ'S" },
     { href: "/contact", label: "Contact Us" },
   ];

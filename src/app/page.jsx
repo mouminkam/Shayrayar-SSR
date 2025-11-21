@@ -12,7 +12,7 @@ import FoodMenuSection from "../components/home/FoodMenuSection";
 import TimerSection from "../components/home/TimerSection";
 import ChefeSection from "../components/about/ChefeSection";
 import TestimonialSection from "../components/about/TestimonialSection";
-import BlogSection from "../components/about/BlogSection";
+// import BlogSection from "../components/about/BlogSection"; // Blog section temporarily disabled
 import GallerySection from "../components/home/GallerySection";
 import MarqueeSection from "../components/about/MarqueeSection";
 
@@ -46,7 +46,7 @@ export default function HomePage() {
       <TimerSection />
       <ChefeSection />
       <TestimonialSection />
-      <BlogSection />
+      {/* <BlogSection /> */} {/* Blog section temporarily disabled */}
       <GallerySection />
     </div>
   );

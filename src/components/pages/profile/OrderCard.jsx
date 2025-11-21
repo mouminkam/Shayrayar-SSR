@@ -3,28 +3,36 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { formatCurrency } from "../../../lib/utils/formatters";
+import { useRouter } from "next/navigation";
 
 export default function OrderCard({ order, index }) {
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    router.push(`/orders/${order.id}`);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3, delay: index * 0.1 }}
-      className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-theme3/50 transition-all duration-300"
+      onClick={handleCardClick}
+      className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-theme3/50 transition-all duration-300 cursor-pointer group"
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
           <p className="text-white font-['Epilogue',sans-serif] font-bold text-lg mb-1">
-            Order #{order.id.slice(-8).toUpperCase()}
+            Order #{String(order.id || '').slice(-8).toUpperCase()}
           </p>
           <p className="text-text text-sm">
-            {new Date(order.date).toLocaleDateString("en-US", {
+            {order.date ? new Date(order.date).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
               day: "numeric",
               hour: "2-digit",
               minute: "2-digit",
-            })}
+            }) : 'Date not available'}
           </p>
         </div>
         <div className="text-right">
@@ -46,35 +54,37 @@ export default function OrderCard({ order, index }) {
       </div>
 
       {/* Order Items */}
-      <div className="space-y-2 mb-4 pt-4 border-t border-white/10">
-        {order.items?.slice(0, 3).map((item) => (
-          <div key={item.id} className="flex items-center gap-3 text-sm">
-            <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
-              <Image
-                src={item.image || "/img/placeholder.png"}
-                alt={item.name}
-                fill
-                className="object-cover"
-                unoptimized={true}
-              />
-            </div>
-            <div className="flex-1">
-              <p className="text-white font-medium">{item.name}</p>
-              <p className="text-text text-xs">
-                Qty: {item.quantity} × {formatCurrency(item.price)}
+      {order.items && order.items.length > 0 && (
+        <div className="space-y-2 mb-4 pt-4 border-t border-white/10">
+          {order.items.slice(0, 3).map((item, idx) => (
+            <div key={item.id || idx} className="flex items-center gap-3 text-sm">
+              <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
+                <Image
+                  src={item.image || "/img/placeholder.png"}
+                  alt={item.name || 'Item'}
+                  fill
+                  className="object-cover"
+                  unoptimized={true}
+                />
+              </div>
+              <div className="flex-1">
+                <p className="text-white font-medium">{item.name || 'Unknown Item'}</p>
+                <p className="text-text text-xs">
+                  Qty: {item.quantity || 1} × {formatCurrency(item.price || 0)}
+                </p>
+              </div>
+              <p className="text-theme3 font-bold">
+                {formatCurrency((item.price || 0) * (item.quantity || 1))}
               </p>
             </div>
-            <p className="text-theme3 font-bold">
-              {formatCurrency(item.price * item.quantity)}
+          ))}
+          {order.items.length > 3 && (
+            <p className="text-text text-xs text-center pt-2">
+              +{order.items.length - 3} more item(s)
             </p>
-          </div>
-        ))}
-        {order.items?.length > 3 && (
-          <p className="text-text text-xs text-center pt-2">
-            +{order.items.length - 3} more item(s)
-          </p>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Payment Method */}
       <div className="flex items-center justify-between pt-4 border-t border-white/10">
@@ -84,12 +94,12 @@ export default function OrderCard({ order, index }) {
             {order.paymentMethod}
           </span>
         </p>
-        <Link
-          href={`/profile?order=${order.id}`}
-          className="text-theme3 hover:text-theme text-sm font-medium transition-colors"
-        >
-          View Details
-        </Link>
+        <div className="flex items-center gap-2 text-theme3 group-hover:text-theme text-sm font-medium transition-colors">
+          <span>View Details</span>
+          <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
       </div>
     </motion.div>
   );

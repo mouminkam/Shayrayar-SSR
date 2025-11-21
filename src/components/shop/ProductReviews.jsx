@@ -1,11 +1,8 @@
 "use client";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import { Star, MessageSquare } from "lucide-react";
 
 export default function ProductReviews({ productId }) {
-  // TODO: Replace with API call when reviews endpoint is available
-  // For now, using static data
   const reviews = [
     {
       id: 1,
@@ -28,13 +25,7 @@ export default function ProductReviews({ productId }) {
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="product-review mb-12 bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-12 shadow-2xl shadow-theme3/10 border border-white/10 relative overflow-hidden"
-    >
-      {/* Subtle gradient overlay */}
+    <div className="product-review mb-12 bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-12 shadow-2xl shadow-theme3/10 border border-white/10 relative overflow-hidden">
       <div className="absolute inset-0 bg-linear-to-br from-theme3/5 via-transparent to-theme/5 opacity-20 pointer-events-none"></div>
       
       <div className="flex items-center justify-between mb-10 relative z-10">
@@ -56,21 +47,14 @@ export default function ProductReviews({ productId }) {
         </div>
       ) : (
         <ul className="comment-list relative z-10">
-          {reviews.map((review, index) => (
-            <motion.li
+          {reviews.map((review) => (
+            <li
               key={review.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
               className="comment-item pb-8 mb-8 border-b border-white/10 last:border-0 last:mb-0 last:pb-0"
             >
               <div className="post-comment flex items-start gap-5 group">
                 <div className="comment-avater shrink-0">
-                  <motion.div
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    transition={{ duration: 0.3 }}
-                    className="relative"
-                  >
+                  <div className="relative">
                     <div className="absolute inset-0 bg-linear-to-br from-theme3/20 to-theme/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <Image
                       src={review.avatar}
@@ -80,7 +64,7 @@ export default function ProductReviews({ productId }) {
                       className="w-20 h-20 rounded-full object-cover border-2 border-white/20 group-hover:border-theme3/50 transition-all duration-300 relative z-10"
                       unoptimized={true}
                     />
-                  </motion.div>
+                  </div>
                 </div>
                 <div className="comment-content flex-1 relative">
                   <h4 className="name text-white font-['Epilogue',sans-serif] text-xl font-bold mb-1 capitalize transition-colors duration-300">
@@ -106,11 +90,10 @@ export default function ProductReviews({ productId }) {
                   <p className="text text-white text-base leading-relaxed">{review.comment}</p>
                 </div>
               </div>
-            </motion.li>
+            </li>
           ))}
         </ul>
       )}
-    </motion.div>
+    </div>
   );
 }
-

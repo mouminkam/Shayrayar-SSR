@@ -153,10 +153,34 @@ export const getRegistrationBranches = async (lang = 'ar') => {
 
 /**
  * Get Google authentication URL
- * @returns {Promise<Object>} Response with Google OAuth URL
+ * @returns {Promise<Object>} Response with Google OAuth URL and state
+ * Response format: { success: true, data: { redirect_url: "...", state: "..." } }
  */
 export const getGoogleAuthUrl = async () => {
   const response = await axiosInstance.get('/auth/google');
+  return response;
+};
+
+/**
+ * Call Backend Google OAuth callback endpoint
+ * Backend callback URL: https://shahrayar.peaklink.pro/api/v1/auth/google/callback
+ * @param {string} code - Authorization code from Google
+ * @param {string} state - State parameter for CSRF protection
+ * @returns {Promise<Object>} Response with user data and token
+ */
+export const googleCallback = async (code, state) => {
+  // Call Backend callback endpoint with code and state
+  // Note: This endpoint is on Backend domain, so we need to use full URL or proxy
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://shahrayar.peaklink.pro/api/v1';
+  
+  // Use axios directly to call Backend callback endpoint
+  const response = await axiosInstance.get('/auth/google/callback', {
+    params: {
+      code,
+      state,
+    },
+  });
+  
   return response;
 };
 
@@ -185,6 +209,7 @@ const authAPI = {
   completeRegistration,
   getRegistrationBranches,
   getGoogleAuthUrl,
+  googleCallback,
   googleLogin,
 };
 

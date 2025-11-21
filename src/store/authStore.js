@@ -199,25 +199,6 @@ const useAuthStore = create(
         }
       },
 
-      addOrder: (order) => {
-        const user = get().user;
-        if (user) {
-          set({
-            user: {
-              ...user,
-              orders: [
-                {
-                  id: Date.now().toString(),
-                  ...order,
-                  date: new Date().toISOString(),
-                },
-                ...(user.orders || []),
-              ],
-            },
-          });
-        }
-      },
-
       // Reset password flow helpers
       resetPasswordRequest: async (email) => {
         set({ isLoading: true });
@@ -463,7 +444,8 @@ const useAuthStore = create(
           if (response.success && response.data) {
             return { 
               success: true, 
-              url: response.data.url || response.data.auth_url 
+              data: response.data,
+              url: response.data.redirect_url || response.data.url || response.data.auth_url 
             };
           } else {
             return { 
@@ -476,6 +458,76 @@ const useAuthStore = create(
           return { 
             success: false, 
             error: error.message || "An error occurred while getting Google auth URL" 
+          };
+        }
+      },
+
+      // Handle Google OAuth callback data
+      handleGoogleOAuthCallback: async (callbackData) => {
+        set({ isLoading: true });
+        try {
+          const { user, token } = callbackData;
+          
+          if (!user || !token) {
+            set({ isLoading: false });
+            return { success: false, error: "Invalid callback data" };
+          }
+
+          // Save user + token in sessionStorage for both cases
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("googleUser", JSON.stringify(user));
+            sessionStorage.setItem("googleToken", token);
+            sessionStorage.setItem("googleFlow", "true");
+          }
+
+          // Check if phone is missing
+          if (!user.phone) {
+            set({ isLoading: false });
+            return {
+              success: true,
+              redirect: "/add-phone",
+            };
+          }
+
+          // Phone exists - send OTP
+          try {
+            const otpResult = await api.auth.registerPhone({
+              phone: user.phone,
+              password: null,
+              password_confirmation: null,
+            });
+
+            if (otpResult.success) {
+              // Save phone in sessionStorage for OTP verification
+              if (typeof window !== "undefined") {
+                sessionStorage.setItem("registrationPhone", user.phone);
+              }
+
+              set({ isLoading: false });
+              return {
+                success: true,
+                redirect: "/enter-otp",
+              };
+            } else {
+              set({ isLoading: false });
+              return {
+                success: false,
+                error: otpResult.message || "Failed to send OTP",
+              };
+            }
+          } catch (otpError) {
+            console.error("Error sending OTP:", otpError);
+            set({ isLoading: false });
+            return {
+              success: false,
+              error: otpError.message || "Failed to send OTP",
+            };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          return {
+            success: false,
+            error: error.message || "An error occurred during Google authentication",
           };
         }
       },

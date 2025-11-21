@@ -5,7 +5,7 @@ import MarqueeSection from "../../components/about/MarqueeSection";
 import CTASection from "../../components/about/CTASection";
 import ChefeSection from "../../components/about/ChefeSection";
 import TestimonialSection from "../../components/about/TestimonialSection";
-import BlogSection from "../../components/about/BlogSection";
+// import BlogSection from "../../components/about/BlogSection"; // Blog section temporarily disabled
 
 export default function AboutUsPage() {
   return (
@@ -17,7 +17,7 @@ export default function AboutUsPage() {
       <CTASection />
       <ChefeSection />
       <TestimonialSection />
-      <BlogSection />
+      {/* <BlogSection /> */} {/* Blog section temporarily disabled */}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { CreditCard, Wallet } from "lucide-react";
+import { Wallet, Zap } from "lucide-react";
 
 export default function PaymentMethodSelector({ paymentMethod, setPaymentMethod }) {
   return (
@@ -9,17 +9,19 @@ export default function PaymentMethodSelector({ paymentMethod, setPaymentMethod 
         type="button"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        onClick={() => setPaymentMethod("card")}
+        onClick={() => setPaymentMethod("stripe")}
         className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-          paymentMethod === "card"
+          paymentMethod === "stripe"
             ? "border-theme3 bg-theme3/20"
             : "border-white/20 bg-white/5 hover:border-theme3/50"
         }`}
       >
-        <div className="flex items-center gap-3">
-          <CreditCard className="w-6 h-6 text-theme3" />
-          <span className="text-white font-['Epilogue',sans-serif] font-bold">
-            Credit/Debit Card
+        <div className="flex flex-col items-center gap-2">
+          <Zap className={`w-6 h-6 ${paymentMethod === "stripe" ? "text-theme3" : "text-text"}`} />
+          <span className={`font-['Epilogue',sans-serif] font-bold text-sm ${
+            paymentMethod === "stripe" ? "text-theme3" : "text-white"
+          }`}>
+            Stripe
           </span>
         </div>
       </motion.button>
@@ -35,10 +37,12 @@ export default function PaymentMethodSelector({ paymentMethod, setPaymentMethod 
             : "border-white/20 bg-white/5 hover:border-theme3/50"
         }`}
       >
-        <div className="flex items-center gap-3">
-          <Wallet className="w-6 h-6 text-theme3" />
-          <span className="text-white font-['Epilogue',sans-serif] font-bold">
-            Cash on Delivery
+        <div className="flex flex-col items-center gap-2">
+          <Wallet className={`w-6 h-6 ${paymentMethod === "cash" ? "text-theme3" : "text-text"}`} />
+          <span className={`font-['Epilogue',sans-serif] font-bold text-sm ${
+            paymentMethod === "cash" ? "text-theme3" : "text-white"
+          }`}>
+            Cash
           </span>
         </div>
       </motion.button>

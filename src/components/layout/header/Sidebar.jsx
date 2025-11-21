@@ -3,12 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { X, MapPin, Mail, Clock, Phone, ShoppingCart, Facebook, Twitter, Youtube, Linkedin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import BranchSelector from "./BranchSelector";
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const navItems = [
     { href: "/", label: "Home" },
     { href: "/shop", label: "Shop" },
-    { href: "/blog", label: "Blog" },
+    // { href: "/blog", label: "Blog" }, // Blog section temporarily disabled
     { href: "/contact-us", label: "ContactUs" },
     { href: "/about-us", label: "AboutUs" },
   ];
@@ -83,6 +84,21 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                       >
                         <X className="w-5 h-5" />
                       </motion.button>
+                    </div>
+                  </motion.div>
+
+                  {/* Branch Selector - Mobile & Tablet */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
+                    className="mb-6 lg:hidden"
+                  >
+                    <h4 className="text-white font-['Epilogue',sans-serif] text-lg font-semibold mb-3">
+                      Select Branch
+                    </h4>
+                    <div className="relative">
+                      <BranchSelector isMobile={true} />
                     </div>
                   </motion.div>
 

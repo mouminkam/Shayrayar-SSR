@@ -7,7 +7,7 @@ export default function ShopPage() {
     <div className="bg-bg3 min-h-screen">
       <Breadcrumb title="Shop" />
       <Suspense fallback={
-        <div className="flex items-center justify-center py-20">
+        <div className="flex items-center justify-center py-20 bg-bgimg">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-theme3"></div>
         </div>
       }>

@@ -80,6 +80,21 @@ export const trackOrder = async (orderId) => {
   return response;
 };
 
+/**
+ * Get available coupons for an order
+ * @param {Object} orderData - Order data to check available coupons
+ * @param {number} orderData.order_amount - Order total amount
+ * @param {number} orderData.branch_id - Branch ID
+ * @param {Array} orderData.items - Order items array
+ * @param {number} orderData.items[].menu_item_id - Menu item ID
+ * @param {number} orderData.items[].quantity - Item quantity
+ * @returns {Promise<Object>} Response with available coupons list
+ */
+export const getAvailableCoupons = async (orderData) => {
+  const response = await axiosInstance.post('/orders/available-coupons', orderData);
+  return response;
+};
+
 // Default export with all order functions
 const ordersAPI = {
   getUserOrders,
@@ -87,6 +102,7 @@ const ordersAPI = {
   getOrderById,
   cancelOrder,
   trackOrder,
+  getAvailableCoupons,
 };
 
 export default ordersAPI;

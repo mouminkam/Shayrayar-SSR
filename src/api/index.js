@@ -18,6 +18,9 @@ import customerAPI from './customer';
 import couponsAPI from './coupons';
 import paymentsAPI from './payments';
 import homeAPI from './home';
+import notificationsAPI from './notifications';
+import deliveryBoyAPI from './deliveryBoy';
+import contactAPI from './contact';
 import axiosInstance from './config/axios';
 
 // Export all API modules
@@ -30,6 +33,9 @@ export {
   couponsAPI,
   paymentsAPI,
   homeAPI,
+  notificationsAPI,
+  deliveryBoyAPI,
+  contactAPI,
 };
 
 // Export axios instance for direct use if needed
@@ -45,6 +51,9 @@ const api = {
   coupons: couponsAPI,
   payments: paymentsAPI,
   home: homeAPI,
+  notifications: notificationsAPI,
+  deliveryBoy: deliveryBoyAPI,
+  contact: contactAPI,
 };
 
 export default api;

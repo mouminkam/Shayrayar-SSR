@@ -5,11 +5,12 @@ import { motion } from "framer-motion";
 import { Mail, Lock, LogIn, Eye, EyeOff } from "lucide-react";
 import useAuthStore from "../../../store/authStore";
 import useToastStore from "../../../store/toastStore";
+import api from "../../../api";
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login, getGoogleAuthUrl, loginWithGoogle, isLoading } = useAuthStore();
+  const { login, getGoogleAuthUrl, isLoading } = useAuthStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
 
   const [formData, setFormData] = useState({
@@ -30,6 +31,16 @@ export default function LoginForm() {
       }
     }
   }, []);
+
+  // Handle error from query params (Google OAuth errors)
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      toastError(decodeURIComponent(error));
+      // Remove error from URL
+      router.replace("/login", { scroll: false });
+    }
+  }, [searchParams, router, toastError]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -104,11 +115,19 @@ export default function LoginForm() {
 
   const handleGoogleLogin = async () => {
     try {
+      setErrors({});
       const result = await getGoogleAuthUrl();
       
-      if (result.success && result.url) {
-        // Redirect to Google OAuth URL
-        window.location.href = result.url;
+      if (result.success && result.data) {
+        const redirectUrl = result.data.redirect_url || result.data.url;
+        
+        if (!redirectUrl) {
+          toastError("Failed to get Google OAuth URL");
+          return;
+        }
+
+        // Redirect directly to Google OAuth URL (same page)
+        window.location.href = redirectUrl;
       } else {
         toastError(result.error || "Failed to get Google login URL");
       }
@@ -191,7 +210,7 @@ export default function LoginForm() {
         disabled={isLoading}
         whileHover={{ scale: isLoading ? 1 : 1.02 }}
         whileTap={{ scale: isLoading ? 1 : 0.98 }}
-        className="w-full bg-black hover:bg-black/90 text-white py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-theme3 cursor-pointer text-title py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-3  disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path

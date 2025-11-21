@@ -29,10 +29,20 @@ export const getAvailableCoupons = async (params) => {
   return response;
 };
 
+/**
+ * Get user coupons (coupons available to the authenticated user)
+ * @returns {Promise<Object>} Response with user coupons list
+ */
+export const getUserCoupons = async () => {
+  const response = await axiosInstance.get('/coupons/user');
+  return response;
+};
+
 // Default export with all coupon functions
 const couponsAPI = {
   validateCoupon,
   getAvailableCoupons,
+  getUserCoupons,
 };
 
 export default couponsAPI;

@@ -1,9 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
+import api from "../../api";
+import useToastStore from "../../store/toastStore";
+import useBranchStore from "../../store/branchStore";
 
 export default function ContactForm() {
+  const { success: toastSuccess, error: toastError } = useToastStore();
+  const { selectedBranch, initialize } = useBranchStore();
+  const [branchEmail, setBranchEmail] = useState("info@example.com");
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -12,6 +18,36 @@ export default function ContactForm() {
     message: "",
     agree: false,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Initialize branch if not loaded
+  useEffect(() => {
+    if (!selectedBranch) {
+      initialize();
+    }
+  }, [selectedBranch, initialize]);
+
+  // Fetch branch email
+  useEffect(() => {
+    const fetchBranchEmail = async () => {
+      if (!selectedBranch) return;
+
+      try {
+        const response = await api.branches.getBranchById(selectedBranch.id || selectedBranch.branch_id);
+        
+        if (response && response.success && response.data) {
+          const branchData = response.data.branch || response.data;
+          const email = branchData.email || branchData.contact_email || "info@example.com";
+          setBranchEmail(email);
+        }
+      } catch (error) {
+        console.error("Error fetching branch email:", error);
+        // Keep default email
+      }
+    };
+
+    fetchBranchEmail();
+  }, [selectedBranch]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -23,8 +59,77 @@ export default function ContactForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
+
+    // Validation
+    if (!formData.fullName || !formData.email || !formData.phone || !formData.message) {
+      toastError("Please fill in all required fields");
+      return;
+    }
+
+    if (!formData.agree) {
+      toastError("Please agree to the terms");
+      return;
+    }
+
+    if (formData.subject === "subject") {
+      toastError("Please select a subject");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Format subject for email
+      const subjectLabels = {
+        complain: "Complain",
+        greetings: "Greetings",
+        date: "Expire Date",
+        price: "About Price",
+        order: "About Order",
+      };
+      const emailSubject = subjectLabels[formData.subject] || formData.subject;
+
+      // Create email body with all form data
+      const emailBody = `Hello,
+
+I would like to contact you regarding: ${emailSubject}
+
+Name: ${formData.fullName}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Subject: ${emailSubject}
+
+Message:
+${formData.message}
+
+---
+This message was sent from the contact form on the website.`;
+
+      // Create mailto link
+      const mailtoLink = `mailto:${branchEmail}?subject=${encodeURIComponent(`Contact Form: ${emailSubject}`)}&body=${encodeURIComponent(emailBody)}`;
+
+      // Open email client
+      window.location.href = mailtoLink;
+
+      toastSuccess("Opening your email client... Please send the message to complete your request.");
+      
+      // Reset form after a short delay
+      setTimeout(() => {
+        setFormData({
+          fullName: "",
+          email: "",
+          phone: "",
+          subject: "subject",
+          message: "",
+          agree: false,
+        });
+        setIsSubmitting(false);
+      }, 1000);
+    } catch (error) {
+      console.error("Contact form error:", error);
+      toastError("Failed to open email client. Please try again.");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -151,10 +256,20 @@ export default function ContactForm() {
                   <div className="col-12 form-group mb-0">
                     <button
                       type="submit"
-                      className="theme-btn w-full  bg-theme3 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-sm font-['Roboto',sans-serif] text-sm sm:text-base font-medium hover:bg-theme transition-colors duration-300 flex items-center justify-center gap-2"
+                      disabled={isSubmitting}
+                      className="theme-btn w-full bg-theme3 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-sm font-['Roboto',sans-serif] text-sm sm:text-base font-medium hover:bg-theme transition-colors duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      SUBMIT NOW
-                      <ArrowRight className="w-4 h-4 bg-transparent text-white" />
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          SENDING...
+                        </>
+                      ) : (
+                        <>
+                          SUBMIT NOW
+                          <ArrowRight className="w-4 h-4 bg-transparent text-white" />
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>

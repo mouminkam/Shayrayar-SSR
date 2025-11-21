@@ -1,0 +1,168 @@
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { Phone, ArrowRight } from "lucide-react";
+import useAuthStore from "../../../store/authStore";
+import useToastStore from "../../../store/toastStore";
+
+export default function PhoneInputForm() {
+  const router = useRouter();
+  const { registerPhone, isLoading } = useAuthStore();
+  const { success: toastSuccess, error: toastError } = useToastStore();
+
+  const [formData, setFormData] = useState({
+    phone: "",
+  });
+  const [errors, setErrors] = useState({});
+
+  // Check if user came from Google login flow
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const googleFlow = sessionStorage.getItem("googleFlow");
+      const googleUser = sessionStorage.getItem("googleUser");
+      
+      if (!googleFlow || !googleUser) {
+        // Not from Google login flow, redirect to register
+        router.push("/register");
+      }
+    }
+  }, [router]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.phone) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^\+?[1-9]\d{1,14}$/.test(formData.phone.replace(/\s/g, ""))) {
+      newErrors.phone = "Please enter a valid phone number";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    // Check if we have Google user data
+    if (typeof window !== "undefined") {
+      const googleFlow = sessionStorage.getItem("googleFlow");
+      if (!googleFlow) {
+        toastError("Session expired. Please try again.");
+        router.push("/register");
+        return;
+      }
+    }
+
+    try {
+      const phoneNumber = formData.phone.replace(/\s/g, "");
+      
+      // Send OTP to phone
+      const result = await registerPhone({
+        phone: phoneNumber,
+        password: null, // No password for Google login
+        password_confirmation: null,
+      });
+
+      if (result.success) {
+        // Save phone in sessionStorage
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("registrationPhone", phoneNumber);
+        }
+
+        toastSuccess(result.message || "OTP sent to your phone! Please check your messages.");
+        router.push("/enter-otp");
+      } else {
+        const errorMessage = result.error || "Failed to send OTP. Please try again.";
+        toastError(errorMessage);
+        
+        // Set field-specific errors if available
+        if (result.errors) {
+          const apiErrors = {};
+          Object.keys(result.errors).forEach((key) => {
+            apiErrors[key] = Array.isArray(result.errors[key]) 
+              ? result.errors[key][0] 
+              : result.errors[key];
+          });
+          setErrors({ ...errors, ...apiErrors });
+        }
+      }
+    } catch (error) {
+      toastError(error.message || "An unexpected error occurred. Please try again.");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Phone */}
+      <div>
+        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+          <Phone className="w-4 h-4 inline mr-1" />
+          Enter your phone number
+        </label>
+        <input
+          type="tel"
+          name="phone"
+          value={formData.phone}
+          onChange={handleInputChange}
+          className={`w-full px-4 py-3 bg-white/10 border ${
+            errors.phone ? "border-red-500" : "border-white/20"
+          } rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300`}
+          placeholder="+963933310888"
+        />
+        {errors.phone && (
+          <p className="mt-1 text-red-400 text-sm">{errors.phone}</p>
+        )}
+        <p className="mt-2 text-text text-xs">
+          We'll send you a verification code via SMS
+        </p>
+      </div>
+
+      {/* Submit Button */}
+      <motion.button
+        type="submit"
+        disabled={isLoading}
+        whileHover={{ scale: isLoading ? 1 : 1.02 }}
+        whileTap={{ scale: isLoading ? 1 : 0.98 }}
+        className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base font-['Epilogue',sans-serif] font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {isLoading ? (
+          <>
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+            />
+            Sending OTP...
+          </>
+        ) : (
+          <>
+            Continue
+            <ArrowRight className="w-5 h-5" />
+          </>
+        )}
+      </motion.button>
+    </form>
+  );
+}
+

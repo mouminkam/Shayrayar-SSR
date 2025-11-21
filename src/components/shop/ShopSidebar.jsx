@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Search, Star, Heart, ShoppingBasket } from "lucide-react";
-import { motion } from "framer-motion";
 import api from "../../api";
 import useBranchStore from "../../store/branchStore";
 import { transformCategories, transformMenuItemsToProducts } from "../../lib/utils/productTransform";
@@ -303,16 +302,12 @@ export default function ShopSidebar() {
             <p className="text-text text-sm text-center">No recent products</p>
           ) : (
             <div className="grid grid-cols-1 gap-4 lg:gap-6 relative z-10">
-              {recentProducts.map((product, index) => {
+              {recentProducts.map((product) => {
                 const isInWishlistState = isInWishlist(product.id);
                 return (
-                  <motion.div
+                  <div
                     key={product.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
-                    className="group bg-linear-to-br from-white/5 via-bgimg to-black/90 backdrop-blur-md p-4 lg:p-5 rounded-2xl transition-all duration-500 relative overflow-hidden"
-                    whileHover={{ y: -4 }}
+                    className="group bg-linear-to-br from-white/5 via-bgimg to-black/90 backdrop-blur-md p-4 lg:p-5 rounded-2xl transition-all duration-500 relative overflow-hidden hover:-translate-y-1"
                   >
                     {/* Heart Button - Top Right */}
                     <button
@@ -387,7 +382,7 @@ export default function ShopSidebar() {
                         </div>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>

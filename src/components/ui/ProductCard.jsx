@@ -31,14 +31,38 @@ export default function ProductCard({ product, viewMode = "grid" }) {
     }
     
     try {
-      addToCart({
+      // Calculate default values for sizes and ingredients
+      const defaultSizeId = product?.default_size_id || (product?.sizes?.[0]?.id || null);
+      const defaultSize = product?.sizes?.find(s => s.id === defaultSizeId) || null;
+      
+      // Calculate final price with default size
+      let finalPrice = product.base_price || product.price || 0;
+      if (defaultSize) {
+        finalPrice += parseFloat(defaultSize.price || 0);
+      }
+      
+      // Prepare cart item with default values
+      const cartItem = {
         id: product.id,
         name: product.title,
-        price: product.price,
+        price: finalPrice,
+        base_price: product.base_price || product.price,
         image: product.image,
         title: product.title,
-      });
-      toastSuccess(`${product.title} added to cart`);
+        final_price: finalPrice,
+        // Default size (if available)
+        size_id: defaultSizeId,
+        size_name: defaultSize?.name || null,
+        // No ingredients by default
+        ingredients: [],
+        ingredients_data: [],
+      };
+      
+      addToCart(cartItem);
+      
+      // Show success message with customization info if applicable
+      const customizationText = defaultSize?.name ? ` (${defaultSize.name})` : "";
+      toastSuccess(`${product.title}${customizationText} added to cart`);
     } catch {
       toastError("Failed to add product to cart");
     }

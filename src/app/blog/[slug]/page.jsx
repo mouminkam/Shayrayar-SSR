@@ -1,3 +1,5 @@
+// Blog section temporarily disabled
+/*
 import Breadcrumb from "../../../components/ui/Breadcrumb";
 import BlogDetailsContent from "../../../components/blog/blog-details/BlogDetailsContent";
 import BlogDetailsSidebar from "../../../components/blog/blog-details/BlogDetailsSidebar";
@@ -13,12 +15,9 @@ export default async function BlogDetailsPage({ params }) {
         <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
           <div className="blog-details-area">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-              {/* Main Content */}
               <div className="lg:col-span-8">
                 <BlogDetailsContent slug={slug} />
               </div>
-
-              {/* Sidebar */}
               <div className="lg:col-span-4">
                 <BlogDetailsSidebar />
               </div>
@@ -30,6 +29,17 @@ export default async function BlogDetailsPage({ params }) {
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+*/
+
+export default async function BlogDetailsPage() {
+  return (
+    <div className="bg-bg3 min-h-screen">
+      <div className="flex items-center justify-center py-20">
+        <p className="text-text text-lg">Blog section is temporarily disabled</p>
+      </div>
     </div>
   );
 }

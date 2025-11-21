@@ -1,11 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { User, Mail, MessageSquare, Star, ArrowRight, Loader2 } from "lucide-react";
 import useAuthStore from "../../store/authStore";
 import useToastStore from "../../store/toastStore";
-// import api from "../../api"; // TODO: Uncomment when review API is available
 
 export default function ReviewForm({ productId }) {
   const router = useRouter();
@@ -20,7 +18,6 @@ export default function ReviewForm({ productId }) {
     saveInfo: false,
   });
 
-  // Update form data when user changes
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
@@ -34,20 +31,17 @@ export default function ReviewForm({ productId }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Check authentication
     if (!isAuthenticated) {
       toastError("Please login to submit a review");
       router.push("/login");
       return;
     }
 
-    // Validate rating
     if (rating === 0) {
       toastError("Please select a rating");
       return;
     }
 
-    // Validate message
     if (!formData.message.trim()) {
       toastError("Please write a review message");
       return;
@@ -56,18 +50,10 @@ export default function ReviewForm({ productId }) {
     setIsSubmitting(true);
 
     try {
-      // TODO: Replace with actual API call when review endpoint is available
-      // const response = await api.menu.submitReview(productId, {
-      //   rating,
-      //   comment: formData.message,
-      // });
-      
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toastSuccess("Review submitted successfully!");
       
-      // Reset form
       setRating(0);
       setFormData({
         name: user?.name || "",
@@ -75,9 +61,6 @@ export default function ReviewForm({ productId }) {
         message: "",
         saveInfo: formData.saveInfo,
       });
-      
-      // TODO: Refresh reviews list after successful submission
-      // router.refresh();
     } catch (error) {
       toastError(error.message || "Failed to submit review. Please try again.");
     } finally {
@@ -86,68 +69,40 @@ export default function ReviewForm({ productId }) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="comment-form mt-12 p-8 sm:p-12 lg:p-16 bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 relative overflow-hidden"
-    >
-      {/* Subtle gradient overlay */}
+    <div className="comment-form mt-12 p-8 sm:p-12 lg:p-16 bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 relative overflow-hidden">
       <div className="absolute inset-0 bg-linear-to-br from-theme3/5 via-transparent to-theme/5 opacity-20 pointer-events-none"></div>
 
       <div className="form-title mb-8 relative z-10">
-        <motion.h3
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="inner-title text-white font-['Epilogue',sans-serif] text-3xl font-black mb-4 capitalize"
-        >
+        <h3 className="inner-title text-white font-['Epilogue',sans-serif] text-3xl font-black mb-4 capitalize">
           Add a Review
-        </motion.h3>
-        <motion.p
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-text text-sm sm:text-base mb-6"
-        >
+        </h3>
+        <p className="text-text text-sm sm:text-base mb-6">
           Your email address will not be published. Required fields are marked *
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="rating flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mt-4 mb-9"
-        >
+        </p>
+        <div className="rating flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mt-4 mb-9">
           <p className="text-white font-['Epilogue',sans-serif] text-base sm:text-lg font-semibold m-0">Rate this product? *</p>
           <ul className="star flex items-center gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <li key={star}>
-                <motion.button
+                <button
                   type="button"
                   onClick={() => setRating(star)}
-                  whileHover={{ scale: 1.2, rotate: 10 }}
-                  whileTap={{ scale: 0.9 }}
                   className="transition-all duration-300"
                 >
                   <Star
                     className={`w-6 h-6 sm:w-7 sm:h-7 ${rating >= star ? "text-theme3 fill-theme3" : "text-white/30 fill-white/10 hover:text-theme3 transition-all duration-300"
                       }`}
                   />
-                </motion.button>
+                </button>
               </li>
             ))}
           </ul>
-        </motion.div>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="form-group style-white2 relative"
-          >
+          <div className="form-group style-white2 relative">
             <input
               type="text"
               placeholder="Your Name"
@@ -157,13 +112,8 @@ export default function ReviewForm({ productId }) {
               required
             />
             <User className="absolute right-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="form-group style-white2 relative"
-          >
+          </div>
+          <div className="form-group style-white2 relative">
             <input
               type="email"
               placeholder="Your Email"
@@ -173,14 +123,9 @@ export default function ReviewForm({ productId }) {
               required
             />
             <Mail className="absolute right-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
-          </motion.div>
+          </div>
         </div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          className="form-group style-white2 relative mb-5"
-        >
+        <div className="form-group style-white2 relative mb-5">
           <textarea
             placeholder="Write a Message"
             rows="5"
@@ -190,14 +135,9 @@ export default function ReviewForm({ productId }) {
             required
           />
           <MessageSquare className="absolute right-5 top-5 w-5 h-5 text-white/60" />
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.7 }}
-          className="form-group mb-6"
-        >
+        <div className="form-group mb-6">
           <input
             type="checkbox"
             id="reviewcheck"
@@ -218,27 +158,16 @@ export default function ReviewForm({ productId }) {
                 }`}
             >
               {formData.saveInfo && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="w-3 h-3 bg-white rounded-sm"
-                />
+                <span className="w-3 h-3 bg-white rounded-sm"></span>
               )}
             </span>
           </label>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
-          className="form-group mb-0"
-        >
-          <motion.button
+        <div className="form-group mb-0">
+          <button
             type="submit"
             disabled={isSubmitting || rating === 0}
-            whileHover={!isSubmitting && rating > 0 ? { scale: 1.02, y: -2 } : {}}
-            whileTap={!isSubmitting && rating > 0 ? { scale: 0.98 } : {}}
             className={`theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3 font-['Epilogue',sans-serif] text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30 ${
               isSubmitting || rating === 0 ? 'opacity-50 cursor-not-allowed' : ''
             }`}
@@ -254,10 +183,9 @@ export default function ReviewForm({ productId }) {
                 <ArrowRight className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
               </>
             )}
-          </motion.button>
-        </motion.div>
+          </button>
+        </div>
       </form>
-    </motion.div>
+    </div>
   );
 }
-

@@ -2,6 +2,7 @@ import FreshHeatHeader from "../components/layout/Header";
 import FreshHeatFooter from "../components/layout/Footer";
 import Toast from "../components/ui/Toast";
 import BranchInitializer from "../components/layout/BranchInitializer";
+import LenisScrollProvider from "../components/layout/LenisScrollProvider";
 import "./globals.css";
 
 export const metadata = {
@@ -19,13 +20,15 @@ export default function RootLayout({ children }) {
       </head>
 
       <body suppressHydrationWarning>
-          <BranchInitializer />
-          <FreshHeatHeader />
-          <main id="main" role="main">
-            {children}
-          </main>
-          <FreshHeatFooter />
-          <Toast />
+          <LenisScrollProvider>
+            <BranchInitializer />
+            <FreshHeatHeader />
+            <main id="main" role="main">
+              {children}
+            </main>
+            <FreshHeatFooter />
+            <Toast />
+          </LenisScrollProvider>
       </body>
     </html>
   );

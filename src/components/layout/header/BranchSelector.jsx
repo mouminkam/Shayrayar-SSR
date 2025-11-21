@@ -74,20 +74,20 @@ const BranchSelector = ({ isMobile = false }) => {
         <button
           onClick={() => setIsOpen(!isOpen)}
           disabled={isLoading || branches.length === 0}
-          className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
         >
-          <MapPin className="w-4 h-4" />
-          <span className="hidden sm:inline">{displayName}</span>
-          <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+          <MapPin className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span className="flex-1 text-left truncate">{displayName}</span>
+          <ChevronDown className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
         {isOpen && (
           <>
             <div 
-              className="fixed inset-0 z-40" 
+              className="fixed inset-0 z-[10000]" 
               onClick={() => setIsOpen(false)}
             />
-            <div className="absolute top-full right-0 mt-2 w-56 bg-bgimg border border-white/20 rounded-xl shadow-2xl z-50 max-h-64 overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-2 w-full sm:w-64 bg-bgimg border border-white/20 rounded-xl shadow-2xl z-[10001] max-h-64 overflow-y-auto">
               {isLoading ? (
                 <div className="p-4 text-center text-text text-sm">Loading branches...</div>
               ) : branches.length === 0 ? (

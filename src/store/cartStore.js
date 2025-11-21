@@ -3,84 +3,361 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 // Cart item structure
-// { id, name, price, quantity, image }
+// { 
+//   id, name, price, quantity, image,
+//   size_id, size_name, ingredients, ingredients_data,
+//   base_price, final_price
+// }
+
+// Helper function to generate unique cart item key
+export const getCartItemKey = (item) => {
+  const sizeKey = item.size_id || 'no-size';
+  const ingredientsKey = Array.isArray(item.ingredients) 
+    ? item.ingredients.sort().join(',') 
+    : 'no-ingredients';
+  return `${item.id}-${sizeKey}-${ingredientsKey}`;
+};
 
 const useCartStore = create(
   persist(
     (set, get) => ({
       // State - الحالة الأساسية للـ cart
       items: [], // Cart فارغ افتراضياً
+      coupon: null, // Applied coupon { code, discount_amount, discount_type, ... }
+      deliveryCharge: 0, // Delivery charge amount
+      orderType: 'delivery', // 'pickup' or 'delivery'
 
       // Actions
       addToCart: (product) => {
         const items = get().items;
-        const existingItem = items.find((item) => item.id === product.id);
+        
+        // Generate unique key for this product configuration
+        const productKey = getCartItemKey({
+          id: product.id,
+          size_id: product.size_id || null,
+          ingredients: product.ingredients || [],
+        });
+
+        // Find existing item with same configuration
+        const existingItem = items.find((item) => {
+          const itemKey = getCartItemKey({
+            id: item.id,
+            size_id: item.size_id || null,
+            ingredients: item.ingredients || [],
+          });
+          return itemKey === productKey;
+        });
 
         if (existingItem) {
-          // If item exists, increase quantity
+          // If same product with same size and ingredients exists, increase quantity
           set({
-            items: items.map((item) =>
-              item.id === product.id
+            items: items.map((item) => {
+              const itemKey = getCartItemKey({
+                id: item.id,
+                size_id: item.size_id || null,
+                ingredients: item.ingredients || [],
+              });
+              return itemKey === productKey
                 ? { ...item, quantity: item.quantity + 1 }
-                : item
-            ),
+                : item;
+            }),
           });
         } else {
-          // If item doesn't exist, add it with quantity 1
+          // If different configuration, add as new item
           set({
-            items: [...items, { ...product, quantity: 1 }],
+            items: [...items, { 
+              ...product, 
+              quantity: 1,
+              // Ensure all fields are set
+              size_id: product.size_id || null,
+              size_name: product.size_name || null,
+              ingredients: product.ingredients || [],
+              ingredients_data: product.ingredients_data || [],
+              base_price: product.base_price || product.price,
+              final_price: product.final_price || product.price,
+            }],
           });
         }
       },
 
-      removeFromCart: (id) => {
-        set({
-          items: get().items.filter((item) => item.id !== id),
-        });
-      },
-
-      increaseQty: (id) => {
-        set({
-          items: get().items.map((item) =>
-            item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-          ),
-        });
-      },
-
-      decreaseQty: (id) => {
+      removeFromCart: (cartItemKey) => {
+        // cartItemKey can be either an ID (for backward compatibility) or a unique key
+        // If it's a number/string that looks like an ID, remove by ID
+        // Otherwise, treat it as a unique key
         const items = get().items;
-        const item = items.find((item) => item.id === id);
+        
+        // Try to find by unique key first
+        const itemToRemove = items.find((item) => {
+          const itemKey = getCartItemKey({
+            id: item.id,
+            size_id: item.size_id || null,
+            ingredients: item.ingredients || [],
+          });
+          return itemKey === cartItemKey || item.id === cartItemKey;
+        });
+
+        if (itemToRemove) {
+          const itemKey = getCartItemKey({
+            id: itemToRemove.id,
+            size_id: itemToRemove.size_id || null,
+            ingredients: itemToRemove.ingredients || [],
+          });
+          
+          set({
+            items: items.filter((item) => {
+              const currentKey = getCartItemKey({
+                id: item.id,
+                size_id: item.size_id || null,
+                ingredients: item.ingredients || [],
+              });
+              return currentKey !== itemKey && item.id !== cartItemKey;
+            }),
+          });
+        } else {
+          // Fallback: remove by ID (backward compatibility)
+          set({
+            items: items.filter((item) => item.id !== cartItemKey),
+          });
+        }
+      },
+
+      increaseQty: (cartItemKey) => {
+        const items = get().items;
+        set({
+          items: items.map((item) => {
+            const itemKey = getCartItemKey({
+              id: item.id,
+              size_id: item.size_id || null,
+              ingredients: item.ingredients || [],
+            });
+            if (itemKey === cartItemKey || item.id === cartItemKey) {
+              return { ...item, quantity: item.quantity + 1 };
+            }
+            return item;
+          }),
+        });
+      },
+
+      decreaseQty: (cartItemKey) => {
+        const items = get().items;
+        const item = items.find((item) => {
+          const itemKey = getCartItemKey({
+            id: item.id,
+            size_id: item.size_id || null,
+            ingredients: item.ingredients || [],
+          });
+          return itemKey === cartItemKey || item.id === cartItemKey;
+        });
 
         if (item && item.quantity > 1) {
           set({
-            items: items.map((item) =>
-              item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-            ),
+            items: items.map((item) => {
+              const itemKey = getCartItemKey({
+                id: item.id,
+                size_id: item.size_id || null,
+                ingredients: item.ingredients || [],
+              });
+              if (itemKey === cartItemKey || item.id === cartItemKey) {
+                return { ...item, quantity: item.quantity - 1 };
+              }
+              return item;
+            }),
           });
         } else {
           // If quantity is 1, remove the item
-          get().removeFromCart(id);
+          get().removeFromCart(cartItemKey);
         }
       },
 
       clearCart: () => {
-        set({ items: [] });
+        set({ 
+          items: [],
+          coupon: null,
+          deliveryCharge: 0,
+        });
+      },
+
+      // Coupon management
+      applyCoupon: (couponData) => {
+        set({ coupon: couponData });
+      },
+
+      removeCoupon: () => {
+        set({ coupon: null });
+      },
+
+      // Delivery charge management
+      setDeliveryCharge: (charge) => {
+        set({ deliveryCharge: charge || 0 });
+      },
+
+      // Order type management
+      setOrderType: (type) => {
+        set({ orderType: type });
+        // Reset delivery charge if pickup
+        if (type === 'pickup') {
+          set({ deliveryCharge: 0 });
+        }
+      },
+
+      // Update cart item (for editing customization)
+      updateCartItem: (cartItemKey, updates) => {
+        const items = get().items;
+        
+        // Find the item to update
+        const itemToUpdate = items.find((item) => {
+          const itemKey = getCartItemKey({
+            id: item.id,
+            size_id: item.size_id || null,
+            ingredients: item.ingredients || [],
+          });
+          return itemKey === cartItemKey || item.id === cartItemKey;
+        });
+
+        if (!itemToUpdate) {
+          return false; // Item not found
+        }
+
+        // Create updated item with new values
+        const updatedItem = {
+          ...itemToUpdate,
+          ...updates,
+          // Preserve quantity
+          quantity: itemToUpdate.quantity,
+        };
+
+        // Generate new key for updated item
+        const newKey = getCartItemKey({
+          id: updatedItem.id,
+          size_id: updatedItem.size_id || null,
+          ingredients: updatedItem.ingredients || [],
+        });
+
+        // Get old key
+        const oldKey = getCartItemKey({
+          id: itemToUpdate.id,
+          size_id: itemToUpdate.size_id || null,
+          ingredients: itemToUpdate.ingredients || [],
+        });
+
+        // If key changed, we need to replace the item (remove old, add new)
+        if (newKey !== oldKey) {
+          // Check if new configuration already exists
+          const existingItem = items.find((item) => {
+            const itemKey = getCartItemKey({
+              id: item.id,
+              size_id: item.size_id || null,
+              ingredients: item.ingredients || [],
+            });
+            return itemKey === newKey && itemKey !== oldKey;
+          });
+
+          if (existingItem) {
+            // If same configuration exists, merge quantities and remove old item
+            set({
+              items: items
+                .filter((item) => {
+                  const itemKey = getCartItemKey({
+                    id: item.id,
+                    size_id: item.size_id || null,
+                    ingredients: item.ingredients || [],
+                  });
+                  return itemKey !== oldKey;
+                })
+                .map((item) => {
+                  const itemKey = getCartItemKey({
+                    id: item.id,
+                    size_id: item.size_id || null,
+                    ingredients: item.ingredients || [],
+                  });
+                  if (itemKey === newKey) {
+                    return { ...item, quantity: item.quantity + updatedItem.quantity };
+                  }
+                  return item;
+                }),
+            });
+          } else {
+            // Remove old item and add new one
+            set({
+              items: items
+                .filter((item) => {
+                  const itemKey = getCartItemKey({
+                    id: item.id,
+                    size_id: item.size_id || null,
+                    ingredients: item.ingredients || [],
+                  });
+                  return itemKey !== oldKey;
+                })
+                .concat([updatedItem]),
+            });
+          }
+        } else {
+          // Key didn't change, just update the item in place
+          set({
+            items: items.map((item) => {
+              const itemKey = getCartItemKey({
+                id: item.id,
+                size_id: item.size_id || null,
+                ingredients: item.ingredients || [],
+              });
+              return itemKey === oldKey ? updatedItem : item;
+            }),
+          });
+        }
+
+        return true;
       },
 
       // Derived state (computed values)
       getSubtotal: () => {
         return get().items.reduce(
-          (sum, item) => sum + item.price * item.quantity,
+          (sum, item) => {
+            // Use final_price if available, otherwise use price
+            const itemPrice = item.final_price || item.price;
+            return sum + itemPrice * item.quantity;
+          },
           0
         );
       },
 
       getTax: () => {
-        return get().getSubtotal() * 0.1; // 10% tax
+        const subtotal = get().getSubtotal();
+        const discount = get().getDiscount();
+        const taxableAmount = subtotal - discount;
+        return taxableAmount * 0.1; // 10% tax on amount after discount
+      },
+
+      getDiscount: () => {
+        const coupon = get().coupon;
+        if (!coupon) return 0;
+        
+        const subtotal = get().getSubtotal();
+        
+        if (coupon.discount_type === 'percentage') {
+          return (subtotal * coupon.discount_value) / 100;
+        } else if (coupon.discount_type === 'fixed') {
+          return Math.min(coupon.discount_value, subtotal); // Don't exceed subtotal
+        }
+        
+        // Fallback: use discount_amount if available
+        return coupon.discount_amount || 0;
+      },
+
+      getDeliveryCharge: () => {
+        const orderType = get().orderType;
+        if (orderType === 'pickup') {
+          return 0;
+        }
+        return get().deliveryCharge || 0;
       },
 
       getTotal: () => {
-        return get().getSubtotal() + get().getTax();
+        const subtotal = get().getSubtotal();
+        const discount = get().getDiscount();
+        const tax = get().getTax();
+        const delivery = get().getDeliveryCharge();
+        
+        return subtotal - discount + tax + delivery;
       },
 
       getItemCount: () => {

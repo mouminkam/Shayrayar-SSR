@@ -4,8 +4,7 @@ import { useSearchParams } from "next/navigation";
 import ShopSidebar from "./ShopSidebar";
 import SortBar from "./SortBar";
 import ProductCard from "../ui/ProductCard";
-import Pagination from "../blog/Pagination";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronDown } from "lucide-react";
 import api from "../../api";
 import useBranchStore from "../../store/branchStore";
 import { transformMenuItemsToProducts } from "../../lib/utils/productTransform";
@@ -29,20 +28,38 @@ export default function ShopSection() {
     }
   }, [selectedBranch, initialize]);
   
-  const currentPage = Number(searchParams.get("page")) || 1;
   const categoryId = searchParams.get("category");
   const searchQuery = searchParams.get("search") || "";
   const sortBy = searchParams.get("sort") || "menu_order";
   
   const [viewMode, setViewMode] = useState("grid");
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]); // Products to display
+  const [allProducts, setAllProducts] = useState([]); // All products (for client-side pagination)
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalItems, setTotalItems] = useState(0);
+  const [useClientPagination, setUseClientPagination] = useState(false); // Flag to determine pagination type
 
   const itemsPerPage = viewMode === "grid" ? ITEMS_PER_PAGE_GRID : ITEMS_PER_PAGE_LIST;
 
-  // Fetch products from API
+  // Handle view mode change
+  const handleViewModeChange = (newViewMode) => {
+    setViewMode(newViewMode);
+    // If using client pagination, reset displayed products
+    if (useClientPagination) {
+      const newItemsPerPage = newViewMode === "grid" ? ITEMS_PER_PAGE_GRID : ITEMS_PER_PAGE_LIST;
+      setProducts(allProducts.slice(0, newItemsPerPage));
+    }
+  };
+
+  // Handle show more button (only for client-side pagination)
+  const handleShowMore = () => {
+    const currentCount = products.length;
+    const nextCount = currentCount + itemsPerPage;
+    setProducts(allProducts.slice(0, nextCount));
+  };
+
+  // Hybrid Pagination: Try server-side first, fallback to client-side
   const fetchProducts = useCallback(async () => {
     if (!selectedBranch) {
       setIsLoading(false);
@@ -53,42 +70,64 @@ export default function ShopSection() {
     setError(null);
 
     try {
+      // Step 1: Try server-side pagination with requested limit
       const params = {
-        page: currentPage,
+        page: 1,
         limit: itemsPerPage,
       };
 
-      // Add category filter if selected
+      // Add filters
       if (categoryId) {
         params.category_id = categoryId;
       }
-
-      // Add search query if provided
       if (searchQuery) {
         params.search = searchQuery;
       }
-
-      // Add sort parameter (if API supports it)
       if (sortBy && sortBy !== "menu_order") {
         params.sort_by = sortBy;
       }
 
       const response = await api.menu.getMenuItems(params);
       const { menuItems, totalCount } = extractMenuItemsFromResponse(response);
+      const apiPerPage = response?.data?.items?.per_page;
+
+      // Check if API respects the limit parameter
+      const apiRespectsLimit = apiPerPage && apiPerPage === itemsPerPage;
 
       if (Array.isArray(menuItems) && menuItems.length > 0) {
         const transformedProducts = transformMenuItemsToProducts(menuItems);
-        setProducts(transformedProducts);
-        setTotalItems(totalCount || transformedProducts.length);
+
+        if (apiRespectsLimit) {
+          // ✅ Server-side pagination works!
+          setUseClientPagination(false);
+          setProducts(transformedProducts);
+          setAllProducts([]); // Not needed for server-side
+          setTotalItems(totalCount || transformedProducts.length);
+        } else {
+          // ❌ API doesn't respect limit - use client-side pagination
+          setUseClientPagination(true);
+          
+          // Fetch all products for client-side pagination
+          const allParams = { ...params, limit: 1000 };
+          const allResponse = await api.menu.getMenuItems(allParams);
+          const { menuItems: allMenuItems } = extractMenuItemsFromResponse(allResponse);
+          const allTransformed = transformMenuItemsToProducts(allMenuItems);
+          
+          setAllProducts(allTransformed);
+          setProducts(allTransformed.slice(0, itemsPerPage));
+          setTotalItems(allTransformed.length);
+        }
         setError(null);
       } else if (totalCount > 0) {
-        setError("No products found on this page");
+        setError("No products found");
         setProducts([]);
+        setAllProducts([]);
         setTotalItems(totalCount);
       } else {
         const errorMsg = response?.message || response?.error || "No products found";
         setError(errorMsg);
         setProducts([]);
+        setAllProducts([]);
         setTotalItems(0);
       }
     } catch (err) {
@@ -96,15 +135,21 @@ export default function ShopSection() {
       setError(errorMessage);
       toastError(errorMessage);
       setProducts([]);
+      setAllProducts([]);
       setTotalItems(0);
     } finally {
       setIsLoading(false);
     }
-  }, [selectedBranch, currentPage, itemsPerPage, categoryId, searchQuery, sortBy, toastError]);
+  }, [selectedBranch, itemsPerPage, categoryId, searchQuery, sortBy, toastError]);
 
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  // Calculate if there are more products to show
+  const hasMore = useClientPagination 
+    ? products.length < allProducts.length 
+    : false; // Server-side pagination handled by API
 
   return (
     <section className="shop-section py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
@@ -114,9 +159,9 @@ export default function ShopSection() {
           <div className="mb-6 lg:mb-8">
             <SortBar
               totalItems={totalItems}
-              currentPage={currentPage}
+              currentPage={1}
               itemsPerPage={itemsPerPage}
-              onViewChange={setViewMode}
+              onViewChange={handleViewModeChange}
               viewMode={viewMode}
             />
           </div>
@@ -130,7 +175,7 @@ export default function ShopSection() {
               {/* Products Grid/List */}
               <div className="w-full min-h-[400px]">
                 {isLoading ? (
-                  <div className="flex items-center justify-center py-20">
+                  <div className="flex items-center justify-center py-20 bg-bgimg rounded-2xl">
                     <Loader2 className="w-8 h-8 text-theme3 animate-spin" />
                   </div>
                 ) : error ? (
@@ -151,26 +196,47 @@ export default function ShopSection() {
                     )}
                   </div>
                 ) : viewMode === "grid" ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
-                    {products.map((product) => (
-                      <ProductCard key={product.id} product={product} viewMode="grid" />
-                    ))}
-                  </div>
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
+                      {products.map((product) => (
+                        <ProductCard key={product.id} product={product} viewMode="grid" />
+                      ))}
+                    </div>
+                    {/* Show More Button (only for client-side pagination) */}
+                    {hasMore && (
+                      <div className="flex justify-center mt-8">
+                        <button
+                          onClick={handleShowMore}
+                          className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white font-['Epilogue',sans-serif] text-sm font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                        >
+                          Show More
+                          <ChevronDown className="w-5 h-5" />
+                        </button>
+                      </div>
+                    )}
+                  </>
                 ) : (
-                  <div className="flex flex-col gap-4">
-                    {products.map((product) => (
-                      <ProductCard key={product.id} product={product} viewMode="list" />
-                    ))}
-                  </div>
+                  <>
+                    <div className="flex flex-col gap-4">
+                      {products.map((product) => (
+                        <ProductCard key={product.id} product={product} viewMode="list" />
+                      ))}
+                    </div>
+                    {/* Show More Button (only for client-side pagination) */}
+                    {hasMore && (
+                      <div className="flex justify-center mt-8">
+                        <button
+                          onClick={handleShowMore}
+                          className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white font-['Epilogue',sans-serif] text-sm font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                        >
+                          Show More
+                          <ChevronDown className="w-5 h-5" />
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
-
-              {/* Pagination */}
-              {totalItems > itemsPerPage && (
-                <div className="w-full mt-4">
-                  <Pagination totalItems={totalItems} itemsPerPage={itemsPerPage} />
-                </div>
-              )}
 
             </main>
           </div>

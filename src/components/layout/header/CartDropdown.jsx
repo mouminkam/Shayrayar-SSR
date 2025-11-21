@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../../../hooks/useCart";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { IMAGE_PATHS } from "../../../data/constants";
+import { getCartItemKey } from "../../../store/cartStore";
 
 export default function CartDropdown({
   cartOpen,
@@ -150,51 +151,64 @@ export default function CartDropdown({
                   <p>Your cart is empty</p>
                 </motion.div>
               ) : (
-                cartItems.map((item, index) => (
-                  <motion.div
-                    key={item.id}
-                    variants={itemVariants}
-                    custom={index}
-                    className="flex items-center justify-between py-2 border-b border-gray-100 gap-2"
-                  >
-                    <div className="flex items-center space-x-3 flex-1 min-w-0">
-                      <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center shrink-0 overflow-hidden">
-                        {item.image ? (
-                          <Image
-                            src={item.image || IMAGE_PATHS.placeholder}
-                            alt={item.name}
-                            width={48}
-                            height={48}
-                            className="w-full h-full object-cover rounded"
-                            unoptimized={true}
-                          />
-                        ) : (
-                          <span className="text-xs text-gray-600">🍔</span>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {item.name}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {item.quantity} x{" "}
-                          <span className="text-theme3 font-semibold">
-                            {formatCurrency(item.price)}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                    <motion.button
-                      onClick={() => removeFromCart(item.id)}
-                      className="text-gray-400 hover:text-theme shrink-0 ml-2 rounded-full p-1 flex items-center justify-center"
-                      aria-label={`Remove ${item.name} from cart`}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
+                cartItems.map((item, index) => {
+                  const itemKey = getCartItemKey(item);
+                  const itemPrice = item.final_price || item.price;
+                  const hasCustomization = item.size_name || (item.ingredients_data && item.ingredients_data.length > 0);
+
+                  return (
+                    <motion.div
+                      key={itemKey}
+                      variants={itemVariants}
+                      custom={index}
+                      className="flex items-center justify-between py-2 border-b border-gray-100 gap-2"
                     >
-                      <X className="w-4 h-4" />
-                    </motion.button>
-                  </motion.div>
-                ))
+                      <div className="flex items-center space-x-3 flex-1 min-w-0">
+                        <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center shrink-0 overflow-hidden">
+                          {item.image ? (
+                            <Image
+                              src={item.image || IMAGE_PATHS.placeholder}
+                              alt={item.name}
+                              width={48}
+                              height={48}
+                              className="w-full h-full object-cover rounded"
+                              unoptimized={true}
+                            />
+                          ) : (
+                            <span className="text-xs text-gray-600">🍔</span>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {item.name}
+                          </p>
+                          {hasCustomization && (
+                            <p className="text-xs text-gray-500 truncate">
+                              {item.size_name && `${item.size_name}`}
+                              {item.size_name && item.ingredients_data?.length > 0 && " • "}
+                              {item.ingredients_data?.length > 0 && `${item.ingredients_data.length} add-on(s)`}
+                            </p>
+                          )}
+                          <p className="text-sm text-gray-600">
+                            {item.quantity} x{" "}
+                            <span className="text-theme3 font-semibold">
+                              {formatCurrency(itemPrice)}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                      <motion.button
+                        onClick={() => removeFromCart(itemKey)}
+                        className="text-gray-400 hover:text-theme shrink-0 ml-2 rounded-full p-1 flex items-center justify-center"
+                        aria-label={`Remove ${item.name} from cart`}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <X className="w-4 h-4" />
+                      </motion.button>
+                    </motion.div>
+                  );
+                })
               )}
             </div>
 

@@ -354,9 +354,9 @@ const FreshHeatHeader = () => {
           </nav>
 
           {/* Icons */}
-          <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 xl:gap-6 shrink-0">
-            {/* Branch Selector - Mobile & Desktop */}
-            <div className="hidden sm:block">
+          <div className="flex items-center gap-2 sm:gap-3 lg:gap-5 xl:gap-6 shrink-0">
+            {/* Branch Selector - Desktop only (hidden on mobile/tablet, shown in sidebar) */}
+            <div className="hidden lg:block">
               <BranchSelector isMobile={true} />
             </div>
             

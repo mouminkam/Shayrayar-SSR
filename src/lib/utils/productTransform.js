@@ -3,52 +3,76 @@
  */
 
 /**
- * Transform API menu item to frontend product structure
- * @param {Object} menuItem - Menu item from API
- * @returns {Object} Product object for frontend
- */
-/**
  * Get full image URL from API response
- * Handles both full URLs and relative paths
+ * API provides image_url as full URL, fallback to constructing from image path
  */
 const getImageUrl = (menuItem) => {
-  // Priority: image_url (usually full URL) > image > thumbnail
-  const imageUrl = menuItem.image_url || menuItem.image || menuItem.thumbnail;
-  
-  if (!imageUrl) {
-    return "/img/placeholder.png";
+  // API provides image_url as full URL
+  if (menuItem.image_url) {
+    return menuItem.image_url;
   }
   
-  // If it's already a full URL (starts with http:// or https://), return as is
-  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
-    return imageUrl;
+  // Fallback: construct URL from relative image path
+  if (menuItem.image) {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://shahrayar.peaklink.pro/api/v1";
+    const storageBaseUrl = API_BASE_URL.replace("/api/v1", "");
+    const cleanPath = menuItem.image.startsWith("/") ? menuItem.image.slice(1) : menuItem.image;
+    return `${storageBaseUrl}/storage/${cleanPath}`;
   }
   
-  // If it's a relative path, construct full URL
-  // API base URL for storage
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://shahrayar.peaklink.pro/api/v1";
-  const storageBaseUrl = API_BASE_URL.replace("/api/v1", "");
-  
-  // Remove leading slash if present
-  const cleanPath = imageUrl.startsWith("/") ? imageUrl.slice(1) : imageUrl;
-  
-  return `${storageBaseUrl}/storage/${cleanPath}`;
+  return "/img/placeholder.png";
 };
 
 export const transformMenuItemToProduct = (menuItem) => {
   if (!menuItem) return null;
 
+  // Extract sizes and ingredients (API provides them directly)
+  const sizesArray = Array.isArray(menuItem.sizes) ? menuItem.sizes : [];
+  const ingredientsArray = Array.isArray(menuItem.ingredients) ? menuItem.ingredients : [];
+
+  // Get base price - API provides default_price
+  const basePrice = parseFloat(menuItem.default_price || menuItem.price || 0);
+
+  // Get default size (size with is_default flag, or first size)
+  const defaultSize = sizesArray.find(s => s.is_default) || sizesArray[0] || null;
+  const defaultSizeId = defaultSize?.id || null;
+  const defaultSizePrice = defaultSize?.price ? parseFloat(defaultSize.price) : basePrice;
+
+  // Display price: default size price if available, otherwise base price
+  const displayPrice = defaultSizePrice || basePrice;
+
   return {
-    id: menuItem.id || menuItem.menu_item_id,
-    title: menuItem.name || menuItem.title || "",
-    price: parseFloat(menuItem.price || menuItem.default_price || menuItem.base_price || 0),
+    id: menuItem.id,
+    title: menuItem.name || "",
+    price: displayPrice,
+    base_price: basePrice,
     image: getImageUrl(menuItem),
-    description: menuItem.description || menuItem.short_description || "",
-    longDescription: menuItem.long_description || menuItem.description || "",
-    category: menuItem.category?.name || menuItem.category_name || "",
+    description: menuItem.description || "",
+    longDescription: menuItem.description || "",
+    category: menuItem.category?.name || "",
     category_id: menuItem.category_id || menuItem.category?.id || null,
-    rating: menuItem.rating || menuItem.average_rating || 0,
-    featured: menuItem.is_featured || menuItem.featured || false,
+    rating: menuItem.rating || 0,
+    featured: menuItem.is_featured || false,
+    // Sizes data (API provides: id, name, price, is_default)
+    sizes: sizesArray.map(size => ({
+      id: size.id,
+      name: size.name || "",
+      price: parseFloat(size.price || 0),
+      is_default: size.is_default || false,
+      original: size,
+    })),
+    // Ingredients data (API provides: id, name, price, pivot.is_required)
+    ingredients: ingredientsArray.map(ingredient => ({
+      id: ingredient.id,
+      name: ingredient.name || "",
+      price: parseFloat(ingredient.price || 0),
+      category: null,
+      is_required: ingredient.pivot?.is_required === 1 || false,
+      original: ingredient,
+    })),
+    default_size_id: defaultSizeId,
+    has_sizes: sizesArray.length > 0,
+    has_ingredients: ingredientsArray.length > 0,
     // Keep original data for reference
     original: menuItem,
   };

@@ -2,33 +2,30 @@
 import { memo, useMemo } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ShoppingCart, Package } from "lucide-react";
-import useCartStore from "../../../store/cartStore";
+import { ShoppingCart, Package, Tag, Truck } from "lucide-react";
+import useCartStore, { getCartItemKey } from "../../../store/cartStore";
 import { formatCurrency } from "../../../lib/utils/formatters";
 
 const CheckoutSummary = memo(() => {
-  const items = useCartStore((state) => state.items);
+  const {
+    items,
+    coupon,
+    orderType,
+    getSubtotal,
+    getTax,
+    getDiscount,
+    getDeliveryCharge,
+    getTotal,
+    getItemCount,
+  } = useCartStore();
 
-  // Derived calculations
-  const subtotal = useMemo(() => {
-    return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  }, [items]);
-
-  const tax = useMemo(() => {
-    return subtotal * 0.1; // 10% tax
-  }, [subtotal]);
-
-  const shipping = useMemo(() => {
-    return subtotal > 100 ? 0 : 10; // Free shipping over $100
-  }, [subtotal]);
-
-  const total = useMemo(() => {
-    return subtotal + tax + shipping;
-  }, [subtotal, tax, shipping]);
-
-  const itemCount = useMemo(() => {
-    return items.reduce((sum, item) => sum + item.quantity, 0);
-  }, [items]);
+  // Use store methods for calculations
+  const subtotal = useMemo(() => getSubtotal(), [items, getSubtotal]);
+  const tax = useMemo(() => getTax(), [subtotal, getTax]);
+  const discount = useMemo(() => getDiscount(), [coupon, subtotal, getDiscount]);
+  const delivery = useMemo(() => getDeliveryCharge(), [orderType, getDeliveryCharge]);
+  const total = useMemo(() => getTotal(), [subtotal, discount, tax, delivery, getTotal]);
+  const itemCount = useMemo(() => getItemCount(), [items, getItemCount]);
 
   if (items.length === 0) {
     return null;
@@ -55,9 +52,17 @@ const CheckoutSummary = memo(() => {
 
       {/* Order Items */}
       <div className="space-y-3 mb-6 max-h-64 overflow-y-auto pr-2">
-        {items.map((item) => (
+        {items.map((item) => {
+          // Generate unique key for each cart item based on product ID, size, and ingredients
+          const uniqueKey = getCartItemKey({
+            id: item.id,
+            size_id: item.size_id || null,
+            ingredients: item.ingredients || [],
+          });
+          
+          return (
           <motion.div
-            key={item.id}
+            key={uniqueKey}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10"
@@ -76,14 +81,17 @@ const CheckoutSummary = memo(() => {
                 {item.name}
               </h4>
               <p className="text-text text-xs">
-                Qty: {item.quantity} × {formatCurrency(item.price)}
+                Qty: {item.quantity} × {formatCurrency(item.final_price || item.price)}
+                {item.size_name && ` • ${item.size_name}`}
+                {item.ingredients_data?.length > 0 && ` • +${item.ingredients_data.length} add-ons`}
               </p>
             </div>
             <div className="text-theme3 font-['Epilogue',sans-serif] text-sm font-bold">
-              {formatCurrency(item.price * item.quantity)}
+              {formatCurrency((item.final_price || item.price) * item.quantity)}
             </div>
           </motion.div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Summary Details */}
@@ -111,19 +119,39 @@ const CheckoutSummary = memo(() => {
           </span>
         </div>
 
-        {/* Shipping */}
-        <div className="flex justify-between items-center py-2 border-b border-white/10">
-          <span className="text-text font-['Roboto',sans-serif] text-base font-medium">
-            Shipping
-          </span>
-          <span className="text-white font-['Epilogue',sans-serif] text-lg font-bold">
-            {shipping === 0 ? (
-              <span className="text-theme3">FREE</span>
-            ) : (
-              formatCurrency(shipping)
-            )}
-          </span>
-        </div>
+        {/* Discount */}
+        {discount > 0 && (
+          <div className="flex justify-between items-center py-2 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <Tag className="w-4 h-4 text-theme3" />
+              <span className="text-text font-['Roboto',sans-serif] text-base font-medium">
+                Discount {coupon?.code && `(${coupon.code})`}
+              </span>
+            </div>
+            <span className="text-theme3 font-['Epilogue',sans-serif] text-lg font-bold">
+              -{formatCurrency(discount)}
+            </span>
+          </div>
+        )}
+
+        {/* Delivery Charge */}
+        {orderType === 'delivery' && (
+          <div className="flex justify-between items-center py-2 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <Truck className="w-4 h-4 text-theme3" />
+              <span className="text-text font-['Roboto',sans-serif] text-base font-medium">
+                Delivery
+              </span>
+            </div>
+            <span className="text-white font-['Epilogue',sans-serif] text-lg font-bold">
+              {delivery === 0 ? (
+                <span className="text-theme3">FREE</span>
+              ) : (
+                formatCurrency(delivery)
+              )}
+            </span>
+          </div>
+        )}
 
         {/* Tax */}
         <div className="flex justify-between items-center py-2 border-b border-white/10">
