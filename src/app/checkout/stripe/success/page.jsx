@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { CheckCircle, Package, ArrowRight, Home } from 'lucide-react';
@@ -10,7 +10,7 @@ import useCartStore from '../../../../store/cartStore';
 import useToastStore from '../../../../store/toastStore';
 import { formatCurrency } from '../../../../lib/utils/formatters';
 
-export default function StripeSuccessPage() {
+function StripeSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('order_id');
@@ -311,6 +311,23 @@ export default function StripeSuccessPage() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function StripeSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="bg-bgimg min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme3 mx-auto mb-4"></div>
+            <p className="text-text">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <StripeSuccessContent />
+    </Suspense>
   );
 }
 

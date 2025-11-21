@@ -1,11 +1,12 @@
 "use client";
 
+import { Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { XCircle, ArrowLeft, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-export default function StripeCancelPage() {
+function StripeCancelContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('order_id');
 
@@ -80,6 +81,23 @@ export default function StripeCancelPage() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function StripeCancelPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="bg-bg3 min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-theme3 mx-auto mb-4"></div>
+            <p className="text-white text-lg">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <StripeCancelContent />
+    </Suspense>
   );
 }
 

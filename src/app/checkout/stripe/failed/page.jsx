@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { AlertCircle, ArrowLeft, RefreshCw, Home } from 'lucide-react';
 import Link from 'next/link';
 import useToastStore from '../../../../store/toastStore';
 
-export default function StripeFailedPage() {
+function StripeFailedContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('order_id');
@@ -113,6 +113,23 @@ export default function StripeFailedPage() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function StripeFailedPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="bg-bg3 min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-theme3 mx-auto mb-4"></div>
+            <p className="text-white text-lg">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <StripeFailedContent />
+    </Suspense>
   );
 }
 

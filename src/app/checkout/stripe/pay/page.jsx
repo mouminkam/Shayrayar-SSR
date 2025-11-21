@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
@@ -163,7 +163,7 @@ function PaymentForm({ orderId }) {
 /**
  * Main Payment Page Component
  */
-export default function StripePaymentPage() {
+function StripePaymentContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('order_id');
   const clientSecret = searchParams.get('client_secret');
@@ -217,6 +217,20 @@ export default function StripePaymentPage() {
     >
       <PaymentForm orderId={orderId} />
     </Elements>
+  );
+}
+
+export default function StripePaymentPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-bgimg flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-theme3" />
+        </div>
+      }
+    >
+      <StripePaymentContent />
+    </Suspense>
   );
 }
 
