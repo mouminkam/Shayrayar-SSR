@@ -167,7 +167,8 @@ const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, on
       </tbody>
     </table>
   </div>
-));
+  );
+});
 
 DesktopTable.displayName = "DesktopTable";
 
