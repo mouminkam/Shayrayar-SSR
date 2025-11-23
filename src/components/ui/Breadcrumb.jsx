@@ -31,7 +31,7 @@ export default function Breadcrumb({ title, showLinks = true }) {
         {/* Breadcrumb content */}
         <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10">
           <div className="py-40 text-center">
-            <h1 className="text-white font-['Epilogue',sans-serif] text-4xl sm:text-5xl lg:text-6xl font-black leading-tight uppercase mb-4">
+            <h1 className="text-white  text-4xl sm:text-5xl lg:text-6xl font-black leading-tight uppercase mb-4">
               {title}
             </h1>
             {showLinks && (
@@ -39,13 +39,13 @@ export default function Breadcrumb({ title, showLinks = true }) {
                 <li>
                   <Link
                     href="/"
-                    className="text-white/90 font-['Roboto',sans-serif] text-xl font-medium hover:text-theme hover:scale-105 transition-all duration-300 px-3 py-1 rounded-lg hover:bg-white/10 backdrop-blur-sm"
+                    className="text-white/90  text-xl font-medium hover:text-theme hover:scale-105 transition-all duration-300 px-3 py-1 rounded-lg hover:bg-white/10 backdrop-blur-sm"
                   >
                     Home
                   </Link>
                 </li>
                 <li className="text-white/70 text-xl">›</li>
-                <li className="text-white/90 font-['Roboto',sans-serif] text-xl font-medium hover:text-theme hover:scale-105 transition-all duration-300 px-3 py-1 rounded-lg hover:bg-white/10 backdrop-blur-sm">
+                <li className="text-white/90  text-xl font-medium hover:text-theme hover:scale-105 transition-all duration-300 px-3 py-1 rounded-lg hover:bg-white/10 backdrop-blur-sm">
                   {title}
                 </li>
               </ul>

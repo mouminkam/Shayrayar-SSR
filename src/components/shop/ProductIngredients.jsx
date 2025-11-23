@@ -1,6 +1,5 @@
 "use client";
 import { memo, useMemo } from "react";
-import { motion } from "framer-motion";
 import { Check, Plus } from "lucide-react";
 import { formatCurrency } from "../../lib/utils/formatters";
 
@@ -43,18 +42,13 @@ const ProductIngredients = memo(({ ingredients = [], selectedIngredientIds = [],
     const hasPrice = ingredientPrice !== 0;
 
     return (
-      <motion.div
+      <div
         key={ingredient.id}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
         className="mb-3"
       >
-        <motion.button
+        <button
           type="button"
           onClick={() => onIngredientToggle(ingredient.id)}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
           className={`
             w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-300
             ${
@@ -78,17 +72,13 @@ const ProductIngredients = memo(({ ingredients = [], selectedIngredientIds = [],
               `}
             >
               {isSelected && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                >
+                <div>
                   <Check className="w-3 h-3 text-white" />
-                </motion.div>
+                </div>
               )}
             </div>
             <div className="flex-1 text-left">
-              <span className="font-['Epilogue',sans-serif] text-base font-semibold block">
+              <span className=" text-base font-semibold block">
                 {ingredient.name}
               </span>
               {ingredient.is_required && (
@@ -98,19 +88,19 @@ const ProductIngredients = memo(({ ingredients = [], selectedIngredientIds = [],
           </div>
           {hasPrice && (
             <div className="ml-4">
-              <span className="text-theme3 font-['Epilogue',sans-serif] text-sm font-bold">
+              <span className="text-theme3  text-sm font-bold">
                 +{formatCurrency(ingredientPrice)}
               </span>
             </div>
           )}
-        </motion.button>
-      </motion.div>
+        </button>
+      </div>
     );
   };
 
   return (
     <div className="product-ingredients mb-6">
-      <h4 className="text-white font-['Epilogue',sans-serif] text-lg font-semibold mb-4">
+      <h4 className="text-white  text-lg font-semibold mb-4">
         Add-ons & Extras
       </h4>
       <div className="space-y-4">
@@ -118,7 +108,7 @@ const ProductIngredients = memo(({ ingredients = [], selectedIngredientIds = [],
         {Object.keys(groupedIngredients.grouped).length > 0 &&
           Object.entries(groupedIngredients.grouped).map(([category, categoryIngredients]) => (
             <div key={category} className="mb-4">
-              <h5 className="text-theme3 font-['Epilogue',sans-serif] text-sm font-semibold mb-3 uppercase tracking-wide">
+              <h5 className="text-theme3  text-sm font-semibold mb-3 uppercase tracking-wide">
                 {category}
               </h5>
               <div className="space-y-2">
@@ -131,7 +121,7 @@ const ProductIngredients = memo(({ ingredients = [], selectedIngredientIds = [],
         {groupedIngredients.uncategorized.length > 0 && (
           <div>
             {Object.keys(groupedIngredients.grouped).length > 0 && (
-              <h5 className="text-theme3 font-['Epilogue',sans-serif] text-sm font-semibold mb-3 uppercase tracking-wide">
+              <h5 className="text-theme3  text-sm font-semibold mb-3 uppercase tracking-wide">
                 Other
               </h5>
             )}

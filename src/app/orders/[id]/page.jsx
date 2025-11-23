@@ -8,6 +8,8 @@ import Image from "next/image";
 import api from "../../../api";
 import useToastStore from "../../../store/toastStore";
 import { formatCurrency } from "../../../lib/utils/formatters";
+import AnimatedSection from "../../../components/ui/AnimatedSection";
+import ErrorBoundary from "../../../components/ui/ErrorBoundary";
 import Breadcrumb from "../../../components/ui/Breadcrumb";
 
 export default function OrderDetailsPage() {
@@ -175,11 +177,17 @@ export default function OrderDetailsPage() {
 
   return (
     <div className="bg-bg3 min-h-screen">
-      <Breadcrumb title="Order Details" />
+      <ErrorBoundary>
+        <AnimatedSection>
+          <Breadcrumb title="Order Details" />
+        </AnimatedSection>
+      </ErrorBoundary>
       <section className="section-padding fix bg-bg3 py-12 px-1 sm:px-5 sm:py-16 md:py-20 lg:py-24">
         <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
+          <ErrorBoundary>
           {/* Back Button */}
-          <motion.div
+          <AnimatedSection>
+            <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="mb-6"
@@ -191,13 +199,15 @@ export default function OrderDetailsPage() {
               <ArrowLeft className="w-5 h-5" />
               <span className="font-medium">Back to Profile</span>
             </Link>
-          </motion.div>
+            </motion.div>
+          </AnimatedSection>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Order Header */}
-              <motion.div
+              <AnimatedSection>
+                <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
@@ -205,7 +215,7 @@ export default function OrderDetailsPage() {
               >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                   <div>
-                    <h1 className="text-white font-['Epilogue',sans-serif] text-3xl font-black mb-2">
+                    <h1 className="text-white  text-3xl font-black mb-2">
                       Order #{order.order_number || order.id}
                     </h1>
                     <p className="text-text text-sm flex items-center gap-2">
@@ -228,7 +238,7 @@ export default function OrderDetailsPage() {
                 {/* Order Items */}
                 {orderItems.length > 0 && (
                   <div className="space-y-4">
-                    <h2 className="text-white font-['Epilogue',sans-serif] text-xl font-bold mb-4">
+                    <h2 className="text-white  text-xl font-bold mb-4">
                       Order Items ({orderItems.length})
                     </h2>
                     {orderItems.map((item, idx) => {
@@ -254,11 +264,13 @@ export default function OrderDetailsPage() {
                               alt={itemName}
                               fill
                               className="object-cover"
-                              unoptimized={true}
+                              quality={85}
+                              loading="lazy"
+                              sizes="80px"
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-white font-['Epilogue',sans-serif] font-bold text-lg mb-1">
+                            <h3 className="text-white  font-bold text-lg mb-1">
                               {itemName}
                             </h3>
                             {item.size && (
@@ -271,7 +283,7 @@ export default function OrderDetailsPage() {
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-theme3 font-['Epilogue',sans-serif] font-black text-xl">
+                            <p className="text-theme3  font-black text-xl">
                               {formatCurrency(itemPrice * quantity)}
                             </p>
                           </div>
@@ -299,18 +311,20 @@ export default function OrderDetailsPage() {
                   >
                     <Navigation className="w-5 h-5" />
                     {isTracking ? "Tracking..." : "Track Order"}
-                  </button>
-                </div>
-              </motion.div>
+                    </button>
+                  </div>
+                </motion.div>
+              </AnimatedSection>
 
               {/* Tracking Information */}
               {trackingData && (
+                <AnimatedSection>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 p-6 lg:p-8"
                 >
-                  <h2 className="text-white font-['Epilogue',sans-serif] text-xl font-bold mb-4">
+                  <h2 className="text-white  text-xl font-bold mb-4">
                     Order Tracking
                   </h2>
                   <div className="space-y-3">
@@ -342,18 +356,20 @@ export default function OrderDetailsPage() {
                     )}
                   </div>
                 </motion.div>
+                </AnimatedSection>
               )}
             </div>
 
             {/* Sidebar - Order Summary */}
             <div className="lg:col-span-1">
-              <motion.div
+              <AnimatedSection>
+                <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 p-6 lg:p-8 sticky top-8"
               >
-                <h2 className="text-white font-['Epilogue',sans-serif] text-xl font-black uppercase mb-6">
+                <h2 className="text-white  text-xl font-black uppercase mb-6">
                   Order Summary
                 </h2>
 
@@ -429,16 +445,18 @@ export default function OrderDetailsPage() {
                       </div>
                     )}
                     <div className="flex justify-between items-center pt-3 border-t border-white/10">
-                      <span className="text-white font-['Epilogue',sans-serif] text-lg font-black uppercase">Total</span>
-                      <span className="text-theme3 font-['Epilogue',sans-serif] text-2xl font-black">
+                      <span className="text-white  text-lg font-black uppercase">Total</span>
+                      <span className="text-theme3  text-2xl font-black">
                         {formatCurrency(parseFloat(order.total_amount || order.total || 0))}
                       </span>
                     </div>
                   </div>
                 </div>
-              </motion.div>
+                </motion.div>
+              </AnimatedSection>
             </div>
           </div>
+          </ErrorBoundary>
         </div>
       </section>
 
@@ -450,7 +468,7 @@ export default function OrderDetailsPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-linear-to-br from-bgimg/95 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/10 p-6 lg:p-8 max-w-md w-full"
           >
-            <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black mb-4">
+            <h3 className="text-white  text-2xl font-black mb-4">
               Cancel Order
             </h3>
             <p className="text-text mb-4">

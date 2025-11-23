@@ -66,20 +66,25 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
   }, [isOpen, cartItem]);
 
   // Calculate final price
+  // Note: size.price from API is the FULL price for that size, not an addition
+  // So we use size.price directly instead of adding it to base_price
   const finalPrice = useMemo(() => {
     if (!product) return cartItem?.final_price || cartItem?.price || 0;
 
-    let price = product.base_price || product.price || 0;
+    let price = 0;
 
-    // Add size price if selected
+    // If a size is selected, use its price directly (it's the full price for that size)
     if (selectedSizeId && product.sizes) {
       const selectedSize = product.sizes.find((s) => s.id === selectedSizeId);
       if (selectedSize) {
-        price += parseFloat(selectedSize.price || 0);
+        price = parseFloat(selectedSize.price || 0);
       }
+    } else {
+      // If no size selected, use base_price (fallback for products without sizes)
+      price = product.base_price || product.price || 0;
     }
 
-    // Add ingredients prices
+    // Add ingredients prices (these are additions, not full prices)
     if (selectedIngredientIds.length > 0 && product.ingredients) {
       selectedIngredientIds.forEach((ingredientId) => {
         const ingredient = product.ingredients.find((ing) => ing.id === ingredientId);
@@ -158,7 +163,7 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
         >
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-white/10">
-            <h2 className="text-white font-['Epilogue',sans-serif] text-2xl font-bold">
+            <h2 className="text-white  text-2xl font-bold">
               Edit Item: {cartItem?.name || "Product"}
             </h2>
             <button
@@ -204,10 +209,10 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
                   className="mt-6 p-4 bg-theme3/10 rounded-xl border border-theme3/30"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-white font-['Epilogue',sans-serif] text-base font-semibold">
+                    <span className="text-white  text-base font-semibold">
                       Total Price:
                     </span>
-                    <span className="text-theme3 font-['Epilogue',sans-serif] text-2xl font-black">
+                    <span className="text-theme3  text-2xl font-black">
                       {formatCurrency(finalPrice)}
                     </span>
                   </div>
@@ -224,14 +229,14 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
           <div className="flex items-center justify-end gap-4 p-6 border-t border-white/10">
             <button
               onClick={onClose}
-              className="px-6 py-3 bg-transparent border-2 border-white/20 text-white rounded-xl hover:border-white/40 transition-colors font-['Epilogue',sans-serif] font-semibold"
+              className="px-6 py-3 bg-transparent border-2 border-white/20 text-white rounded-xl hover:border-white/40 transition-colors  font-semibold"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={isLoading || !product || (product.has_sizes && !selectedSizeId)}
-              className="px-6 py-3 bg-theme3 text-white rounded-xl hover:bg-theme transition-colors font-['Epilogue',sans-serif] font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 bg-theme3 text-white rounded-xl hover:bg-theme transition-colors  font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Save Changes
             </button>

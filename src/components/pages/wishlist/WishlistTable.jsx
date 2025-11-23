@@ -1,11 +1,12 @@
 "use client";
 import { memo } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Trash2, ShoppingCart, Heart } from "lucide-react";
 import useWishlistStore from "../../../store/wishlistStore";
 import useCartStore from "../../../store/cartStore";
+import OptimizedImage from "../../ui/OptimizedImage";
+import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 
 const WishlistTable = memo(() => {
   const { items, removeFromWishlist } = useWishlistStore();
@@ -36,7 +37,7 @@ const WishlistTable = memo(() => {
         >
           <Heart className="w-12 h-12 text-theme3" />
         </motion.div>
-        <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black mb-2">
+        <h3 className="text-white  text-2xl font-black mb-2">
           Your wishlist is empty
         </h3>
         <p className="text-text text-base mb-6">
@@ -45,7 +46,7 @@ const WishlistTable = memo(() => {
         <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white font-['Epilogue',sans-serif] text-base font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white  text-base font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30"
           >
             Continue Shopping
           </Link>
@@ -55,21 +56,24 @@ const WishlistTable = memo(() => {
   }
 
   // Desktop Table View
-  const DesktopTable = () => (
+  const DesktopTable = () => {
+    const { prefetchRoute } = usePrefetchRoute();
+    
+    return (
     <div className="hidden lg:block overflow-x-auto mb-5">
       <table className="w-full border-collapse">
         <thead>
           <tr className="border-b-2 border-white/10">
-            <th className="text-left py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold">
+            <th className="text-left py-4 px-4  text-white font-bold">
               Product
             </th>
-            <th className="text-center py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold">
+            <th className="text-center py-4 px-4  text-white font-bold">
               Price
             </th>
-            <th className="text-center py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold">
+            <th className="text-center py-4 px-4  text-white font-bold">
               Action
             </th>
-            <th className="text-center py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold w-12">
+            <th className="text-center py-4 px-4  text-white font-bold w-12">
               Remove
             </th>
           </tr>
@@ -85,23 +89,30 @@ const WishlistTable = memo(() => {
             >
               <td className="py-6 px-4">
                 <div className="flex items-center gap-4">
-                  <Link href={`/shop/${item.id}`} className="shrink-0 group">
+                  <Link 
+                    href={`/shop/${item.id}`} 
+                    className="shrink-0 group"
+                    onMouseEnter={() => prefetchRoute(`/shop/${item.id}`)}
+                  >
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       className="relative w-20 h-20 rounded-xl overflow-hidden transition-all duration-300"
                     >
-                      <Image
+                      <OptimizedImage
                         src={item.image || "/img/placeholder.png"}
                         alt={item.name}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-300"
-                        unoptimized={true}
+                        quality={85}
+                        loading="lazy"
+                        sizes="80px"
                       />
                     </motion.div>
                   </Link>
                   <Link
                     href={`/shop/${item.id}`}
-                    className="text-white font-['Epilogue',sans-serif] text-lg font-bold hover:text-theme transition-colors duration-300"
+                    onMouseEnter={() => prefetchRoute(`/shop/${item.id}`)}
+                    className="text-white  text-lg font-bold hover:text-theme transition-colors duration-300"
                   >
                     {item.name}
                   </Link>
@@ -110,7 +121,7 @@ const WishlistTable = memo(() => {
               <td className="text-center py-6 px-4">
                 {item.originalPrice ? (
                   <div className="flex items-center justify-center gap-2">
-                    <span className="text-theme font-['Epilogue',sans-serif] font-bold text-lg">
+                    <span className="text-theme  font-bold text-lg">
                       ${item.price.toFixed(2)}
                     </span>
                     <span className="text-text opacity-60 text-sm line-through">
@@ -118,7 +129,7 @@ const WishlistTable = memo(() => {
                     </span>
                   </div>
                 ) : (
-                  <span className="text-theme font-['Epilogue',sans-serif] font-bold text-lg">
+                  <span className="text-theme  font-bold text-lg">
                     ${item.price.toFixed(2)}
                   </span>
                 )}
@@ -151,10 +162,14 @@ const WishlistTable = memo(() => {
         </tbody>
       </table>
     </div>
-  );
+    );
+  };
 
   // Mobile Card View
-  const MobileCardView = () => (
+  const MobileCardView = () => {
+    const { prefetchRoute } = usePrefetchRoute();
+    
+    return (
     <div className="lg:hidden space-y-4 mb-8">
       {items.map((item, index) => (
         <motion.div
@@ -166,14 +181,20 @@ const WishlistTable = memo(() => {
         >
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Image */}
-            <Link href={`/shop/${item.id}`} className="shrink-0 group">
+            <Link 
+              href={`/shop/${item.id}`} 
+              className="shrink-0 group"
+              onMouseEnter={() => prefetchRoute(`/shop/${item.id}`)}
+            >
               <div className="relative w-full sm:w-24 h-24 rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-shadow duration-300">
-                <Image
+                <OptimizedImage
                   src={item.image || "/img/placeholder.png"}
                   alt={item.name}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-300"
-                  unoptimized={true}
+                  quality={85}
+                  loading="lazy"
+                  sizes="(max-width: 640px) 100vw, 96px"
                 />
               </div>
             </Link>
@@ -182,14 +203,15 @@ const WishlistTable = memo(() => {
             <div className="flex-1 min-w-0">
               <Link
                 href={`/shop/${item.id}`}
-                className="text-white font-['Epilogue',sans-serif] text-lg font-bold hover:text-theme transition-colors duration-300 block mb-2"
+                onMouseEnter={() => prefetchRoute(`/shop/${item.id}`)}
+                className="text-white  text-lg font-bold hover:text-theme transition-colors duration-300 block mb-2"
               >
                 {item.name}
               </Link>
               <div className="mb-3">
                 {item.originalPrice ? (
                   <div className="flex items-center gap-2">
-                    <span className="text-theme font-['Epilogue',sans-serif] font-bold text-base">
+                    <span className="text-theme  font-bold text-base">
                       ${item.price.toFixed(2)}
                     </span>
                     <span className="text-text opacity-60 text-sm line-through">
@@ -197,7 +219,7 @@ const WishlistTable = memo(() => {
                     </span>
                   </div>
                 ) : (
-                  <span className="text-theme font-['Epilogue',sans-serif] font-bold text-base">
+                  <span className="text-theme  font-bold text-base">
                     ${item.price.toFixed(2)}
                   </span>
                 )}
@@ -230,7 +252,8 @@ const WishlistTable = memo(() => {
         </motion.div>
       ))}
     </div>
-  );
+    );
+  };
 
   return (
     <div className="wishlist-table-wrapper">

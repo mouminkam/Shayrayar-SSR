@@ -44,7 +44,7 @@ export default function ShippingAddressSection({ formData, handleInputChange, se
         >
           <MapPin className="w-6 h-6 text-white fill-white" />
         </motion.div>
-        <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black uppercase">
+        <h3 className="text-white  text-2xl font-black uppercase">
           {isDelivery ? "Delivery Address" : "Pickup Information"}
         </h3>
       </div>
@@ -65,7 +65,7 @@ export default function ShippingAddressSection({ formData, handleInputChange, se
       {isDelivery && (!selectedAddress || showNewAddressForm) && (
         <>
           <div className="mb-4">
-            <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+            <label className="block text-text  text-sm font-medium mb-2">
               {isDelivery ? "Delivery Address *" : "Pickup Location"}
             </label>
             <input
@@ -82,7 +82,7 @@ export default function ShippingAddressSection({ formData, handleInputChange, se
           {isDelivery && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div>
-                <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+                <label className="block text-text  text-sm font-medium mb-2">
                   City *
                 </label>
                 <input
@@ -96,7 +96,7 @@ export default function ShippingAddressSection({ formData, handleInputChange, se
                 />
               </div>
               <div>
-                <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+                <label className="block text-text  text-sm font-medium mb-2">
                   State *
                 </label>
                 <input
@@ -110,7 +110,7 @@ export default function ShippingAddressSection({ formData, handleInputChange, se
                 />
               </div>
               <div>
-                <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+                <label className="block text-text  text-sm font-medium mb-2">
                   ZIP Code *
                 </label>
                 <input
@@ -128,7 +128,7 @@ export default function ShippingAddressSection({ formData, handleInputChange, se
 
           {isDelivery && (
             <div className="mb-4">
-              <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+              <label className="block text-text  text-sm font-medium mb-2">
                 Country *
               </label>
               <input
@@ -172,7 +172,7 @@ export default function ShippingAddressSection({ formData, handleInputChange, se
 
       {/* Scheduled Order - Optional */}
       {/* <div className="mt-4">
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           <Calendar className="w-4 h-4 inline mr-1" />
           Schedule Order (Optional)
         </label>

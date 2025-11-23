@@ -51,7 +51,7 @@ const WishlistSummary = memo(() => {
         >
           <Heart className="w-6 h-6 text-white fill-white" />
         </motion.div>
-        <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black uppercase">
+        <h3 className="text-white  text-2xl font-black uppercase">
           Wishlist Summary
         </h3>
       </div>
@@ -61,11 +61,11 @@ const WishlistSummary = memo(() => {
         <div className="flex justify-between items-center py-4 border-t-2 border-theme3/30 border-b-2 border-theme3/30">
           <div className="flex items-center gap-2">
             <Package className="w-5 h-5 text-theme3" />
-            <span className="text-white font-['Epilogue',sans-serif] text-xl font-black uppercase">
+            <span className="text-white  text-xl font-black uppercase">
               Total Items
             </span>
           </div>
-          <span className="text-theme3 font-['Epilogue',sans-serif] text-2xl font-black">
+          <span className="text-theme3  text-2xl font-black">
             {itemCount}
           </span>
         </div>
@@ -77,7 +77,7 @@ const WishlistSummary = memo(() => {
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <button
             onClick={handleMoveAllToCart}
-            className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base font-['Epilogue',sans-serif] font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2"
+            className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2"
           >
             <ShoppingCart className="w-5 h-5" />
             Move All to Cart
@@ -88,7 +88,7 @@ const WishlistSummary = memo(() => {
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <button
             onClick={handleClearWishlist}
-            className="w-full border-2 border-theme text-theme py-3 px-6 hover:bg-theme hover:text-white transition-all duration-300 text-base font-['Epilogue',sans-serif] font-medium rounded-xl flex items-center justify-center gap-2"
+            className="w-full border-2 border-theme text-theme py-3 px-6 hover:bg-theme hover:text-white transition-all duration-300 text-base  font-medium rounded-xl flex items-center justify-center gap-2"
           >
             <Trash2 className="w-5 h-5" />
             Clear Wishlist
@@ -103,7 +103,7 @@ const WishlistSummary = memo(() => {
         >
           <Link
             href="/shop"
-            className="w-full border-2 border-white/20 hover:border-theme text-white py-3 px-6 hover:bg-theme/10 transition-all duration-300 text-base font-['Epilogue',sans-serif] font-medium block text-center rounded-xl"
+            className="w-full border-2 border-white/20 hover:border-theme text-white py-3 px-6 hover:bg-theme/10 transition-all duration-300 text-base  font-medium block text-center rounded-xl"
           >
             Continue Shopping
           </Link>

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle } from "lucide-react";
 import ProductImage from "./ProductImage";
@@ -9,25 +9,9 @@ import { transformMenuItemToProduct } from "../../lib/utils/productTransform";
 import useToastStore from "../../store/toastStore";
 import useBranchStore from "../../store/branchStore";
 
-// Helper function to extract product data from API response
+// Simplified extractor - API always returns { success: true, data: { item: {...} } }
 const extractProductData = (response) => {
-  if (!response) return null;
-
-  if (response.success && response.data) {
-    return response.data.item || response.data;
-  }
-  
-  if (response.data) {
-    return response.data.item || response.data;
-  }
-  
-  if (typeof response === 'object' && !Array.isArray(response)) {
-    if (response.id || response.name || response.menu_item_id) {
-      return response;
-    }
-  }
-  
-  return null;
+  return response?.data?.item || response?.data || null;
 };
 
 export default function ShopDetailsContent({ productId }) {
@@ -38,7 +22,7 @@ export default function ShopDetailsContent({ productId }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     if (!productId) {
       setError("Product ID is required");
       setIsLoading(false);
@@ -47,33 +31,30 @@ export default function ShopDetailsContent({ productId }) {
 
     setIsLoading(true);
     setError(null);
-    setProduct(null);
 
     try {
       const response = await api.menu.getMenuItemById(productId);
       const productData = extractProductData(response);
 
       if (productData) {
-        const transformed = transformMenuItemToProduct(productData);
-        setProduct(transformed);
+        setProduct(transformMenuItemToProduct(productData));
       } else {
-        const errorMsg = response?.message || response?.error || "Product not found";
+        const errorMsg = "Product not found";
         setError(errorMsg);
         toastError(errorMsg);
       }
     } catch (err) {
-      const errorMessage = err.message || err.data?.message || "An error occurred while loading product";
+      const errorMessage = err?.message || err?.data?.message || "Failed to load product";
       setError(errorMessage);
       toastError(errorMessage);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [productId, toastError]);
 
   useEffect(() => {
     fetchProduct();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId, selectedBranch?.id]);
+  }, [fetchProduct, selectedBranch?.id]);
 
   if (isLoading) {
     return (
@@ -95,7 +76,7 @@ export default function ShopDetailsContent({ productId }) {
           <div className="flex flex-col items-center justify-center py-20 gap-6">
             <div className="flex items-center gap-3 text-theme3">
               <AlertCircle className="w-8 h-8" />
-              <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-bold">
+              <h3 className="text-white  text-2xl font-bold">
                 Product Not Found
               </h3>
             </div>
@@ -105,13 +86,13 @@ export default function ShopDetailsContent({ productId }) {
             <div className="flex gap-4">
               <button
                 onClick={() => router.push("/shop")}
-                className="px-6 py-3 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors font-['Epilogue',sans-serif] font-semibold"
+                className="px-6 py-3 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors  font-semibold"
               >
                 Back to Shop
               </button>
               <button
                 onClick={fetchProduct}
-                className="px-6 py-3 bg-transparent border-2 border-theme3 text-theme3 rounded-lg hover:bg-theme3/10 transition-colors font-['Epilogue',sans-serif] font-semibold"
+                className="px-6 py-3 bg-transparent border-2 border-theme3 text-theme3 rounded-lg hover:bg-theme3/10 transition-colors  font-semibold"
               >
                 Try Again
               </button>
@@ -123,25 +104,11 @@ export default function ShopDetailsContent({ productId }) {
   }
 
   return (
-    <section className="bg-bg3 py-12 relative overflow-hidden">
-      <div className="absolute inset-0 bg-linear-to-br from-theme3/5 via-transparent to-theme/5 opacity-30 pointer-events-none"></div>
-      
-      <div className="shop-details-wrapper style1 relative z-10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="shop-details rounded-3xl">
-            <div className="container mx-auto">
-              <div className="grid grid-cols-1 bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-12 xl:p-16 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 mb-12 items-stretch shadow-2xl shadow-theme3/10 border border-white/10 relative overflow-hidden">
-                <div className="absolute inset-0 bg-linear-to-br from-theme3/5 via-transparent to-theme/5 opacity-20 pointer-events-none"></div>
-                
-                <div className="relative z-10">
-                  <ProductImage product={product} />
-                </div>
-                <div className="relative z-10">
-                  <ProductAbout product={product} />
-                </div>
-              </div>
-            </div>
-          </div>
+    <section className="bg-bg3 py-12 relative">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 rounded-3xl p-6 sm:p-8 lg:p-12 border border-white/10 shadow-xl">
+          <ProductImage product={product} />
+          <ProductAbout product={product} />
         </div>
       </div>
     </section>

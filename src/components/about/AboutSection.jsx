@@ -28,8 +28,9 @@ export default function AboutSection() {
               width={600}
               height={600}
               className="w-full h-auto object-contain"
-              unoptimized={true}
-              priority={false}
+              quality={85}
+              loading="lazy"
+              sizes="(max-width: 1024px) 100vw, 600px"
             />
             {/* Video Play Button */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
@@ -57,7 +58,7 @@ export default function AboutSection() {
                 width={20}
                 height={20}
               />
-              <span className="text-theme2 font-['Epilogue',sans-serif] text-base font-bold uppercase">
+              <span className="text-theme2  text-base font-bold uppercase">
                 About US
               </span>
               <Image
@@ -67,10 +68,10 @@ export default function AboutSection() {
                 height={20}
               />
             </div>
-            <h2 className="text-white font-['Epilogue',sans-serif] text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4 text-center sm:text-left">
+            <h2 className="text-white  text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4 text-center sm:text-left">
               Variety of flavours from american cuisine
             </h2>
-            <p className="text-text font-['Roboto',sans-serif] text-lg sm:text-xl text-center sm:text-left leading-relaxed mb-12">
+            <p className="text-text  text-lg sm:text-xl text-center sm:text-left leading-relaxed mb-12">
               Every dish is not just prepared it's a crafted with a savor the a
               utmost <br className="hidden sm:block" /> precision and a deep understanding sdf of flavor harmony. <br className="hidden sm:block" />
               The experienced hands of our chefs
@@ -90,10 +91,10 @@ export default function AboutSection() {
                     />
                   </div>
                   <div>
-                    <h6 className="text-white font-['Epilogue',sans-serif] text-lg font-bold mb-1 capitalize">
+                    <h6 className="text-white  text-lg font-bold mb-1 capitalize">
                       {feature.title}
                     </h6>
-                    <p className="text-text font-['Roboto',sans-serif] text-base">
+                    <p className="text-text  text-base">
                       {feature.description}
                     </p>
                   </div>

@@ -178,7 +178,7 @@ export default function AddInformationForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* First Name */}
       <div>
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           <User className="w-4 h-4 inline mr-1" />
           First name
         </label>
@@ -199,7 +199,7 @@ export default function AddInformationForm() {
 
       {/* Last Name */}
       <div>
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           <User className="w-4 h-4 inline mr-1" />
           Last name
         </label>
@@ -220,7 +220,7 @@ export default function AddInformationForm() {
 
       {/* Email */}
       <div>
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           <Mail className="w-4 h-4 inline mr-1" />
           E-mail address
         </label>
@@ -241,7 +241,7 @@ export default function AddInformationForm() {
 
       {/* Branch Selection */}
       <div>
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           <MapPin className="w-4 h-4 inline mr-1" />
           Branch
         </label>
@@ -268,7 +268,7 @@ export default function AddInformationForm() {
 
       {/* Location */}
       <div>
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           <MapPin className="w-4 h-4 inline mr-1" />
           Location
         </label>
@@ -297,7 +297,7 @@ export default function AddInformationForm() {
         disabled={isLoading || loadingBranches}
         whileHover={{ scale: isLoading || loadingBranches ? 1 : 1.02 }}
         whileTap={{ scale: isLoading || loadingBranches ? 1 : 0.98 }}
-        className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base font-['Epilogue',sans-serif] font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+        className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
       >
         {isLoading ? (
           <>

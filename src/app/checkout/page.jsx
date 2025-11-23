@@ -1,10 +1,29 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
-import CheckoutSummary from "../../components/pages/checkout/CheckoutSummary";
-import BillingForm from "../../components/pages/checkout/BillingForm";
+import dynamic from "next/dynamic";
+import AnimatedSection from "../../components/ui/AnimatedSection";
+import ErrorBoundary from "../../components/ui/ErrorBoundary";
+import SectionSkeleton from "../../components/ui/SectionSkeleton";
 import useCartStore from "../../store/cartStore";
 import useAuthStore from "../../store/authStore";
+
+// Lazy load checkout components
+const CheckoutSummary = dynamic(
+  () => import("../../components/pages/checkout/CheckoutSummary"),
+  {
+    loading: () => <SectionSkeleton variant="default" showCards={false} height="h-64" />,
+    ssr: false,
+  }
+);
+
+const BillingForm = dynamic(
+  () => import("../../components/pages/checkout/BillingForm"),
+  {
+    loading: () => <SectionSkeleton variant="default" height="h-96" />,
+    ssr: false,
+  }
+);
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -35,12 +54,24 @@ export default function CheckoutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Billing Form - Takes 2 columns on desktop */}
             <div className="lg:col-span-2">
-              <BillingForm />
+              <ErrorBoundary>
+                <Suspense fallback={<SectionSkeleton variant="default" height="h-96" />}>
+                  <AnimatedSection>
+                    <BillingForm />
+                  </AnimatedSection>
+                </Suspense>
+              </ErrorBoundary>
             </div>
 
             {/* Checkout Summary - Takes 1 column on desktop */}
             <div className="lg:col-span-1">
-              <CheckoutSummary />
+              <ErrorBoundary>
+                <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-64" />}>
+                  <AnimatedSection>
+                    <CheckoutSummary />
+                  </AnimatedSection>
+                </Suspense>
+              </ErrorBoundary>
             </div>
           </div>
         </div>

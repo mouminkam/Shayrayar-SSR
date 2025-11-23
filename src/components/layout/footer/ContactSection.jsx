@@ -59,13 +59,7 @@ export default function ContactSection() {
             htmlFor="privacy-checkbox"
             className="text-white text-xs sm:text-sm leading-6 sm:leading-7 cursor-pointer"
           >
-            I agree to the{" "}
-            <Link
-              href="/privacy-policy"
-              className="text-white underline hover:text-theme3 transition-colors"
-            >
-              Privacy Policy.
-            </Link>
+            I agree to the terms and conditions.
           </label>
         </div>
       </form>

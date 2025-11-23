@@ -24,19 +24,24 @@ export default function ProductCustomization({ product, onCustomizationChange })
     onCustomizationChangeRef.current = onCustomizationChange;
   }, [onCustomizationChange]);
 
-  // Calculate final price based on base price + size price + ingredients prices
+  // Calculate final price
+  // Note: size.price from API is the FULL price for that size, not an addition
+  // So we use size.price directly instead of adding it to base_price
   const finalPrice = useMemo(() => {
-    let price = product?.base_price || product?.price || 0;
+    let price = 0;
 
-    // Add size price if selected
+    // If a size is selected, use its price directly (it's the full price for that size)
     if (selectedSizeId && product?.sizes) {
       const selectedSize = product.sizes.find((s) => s.id === selectedSizeId);
       if (selectedSize) {
-        price += parseFloat(selectedSize.price || 0);
+        price = parseFloat(selectedSize.price || 0);
       }
+    } else {
+      // If no size selected, use base_price (fallback for products without sizes)
+      price = product?.base_price || product?.price || 0;
     }
 
-    // Add ingredients prices
+    // Add ingredients prices (these are additions, not full prices)
     if (selectedIngredientIds.length > 0 && product?.ingredients) {
       selectedIngredientIds.forEach((ingredientId) => {
         const ingredient = product.ingredients.find((ing) => ing.id === ingredientId);
@@ -49,49 +54,17 @@ export default function ProductCustomization({ product, onCustomizationChange })
     return price;
   }, [product, selectedSizeId, selectedIngredientIds]);
 
-  // Handle size selection
-  const handleSizeChange = useCallback(
-    (sizeId) => {
-      setSelectedSizeId(sizeId);
-    },
-    []
-  );
+  const handleSizeChange = useCallback((sizeId) => {
+    setSelectedSizeId(sizeId);
+  }, []);
 
-  // Handle ingredient toggle
-  const handleIngredientToggle = useCallback(
-    (ingredientId) => {
-      setSelectedIngredientIds((prev) => {
-        const newIds = prev.includes(ingredientId)
-          ? prev.filter((id) => id !== ingredientId)
-          : [...prev, ingredientId];
-        return newIds;
-      });
-    },
-    []
-  );
-
-  // Helper function to calculate price
-  const calculatePriceForCustomization = (sizeId, ingredientIds) => {
-    let price = product?.base_price || product?.price || 0;
-
-    if (sizeId && product?.sizes) {
-      const size = product.sizes.find((s) => s.id === sizeId);
-      if (size) {
-        price += parseFloat(size.price || 0);
-      }
-    }
-
-    if (ingredientIds.length > 0 && product?.ingredients) {
-      ingredientIds.forEach((id) => {
-        const ingredient = product.ingredients.find((ing) => ing.id === id);
-        if (ingredient) {
-          price += parseFloat(ingredient.price || 0);
-        }
-      });
-    }
-
-    return price;
-  };
+  const handleIngredientToggle = useCallback((ingredientId) => {
+    setSelectedIngredientIds((prev) =>
+      prev.includes(ingredientId)
+        ? prev.filter((id) => id !== ingredientId)
+        : [...prev, ingredientId]
+    );
+  }, []);
 
   // Update parent when customization changes
   // Use ref to access the latest callback without including it in dependencies
@@ -138,21 +111,16 @@ export default function ProductCustomization({ product, onCustomizationChange })
 
       {/* Price Summary */}
       {(product?.has_sizes || product?.has_ingredients) && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="mt-6 p-4 bg-theme3/10 rounded-xl border border-theme3/30"
-        >
+        <div className="mt-6 p-4 bg-theme3/10 rounded-xl border border-theme3/30">
           <div className="flex items-center justify-between">
-            <span className="text-white font-['Epilogue',sans-serif] text-base font-semibold">
+            <span className="text-white  text-base font-semibold">
               Total Price:
             </span>
-            <span className="text-theme3 font-['Epilogue',sans-serif] text-2xl font-black">
+            <span className="text-theme3  text-2xl font-black">
               {formatCurrency(finalPrice)}
             </span>
           </div>
-        </motion.div>
+        </div>
       )}
     </motion.div>
   );

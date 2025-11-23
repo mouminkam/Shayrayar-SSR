@@ -74,7 +74,7 @@ export default function fFoodMenuSection() {
           <div className="food-menu-tab-wrapper">
             {/* Title Area */}
             <div className="title-area text-center mb-12 lg:mb-16">
-              <div className="sub-title text-theme3 font-epilogue text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
+              <div className="sub-title text-theme3  text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
                 {/* <Image
                   className="me-1"
                   src="/img/icon/titleIcon.svg"
@@ -93,7 +93,7 @@ export default function fFoodMenuSection() {
                   unoptimized={true}
                 /> */}
               </div>
-              <h2 className="title text-white font-epilogue text-3xl sm:text-4xl lg:text-5xl font-black">
+              <h2 className="title text-white  text-3xl sm:text-4xl lg:text-5xl font-black">
                 Fresheat Foods Menu
               </h2>
             </div>
@@ -104,7 +104,7 @@ export default function fFoodMenuSection() {
                 {tabs.map((tab) => (
                   <li key={tab.id} className="nav-item mb-10" role="presentation">
                     <button
-                      className={`nav-link px-6 py-3 rounded-xl font-epilogue text-base cursor-pointer font-medium transition-all duration-300 flex items-center gap-2 ${activeTab === tab.id
+                      className={`nav-link px-6 py-3 rounded-xl  text-base cursor-pointer font-medium transition-all duration-300 flex items-center gap-2 ${activeTab === tab.id
                         ? "bg-theme text-white"
                         : "text-white hover:bg-theme hover:text-white"
                         }`}
@@ -138,21 +138,23 @@ export default function fFoodMenuSection() {
                           <Image
                             src={item.image}
                             alt={item.title}
-                            width={100}
-                            height={100}
+                            width={96}
+                            height={96}
                             className="w-24 h-24 object-cover rounded-full"
-                            unoptimized={true}
+                            quality={85}
+                            loading="lazy"
+                            sizes="96px"
                           />
                         </div>
                         <div className="menu-content flex-1">
-                          <Link href="/menu">
-                            <h3 className={`text-white font-epilogue text-lg font-bold mb-2 hover:text-theme transition-colors duration-300 ${activeTab === "FastFood" && item.id === 1 ? "text-theme" : ""}`}>
+                          <Link href="/shop">
+                            <h3 className={`text-white  text-lg font-bold mb-2 hover:text-theme transition-colors duration-300 ${activeTab === "FastFood" && item.id === 1 ? "text-theme" : ""}`}>
                               {item.title}
                             </h3>
                           </Link>
-                          <p className="text-text font-roboto text-sm">{item.description}</p>
+                          <p className="text-text  text-sm">{item.description}</p>
                         </div>
-                        <h6 className="text-theme font-epilogue text-xl font-bold shrink-0">
+                        <h6 className="text-theme  text-xl font-bold shrink-0">
                           {formatCurrency(item.price)}
                         </h6>
                       </div>

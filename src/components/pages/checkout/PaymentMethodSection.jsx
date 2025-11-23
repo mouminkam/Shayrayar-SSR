@@ -15,7 +15,7 @@ export default function PaymentMethodSection({ formData, setFormData }) {
         >
           <CreditCard className="w-6 h-6 text-white fill-white" />
         </motion.div>
-        <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black uppercase">
+        <h3 className="text-white  text-2xl font-black uppercase">
           Payment Method
         </h3>
       </div>
@@ -31,7 +31,7 @@ export default function PaymentMethodSection({ formData, setFormData }) {
           animate={{ opacity: 1 }}
           className="p-4 bg-theme3/20 border border-theme3/50 rounded-xl"
         >
-          <p className="text-white text-sm font-['Roboto',sans-serif]">
+          <p className="text-white text-sm ">
             Stripe payment method selected.
           </p>
         </motion.div>
@@ -43,7 +43,7 @@ export default function PaymentMethodSection({ formData, setFormData }) {
           animate={{ opacity: 1 }}
           className="p-4 bg-green-500/20 border border-green-500/50 rounded-xl"
         >
-          <p className="text-green-300 text-sm font-['Roboto',sans-serif]">
+          <p className="text-green-300 text-sm ">
             You will pay in cash when the order is {orderType === 'pickup' ? 'picked up' : 'delivered'}.
           </p>
         </motion.div>

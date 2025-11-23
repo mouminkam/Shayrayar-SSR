@@ -29,31 +29,31 @@ export default function CommentsSection({ slug }) {
       <div className="tag-share-wrap border-b border-gray-200 py-5 mt-10 mb-8 w-full">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="tagcloud flex items-center flex-wrap gap-2">
-            <h6 className="text-white font-['Epilogue',sans-serif] text-lg sm:text-xl font-semibold mr-2 inline">
+            <h6 className="text-white  text-lg sm:text-xl font-semibold mr-2 inline">
               Tags:{" "}
             </h6>
             <Link
               href="/blog"
-              className="inline-flex px-4 py-2 text-title font-['Epilogue',sans-serif] text-sm font-normal capitalize bg-white border border-gray-200 rounded transition-all duration-300 hover:bg-theme3 hover:text-white hover:border-theme3"
+              className="inline-flex px-4 py-2 text-title  text-sm font-normal capitalize bg-white border border-gray-200 rounded transition-all duration-300 hover:bg-theme3 hover:text-white hover:border-theme3"
             >
               News
             </Link>
             <Link
               href="/blog"
-              className="inline-flex px-4 py-2 text-white font-['Epilogue',sans-serif] text-sm font-normal capitalize bg-theme3 border border-theme3 rounded transition-all duration-300"
+              className="inline-flex px-4 py-2 text-white  text-sm font-normal capitalize bg-theme3 border border-theme3 rounded transition-all duration-300"
             >
               business
             </Link>
             <Link
               href="/blog"
-              className="inline-flex px-4 py-2 text-title font-['Epilogue',sans-serif] text-sm font-normal capitalize bg-white border border-gray-200 rounded transition-all duration-300 hover:bg-theme3 hover:text-white hover:border-theme3"
+              className="inline-flex px-4 py-2 text-title  text-sm font-normal capitalize bg-white border border-gray-200 rounded transition-all duration-300 hover:bg-theme3 hover:text-white hover:border-theme3"
             >
               marketing
             </Link>
           </div>
           {/* Social Media Icons */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-white font-['Epilogue',sans-serif] text-lg font-semibold">Share:</span>
+            <span className="text-white  text-lg font-semibold">Share:</span>
             <a
               href="https://facebook.com"
               target="_blank"
@@ -94,7 +94,7 @@ export default function CommentsSection({ slug }) {
         </div>
       </div>
       <div className="comments-heading mb-8">
-        <h3 className="text-white font-['Epilogue',sans-serif] text-2xl sm:text-3xl lg:text-4xl font-medium mb-0">
+        <h3 className="text-white  text-2xl sm:text-3xl lg:text-4xl font-medium mb-0">
           02 Comments
         </h3>
       </div>
@@ -111,28 +111,30 @@ export default function CommentsSection({ slug }) {
               width={80}
               height={80}
               className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover"
-              unoptimized={true}
+              quality={80}
+              loading="lazy"
+              sizes="(max-width: 640px) 64px, 80px"
             />
           </div>
           <div className="content flex-1">
             <div className="head flex flex-wrap gap-2 sm:gap-4 items-center justify-between mb-3">
               <div className="con">
                 <h5 className="mb-1">
-                  <span className="text-white font-['Epilogue',sans-serif] text-lg sm:text-xl font-semibold capitalize">
+                  <span className="text-white  text-lg sm:text-xl font-semibold capitalize">
                     {comment.author}
                   </span>
                 </h5>
-                <span className="text-text font-['Roboto',sans-serif] text-sm">{comment.date}</span>
+                <span className="text-text  text-sm">{comment.date}</span>
               </div>
               <div className="btn">
                 <button
-                  className="inline-flex px-10 py-2 bg-theme3 text-white font-['Roboto',sans-serif] text-md rounded-full hover:bg-theme transition-colors duration-300"
+                  className="inline-flex px-10 py-2 bg-theme3 text-white  text-md rounded-full hover:bg-theme transition-colors duration-300"
                 >
                   Reply
                 </button>
               </div>
             </div>
-            <p className="text-text font-['Roboto',sans-serif] text-base leading-7 mb-0">{comment.comment}</p>
+            <p className="text-text  text-base leading-7 mb-0">{comment.comment}</p>
           </div>
         </div>
       ))}

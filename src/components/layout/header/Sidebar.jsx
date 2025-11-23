@@ -70,7 +70,9 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                           width={150}
                           height={60}
                           className="h-25 w-auto object-contain"
-                          unoptimized={true}
+                          quality={90}
+                          priority
+                          sizes="150px"
                         />
                       </Link>
                     </div>
@@ -94,7 +96,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
                     className="mb-6 lg:hidden"
                   >
-                    <h4 className="text-white font-['Epilogue',sans-serif] text-lg font-semibold mb-3">
+                    <h4 className="text-white  text-lg font-semibold mb-3">
                       Select Branch
                     </h4>
                     <div className="relative">
@@ -107,7 +109,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
-                    className="text text-white font-['Roboto',sans-serif] text-base font-normal leading-relaxed mb-6 hidden lg:block"
+                    className="text text-white  text-base font-normal leading-relaxed mb-6 hidden lg:block"
                   >
                     This involves interactions between a business and its customers. It&apos;s about meeting
                     customers&apos; needs and resolving their problems. Effective customer service is crucial.
@@ -137,7 +139,9 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                               width={120}
                               height={120}
                               className="w-full h-full object-cover"
-                              unoptimized={true}
+                              quality={80}
+                              loading="lazy"
+                              sizes="120px"
                             />
                           </motion.div>
                         </Link>
@@ -182,7 +186,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                             <Link
                               href={item.href}
                               onClick={() => setIsOpen(false)}
-                              className="block text-white font-['Roboto',sans-serif] text-lg font-normal hover:text-theme3 transition-colors duration-300 py-2"
+                              className="block text-white  text-lg font-normal hover:text-theme3 transition-colors duration-300 py-2"
                             >
                               {item.label}
                             </Link>
@@ -199,7 +203,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     transition={{ delay: 0.6, duration: 0.4, ease: "easeOut" }}
                     className="offcanvas__contact"
                   >
-                    <h4 className="text-white font-['Epilogue',sans-serif] text-2xl font-bold mb-6">
+                    <h4 className="text-white  text-2xl font-bold mb-6">
                       Contact Info
                     </h4>
                     <ul className="space-y-4 mb-12">
@@ -217,7 +221,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                           <Link
                             href="#"
                             target="_blank"
-                            className="text-text font-['Roboto',sans-serif] text-base font-normal hover:text-theme3 transition-colors duration-300"
+                            className="text-text  text-base font-normal hover:text-theme3 transition-colors duration-300"
                           >
                             Main Street, Melbourne, Australia
                           </Link>
@@ -237,7 +241,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                         <div className="offcanvas__contact-text">
                           <Link
                             href="mailto:info@fresheat.com"
-                            className="text-text font-['Roboto',sans-serif] text-base font-normal hover:text-theme3 transition-colors duration-300"
+                            className="text-text  text-base font-normal hover:text-theme3 transition-colors duration-300"
                           >
                             info@fresheat.com
                           </Link>
@@ -258,7 +262,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                           <Link
                             href="#"
                             target="_blank"
-                            className="text-text font-['Roboto',sans-serif] text-base font-normal hover:text-theme3 transition-colors duration-300"
+                            className="text-text  text-base font-normal hover:text-theme3 transition-colors duration-300"
                           >
                             Mod-friday, 09am -05pm
                           </Link>
@@ -278,7 +282,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                         <div className="offcanvas__contact-text">
                           <Link
                             href="tel:+11002345909"
-                            className="text-text font-['Roboto',sans-serif] text-base font-normal hover:text-theme3 transition-colors duration-300"
+                            className="text-text  text-base font-normal hover:text-theme3 transition-colors duration-300"
                           >
                             +11002345909
                           </Link>
@@ -296,7 +300,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                       <Link
                         href="/shop"
                         onClick={() => setIsOpen(false)}
-                        className="theme-btn px-6 py-3 bg-theme3 text-white font-['Roboto',sans-serif] text-sm font-normal hover:bg-theme transition-colors duration-300 rounded-md flex items-center justify-center gap-2 shadow-lg"
+                        className="theme-btn px-6 py-3 bg-theme3 text-white  text-sm font-normal hover:bg-theme transition-colors duration-300 rounded-md flex items-center justify-center gap-2 shadow-lg"
                       >
                         <ShoppingCart className="w-4 h-4" />
                         <span>ORDER NOW</span>

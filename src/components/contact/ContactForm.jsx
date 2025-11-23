@@ -146,8 +146,9 @@ This message was sent from the contact form on the website.`;
                   width={600}
                   height={600}
                   className="w-full h-full object-contain object-left rounded-lg"
-                  unoptimized={true}
-                  priority={false}
+                  quality={85}
+                  loading="lazy"
+                  sizes="(max-width: 1024px) 100vw, 600px"
                 />
               </div>
             </div>
@@ -155,7 +156,7 @@ This message was sent from the contact form on the website.`;
             {/* Form Section */}
             <div className="w-full lg:w-1/2 xl:w-[45%] flex border-2">
               <div className="contact-form style2 bg-white rounded-2xl p-6 sm:p-8 lg:p-10 shadow-lg w-full">
-                <h2 className="text-title font-['Epilogue',sans-serif] text-2xl sm:text-3xl lg:text-4xl font-black mb-6 capitalize">
+                <h2 className="text-title  text-2xl sm:text-3xl lg:text-4xl font-black mb-6 capitalize">
                   Get in Touch
                 </h2>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-6">
@@ -168,7 +169,7 @@ This message was sent from the contact form on the website.`;
                         placeholder="Full Name"
                         value={formData.fullName}
                         onChange={handleChange}
-                        className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text font-['Roboto',sans-serif] text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
+                        className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
                         required
                       />
                     </div>
@@ -181,7 +182,7 @@ This message was sent from the contact form on the website.`;
                         placeholder="Email Address"
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text font-['Roboto',sans-serif] text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
+                        className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
                         required
                       />
                     </div>
@@ -194,7 +195,7 @@ This message was sent from the contact form on the website.`;
                         placeholder="Phone Number"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text font-['Roboto',sans-serif] text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
+                        className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
                         required
                       />
                     </div>
@@ -205,7 +206,7 @@ This message was sent from the contact form on the website.`;
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
-                        className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text font-['Roboto',sans-serif] text-sm sm:text-base bg-white focus:outline-none focus:border-theme3 transition-colors duration-300 cursor-pointer"
+                        className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base bg-white focus:outline-none focus:border-theme3 transition-colors duration-300 cursor-pointer"
                       >
                         <option value="subject">Subject</option>
                         <option value="complain">Complain</option>
@@ -226,7 +227,7 @@ This message was sent from the contact form on the website.`;
                       rows="5"
                       value={formData.message}
                       onChange={handleChange}
-                      className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text font-['Roboto',sans-serif] text-sm sm:text-base resize-y focus:outline-none focus:border-theme3 transition-colors duration-300"
+                      className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base resize-y focus:outline-none focus:border-theme3 transition-colors duration-300"
                       required
                     ></textarea>
                   </div>
@@ -244,7 +245,7 @@ This message was sent from the contact form on the website.`;
                     />
                     <label
                       htmlFor="reviewcheck"
-                      className="text-text font-['Roboto',sans-serif] text-sm sm:text-base leading-relaxed cursor-pointer"
+                      className="text-text  text-sm sm:text-base leading-relaxed cursor-pointer"
                     >
                       Collaboratively formulate principle capital. Progressively
                       evolve user
@@ -257,7 +258,7 @@ This message was sent from the contact form on the website.`;
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="theme-btn w-full bg-theme3 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-sm font-['Roboto',sans-serif] text-sm sm:text-base font-medium hover:bg-theme transition-colors duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="theme-btn w-full bg-theme3 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-sm  text-sm sm:text-base font-medium hover:bg-theme transition-colors duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? (
                         <>

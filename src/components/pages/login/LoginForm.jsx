@@ -140,7 +140,7 @@ export default function LoginForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Email */}
       <div>
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           <Mail className="w-4 h-4 inline mr-1" />
           Email Address
         </label>
@@ -161,7 +161,7 @@ export default function LoginForm() {
 
       {/* Password */}
       <div>
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           <Lock className="w-4 h-4 inline mr-1" />
           Password
         </label>
@@ -258,7 +258,7 @@ export default function LoginForm() {
         disabled={isLoading}
         whileHover={{ scale: isLoading ? 1 : 1.02 }}
         whileTap={{ scale: isLoading ? 1 : 0.98 }}
-        className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base font-['Epilogue',sans-serif] font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? (
           <>

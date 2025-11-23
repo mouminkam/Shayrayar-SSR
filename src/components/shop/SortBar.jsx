@@ -38,7 +38,7 @@ export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6">
         {/* Results Count */}
         <div className="shrink-0">
-          <p className="text-white text-sm sm:text-base font-['Roboto',sans-serif]">
+          <p className="text-white text-sm sm:text-base ">
             Showing <span className="font-semibold">{startItem}</span> - <span className="font-semibold">{endItem}</span> of <span className="font-semibold">{totalItems}</span> Results
           </p>
         </div>
@@ -50,14 +50,14 @@ export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage 
             <form className="woocommerce-ordering flex justify-between items-center gap-4" method="get">
               <label
                 htmlFor="sort-select"
-                className="block text-white text-lg font-['Roboto',sans-serif]"
+                className="block text-white text-lg "
               >
                 Sort by:
               </label>
               <select
                 id="sort-select"
                 name="orderby"
-                className="h-12 leading-[46px] bg-bgimg border border-gray-200 w-3/4 sm:w-auto min-w-[200px] text-sm sm:text-base px-4 pr-10 rounded-lg transition-all duration-300 appearance-none  text-white font-['Roboto',sans-serif] cursor-pointer"
+                className="h-12 leading-[46px] bg-bgimg border border-gray-200 w-3/4 sm:w-auto min-w-[200px] text-sm sm:text-base px-4 pr-10 rounded-lg transition-all duration-300 appearance-none  text-white  cursor-pointer"
                 value={sortBy}
                 onChange={handleSortChange}
               >

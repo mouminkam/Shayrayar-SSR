@@ -67,7 +67,7 @@ export default function SearchBar({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          className="w-full pl-12 pr-10 py-3 bg-transparent text-white placeholder-text/50 focus:outline-none focus:ring-2 focus:ring-theme3/20 rounded-xl font-['Roboto',sans-serif]"
+          className="w-full pl-12 pr-10 py-3 bg-transparent text-white placeholder-text/50 focus:outline-none focus:ring-2 focus:ring-theme3/20 rounded-xl "
         />
         {searchValue && (
           <motion.button

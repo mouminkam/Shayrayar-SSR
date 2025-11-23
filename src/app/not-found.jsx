@@ -22,7 +22,7 @@ export default function NotFound() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-9xl sm:text-[12rem] font-black text-transparent bg-clip-text bg-linear-to-r from-theme via-theme3 to-theme mb-4 font-['Epilogue',sans-serif]"
+              className="text-9xl sm:text-[12rem] font-black text-transparent bg-clip-text bg-linear-to-r from-theme via-theme3 to-theme mb-4 "
               style={{
                 backgroundImage: "linear-gradient(to right, var(--theme), var(--theme3), var(--theme))",
                 WebkitBackgroundClip: "text",
@@ -39,7 +39,7 @@ export default function NotFound() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="mb-8"
           >
-            <h2 className="text-white font-['Epilogue',sans-serif] text-3xl sm:text-4xl lg:text-5xl font-black uppercase mb-4">
+            <h2 className="text-white  text-3xl sm:text-4xl lg:text-5xl font-black uppercase mb-4">
               Page Not Found
             </h2>
             <p className="text-text text-lg sm:text-xl mb-2">
@@ -59,7 +59,7 @@ export default function NotFound() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white font-['Epilogue',sans-serif] text-base font-semibold uppercase rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white  text-base font-semibold uppercase rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30"
               >
                 <Home className="w-5 h-5" />
                 Go Home
@@ -69,7 +69,7 @@ export default function NotFound() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <button
                 onClick={() => window.history.back()}
-                className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white/20 hover:border-theme text-white font-['Epilogue',sans-serif] text-base font-medium rounded-xl hover:bg-theme/10 transition-all duration-300"
+                className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white/20 hover:border-theme text-white  text-base font-medium rounded-xl hover:bg-theme/10 transition-all duration-300"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Go Back
@@ -79,7 +79,7 @@ export default function NotFound() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/shop"
-                className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white/20 hover:border-theme text-white font-['Epilogue',sans-serif] text-base font-medium rounded-xl hover:bg-theme/10 transition-all duration-300"
+                className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white/20 hover:border-theme text-white  text-base font-medium rounded-xl hover:bg-theme/10 transition-all duration-300"
               >
                 <Search className="w-5 h-5" />
                 Browse Shop

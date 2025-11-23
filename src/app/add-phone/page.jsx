@@ -1,4 +1,5 @@
 "use client";
+import AnimatedSection from "../../components/ui/AnimatedSection";
 import PhoneInputSection from "../../components/pages/add-phone/PhoneInputSection";
 import GuestOnly from "../../components/auth/GuestOnly";
 
@@ -9,7 +10,9 @@ export default function AddPhonePage() {
         <section className="add-phone-section section-padding fix bg-bg3 py-12 px-1 sm:px-5 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
           <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
             <div className="max-w-2xl mx-auto">
-              <PhoneInputSection />
+              <AnimatedSection>
+                <PhoneInputSection />
+              </AnimatedSection>
             </div>
           </div>
         </section>

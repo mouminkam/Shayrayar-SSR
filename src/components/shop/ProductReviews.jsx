@@ -29,7 +29,7 @@ export default function ProductReviews({ productId }) {
       <div className="absolute inset-0 bg-linear-to-br from-theme3/5 via-transparent to-theme/5 opacity-20 pointer-events-none"></div>
       
       <div className="flex items-center justify-between mb-10 relative z-10">
-        <h3 className="text-white font-['Epilogue',sans-serif] text-3xl font-black capitalize">
+        <h3 className="text-white  text-3xl font-black capitalize">
           {reviews.length} {reviews.length === 1 ? 'Review' : 'Reviews'}
         </h3>
         {reviews.length > 0 && (
@@ -67,7 +67,7 @@ export default function ProductReviews({ productId }) {
                   </div>
                 </div>
                 <div className="comment-content flex-1 relative">
-                  <h4 className="name text-white font-['Epilogue',sans-serif] text-xl font-bold mb-1 capitalize transition-colors duration-300">
+                  <h4 className="name text-white  text-xl font-bold mb-1 capitalize transition-colors duration-300">
                     {review.author}
                   </h4>
                   <div className="commented-on text-text text-sm mb-4">{review.date}</div>

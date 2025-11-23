@@ -255,7 +255,7 @@ const BillingForm = memo(() => {
       
       {/* Notes Section */}
       <div className="mb-6">
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           Order Notes (Optional)
         </label>
         <textarea

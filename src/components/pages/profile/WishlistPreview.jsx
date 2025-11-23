@@ -24,7 +24,7 @@ export default function WishlistPreview({ wishlistItems }) {
           >
             <Heart className="w-6 h-6 text-white fill-white" />
           </motion.div>
-          <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black uppercase">
+          <h3 className="text-white  text-2xl font-black uppercase">
             Saved Items
           </h3>
         </div>
@@ -48,7 +48,9 @@ export default function WishlistPreview({ wishlistItems }) {
               alt={item.name}
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-300"
-              unoptimized={true}
+              quality={85}
+              loading="lazy"
+              sizes="80px"
             />
           </Link>
         ))}

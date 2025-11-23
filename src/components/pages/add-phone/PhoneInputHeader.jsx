@@ -7,7 +7,7 @@ export default function PhoneInputHeader() {
       <div className="w-16 h-16 bg-theme3 rounded-full flex items-center justify-center mx-auto mb-4">
         <Phone className="w-8 h-8 text-white" />
       </div>
-      <h2 className="text-white font-['Epilogue',sans-serif] text-2xl font-black uppercase mb-2">
+      <h2 className="text-white  text-2xl font-black uppercase mb-2">
         Enter Your Phone Number
       </h2>
       <p className="text-text text-sm">

@@ -18,7 +18,7 @@ export default function PaymentMethodSelector({ paymentMethod, setPaymentMethod 
       >
         <div className="flex flex-col items-center gap-2">
           <Zap className={`w-6 h-6 ${paymentMethod === "stripe" ? "text-theme3" : "text-text"}`} />
-          <span className={`font-['Epilogue',sans-serif] font-bold text-sm ${
+          <span className={` font-bold text-sm ${
             paymentMethod === "stripe" ? "text-theme3" : "text-white"
           }`}>
             Stripe
@@ -39,7 +39,7 @@ export default function PaymentMethodSelector({ paymentMethod, setPaymentMethod 
       >
         <div className="flex flex-col items-center gap-2">
           <Wallet className={`w-6 h-6 ${paymentMethod === "cash" ? "text-theme3" : "text-text"}`} />
-          <span className={`font-['Epilogue',sans-serif] font-bold text-sm ${
+          <span className={` font-bold text-sm ${
             paymentMethod === "cash" ? "text-theme3" : "text-white"
           }`}>
             Cash

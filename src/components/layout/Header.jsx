@@ -332,7 +332,9 @@ const FreshHeatHeader = () => {
                 width={120}
                 height={120}
                 className="h-12 sm:h-14 lg:h-16 xl:h-20 w-auto object-contain transition-transform duration-300 hover:scale-105"
-                unoptimized={true}
+                quality={90}
+                priority
+                sizes="(max-width: 640px) 80px, (max-width: 1024px) 100px, 120px"
               />
             </Link>
           </div>

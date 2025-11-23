@@ -19,7 +19,7 @@ export default function BannerSection() {
       title: "SPICY FRIED CHICKEN",
       image: "/img/banner/bannerThumb1_1.png",
       bgImage: "/img/bg/bannerBG1_1.jpg",
-      link: "/menu",
+      link: "/shop",
       shape4Float: false,
     },
     {
@@ -28,7 +28,7 @@ export default function BannerSection() {
       title: "Chicago Deep Pizza King",
       image: "/img/banner/bannerThumb1_2.png",
       bgImage: "/img/bg/bannerBG1_1.jpg",
-      link: "/menu",
+      link: "/shop",
       shape4Float: true,
     },
     {
@@ -37,7 +37,7 @@ export default function BannerSection() {
       title: "Chicago Deep Burger King",
       image: "/img/banner/bannerThumb1_3.png",
       bgImage: "/img/bg/bannerBG1_1.jpg",
-      link: "/menu",
+      link: "/shop",
       shape4Float: false,
     },
   ];
@@ -148,11 +148,13 @@ export default function BannerSection() {
                     <Image
                       src={currentSlide.image}
                       alt="banner"
-                      width={600}
-                      height={600}
+                      width={1200}
+                      height={1200}
                       className="w-full h-auto object-contain"
-                      unoptimized={true}
+                      quality={90}
                       priority={activeIndex === 0}
+                      loading={activeIndex === 0 ? "eager" : "lazy"}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px"
                     />
                   </motion.div>
                 </AnimatePresence>
@@ -175,7 +177,7 @@ export default function BannerSection() {
                           initial={{ y: -20, opacity: 0 }}
                           animate={{ y: 0, opacity: 1 }}
                           transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
-                          className="sub-title text-theme font-epilogue text-sm sm:text-2xl font-extrabold uppercase mb-3 sm:mb-1"
+                          className="sub-title text-theme  text-sm sm:text-2xl font-extrabold uppercase mb-3 sm:mb-1"
                         >
                           {currentSlide.subtitle}
                         </motion.h6>
@@ -183,7 +185,7 @@ export default function BannerSection() {
                           initial={{ y: -20, opacity: 0 }}
                           animate={{ y: 0, opacity: 1 }}
                           transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
-                          className="title text-white font-epilogue text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-black leading-tight mb-4 sm:mb-6"
+                          className="title text-white  text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-black leading-tight mb-4 sm:mb-6"
                         >
                           {currentSlide.title}
                         </motion.h1>
@@ -198,7 +200,7 @@ export default function BannerSection() {
                             whileTap={{ scale: 0.95 }}
                           >
                             <Link
-                              className="theme-btn px-6 py-2.5 sm:px-8 sm:py-3 bg-theme3 text-white font-roboto text-sm sm:text-base font-medium hover:bg-theme transition-colors duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
+                              className="theme-btn px-6 py-2.5 sm:px-8 sm:py-3 bg-theme3 text-white  text-sm sm:text-base font-medium hover:bg-theme transition-colors duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
                               href={currentSlide.link}
                             >
                               ORDER NOW

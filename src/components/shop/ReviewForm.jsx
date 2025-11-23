@@ -73,14 +73,14 @@ export default function ReviewForm({ productId }) {
       <div className="absolute inset-0 bg-linear-to-br from-theme3/5 via-transparent to-theme/5 opacity-20 pointer-events-none"></div>
 
       <div className="form-title mb-8 relative z-10">
-        <h3 className="inner-title text-white font-['Epilogue',sans-serif] text-3xl font-black mb-4 capitalize">
+        <h3 className="inner-title text-white  text-3xl font-black mb-4 capitalize">
           Add a Review
         </h3>
         <p className="text-text text-sm sm:text-base mb-6">
           Your email address will not be published. Required fields are marked *
         </p>
         <div className="rating flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mt-4 mb-9">
-          <p className="text-white font-['Epilogue',sans-serif] text-base sm:text-lg font-semibold m-0">Rate this product? *</p>
+          <p className="text-white  text-base sm:text-lg font-semibold m-0">Rate this product? *</p>
           <ul className="star flex items-center gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <li key={star}>
@@ -108,7 +108,7 @@ export default function ReviewForm({ productId }) {
               placeholder="Your Name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-5 py-4 pr-12 border-2 border-white/20 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder:text-white/50 font-['Roboto',sans-serif] text-base font-normal outline-none transition-all duration-300 focus:border-theme3 focus:bg-white/20 focus:ring-2 focus:ring-theme3/30"
+              className="w-full px-5 py-4 pr-12 border-2 border-white/20 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder:text-white/50  text-base font-normal outline-none transition-all duration-300 focus:border-theme3 focus:bg-white/20 focus:ring-2 focus:ring-theme3/30"
               required
             />
             <User className="absolute right-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
@@ -119,7 +119,7 @@ export default function ReviewForm({ productId }) {
               placeholder="Your Email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-5 py-4 pr-12 border-2 border-white/20 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder:text-white/50 font-['Roboto',sans-serif] text-base font-normal outline-none transition-all duration-300 focus:border-theme3 focus:bg-white/20 focus:ring-2 focus:ring-theme3/30"
+              className="w-full px-5 py-4 pr-12 border-2 border-white/20 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder:text-white/50  text-base font-normal outline-none transition-all duration-300 focus:border-theme3 focus:bg-white/20 focus:ring-2 focus:ring-theme3/30"
               required
             />
             <Mail className="absolute right-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
@@ -131,7 +131,7 @@ export default function ReviewForm({ productId }) {
             rows="5"
             value={formData.message}
             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            className="w-full px-5 py-4 pr-12 border-2 border-white/20 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder:text-white/50 font-['Roboto',sans-serif] text-base font-normal outline-none transition-all duration-300 focus:border-theme3 focus:bg-white/20 focus:ring-2 focus:ring-theme3/30 resize-none"
+            className="w-full px-5 py-4 pr-12 border-2 border-white/20 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder:text-white/50  text-base font-normal outline-none transition-all duration-300 focus:border-theme3 focus:bg-white/20 focus:ring-2 focus:ring-theme3/30 resize-none"
             required
           />
           <MessageSquare className="absolute right-5 top-5 w-5 h-5 text-white/60" />
@@ -148,7 +148,7 @@ export default function ReviewForm({ productId }) {
           />
           <label
             htmlFor="reviewcheck"
-            className="relative pl-10 cursor-pointer block leading-7 text-white/80 font-['Roboto',sans-serif] text-sm sm:text-base font-normal hover:text-white transition-colors duration-300"
+            className="relative pl-10 cursor-pointer block leading-7 text-white/80  text-sm sm:text-base font-normal hover:text-white transition-colors duration-300"
           >
             Save my name, email, and website in this browser for the next time I comment.
             <span
@@ -168,7 +168,7 @@ export default function ReviewForm({ productId }) {
           <button
             type="submit"
             disabled={isSubmitting || rating === 0}
-            className={`theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3 font-['Epilogue',sans-serif] text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30 ${
+            className={`theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3  text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30 ${
               isSubmitting || rating === 0 ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >

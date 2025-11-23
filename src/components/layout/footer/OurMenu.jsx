@@ -4,11 +4,11 @@ import { ChevronsRight } from "lucide-react";
 
 export default function OurMenu() {
   const menuItems = [
-    { href: "/menu", label: "Burger King" },
-    { href: "/menu", label: "Pizza king" },
-    { href: "/menu", label: "Fresh Food" },
-    { href: "/menu", label: "Vegetable" },
-    { href: "/menu", label: "Desserts" },
+    { href: "/shop", label: "Burger King" },
+    { href: "/shop", label: "Pizza king" },
+    { href: "/shop", label: "Fresh Food" },
+    { href: "/shop", label: "Vegetable" },
+    { href: "/shop", label: "Desserts" },
   ];
 
   return (

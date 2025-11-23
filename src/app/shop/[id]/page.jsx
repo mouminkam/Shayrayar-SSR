@@ -1,8 +1,27 @@
 "use client";
-import { use } from "react";
+import { use, Suspense } from "react";
 import { useRouter } from "next/navigation";
-import ShopDetailsContent from "../../../components/shop/ShopDetailsContent";
-import PopularDishes from "../../../components/shop/PopularDishes";
+import dynamic from "next/dynamic";
+import AnimatedSection from "../../../components/ui/AnimatedSection";
+import ErrorBoundary from "../../../components/ui/ErrorBoundary";
+import SectionSkeleton from "../../../components/ui/SectionSkeleton";
+
+// Lazy load heavy components
+const ShopDetailsContent = dynamic(
+  () => import("../../../components/shop/ShopDetailsContent"),
+  {
+    loading: () => <SectionSkeleton variant="default" height="h-96" />,
+    ssr: false,
+  }
+);
+
+const PopularDishes = dynamic(
+  () => import("../../../components/shop/PopularDishes"),
+  {
+    loading: () => <SectionSkeleton variant="grid" cardCount={5} height="h-96" />,
+    ssr: false,
+  }
+);
 
 export default function ShopDetailsPage({ params }) {
   const router = useRouter();
@@ -11,28 +30,36 @@ export default function ShopDetailsPage({ params }) {
 
   if (!productId) {
     return (
-      <div className="bg-bg3 min-h-screen">
-        <section className="bg-bg2 py-12 sm:py-16 md:py-20 lg:py-24">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col items-center justify-center py-20">
-              <p className="text-text text-lg mb-4">Invalid product ID</p>
-              <button
-                onClick={() => router.push("/shop")}
-                className="px-6 py-2 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors"
-              >
-                Back to Shop
-              </button>
-            </div>
-          </div>
-        </section>
+      <div className="bg-bg3 min-h-screen flex items-center justify-center py-20">
+        <div className="text-center">
+          <p className="text-text text-lg mb-4">Invalid product ID</p>
+          <button
+            onClick={() => router.push("/shop")}
+            className="px-6 py-2 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors"
+          >
+            Back to Shop
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="bg-bg3 min-h-screen">
-      <ShopDetailsContent productId={productId} />
-      <PopularDishes />
+      <ErrorBoundary>
+        <Suspense fallback={<SectionSkeleton variant="default" height="h-96" />}>
+          <AnimatedSection>
+            <ShopDetailsContent productId={productId} />
+          </AnimatedSection>
+        </Suspense>
+      </ErrorBoundary>
+      <ErrorBoundary>
+        <Suspense fallback={<SectionSkeleton variant="grid" cardCount={5} height="h-96" />}>
+          <AnimatedSection>
+            <PopularDishes />
+          </AnimatedSection>
+        </Suspense>
+      </ErrorBoundary>
     </div>
   );
 }

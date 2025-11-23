@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { XCircle, ArrowLeft, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import AnimatedSection from '../../../../components/ui/AnimatedSection';
 
 function StripeCancelContent() {
   const searchParams = useSearchParams();
@@ -13,7 +14,8 @@ function StripeCancelContent() {
   return (
     <div className="bg-bg3 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-        <motion.div
+        <AnimatedSection>
+          <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-red-500/10 border border-white/10 p-8 lg:p-12 text-center"
@@ -29,7 +31,7 @@ function StripeCancelContent() {
           </motion.div>
 
           {/* Cancel Message */}
-          <h1 className="text-3xl lg:text-4xl font-black text-white font-['Epilogue',sans-serif] mb-4">
+          <h1 className="text-3xl lg:text-4xl font-black text-white  mb-4">
             Payment Cancelled
           </h1>
           <p className="text-text text-lg mb-8">
@@ -78,7 +80,8 @@ function StripeCancelContent() {
           <p className="text-text text-sm mt-8">
             If you continue to experience issues, please contact our support team.
           </p>
-        </motion.div>
+          </motion.div>
+        </AnimatedSection>
       </div>
     </div>
   );

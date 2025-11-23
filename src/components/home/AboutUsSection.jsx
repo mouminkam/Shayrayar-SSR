@@ -74,7 +74,7 @@ export default function AboutUsSection() {
             <div className="row">
               <div className="col-12">
                 <div className="title-area text-center">
-                  <div className="sub-title text-theme3 font-epilogue text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
+                  <div className="sub-title text-theme3  text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
                     {/* <Image
                       className="me-1"
                       src="/img/icon/titleIcon.svg"
@@ -94,18 +94,18 @@ export default function AboutUsSection() {
                       unoptimized={true}
                     /> */}
                   </div>
-                  <h2 className="title text-white font-epilogue text-3xl sm:text-4xl lg:text-5xl font-black mb-10 sm:w-1/2 text-center mx-auto">
+                  <h2 className="title text-white  text-3xl sm:text-4xl lg:text-5xl font-black mb-10 sm:w-1/2 text-center mx-auto">
                     Variety of flavours from american cuisine
                   </h2>
-                  <div className="text text-text font-roboto text-base leading-relaxed mb-8 max-w-3xl mx-auto sm:w-1/3 text-center ">
+                  <div className="text text-text  text-base leading-relaxed mb-8 max-w-3xl mx-auto sm:w-1/3 text-center ">
                     It is a long established fact that a reader will be
                     distracted the readable content of a page when looking at
                     layout the point established fact that
                   </div>
                   <div className="btn-wrapper flex justify-center">
                     <Link
-                      className="theme-btn px-8 py-3 bg-theme3 text-white font-roboto text-base font-medium hover:bg-theme transition-all duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
-                      href="/menu"
+                      className="theme-btn px-8 py-3 bg-theme3 text-white  text-base font-medium hover:bg-theme transition-all duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
+                      href="/shop"
                     >
                       ORDER NOW
                       <ArrowRight className="w-5 h-5" />

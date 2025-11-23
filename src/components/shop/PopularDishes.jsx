@@ -2,8 +2,10 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Heart, ShoppingBasket, Star, Loader2 } from "lucide-react";
+import { Heart, ShoppingBasket, Star } from "lucide-react";
+import OptimizedImage from "../ui/OptimizedImage";
+import ProductCardSkeleton from "../ui/ProductCardSkeleton";
+import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 import api from "../../api";
 import useBranchStore from "../../store/branchStore";
 import { transformMenuItemsToProducts } from "../../lib/utils/productTransform";
@@ -15,7 +17,7 @@ import useAuthStore from "../../store/authStore";
 import { formatCurrency } from "../../lib/utils/formatters";
 
 export default function PopularDishes() {
-  const router = useRouter();
+  const { navigate, prefetchRoute } = usePrefetchRoute();
   const { selectedBranch } = useBranchStore();
   const { addToCart } = useCartStore();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistStore();
@@ -60,7 +62,7 @@ export default function PopularDishes() {
     // Check authentication first
     if (!isAuthenticated) {
       toastError("Please login to add items to cart");
-      router.push("/login");
+      navigate("/login");
       return;
     }
     
@@ -76,7 +78,7 @@ export default function PopularDishes() {
     } catch {
       toastError("Failed to add product to cart");
     }
-  }, [addToCart, toastSuccess, toastError, isAuthenticated, router]);
+  }, [addToCart, toastSuccess, toastError, isAuthenticated, navigate]);
 
   const handleWishlistToggle = useCallback(async (e, dish) => {
     e.preventDefault();
@@ -85,7 +87,7 @@ export default function PopularDishes() {
     // Check authentication first
     if (!isAuthenticated) {
       toastError("Please login to add items to wishlist");
-      router.push("/login");
+      navigate("/login");
       return;
     }
     
@@ -96,7 +98,7 @@ export default function PopularDishes() {
           toastSuccess(`${dish.title} removed from wishlist`);
         } else {
           if (result.requiresAuth) {
-            router.push("/login");
+            navigate("/login");
           }
           toastError(result.error || "Failed to remove from wishlist");
         }
@@ -112,7 +114,7 @@ export default function PopularDishes() {
           toastSuccess(`${dish.title} added to wishlist`);
         } else {
           if (result.requiresAuth) {
-            router.push("/login");
+            navigate("/login");
           }
           toastError(result.error || "Failed to add to wishlist");
         }
@@ -120,14 +122,14 @@ export default function PopularDishes() {
     } catch {
       toastError("Failed to update wishlist");
     }
-  }, [addToWishlist, removeFromWishlist, isInWishlist, toastSuccess, toastError, isAuthenticated, router]);
+  }, [addToWishlist, removeFromWishlist, isInWishlist, toastSuccess, toastError, isAuthenticated, navigate]);
 
   return (
     <section className="popular-dishes-section py-10 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
       <div className="popular-dishes-wrapper style1">
         <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
           <div className="title-area mb-12 sm:mb-14">
-            <div className="sub-title text-center text-theme3 font-['Epilogue',sans-serif] text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
+            <div className="sub-title text-center text-theme3  text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
               {/* <Image
                 src="/img/icon/titleIcon.svg"
                 alt="icon"
@@ -146,14 +148,14 @@ export default function PopularDishes() {
                 unoptimized={true}
               /> */}
             </div>
-            <div className="title text-center text-white font-['Epilogue',sans-serif] text-3xl sm:text-5xl font-black capitalize">
+            <div className="title text-center text-white  text-3xl sm:text-5xl font-black capitalize">
               Best selling Dishes
             </div>
           </div>
 
           {isLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 text-theme3 animate-spin" />
+            <div className="dishes-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 sm:gap-8">
+              <ProductCardSkeleton viewMode="grid" count={5} />
             </div>
           ) : dishes.length === 0 ? (
             <div className="flex items-center justify-center py-20">
@@ -181,7 +183,10 @@ export default function PopularDishes() {
                     </button>
 
                     {/* Product Image */}
-                    <div className="absolute -top-20 left-1/2 -translate-x-1/2 flex justify-center items-center shrink-0 w-full">
+                    <div 
+                      className="absolute -top-20 left-1/2 -translate-x-1/2 flex justify-center items-center shrink-0 w-full"
+                      onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
+                    >
                       <Image
                         src="/img/food-items/circleShape.png"
                         alt="shape"
@@ -190,25 +195,30 @@ export default function PopularDishes() {
                         className="w-51 h-51 -top-[46px] absolute z-0 animate-spin-slow"
                         unoptimized={true}
                       />
-                      <Image
+                      <OptimizedImage
                         src={dish.image}
                         alt={dish.title}
-                        width={150}
-                        height={150}
+                        width={192}
+                        height={192}
                         className="w-48 h-48 object-cover rounded-full -top-10 relative z-10"
-                        unoptimized={true}
+                        quality={85}
+                        loading="lazy"
+                        sizes="192px"
                       />
                     </div>
 
                     {/* Content */}
                     <div className="item-content mt-20 flex flex-col grow justify-between">
                       <div>
-                        <Link href={`/shop/${dish.id}`}>
-                          <h3 className="text-white font-['Epilogue',sans-serif] text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
+                        <Link 
+                          href={`/shop/${dish.id}`}
+                          onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
+                        >
+                          <h3 className="text-white  text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
                             {dish.title}
                           </h3>
                         </Link>
-                        <p className="text-text font-['Roboto',sans-serif] text-sm sm:text-base mb-4 line-clamp-2">
+                        <p className="text-text  text-sm sm:text-base mb-4 line-clamp-2">
                           {dish.description}
                         </p>
                       </div>
@@ -221,13 +231,14 @@ export default function PopularDishes() {
                             />
                           ))}
                         </div>
-                        <h6 className="text-theme font-['Epilogue',sans-serif] text-base sm:text-lg font-bold mb-4">
+                        <h6 className="text-theme  text-base sm:text-lg font-bold mb-4">
                           {formatCurrency(dish.price)}
                         </h6>
                         <div className="flex items-center justify-center gap-2">
                           <Link
                             href={`/shop/${dish.id}`}
-                            className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white font-['Epilogue',sans-serif] text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 flex-1"
+                            onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
+                            className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white  text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 flex-1"
                           >
                             Order
                           </Link>

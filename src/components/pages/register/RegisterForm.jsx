@@ -128,7 +128,7 @@ export default function RegisterForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Phone */}
       <div>
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           <Phone className="w-4 h-4 inline mr-1" />
           Phone number
         </label>
@@ -149,7 +149,7 @@ export default function RegisterForm() {
 
       {/* Password */}
       <div>
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           <Lock className="w-4 h-4 inline mr-1" />
           Create Password
         </label>
@@ -183,7 +183,7 @@ export default function RegisterForm() {
 
       {/* Confirm Password */}
       <div>
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           <Lock className="w-4 h-4 inline mr-1" />
           Confirm Password
         </label>
@@ -282,7 +282,7 @@ export default function RegisterForm() {
         disabled={!agreeToTerms || isLoading}
         whileHover={{ scale: agreeToTerms && !isLoading ? 1.02 : 1 }}
         whileTap={{ scale: agreeToTerms && !isLoading ? 0.98 : 1 }}
-        className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base font-['Epilogue',sans-serif] font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+        className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
       >
         {isLoading ? (
           <>

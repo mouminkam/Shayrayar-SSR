@@ -33,37 +33,37 @@ const CartSummary = memo(() => {
       transition={{ duration: 0.3 }}
       className="cart-summary bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 p-6 lg:p-8 sticky top-8"
     >
-      <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black mb-6 uppercase">
+      <h3 className="text-white  text-2xl font-black mb-6 uppercase">
         Cart Summary
       </h3>
 
       <div className="space-y-4 mb-6">
         {/* Subtotal */}
         <div className="flex justify-between items-center py-3 border-b border-white/10">
-          <span className="text-text font-['Roboto',sans-serif] text-base font-medium">
+          <span className="text-text  text-base font-medium">
             Subtotal
           </span>
-          <span className="text-white font-['Epilogue',sans-serif] text-lg font-bold">
+          <span className="text-white  text-lg font-bold">
             {formatCurrency(subtotal)}
           </span>
         </div>
 
         {/* Tax */}
         <div className="flex justify-between items-center py-3 border-b border-white/10">
-          <span className="text-text font-['Roboto',sans-serif] text-base font-medium">
+          <span className="text-text  text-base font-medium">
             Tax (10%)
           </span>
-          <span className="text-white font-['Epilogue',sans-serif] text-lg font-bold">
+          <span className="text-white  text-lg font-bold">
             {formatCurrency(tax)}
           </span>
         </div>
 
         {/* Total */}
         <div className="flex justify-between items-center py-4 border-t-2 border-theme3/30 border-b-2 border-theme3/30">
-          <span className="text-white font-['Epilogue',sans-serif] text-xl font-black uppercase">
+          <span className="text-white  text-xl font-black uppercase">
             Total
           </span>
-          <span className="text-theme3 font-['Epilogue',sans-serif] text-2xl font-black">
+          <span className="text-theme3  text-2xl font-black">
             {formatCurrency(total)}
           </span>
         </div>
@@ -73,7 +73,7 @@ const CartSummary = memo(() => {
       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
         <Link
           href="/checkout"
-          className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base font-['Epilogue',sans-serif] font-semibold uppercase block text-center rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2"
+          className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase block text-center rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2"
         >
           <ShoppingCart className="w-5 h-5" />
           Proceed to Checkout
@@ -88,7 +88,7 @@ const CartSummary = memo(() => {
       >
         <Link
           href="/shop"
-          className="w-full border-2 border-white/20 hover:border-theme text-white py-3 px-6 hover:bg-theme/10 transition-all duration-300 text-base font-['Epilogue',sans-serif] font-medium block text-center rounded-xl"
+          className="w-full border-2 border-white/20 hover:border-theme text-white py-3 px-6 hover:bg-theme/10 transition-all duration-300 text-base  font-medium block text-center rounded-xl"
         >
           Continue Shopping
         </Link>

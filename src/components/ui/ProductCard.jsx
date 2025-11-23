@@ -1,22 +1,36 @@
 "use client";
+import { useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ShoppingBasket, Heart, Star } from "lucide-react";
 import { formatCurrency } from "../../lib/utils/formatters";
 import useCartStore from "../../store/cartStore";
 import useWishlistStore from "../../store/wishlistStore";
 import useToastStore from "../../store/toastStore";
 import useAuthStore from "../../store/authStore";
+import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
+import OptimizedImage from "./OptimizedImage";
 
 export default function ProductCard({ product, viewMode = "grid" }) {
-  const router = useRouter();
+  const { navigate, prefetchRoute } = usePrefetchRoute();
   const { addToCart } = useCartStore();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
   
   const isInWishlistState = isInWishlist(product.id);
+  const productUrl = `/shop/${product.id}`;
+
+  // Prefetch route on hover
+  const handleMouseEnter = useCallback(() => {
+    prefetchRoute(productUrl);
+  }, [prefetchRoute, productUrl]);
+
+  // Handle navigation with transition
+  const handleOrderClick = useCallback((e) => {
+    e.preventDefault();
+    navigate(productUrl);
+  }, [navigate, productUrl]);
 
   // Handle add to cart
   const handleAddToCart = (e) => {
@@ -26,7 +40,7 @@ export default function ProductCard({ product, viewMode = "grid" }) {
     // Check authentication first
     if (!isAuthenticated) {
       toastError("Please login to add items to cart");
-      router.push("/login");
+      navigate("/login");
       return;
     }
     
@@ -76,7 +90,7 @@ export default function ProductCard({ product, viewMode = "grid" }) {
     // Check authentication first
     if (!isAuthenticated) {
       toastError("Please login to add items to wishlist");
-      router.push("/login");
+      navigate("/login");
       return;
     }
     
@@ -87,7 +101,7 @@ export default function ProductCard({ product, viewMode = "grid" }) {
           toastSuccess(`${product.title} removed from wishlist`);
         } else {
           if (result.requiresAuth) {
-            router.push("/login");
+            navigate("/login");
           }
           toastError(result.error || "Failed to remove from wishlist");
         }
@@ -103,7 +117,7 @@ export default function ProductCard({ product, viewMode = "grid" }) {
           toastSuccess(`${product.title} added to wishlist`);
         } else {
           if (result.requiresAuth) {
-            router.push("/login");
+            navigate("/login");
           }
           toastError(result.error || "Failed to add to wishlist");
         }
@@ -114,15 +128,20 @@ export default function ProductCard({ product, viewMode = "grid" }) {
   };
   if (viewMode === "list") {
     return (
-      <div className="relative flex flex-col sm:flex-row mt-0 items-start sm:items-center gap-6 sm:gap-8 p-5 sm:p-6 rounded-2xl bg-bgimg shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+      <div 
+        className="relative flex flex-col sm:flex-row mt-0 items-start sm:items-center gap-6 sm:gap-8 p-5 sm:p-6 rounded-2xl bg-bgimg shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+        onMouseEnter={handleMouseEnter}
+      >
         <div className="dishes-thumb relative shrink-0">
-          <Image
+          <OptimizedImage
             src={product.image}
             alt={product.title}
-            width={150}
-            height={150}
+            width={192}
+            height={192}
             className="w-32 h-32 sm:w-48 sm:h-48 object-cover rounded-full relative z-10"
-            unoptimized={true}
+            quality={85}
+            loading="lazy"
+            sizes="(max-width: 640px) 128px, 192px"
           />
           <div className="circle-shape absolute -top-[4.2px] w-[calc(100%+10px)] h-[calc(100%+10px)] left-1/2  transform  -translate-x-1/2 z-0">
             <Image
@@ -136,8 +155,12 @@ export default function ProductCard({ product, viewMode = "grid" }) {
           </div>
         </div>
         <div className="dishes-content flex-1 ">
-          <Link href={`/shop/${product.id}`}>
-            <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-bold mb-3 hover:text-theme transition-colors duration-300">
+          <Link 
+            href={productUrl}
+            onMouseEnter={handleMouseEnter}
+            onClick={handleOrderClick}
+          >
+            <h3 className="text-white  text-2xl font-bold mb-3 hover:text-theme transition-colors duration-300">
               {product.title}
             </h3>
           </Link>
@@ -161,17 +184,19 @@ export default function ProductCard({ product, viewMode = "grid" }) {
               />
             ))}
           </div>
-          <div className="text text-text font-['Roboto',sans-serif] text-base font-normal leading-relaxed mb-5">
+          <div className="text text-text  text-base font-normal leading-relaxed mb-5">
             {product.longDescription || "Neque porro est qui dolorem ipsum quia quaed inventor veritatis et quasi architecto beatae vitae dicta sunt explicabo. Aelltes port lacus quis enim var sed efficitur turpis gilla sed sit amet finibus eros. Lorem Ipsum is simply dummy text of the printing and typesetting industry.When an unknown printer took a galley of type"}
           </div>
         <div className="flex items-center justify-between gap-3">
-          <h6 className="text-theme font-['Epilogue',sans-serif] text-lg font-bold">
+          <h6 className="text-theme  text-lg font-bold">
             {formatCurrency(product.price)}
           </h6>
           <div className="flex items-center gap-2">
             <Link
-              href={`/shop/${product.id}`}
-              className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white font-['Epilogue',sans-serif] text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300"
+              href={productUrl}
+              onMouseEnter={handleMouseEnter}
+              onClick={handleOrderClick}
+              className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white  text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300"
             >
               Order
             </Link>
@@ -191,7 +216,10 @@ export default function ProductCard({ product, viewMode = "grid" }) {
 
   // Grid View
   return (
-    <div className="dishes-card style2 p-6 sm:p-7 mt-38 rounded-2xl bg-bgimg shadow-lg hover:shadow-xl text-center transition-all duration-300 hover:-translate-y-2 relative min-h-[200px] flex flex-col">
+    <div 
+      className="dishes-card style2 p-6 sm:p-7 mt-38 rounded-2xl bg-bgimg shadow-lg hover:shadow-xl text-center transition-all duration-300 hover:-translate-y-2 relative min-h-[200px] flex flex-col"
+      onMouseEnter={handleMouseEnter}
+    >
       {/* Heart Button - Top Right */}
       <div className="absolute top-4 right-4 z-20">
         <button
@@ -218,23 +246,29 @@ export default function ProductCard({ product, viewMode = "grid" }) {
         />
 
         {/* Food Image - On top */}
-        <Image
+        <OptimizedImage
           src={product.image}
           alt={product.title}
-          width={150}
-          height={150}
+          width={192}
+          height={192}
           className="w-48 h-48 object-cover rounded-full -top-10 relative z-10"
-          unoptimized={true}
+          quality={85}
+          loading="lazy"
+          sizes="192px"
         />
       </div>
       <div className="item-content mt-20 flex flex-col grow justify-between">
         <div>
-          <Link href={`/shop/${product.id}`}>
-            <h3 className="text-white font-['Epilogue',sans-serif] text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
+          <Link 
+            href={productUrl}
+            onMouseEnter={handleMouseEnter}
+            onClick={handleOrderClick}
+          >
+            <h3 className="text-white  text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
               {product.title}
             </h3>
           </Link>
-          <p className="text-text font-['Roboto',sans-serif] text-sm sm:text-base mb-4 line-clamp-2">
+          <p className="text-text  text-sm sm:text-base mb-4 line-clamp-2">
             {product.description}
           </p>
         </div>
@@ -247,13 +281,15 @@ export default function ProductCard({ product, viewMode = "grid" }) {
               />
             ))}
           </div>
-          <h6 className="text-theme font-['Epilogue',sans-serif] text-base sm:text-lg font-bold mb-4">
+          <h6 className="text-theme  text-base sm:text-lg font-bold mb-4">
             {formatCurrency(product.price)}
           </h6>
           <div className="flex items-center justify-center gap-2">
             <Link
-              href={`/shop/${product.id}`}
-              className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white font-['Epilogue',sans-serif] text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 flex-1"
+              href={productUrl}
+              onMouseEnter={handleMouseEnter}
+              onClick={handleOrderClick}
+              className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white  text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 flex-1"
             >
               Order
             </Link>

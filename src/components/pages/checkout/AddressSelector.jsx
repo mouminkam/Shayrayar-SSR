@@ -48,7 +48,7 @@ export default function AddressSelector({ selectedAddressId, onSelectAddress, on
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-4">
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium">
+        <label className="block text-text  text-sm font-medium">
           Saved Addresses
         </label>
         <motion.button

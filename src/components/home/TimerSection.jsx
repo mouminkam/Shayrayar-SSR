@@ -85,16 +85,17 @@ export default function TimerSection() {
                     alt="timer"
                     width={500}
                     height={500}
-                    unoptimized={true}
+                    quality={85}
+                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 500px"
                     className="w-full h-auto object-contain "
-
                   />
                 </div>
 
                 {/* Content */}
                 <div className="timer-card style1">
                   <div className="title-area text-center lg:text-left mb-8">
-                    <div className="sub-title text-theme2 font-epilogue text-2xl font-bold uppercase mb-4 flex items-center justify-center lg:justify-start gap-2">
+                    <div className="sub-title text-theme2  text-2xl font-bold uppercase mb-4 flex items-center justify-center lg:justify-start gap-2">
                       {/* <Image
                         className="me-1"
                         src="/img/icon/titleIcon.svg"
@@ -113,7 +114,7 @@ export default function TimerSection() {
                         unoptimized={true}
                       /> */}
                     </div>
-                    <h2 className="title text-white font-epilogue text-3xl sm:text-4xl lg:text-5xl font-black">
+                    <h2 className="title text-white  text-3xl sm:text-4xl lg:text-5xl font-black">
                       Get 30% Discount Every Item
                     </h2>
                   </div>
@@ -121,36 +122,36 @@ export default function TimerSection() {
                   {/* Clock */}
                   <div className="clock-wrapper flex gap-4 sm:gap-6 mb-8 justify-center lg:justify-start">
                     <div className="clock text-center bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 min-w-[80px] sm:min-w-[100px]">
-                      <div className="number text-white font-epilogue text-3xl sm:text-4xl font-black mb-2">
+                      <div className="number text-white  text-3xl sm:text-4xl font-black mb-2">
                         {formatTime(timeLeft.days)}
                       </div>
-                      <div className="text text-white/80 font-roboto text-sm sm:text-base">days</div>
+                      <div className="text text-white/80  text-sm sm:text-base">days</div>
                     </div>
                     <div className="clock text-center bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 min-w-[80px] sm:min-w-[100px]">
-                      <div className="number text-white font-epilogue text-3xl sm:text-4xl font-black mb-2">
+                      <div className="number text-white  text-3xl sm:text-4xl font-black mb-2">
                         {formatTime(timeLeft.hours)}
                       </div>
-                      <div className="text text-white/80 font-roboto text-sm sm:text-base">hrs</div>
+                      <div className="text text-white/80  text-sm sm:text-base">hrs</div>
                     </div>
                     <div className="clock text-center bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 min-w-[80px] sm:min-w-[100px]">
-                      <div className="number text-white font-epilogue text-3xl sm:text-4xl font-black mb-2">
+                      <div className="number text-white  text-3xl sm:text-4xl font-black mb-2">
                         {formatTime(timeLeft.minutes)}
                       </div>
-                      <div className="text text-white/80 font-roboto text-sm sm:text-base">mins</div>
+                      <div className="text text-white/80  text-sm sm:text-base">mins</div>
                     </div>
                     <div className="clock text-center bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 min-w-[80px] sm:min-w-[100px]">
-                      <div className="number text-white font-epilogue text-3xl sm:text-4xl font-black mb-2">
+                      <div className="number text-white  text-3xl sm:text-4xl font-black mb-2">
                         {formatTime(timeLeft.seconds)}
                       </div>
-                      <div className="text text-white/80 font-roboto text-sm sm:text-base">secs</div>
+                      <div className="text text-white/80  text-sm sm:text-base">secs</div>
                     </div>
                   </div>
 
                   {/* Button */}
                   <div className="btn-wrap flex justify-center lg:justify-start">
                     <Link
-                      className="theme-btn px-8 py-3 mb-8 bg-theme2 text-white font-roboto text-base font-medium hover:bg-theme transition-all duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
-                      href="/menu"
+                      className="theme-btn px-8 py-3 mb-8 bg-theme2 text-white  text-base font-medium hover:bg-theme transition-all duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
+                      href="/shop"
                     >
                       ORDER NOW
                       <ArrowRight className="w-5 h-5" />

@@ -1,15 +1,15 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { formatCurrency } from "../../../lib/utils/formatters";
-import { useRouter } from "next/navigation";
+import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
+import OptimizedImage from "../../ui/OptimizedImage";
 
 export default function OrderCard({ order, index }) {
-  const router = useRouter();
+  const { navigate, prefetchRoute } = usePrefetchRoute();
 
   const handleCardClick = () => {
-    router.push(`/orders/${order.id}`);
+    navigate(`/orders/${order.id}`);
   };
 
   return (
@@ -22,7 +22,7 @@ export default function OrderCard({ order, index }) {
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
-          <p className="text-white font-['Epilogue',sans-serif] font-bold text-lg mb-1">
+          <p className="text-white  font-bold text-lg mb-1">
             Order #{String(order.id || '').slice(-8).toUpperCase()}
           </p>
           <p className="text-text text-sm">
@@ -36,7 +36,7 @@ export default function OrderCard({ order, index }) {
           </p>
         </div>
         <div className="text-right">
-          <p className="text-theme3 font-['Epilogue',sans-serif] font-black text-xl mb-1">
+          <p className="text-theme3  font-black text-xl mb-1">
             {formatCurrency(order.total)}
           </p>
           <span
@@ -58,13 +58,18 @@ export default function OrderCard({ order, index }) {
         <div className="space-y-2 mb-4 pt-4 border-t border-white/10">
           {order.items.slice(0, 3).map((item, idx) => (
             <div key={item.id || idx} className="flex items-center gap-3 text-sm">
-              <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
-                <Image
+              <div 
+                className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0"
+                onMouseEnter={() => item.id && prefetchRoute(`/shop/${item.id}`)}
+              >
+                <OptimizedImage
                   src={item.image || "/img/placeholder.png"}
                   alt={item.name || 'Item'}
                   fill
                   className="object-cover"
-                  unoptimized={true}
+                  quality={85}
+                  loading="lazy"
+                  sizes="48px"
                 />
               </div>
               <div className="flex-1">

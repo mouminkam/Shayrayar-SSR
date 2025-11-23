@@ -4,11 +4,9 @@ import { ChevronsRight } from "lucide-react";
 
 export default function QuickLinks() {
   const links = [
-    { href: "/about", label: "About Us" },
-    { href: "/gallery", label: "Our Gallery" },
+    { href: "/about-us", label: "About Us" },
     // { href: "/blog", label: "Our Blogs" }, // Blog section temporarily disabled
-    { href: "/faq", label: "FAQ'S" },
-    { href: "/contact", label: "Contact Us" },
+    { href: "/contact-us", label: "Contact Us" },
   ];
 
   return (

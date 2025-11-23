@@ -1,7 +1,8 @@
-// Removed "use client" - This component only uses static JSX, Image, and Link components which are SSR-compatible
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function OfferCards() {
   const offers = [
@@ -39,13 +40,32 @@ export default function OfferCards() {
       <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {offers.map((offer, index) => (
-            <div
+            <motion.div
               key={index}
               className="relative rounded-3xl overflow-hidden min-h-[300px] flex items-center p-8 sm:p-10 border-2 border-bgimg hover:translate-y-2 transition-all duration-300"
               style={{
                 backgroundImage: `url(${offer.bgImage})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
+              }}
+              variants={{
+                hidden: { y: -50, opacity: 0 },
+                visible: {
+                  y: 0,
+                  opacity: 1,
+                  transition: {
+                    duration: 0.6,
+                    ease: "easeOut"
+                  }
+                },
+                exit: {
+                  y: -30,
+                  opacity: 0,
+                  transition: {
+                    duration: 0.4,
+                    ease: "easeIn"
+                  }
+                }
               }}
             >
               {/* Content */}
@@ -58,7 +78,7 @@ export default function OfferCards() {
                 </h3>
                 <p className="text-theme3 font-extrabold mb-5">{offer.description}</p>
                 <Link
-                  href="/menu"
+                  href="/shop"
                   className={`inline-block px-4 py-3 text-xs sm:text-sm font-normal rounded-md transition-all duration-300 bg-theme3 text-white hover:bg-theme`}
                 >
                   ORDER NOW <ArrowRight className="inline-block w-4 h-4 ml-2" />
@@ -75,8 +95,9 @@ export default function OfferCards() {
                     width={200}
                     height={200}
                     className="object-contain"
-                    unoptimized={true}
-                    priority={false}
+                    quality={85}
+                    loading="lazy"
+                    sizes="200px"
                   />
                   <div className="absolute inset-0 -top-15 right-0 animate-float-bob-x">
                     <Image
@@ -91,7 +112,7 @@ export default function OfferCards() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

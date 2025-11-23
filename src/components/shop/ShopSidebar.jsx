@@ -1,9 +1,11 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Search, Star, Heart, ShoppingBasket } from "lucide-react";
+import OptimizedImage from "../ui/OptimizedImage";
+import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 import api from "../../api";
 import useBranchStore from "../../store/branchStore";
 import { transformCategories, transformMenuItemsToProducts } from "../../lib/utils/productTransform";
@@ -16,7 +18,7 @@ import { formatCurrency } from "../../lib/utils/formatters";
 
 
 export default function ShopSidebar() {
-  const router = useRouter();
+  const { navigate, prefetchRoute } = usePrefetchRoute();
   const searchParams = useSearchParams();
   const { selectedBranch } = useBranchStore();
   const { addToCart } = useCartStore();
@@ -113,7 +115,7 @@ export default function ShopSidebar() {
     // Check authentication first
     if (!isAuthenticated) {
       toastError("Please login to add items to cart");
-      router.push("/login");
+      navigate("/login");
       return;
     }
     
@@ -129,7 +131,7 @@ export default function ShopSidebar() {
     } catch {
       toastError("Failed to add product to cart");
     }
-  }, [addToCart, toastSuccess, toastError, isAuthenticated, router]);
+  }, [addToCart, toastSuccess, toastError, isAuthenticated, navigate]);
 
   // Handle wishlist toggle
   const handleWishlistToggle = useCallback(async (e, product) => {
@@ -139,7 +141,7 @@ export default function ShopSidebar() {
     // Check authentication first
     if (!isAuthenticated) {
       toastError("Please login to add items to wishlist");
-      router.push("/login");
+      navigate("/login");
       return;
     }
     
@@ -150,7 +152,7 @@ export default function ShopSidebar() {
           toastSuccess(`${product.title} removed from wishlist`);
         } else {
           if (result.requiresAuth) {
-            router.push("/login");
+            navigate("/login");
           }
           toastError(result.error || "Failed to remove from wishlist");
         }
@@ -166,7 +168,7 @@ export default function ShopSidebar() {
           toastSuccess(`${product.title} added to wishlist`);
         } else {
           if (result.requiresAuth) {
-            router.push("/login");
+            navigate("/login");
           }
           toastError(result.error || "Failed to add to wishlist");
         }
@@ -174,7 +176,7 @@ export default function ShopSidebar() {
     } catch {
       toastError("Failed to update wishlist");
     }
-  }, [addToWishlist, removeFromWishlist, isInWishlist, toastSuccess, toastError, isAuthenticated, router]);
+  }, [addToWishlist, removeFromWishlist, isInWishlist, toastSuccess, toastError, isAuthenticated, navigate]);
 
   // Update search query when URL changes
   useEffect(() => {
@@ -193,8 +195,8 @@ export default function ShopSidebar() {
       params.delete("page");
     }
     
-    router.push(`/shop?${params.toString()}`);
-  }, [router, searchParams, currentCategory]);
+    navigate(`/shop?${params.toString()}`);
+  }, [navigate, searchParams, currentCategory]);
 
   // Handle search
   const handleSearch = useCallback((e) => {
@@ -209,8 +211,8 @@ export default function ShopSidebar() {
       params.delete("page");
     }
     
-    router.push(`/shop?${params.toString()}`);
-  }, [searchQuery, router, searchParams]);
+    navigate(`/shop?${params.toString()}`);
+  }, [searchQuery, navigate, searchParams]);
 
 
 
@@ -218,7 +220,7 @@ export default function ShopSidebar() {
     <aside className="main-sidebar space-y-6 lg:space-y-8">
       {/* Search Widget */}
       <div className="bg-bgimg p-6 sm:p-8 rounded-2xl shadow-sm">
-        <h5 className="text-white font-['Epilogue',sans-serif] text-lg sm:text-xl font-bold relative pb-3 mb-6 capitalize">
+        <h5 className="text-white  text-lg sm:text-xl font-bold relative pb-3 mb-6 capitalize">
           Search
           <span className="absolute bottom-0 left-0 h-0.5 w-16 sm:w-20 bg-theme3"></span>
         </h5>
@@ -228,7 +230,7 @@ export default function ShopSidebar() {
             placeholder="Search here"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-bgimg text-sm sm:text-base px-4 sm:px-5 py-3 rounded-lg border-none outline-none text-white font-['Roboto',sans-serif] pr-12 sm:pr-16 focus:ring-2 focus:ring-white transition-all"
+            className="w-full bg-bgimg text-sm sm:text-base px-4 sm:px-5 py-3 rounded-lg border-none outline-none text-white  pr-12 sm:pr-16 focus:ring-2 focus:ring-white transition-all"
           />
           <button
             type="submit"
@@ -242,7 +244,7 @@ export default function ShopSidebar() {
 
       {/* Categories Widget */}
       <div className="bg-bgimg p-6 sm:p-8 rounded-2xl shadow-sm">
-        <h5 className="text-white font-['Epilogue',sans-serif] text-lg sm:text-xl font-bold relative pb-3 mb-6 capitalize">
+        <h5 className="text-white  text-lg sm:text-xl font-bold relative pb-3 mb-6 capitalize">
           Categories
           <span className="absolute bottom-0 left-0 h-0.5 w-16 sm:w-20 bg-theme3"></span>
         </h5>
@@ -258,7 +260,7 @@ export default function ShopSidebar() {
             <li>
               <button
                 onClick={() => handleCategoryClick(null)}
-                className={`inline-flex px-3 sm:px-4 py-2 sm:py-2.5 text-white font-['Epilogue',sans-serif] text-xs sm:text-sm font-normal capitalize rounded-lg transition-all duration-300 hover:bg-theme3 hover:text-white active:scale-95 ${
+                className={`inline-flex px-3 sm:px-4 py-2 sm:py-2.5 text-white  text-xs sm:text-sm font-normal capitalize rounded-lg transition-all duration-300 hover:bg-theme3 hover:text-white active:scale-95 ${
                   !currentCategory ? "bg-theme3 text-white" : ""
                 }`}
               >
@@ -269,7 +271,7 @@ export default function ShopSidebar() {
               <li key={category.id}>
                 <button
                   onClick={() => handleCategoryClick(category.id)}
-                  className={`inline-flex px-3 sm:px-4 py-2 sm:py-2.5 text-white font-['Epilogue',sans-serif] text-xs sm:text-sm font-normal capitalize rounded-lg transition-all duration-300 hover:bg-theme3 hover:text-white active:scale-95 ${
+                  className={`inline-flex px-3 sm:px-4 py-2 sm:py-2.5 text-white  text-xs sm:text-sm font-normal capitalize rounded-lg transition-all duration-300 hover:bg-theme3 hover:text-white active:scale-95 ${
                     currentCategory === String(category.id) ? "bg-theme3 text-white" : ""
                   }`}
                 >
@@ -287,7 +289,7 @@ export default function ShopSidebar() {
           {/* Subtle gradient overlay */}
           <div className="absolute inset-0 bg-linear-to-br from-theme3/5 to-transparent opacity-20 pointer-events-none"></div>
 
-          <h5 className="text-white font-['Epilogue',sans-serif] text-lg lg:text-xl font-black relative pb-3 lg:pb-4 mb-6 lg:mb-8 capitalize text-center">
+          <h5 className="text-white  text-lg lg:text-xl font-black relative pb-3 lg:pb-4 mb-6 lg:mb-8 capitalize text-center">
             <span className="relative z-10 bg-linear-to-r from-theme3 to-theme bg-clip-text text-transparent drop-shadow-lg">
               Recent Products
             </span>
@@ -323,16 +325,21 @@ export default function ShopSidebar() {
 
                     <div className="flex flex-col items-center text-center space-y-3 lg:space-y-4">
                       {/* Product Image */}
-                      <div className="relative w-full flex justify-center">
+                      <div 
+                        className="relative w-full flex justify-center"
+                        onMouseEnter={() => prefetchRoute(`/shop/${product.id}`)}
+                      >
                         <div className="w-16 h-16 lg:w-18 lg:h-18 rounded-full bg-linear-to-br transition-all duration-500">
                           <div className="w-full h-full rounded-full bg-bgimg/80 backdrop-blur-sm border border-white/10 group-hover:border-theme3/30 transition-all duration-500 flex items-center justify-center">
-                            <Image
+                            <OptimizedImage
                               src={product.image}
                               alt={product.title}
-                              width={64}
-                              height={64}
+                              width={56}
+                              height={56}
                               className="w-12 h-12 lg:w-14 lg:h-14 object-cover rounded-full transform group-hover:scale-110 transition-transform duration-500"
-                              unoptimized={true}
+                              quality={85}
+                              loading="lazy"
+                              sizes="(max-width: 1024px) 48px, 56px"
                             />
                           </div>
                         </div>
@@ -342,7 +349,8 @@ export default function ShopSidebar() {
                       <div className="space-y-2 lg:space-y-3 flex-1 w-full">
                         <Link
                           href={`/shop/${product.id}`}
-                          className="text-white font-['Epilogue',sans-serif] text-sm lg:text-base font-extrabold hover:text-theme transition-all duration-300 block line-clamp-2 group-hover:-translate-y-px"
+                          onMouseEnter={() => prefetchRoute(`/shop/${product.id}`)}
+                          className="text-white  text-sm lg:text-base font-extrabold hover:text-theme transition-all duration-300 block line-clamp-2 group-hover:-translate-y-px"
                         >
                           {product.title}
                         </Link>
@@ -359,7 +367,7 @@ export default function ShopSidebar() {
 
                         {/* Price */}
                         <div className="flex items-center justify-center gap-2 lg:gap-3">
-                          <span className="text-theme font-['Epilogue',sans-serif] text-sm lg:text-base font-black bg-linear-to-r from-theme/10 to-theme3/10 px-2 lg:px-3 py-1 rounded-full">
+                          <span className="text-theme  text-sm lg:text-base font-black bg-linear-to-r from-theme/10 to-theme3/10 px-2 lg:px-3 py-1 rounded-full">
                             {formatCurrency(product.price)}
                           </span>
                         </div>
@@ -368,7 +376,8 @@ export default function ShopSidebar() {
                         <div className="flex items-center justify-center gap-2">
                           <Link
                             href={`/shop/${product.id}`}
-                            className="flex-1 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white font-['Epilogue',sans-serif] text-xs lg:text-sm font-semibold py-1.5 lg:py-2 px-3 lg:px-4 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-theme3/30 text-center"
+                            onMouseEnter={() => prefetchRoute(`/shop/${product.id}`)}
+                            className="flex-1 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white  text-xs lg:text-sm font-semibold py-1.5 lg:py-2 px-3 lg:px-4 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-theme3/30 text-center"
                           >
                             Order
                           </Link>
@@ -392,7 +401,7 @@ export default function ShopSidebar() {
           <div className="text-center mt-6 lg:mt-8 pt-4 lg:pt-6 border-t border-white/10">
             <Link
               href="/shop"
-              className="inline-flex items-center text-theme3 font-['Epilogue',sans-serif] text-xs lg:text-sm font-semibold hover:text-theme transition-all duration-300 group"
+              className="inline-flex items-center text-theme3  text-xs lg:text-sm font-semibold hover:text-theme transition-all duration-300 group"
             >
               View All Products
               <ArrowRight className="w-3 h-3 lg:w-4 lg:h-4 ml-1 lg:ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />

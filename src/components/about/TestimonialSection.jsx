@@ -53,8 +53,9 @@ export default function TestimonialSection() {
             alt="thumb"
             fill
             className="object-cover"
-            priority={false}
-            unoptimized={true}
+            quality={85}
+            loading="lazy"
+            sizes="(max-width: 1024px) 100vw, 50vw"
           />
         </div>
 
@@ -90,7 +91,7 @@ export default function TestimonialSection() {
                     height={20}
                     className="w-4 h-4 sm:w-5 sm:h-5"
                   /> */}
-                  <span className="text-theme3 font-['Epilogue',sans-serif] text-2xl font-bold uppercase">
+                  <span className="text-theme3  text-2xl font-bold uppercase">
                     Testimonials
                   </span>
                   {/* <Image
@@ -101,7 +102,7 @@ export default function TestimonialSection() {
                     className="w-4 h-4 sm:w-5 sm:h-5"
                   /> */}
                 </div>
-                <h2 className="text-white font-['Epilogue',sans-serif] text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-center">
+                <h2 className="text-white  text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-center">
                   What our Clients Say
                 </h2>
               </div>
@@ -131,16 +132,18 @@ export default function TestimonialSection() {
                               width={70}
                               height={70}
                               className="rounded-full w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-cover"
-                              unoptimized={true}
+                              quality={80}
+                              loading="lazy"
+                              sizes="(max-width: 640px) 48px, (max-width: 768px) 56px, 64px"
                             />
                           </div>
 
                           {/* User Info */}
                           <div className="flex-1 min-w-0">
-                            <h6 className="text-title font-['Epilogue',sans-serif] text-base sm:text-lg md:text-xl font-bold mb-0.5 truncate">
+                            <h6 className="text-title  text-base sm:text-lg md:text-xl font-bold mb-0.5 truncate">
                               {testimonial.name}
                             </h6>
-                            <p className="text-text font-['Roboto',sans-serif] text-xs sm:text-sm mb-1.5 truncate">
+                            <p className="text-text  text-xs sm:text-sm mb-1.5 truncate">
                               {testimonial.role}
                             </p>
                             <div className="mt-1">
@@ -168,7 +171,7 @@ export default function TestimonialSection() {
                           </div>
                         </div>
                         <div className="flex-1 overflow-y-auto pr-1">
-                          <p className="text-text font-['Roboto',sans-serif] text-sm sm:text-base md:text-lg leading-relaxed">
+                          <p className="text-text  text-sm sm:text-base md:text-lg leading-relaxed">
                             {testimonial.text}
                           </p>
                         </div>

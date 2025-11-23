@@ -10,29 +10,37 @@ import useToastStore from "../../store/toastStore";
 import useAuthStore from "../../store/authStore";
 import ProductCustomization from "./ProductCustomization";
 
+// Social media links - memoized outside component
+const SOCIAL_LINKS = [
+  { icon: Facebook, href: "https://www.facebook.com", label: "Facebook" },
+  { icon: Youtube, href: "https://www.youtube.com", label: "YouTube" },
+  { icon: Twitter, href: "https://www.x.com", label: "Twitter" },
+  { icon: Instagram, href: "https://www.instagram.com", label: "Instagram" },
+];
+
 export default function ProductAbout({ product }) {
   const router = useRouter();
   const { addToCart } = useCartStore();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
-  
+
   const [quantity, setQuantity] = useState(1);
-  const [customization, setCustomization] = useState({
+  const [customization, setCustomization] = useState(() => ({
     sizeId: product?.default_size_id || null,
     ingredientIds: [],
     finalPrice: product?.price || product?.base_price || 0,
-  });
+  }));
+
   const isInWishlistState = product?.id ? isInWishlist(product.id) : false;
 
-  // Handle customization change
-  const handleCustomizationChange = useCallback((customizationData) => {
-    setCustomization(customizationData);
+  const handleCustomizationChange = useCallback((data) => {
+    setCustomization(data);
   }, []);
 
   const handleAddToCart = () => {
     if (!product) return;
-    
+
     if (!isAuthenticated) {
       toastError("Please login to add items to cart");
       router.push("/login");
@@ -70,7 +78,7 @@ export default function ProductAbout({ product }) {
           final_price: customization.finalPrice,
         });
       }
-      
+
       const customizationText = [
         selectedSize?.name,
         selectedIngredients.length > 0 && `${selectedIngredients.length} add-on(s)`,
@@ -89,13 +97,13 @@ export default function ProductAbout({ product }) {
 
   const handleWishlistToggle = async () => {
     if (!product) return;
-    
+
     if (!isAuthenticated) {
       toastError("Please login to add items to wishlist");
       router.push("/login");
       return;
     }
-    
+
     try {
       if (isInWishlistState) {
         const result = await removeFromWishlist(product.id);
@@ -136,10 +144,10 @@ export default function ProductAbout({ product }) {
   return (
     <div className="product-about h-full flex flex-col">
       <div className="title-wrapper flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-4">
-        <h2 className="product-title text-white font-['Epilogue',sans-serif] text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">
+        <h2 className="product-title text-white  text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">
           {product?.title || "Product"}
         </h2>
-        <div className="price text-theme font-['Epilogue',sans-serif] text-4xl sm:text-5xl lg:text-6xl font-black">
+        <div className="price text-theme  text-4xl sm:text-5xl lg:text-6xl font-black">
           {formatCurrency(customization.finalPrice)}
         </div>
       </div>
@@ -158,7 +166,7 @@ export default function ProductAbout({ product }) {
         </span>
       </div>
 
-      <p className="text text-white text-base sm:text-lg font-['Roboto',sans-serif] font-normal leading-relaxed mb-8">
+      <p className="text text-white text-base sm:text-lg  font-normal leading-relaxed mb-8">
         {product?.description || product?.longDescription || "No description available."}
       </p>
 
@@ -170,7 +178,7 @@ export default function ProductAbout({ product }) {
 
       <div className="actions mb-8">
         <div className="quantity flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 mb-8">
-          <p className="text-white text-lg font-['Epilogue',sans-serif] font-semibold mb-0">
+          <p className="text-white text-lg  font-semibold mb-0">
             Quantity
           </p>
 
@@ -203,45 +211,38 @@ export default function ProductAbout({ product }) {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
           <button
             onClick={handleAddToCart}
-            className="theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3 font-['Epilogue',sans-serif] text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30"
+            className="theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3  text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30"
           >
             <ShoppingCart className="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform duration-300" />
             Add to Cart
           </button>
           <button
             onClick={handleWishlistToggle}
-            className={`theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3 font-['Epilogue',sans-serif] text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30 ${
-              isInWishlistState ? "bg-theme3/20" : ""
-            }`}
+            className={`theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3  text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30 ${isInWishlistState ? "bg-theme3/20" : ""
+              }`}
           >
-            <Heart className={`w-5 h-5 mr-2 transform group-hover:scale-110 transition-all duration-300 ${
-              isInWishlistState ? "fill-white" : ""
-            }`} />
+            <Heart className={`w-5 h-5 mr-2 transform group-hover:scale-110 transition-all duration-300 ${isInWishlistState ? "fill-white" : ""
+              }`} />
             {isInWishlistState ? "Remove from Wishlist" : "Add to Wishlist"}
           </button>
         </div>
       </div>
 
       <div className="share flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mt-auto pt-6 border-t border-white/10">
-        <h6 className="text-white font-['Epilogue',sans-serif] text-base sm:text-lg font-semibold m-0">
+        <h6 className="text-white  text-base sm:text-lg font-semibold m-0">
           Share with friends
         </h6>
         <ul className="social-media flex items-center gap-3">
-          {[
-            { icon: Facebook, href: "https://www.facebook.com", label: "Facebook" },
-            { icon: Youtube, href: "https://www.youtube.com", label: "YouTube" },
-            { icon: Twitter, href: "https://www.x.com", label: "Twitter" },
-            { icon: Instagram, href: "https://www.instagram.com", label: "Instagram" },
-          ].map(({ icon: Icon, href, label }, index) => (
-            <li key={index}>
+          {SOCIAL_LINKS.map(({ icon: Icon, href, label }) => (
+            <li key={label}>
               <Link
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-full hover:bg-white hover:text-theme3 hover:border-theme3 transition-all duration-300 group"
+                className="w-10 h-10 flex items-center justify-center bg-white/10 text-white border border-white/20 rounded-full hover:bg-white hover:text-theme3 hover:border-theme3 transition-colors"
                 aria-label={label}
               >
-                <Icon className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+                <Icon className="w-4 h-4" />
               </Link>
             </li>
           ))}

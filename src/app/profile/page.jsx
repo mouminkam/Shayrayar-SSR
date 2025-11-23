@@ -1,13 +1,39 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import AnimatedSection from "../../components/ui/AnimatedSection";
+import ErrorBoundary from "../../components/ui/ErrorBoundary";
+import SectionSkeleton from "../../components/ui/SectionSkeleton";
 import Breadcrumb from "../../components/ui/Breadcrumb";
 import useAuthStore from "../../store/authStore";
 import useWishlistStore from "../../store/wishlistStore";
 import api from "../../api";
-import ProfileSidebar from "../../components/pages/profile/ProfileSidebar";
-import OrdersHistory from "../../components/pages/profile/OrdersHistory";
-import WishlistPreview from "../../components/pages/profile/WishlistPreview";
+
+// Lazy load profile components
+const ProfileSidebar = dynamic(
+  () => import("../../components/pages/profile/ProfileSidebar"),
+  {
+    loading: () => <SectionSkeleton variant="default" showCards={false} height="h-64" />,
+    ssr: false,
+  }
+);
+
+const OrdersHistory = dynamic(
+  () => import("../../components/pages/profile/OrdersHistory"),
+  {
+    loading: () => <SectionSkeleton variant="default" cardCount={2} height="h-96" />,
+    ssr: false,
+  }
+);
+
+const WishlistPreview = dynamic(
+  () => import("../../components/pages/profile/WishlistPreview"),
+  {
+    loading: () => <SectionSkeleton variant="grid" cardCount={4} height="h-64" />,
+    ssr: false,
+  }
+);
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -108,50 +134,72 @@ export default function ProfilePage() {
 
   return (
     <div className="bg-bg3 min-h-screen">
-      <Breadcrumb title="My Profile" />
+      <AnimatedSection>
+        <Breadcrumb title="My Profile" />
+      </AnimatedSection>
       <section className="profile-section section-padding fix bg-bg3 py-12 px-1 sm:px-5 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Profile Info Sidebar */}
             <div className="lg:col-span-1">
-              <ProfileSidebar user={user} orders={orders} />
+              <ErrorBoundary>
+                <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-64" />}>
+                  <AnimatedSection>
+                    <ProfileSidebar user={user} orders={orders} />
+                  </AnimatedSection>
+                </Suspense>
+              </ErrorBoundary>
             </div>
 
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* Status Filter Tabs */}
-              <div className="bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 p-2">
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { value: 'all', label: 'All Orders' },
-                    { value: 'pending', label: 'Pending' },
-                    { value: 'processing', label: 'Processing' },
-                    { value: 'completed', label: 'Completed' },
-                    { value: 'cancelled', label: 'Cancelled' },
-                  ].map((tab) => (
-                    <button
-                      key={tab.value}
-                      onClick={() => setStatusFilter(tab.value)}
-                      className={`px-4 py-2 rounded-xl font-['Epilogue',sans-serif] text-sm font-semibold transition-all duration-300 ${
-                        statusFilter === tab.value
-                          ? 'bg-theme3 text-white shadow-lg'
-                          : 'bg-white/5 text-text hover:bg-white/10'
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
+              <AnimatedSection>
+                <div className="bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 p-2">
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'all', label: 'All Orders' },
+                      { value: 'pending', label: 'Pending' },
+                      { value: 'processing', label: 'Processing' },
+                      { value: 'completed', label: 'Completed' },
+                      { value: 'cancelled', label: 'Cancelled' },
+                    ].map((tab) => (
+                      <button
+                        key={tab.value}
+                        onClick={() => setStatusFilter(tab.value)}
+                        className={`px-4 py-2 rounded-xl  text-sm font-semibold transition-all duration-300 ${
+                          statusFilter === tab.value
+                            ? 'bg-theme3 text-white shadow-lg'
+                            : 'bg-white/5 text-text hover:bg-white/10'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </AnimatedSection>
 
-              {isLoadingOrders ? (
-                <div className="flex items-center justify-center py-20 bg-bgimg rounded-2xl">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-theme3"></div>
-                </div>
-              ) : (
-                <OrdersHistory orders={orders} maxDisplay={2}/>
-              )}
-              <WishlistPreview wishlistItems={wishlistItems} />
+              <ErrorBoundary>
+                <Suspense fallback={<SectionSkeleton variant="default" cardCount={2} height="h-96" />}>
+                  <AnimatedSection>
+                    {isLoadingOrders ? (
+                      <div className="flex items-center justify-center py-20 bg-bgimg rounded-2xl">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-theme3"></div>
+                      </div>
+                    ) : (
+                      <OrdersHistory orders={orders} maxDisplay={2}/>
+                    )}
+                  </AnimatedSection>
+                </Suspense>
+              </ErrorBoundary>
+              <ErrorBoundary>
+                <Suspense fallback={<SectionSkeleton variant="grid" cardCount={4} height="h-64" />}>
+                  <AnimatedSection>
+                    <WishlistPreview wishlistItems={wishlistItems} />
+                  </AnimatedSection>
+                </Suspense>
+              </ErrorBoundary>
             </div>
           </div>
         </div>

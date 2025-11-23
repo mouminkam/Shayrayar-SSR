@@ -4,7 +4,9 @@ import { useSearchParams } from "next/navigation";
 import ShopSidebar from "./ShopSidebar";
 import SortBar from "./SortBar";
 import ProductCard from "../ui/ProductCard";
-import { Loader2, ChevronDown } from "lucide-react";
+import ProductCardSkeleton from "../ui/ProductCardSkeleton";
+import AnimatedSection from "../ui/AnimatedSection";
+import { ChevronDown } from "lucide-react";
 import api from "../../api";
 import useBranchStore from "../../store/branchStore";
 import { transformMenuItemsToProducts } from "../../lib/utils/productTransform";
@@ -152,32 +154,39 @@ export default function ShopSection() {
     : false; // Server-side pagination handled by API
 
   return (
-    <section className="shop-section py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
-      <div className="shop-wrapper style1">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          {/* Sort Bar */}
-          <div className="mb-6 lg:mb-8">
-            <SortBar
-              totalItems={totalItems}
-              currentPage={1}
-              itemsPerPage={itemsPerPage}
-              onViewChange={handleViewModeChange}
-              viewMode={viewMode}
-            />
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-            {/* Sidebar */}
-            <aside className="lg:col-span-3 order-1">
-              <ShopSidebar />
-            </aside>
-            {/* Main Content */}
-            <main className="lg:col-span-9 order-2 flex flex-col gap-6 lg:gap-8">
+    <AnimatedSection mobileOptimized={true}>
+      <section className="shop-section py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
+        <div className="shop-wrapper style1">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+            {/* Sort Bar */}
+            <div className="mb-6 lg:mb-8">
+              <SortBar
+                totalItems={totalItems}
+                currentPage={1}
+                itemsPerPage={itemsPerPage}
+                onViewChange={handleViewModeChange}
+                viewMode={viewMode}
+              />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+              {/* Sidebar */}
+              <aside className="lg:col-span-3 order-1">
+                <ShopSidebar />
+              </aside>
+              {/* Main Content */}
+              <main className="lg:col-span-9 order-2 flex flex-col gap-6 lg:gap-8">
               {/* Products Grid/List */}
               <div className="w-full min-h-[400px]">
                 {isLoading ? (
-                  <div className="flex items-center justify-center py-20 bg-bgimg rounded-2xl">
-                    <Loader2 className="w-8 h-8 text-theme3 animate-spin" />
-                  </div>
+                  viewMode === "grid" ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
+                      <ProductCardSkeleton viewMode="grid" count={itemsPerPage} />
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      <ProductCardSkeleton viewMode="list" count={itemsPerPage} />
+                    </div>
+                  )
                 ) : error ? (
                   <div className="flex flex-col items-center justify-center py-20">
                     <p className="text-text text-lg mb-4">{error}</p>
@@ -207,7 +216,7 @@ export default function ShopSection() {
                       <div className="flex justify-center mt-8">
                         <button
                           onClick={handleShowMore}
-                          className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white font-['Epilogue',sans-serif] text-sm font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                          className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white  text-sm font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
                         >
                           Show More
                           <ChevronDown className="w-5 h-5" />
@@ -227,7 +236,7 @@ export default function ShopSection() {
                       <div className="flex justify-center mt-8">
                         <button
                           onClick={handleShowMore}
-                          className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white font-['Epilogue',sans-serif] text-sm font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                          className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white  text-sm font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
                         >
                           Show More
                           <ChevronDown className="w-5 h-5" />
@@ -238,11 +247,12 @@ export default function ShopSection() {
                 )}
               </div>
 
-            </main>
+              </main>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </AnimatedSection>
   );
 }
 

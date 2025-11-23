@@ -172,7 +172,9 @@ export default function CartDropdown({
                               width={48}
                               height={48}
                               className="w-full h-full object-cover rounded"
-                              unoptimized={true}
+                              quality={85}
+                              loading="lazy"
+                              sizes="48px"
                             />
                           ) : (
                             <span className="text-xs text-gray-600">🍔</span>

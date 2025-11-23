@@ -10,22 +10,7 @@ export default function BottomBar() {
             © All Copyright 2024 by
           </p>
           <ul className="flex items-center gap-2 sm:gap-4 flex-wrap justify-center sm:justify-end ">
-            <li className="border border-white/50 px-2 sm:px-3 py-1 rounded-md">
-              <Link
-                href="/terms"
-                className="text-white  transition-colors text-xs sm:text-sm"
-              >
-                Terms & Condition
-              </Link>
-            </li>
-            <li className="border border-white/50 px-2 sm:px-3 py-1 rounded-md">
-              <Link
-                href="/privacy-policy"
-                className="text-white  transition-colors text-xs sm:text-sm"
-              >
-                Privacy Policy
-              </Link>
-            </li>
+            {/* Terms and Privacy Policy links removed - pages don't exist */}
           </ul>
         </div>
       </div>

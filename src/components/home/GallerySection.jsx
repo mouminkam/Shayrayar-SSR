@@ -50,14 +50,16 @@ export default function GallerySection() {
               {galleryItems.map((item) => (
                 <SwiperSlide key={item.id}>
                   <div className="gallery-thumb relative group overflow-hidden rounded-2xl">
-                    <Link href="/menu">
+                    <Link href="/shop">
                       <Image
                         src={item.image}
                         alt="gallery"
                         width={400}
                         height={300}
                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
-                        unoptimized={true}
+                        quality={85}
+                        loading="lazy"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                       />
                       <div className="icon absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                         <Camera className="w-12 h-12 text-white" />

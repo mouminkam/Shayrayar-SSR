@@ -35,7 +35,7 @@ export default function ProfileSidebar({ user, orders }) {
         >
           <User className="w-12 h-12 text-white" />
         </motion.div>
-        <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black uppercase">
+        <h3 className="text-white  text-2xl font-black uppercase">
           {user.name}
         </h3>
         <p className="text-text text-sm mt-1">{user.email}</p>
@@ -47,7 +47,7 @@ export default function ProfileSidebar({ user, orders }) {
           <Mail className="w-5 h-5 text-theme3 mt-0.5 shrink-0" />
           <div>
             <p className="text-text text-xs font-medium mb-1">Email</p>
-            <p className="text-white font-['Roboto',sans-serif] text-sm">
+            <p className="text-white  text-sm">
               {user.email}
             </p>
           </div>
@@ -58,7 +58,7 @@ export default function ProfileSidebar({ user, orders }) {
             <Phone className="w-5 h-5 text-theme3 mt-0.5 shrink-0" />
             <div>
               <p className="text-text text-xs font-medium mb-1">Phone</p>
-              <p className="text-white font-['Roboto',sans-serif] text-sm">
+              <p className="text-white  text-sm">
                 {user.phone}
               </p>
             </div>
@@ -70,7 +70,7 @@ export default function ProfileSidebar({ user, orders }) {
             <MapPin className="w-5 h-5 text-theme3 mt-0.5 shrink-0" />
             <div>
               <p className="text-text text-xs font-medium mb-1">Address</p>
-              <p className="text-white font-['Roboto',sans-serif] text-sm">
+              <p className="text-white  text-sm">
                 {user.address.street}
                 <br />
                 {user.address.city}, {user.address.state} {user.address.zipCode}
@@ -84,14 +84,14 @@ export default function ProfileSidebar({ user, orders }) {
       <div className="grid grid-cols-2 gap-4 mb-6 pt-6 border-t border-white/10">
         <div className="text-center p-3 bg-white/5 rounded-xl">
           <Package className="w-6 h-6 text-theme3 mx-auto mb-2" />
-          <p className="text-white font-['Epilogue',sans-serif] text-xl font-black">
+          <p className="text-white  text-xl font-black">
             {orders.length}
           </p>
           <p className="text-text text-xs">Orders</p>
         </div>
         <div className="text-center p-3 bg-white/5 rounded-xl">
           <Heart className="w-6 h-6 text-theme3 mx-auto mb-2" />
-          <p className="text-white font-['Epilogue',sans-serif] text-xl font-black">
+          <p className="text-white  text-xl font-black">
             {wishlistItems.length}
           </p>
           <p className="text-text text-xs">Wishlist</p>
@@ -103,7 +103,7 @@ export default function ProfileSidebar({ user, orders }) {
         onClick={handleLogout}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="w-full border-2 border-red-500/50 text-red-400 py-3 px-6 hover:bg-red-500/20 transition-all duration-300 text-base font-['Epilogue',sans-serif] font-medium rounded-xl flex items-center justify-center gap-2"
+        className="w-full border-2 border-red-500/50 text-red-400 py-3 px-6 hover:bg-red-500/20 transition-all duration-300 text-base  font-medium rounded-xl flex items-center justify-center gap-2"
       >
         <LogOut className="w-5 h-5" />
         Logout

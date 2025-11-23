@@ -9,6 +9,7 @@ import api from '../../../../api';
 import useCartStore from '../../../../store/cartStore';
 import useToastStore from '../../../../store/toastStore';
 import { formatCurrency } from '../../../../lib/utils/formatters';
+import AnimatedSection from '../../../../components/ui/AnimatedSection';
 
 function StripeSuccessContent() {
   const router = useRouter();
@@ -194,7 +195,8 @@ function StripeSuccessContent() {
   return (
     <div className="bg-bg3 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-        <motion.div
+        <AnimatedSection>
+          <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 p-8 lg:p-12 text-center"
@@ -210,7 +212,7 @@ function StripeSuccessContent() {
           </motion.div>
 
           {/* Success Message */}
-          <h1 className="text-3xl lg:text-4xl font-black text-white font-['Epilogue',sans-serif] mb-4">
+          <h1 className="text-3xl lg:text-4xl font-black text-white  mb-4">
             Payment Successful!
           </h1>
           <p className="text-text text-lg mb-8">
@@ -227,7 +229,7 @@ function StripeSuccessContent() {
             >
               <div className="flex items-center gap-3 mb-4">
                 <Package className="w-6 h-6 text-theme3" />
-                <h2 className="text-xl font-bold text-white font-['Epilogue',sans-serif]">
+                <h2 className="text-xl font-bold text-white ">
                   Order Details
                 </h2>
               </div>
@@ -308,7 +310,8 @@ function StripeSuccessContent() {
           <p className="text-text text-sm mt-8">
             You will receive an email confirmation shortly with your order details.
           </p>
-        </motion.div>
+          </motion.div>
+        </AnimatedSection>
       </div>
     </div>
   );

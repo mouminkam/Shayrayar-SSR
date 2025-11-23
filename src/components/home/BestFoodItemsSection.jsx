@@ -79,7 +79,7 @@ export default function BestFoodItemsSection() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Title Area */}
           <div className="title-area text-center mt-10">
-            <div className="sub-title text-theme3 font-epilogue text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
+            <div className="sub-title text-theme3  text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
               {/* <Image
                 className="me-1"
                 src="/img/icon/titleIcon.svg"
@@ -97,7 +97,7 @@ export default function BestFoodItemsSection() {
                 unoptimized={true}
               /> */}
             </div>
-            <h2 className="title text-white mb-4 sm:mb-8 font-epilogue text-3xl sm:text-4xl lg:text-5xl font-black">
+            <h2 className="title text-white mb-4 sm:mb-8  text-3xl sm:text-4xl lg:text-5xl font-black">
               Popular Food Items
             </h2>
           </div>
@@ -158,22 +158,24 @@ export default function BestFoodItemsSection() {
                       <Image
                         src={item.image}
                         alt="food item"
-                        width={150}
-                        height={150}
+                        width={180}
+                        height={180}
                         className="w-45 h-45 object-cover -top-10 relative z-10"
-                        unoptimized={true}
+                        quality={85}
+                        loading="lazy"
+                        sizes="180px"
                       />
                     </div>
                     <div className="item-content mt-20 flex flex-col grow justify-between">
                       <div>
-                        <Link href="/menu">
-                          <h3 className="text-theme3 font-epilogue text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
+                        <Link href="/shop">
+                          <h3 className="text-theme3  text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
                             {item.title}
                           </h3>
                         </Link>
-                        <p className="text-white font-roboto text-sm sm:text-base mb-4 line-clamp-2">{item.description}</p>
+                        <p className="text-white  text-sm sm:text-base mb-4 line-clamp-2">{item.description}</p>
                       </div>
-                      <h6 className="text-theme font-epilogue text-base sm:text-lg font-bold mt-auto">{formatCurrency(item.price)}</h6>
+                      <h6 className="text-theme  text-base sm:text-lg font-bold mt-auto">{formatCurrency(item.price)}</h6>
                     </div>
                   </div>
                 </SwiperSlide>

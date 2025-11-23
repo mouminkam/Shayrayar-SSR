@@ -24,8 +24,9 @@ export default function CTASection() {
                 width={500}
                 height={500}
                 className="w-full h-auto object-contain"
-                unoptimized={true}
-                priority={false}
+                quality={85}
+                loading="lazy"
+                sizes="(max-width: 1024px) 100vw, 500px"
               />
             </div>
           </div>
@@ -43,7 +44,7 @@ export default function CTASection() {
             </p>
             <div className="flex justify-center lg:justify-start">
               <Link
-                href="/menu"
+                href="/shop"
                 className="inline-flex items-center px-6 py-3 bg-theme3 text-white text-sm font-normal transition-all duration-300 hover:bg-theme rounded-xl"
               >
                 ORDER NOW <ArrowRight className="inline-block w-4 h-4 ml-2" />

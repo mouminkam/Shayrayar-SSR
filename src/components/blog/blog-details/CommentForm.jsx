@@ -25,7 +25,7 @@ export default function CommentForm({ slug }) {
 
   return (
     <div className="comment-form-wrap my-10 pt-5">
-      <h3 className="text-white font-['Epilogue',sans-serif] text-2xl sm:text-3xl lg:text-4xl font-bold mb-8">
+      <h3 className="text-white  text-2xl sm:text-3xl lg:text-4xl font-bold mb-8">
         Leave a comments
       </h3>
       <form onSubmit={handleSubmit} id="contact-form" method="POST">
@@ -38,7 +38,7 @@ export default function CommentForm({ slug }) {
               placeholder="Your Name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-5 py-4 border border-gray-200 rounded-lg bg-transparent text-white font-['Roboto',sans-serif] text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
+              className="w-full px-5 py-4 border border-gray-200 rounded-lg bg-transparent text-white  text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
               required
             />
           </div>
@@ -50,7 +50,7 @@ export default function CommentForm({ slug }) {
               placeholder="Your Email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-5 py-4 border border-gray-200 rounded-lg bg-transparent text-white font-['Roboto',sans-serif] text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
+              className="w-full px-5 py-4 border border-gray-200 rounded-lg bg-transparent text-white  text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
               required
             />
           </div>
@@ -63,14 +63,14 @@ export default function CommentForm({ slug }) {
             rows="6"
             value={formData.message}
             onChange={handleChange}
-            className="w-full px-5 py-4 pb-24 border border-gray-200 rounded-lg bg-transparent text-white font-['Roboto',sans-serif] text-base resize-y focus:outline-none focus:border-theme3 transition-colors duration-300"
+            className="w-full px-5 py-4 pb-24 border border-gray-200 rounded-lg bg-transparent text-white  text-base resize-y focus:outline-none focus:border-theme3 transition-colors duration-300"
             required
           ></textarea>
         </div>
         <div className="form-clt">
           <button
             type="submit"
-            className="theme-btn inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-theme3 text-white font-['Roboto',sans-serif] text-sm sm:text-base font-normal rounded-sm hover:bg-theme transition-colors duration-300"
+            className="theme-btn inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-theme3 text-white  text-sm sm:text-base font-normal rounded-sm hover:bg-theme transition-colors duration-300"
           >
             Post a Comment
             <ArrowRight className="w-4 h-4 bg-transparent text-white" />

@@ -129,7 +129,7 @@ export default function ContactBoxes() {
           <div className="flex items-center justify-center py-20 bg-bgimg rounded-2xl">
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="w-10 h-10 text-theme3 animate-spin" />
-              <p className="text-text font-['Roboto',sans-serif] text-sm">Loading contact information...</p>
+              <p className="text-text  text-sm">Loading contact information...</p>
             </div>
           </div>
         ) : (
@@ -152,15 +152,15 @@ export default function ContactBoxes() {
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-title font-['Epilogue',sans-serif] text-lg sm:text-xl lg:text-2xl font-black mb-3 sm:mb-1 capitalize group-hover:text-theme3 transition-colors duration-300 line-clamp-2 min-h-12 flex items-center justify-center">
+                  <h3 className="text-title  text-lg sm:text-xl lg:text-2xl font-black mb-3 sm:mb-1 capitalize group-hover:text-theme3 transition-colors duration-300 line-clamp-2 min-h-12 flex items-center justify-center">
                     {box.title}
                   </h3>
 
                   {/* Description */}
                   <div className="flex-1 flex items-center justify-center min-h-16">
-                    <p className="text-text font-['Roboto',sans-serif] text-sm sm:text-base leading-relaxed break-words overflow-wrap-anywhere hyphens-auto line-clamp-4 group-hover:text-text/90 transition-colors duration-300 px-1">
+                    <div className="text-text  text-sm sm:text-base leading-relaxed break-words overflow-wrap-anywhere hyphens-auto line-clamp-4 group-hover:text-text/90 transition-colors duration-300 px-1">
                       {box.description}
-                    </p>
+                    </div>
                   </div>
                 </div>
 

@@ -45,7 +45,7 @@ const CheckoutSummary = memo(() => {
         >
           <ShoppingCart className="w-6 h-6 text-white fill-white" />
         </motion.div>
-        <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black uppercase">
+        <h3 className="text-white  text-2xl font-black uppercase">
           Order Summary
         </h3>
       </div>
@@ -73,11 +73,13 @@ const CheckoutSummary = memo(() => {
                 alt={item.name}
                 fill
                 className="object-cover"
-                unoptimized={true}
+                quality={85}
+                loading="lazy"
+                sizes="64px"
               />
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="text-white font-['Epilogue',sans-serif] text-sm font-bold truncate">
+              <h4 className="text-white  text-sm font-bold truncate">
                 {item.name}
               </h4>
               <p className="text-text text-xs">
@@ -86,7 +88,7 @@ const CheckoutSummary = memo(() => {
                 {item.ingredients_data?.length > 0 && ` • +${item.ingredients_data.length} add-ons`}
               </p>
             </div>
-            <div className="text-theme3 font-['Epilogue',sans-serif] text-sm font-bold">
+            <div className="text-theme3  text-sm font-bold">
               {formatCurrency((item.final_price || item.price) * item.quantity)}
             </div>
           </motion.div>
@@ -100,21 +102,21 @@ const CheckoutSummary = memo(() => {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Package className="w-4 h-4 text-theme3" />
-            <span className="text-text font-['Roboto',sans-serif] text-sm font-medium">
+            <span className="text-text  text-sm font-medium">
               Items ({itemCount})
             </span>
           </div>
-          <span className="text-white font-['Epilogue',sans-serif] text-sm font-bold">
+          <span className="text-white  text-sm font-bold">
             {formatCurrency(subtotal)}
           </span>
         </div>
 
         {/* Subtotal */}
         <div className="flex justify-between items-center py-2 border-b border-white/10">
-          <span className="text-text font-['Roboto',sans-serif] text-base font-medium">
+          <span className="text-text  text-base font-medium">
             Subtotal
           </span>
-          <span className="text-white font-['Epilogue',sans-serif] text-lg font-bold">
+          <span className="text-white  text-lg font-bold">
             {formatCurrency(subtotal)}
           </span>
         </div>
@@ -124,11 +126,11 @@ const CheckoutSummary = memo(() => {
           <div className="flex justify-between items-center py-2 border-b border-white/10">
             <div className="flex items-center gap-2">
               <Tag className="w-4 h-4 text-theme3" />
-              <span className="text-text font-['Roboto',sans-serif] text-base font-medium">
+              <span className="text-text  text-base font-medium">
                 Discount {coupon?.code && `(${coupon.code})`}
               </span>
             </div>
-            <span className="text-theme3 font-['Epilogue',sans-serif] text-lg font-bold">
+            <span className="text-theme3  text-lg font-bold">
               -{formatCurrency(discount)}
             </span>
           </div>
@@ -139,11 +141,11 @@ const CheckoutSummary = memo(() => {
           <div className="flex justify-between items-center py-2 border-b border-white/10">
             <div className="flex items-center gap-2">
               <Truck className="w-4 h-4 text-theme3" />
-              <span className="text-text font-['Roboto',sans-serif] text-base font-medium">
+              <span className="text-text  text-base font-medium">
                 Delivery
               </span>
             </div>
-            <span className="text-white font-['Epilogue',sans-serif] text-lg font-bold">
+            <span className="text-white  text-lg font-bold">
               {delivery === 0 ? (
                 <span className="text-theme3">FREE</span>
               ) : (
@@ -155,20 +157,20 @@ const CheckoutSummary = memo(() => {
 
         {/* Tax */}
         <div className="flex justify-between items-center py-2 border-b border-white/10">
-          <span className="text-text font-['Roboto',sans-serif] text-base font-medium">
+          <span className="text-text  text-base font-medium">
             Tax (10%)
           </span>
-          <span className="text-white font-['Epilogue',sans-serif] text-lg font-bold">
+          <span className="text-white  text-lg font-bold">
             {formatCurrency(tax)}
           </span>
         </div>
 
         {/* Total */}
         <div className="flex justify-between items-center py-4 border-t-2 border-theme3/30">
-          <span className="text-white font-['Epilogue',sans-serif] text-xl font-black uppercase">
+          <span className="text-white  text-xl font-black uppercase">
             Total
           </span>
-          <span className="text-theme3 font-['Epilogue',sans-serif] text-2xl font-black">
+          <span className="text-theme3  text-2xl font-black">
             {formatCurrency(total)}
           </span>
         </div>

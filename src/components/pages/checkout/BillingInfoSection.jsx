@@ -12,14 +12,14 @@ export default function BillingInfoSection({ formData, handleInputChange }) {
         >
           <User className="w-6 h-6 text-white fill-white" />
         </motion.div>
-        <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black uppercase">
+        <h3 className="text-white  text-2xl font-black uppercase">
           Billing Information
         </h3>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+          <label className="block text-text  text-sm font-medium mb-2">
             First Name *
           </label>
           <input
@@ -33,7 +33,7 @@ export default function BillingInfoSection({ formData, handleInputChange }) {
           />
         </div>
         <div>
-          <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+          <label className="block text-text  text-sm font-medium mb-2">
             Last Name *
           </label>
           <input
@@ -50,7 +50,7 @@ export default function BillingInfoSection({ formData, handleInputChange }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div>
-          <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+          <label className="block text-text  text-sm font-medium mb-2">
             <Mail className="w-4 h-4 inline mr-1" />
             Email Address *
           </label>
@@ -65,7 +65,7 @@ export default function BillingInfoSection({ formData, handleInputChange }) {
           />
         </div>
         <div>
-          <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+          <label className="block text-text  text-sm font-medium mb-2">
             <Phone className="w-4 h-4 inline mr-1" />
             Phone Number *
           </label>

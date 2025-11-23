@@ -1,6 +1,5 @@
 "use client";
 import { memo, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Trash2, Plus, Minus, Edit } from "lucide-react";
@@ -9,26 +8,31 @@ import { formatCurrency } from "../../lib/utils/formatters";
 import { IMAGE_PATHS } from "../../data/constants";
 import CartEditModal from "./CartEditModal";
 import useToastStore from "../../store/toastStore";
+import OptimizedImage from "../ui/OptimizedImage";
+import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 
 // Desktop Table View Component
-const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, onEditItem }) => (
+const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, onEditItem }) => {
+  const { prefetchRoute } = usePrefetchRoute();
+  
+  return (
   <div className="hidden lg:block overflow-x-auto mb-5">
     <table className="w-full border-collapse">
       <thead>
         <tr className="border-b-2 border-white/10">
-          <th className="text-left py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold">
+          <th className="text-left py-4 px-4  text-white font-bold">
             Product
           </th>
-          <th className="text-center py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold">
+          <th className="text-center py-4 px-4  text-white font-bold">
             Price
           </th>
-          <th className="text-center py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold">
+          <th className="text-center py-4 px-4  text-white font-bold">
             Quantity
           </th>
-          <th className="text-center py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold">
+          <th className="text-center py-4 px-4  text-white font-bold">
             Subtotal
           </th>
-          <th className="text-center py-4 px-4 font-['Epilogue',sans-serif] text-white font-bold w-12">
+          <th className="text-center py-4 px-4  text-white font-bold w-12">
             Action
           </th>
         </tr>
@@ -49,24 +53,31 @@ const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, on
             >
               <td className="py-6 px-4">
                 <div className="flex items-center gap-4">
-                  <Link href={`/shop/${item.id}`} className="shrink-0 group">
+                  <Link 
+                    href={`/shop/${item.id}`} 
+                    className="shrink-0 group"
+                    onMouseEnter={() => prefetchRoute(`/shop/${item.id}`)}
+                  >
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       className="relative w-20 h-20 rounded-xl overflow-hidden transition-all duration-300"
                     >
-                      <Image
+                      <OptimizedImage
                         src={item.image || IMAGE_PATHS.placeholder}
                         alt={item.name}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-300"
-                        unoptimized={true}
+                        quality={85}
+                        loading="lazy"
+                        sizes="80px"
                       />
                     </motion.div>
                   </Link>
                   <div className="flex-1">
                     <Link
                       href={`/shop/${item.id}`}
-                      className="text-white font-['Epilogue',sans-serif] text-lg font-bold hover:text-theme transition-colors duration-300 block mb-1"
+                      onMouseEnter={() => prefetchRoute(`/shop/${item.id}`)}
+                      className="text-white  text-lg font-bold hover:text-theme transition-colors duration-300 block mb-1"
                     >
                       {item.name}
                     </Link>
@@ -92,7 +103,7 @@ const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, on
                 </div>
               </td>
               <td className="text-center py-6 px-4">
-                <span className="text-theme font-['Epilogue',sans-serif] font-bold text-lg">
+                <span className="text-theme  font-bold text-lg">
                   {formatCurrency(itemPrice)}
                 </span>
               </td>
@@ -107,7 +118,7 @@ const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, on
                   >
                     <Minus className="w-4 h-4" />
                   </motion.button>
-                  <span className="text-white font-['Epilogue',sans-serif] font-semibold text-base min-w-8">
+                  <span className="text-white  font-semibold text-base min-w-8">
                     {item.quantity}
                   </span>
                   <motion.button
@@ -122,7 +133,7 @@ const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, on
                 </div>
               </td>
               <td className="text-center py-6 px-4">
-                <span className="text-theme3 font-['Epilogue',sans-serif] font-bold text-lg">
+                <span className="text-theme3  font-bold text-lg">
                   {formatCurrency(itemPrice * item.quantity)}
                 </span>
               </td>
@@ -161,7 +172,10 @@ const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, on
 DesktopTable.displayName = "DesktopTable";
 
 // Mobile Card View Component
-const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, onEditItem }) => (
+const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, onEditItem }) => {
+  const { prefetchRoute } = usePrefetchRoute();
+  
+  return (
   <div className="lg:hidden space-y-4 mb-8">
     {items.map((item, index) => {
       const itemKey = getCartItemKey(item);
@@ -178,14 +192,20 @@ const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, 
         >
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Image */}
-            <Link href={`/shop/${item.id}`} className="shrink-0 group">
+            <Link 
+              href={`/shop/${item.id}`} 
+              className="shrink-0 group"
+              onMouseEnter={() => prefetchRoute(`/shop/${item.id}`)}
+            >
               <div className="relative w-full sm:w-24 h-50 rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-shadow duration-300">
-                <Image
+                <OptimizedImage
                   src={item.image || IMAGE_PATHS.placeholder}
                   alt={item.name}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-300"
-                  unoptimized={true}
+                  quality={85}
+                  loading="lazy"
+                  sizes="(max-width: 640px) 100vw, 96px"
                 />
               </div>
             </Link>
@@ -194,7 +214,8 @@ const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, 
             <div className="flex-1 min-w-0">
               <Link
                 href={`/shop/${item.id}`}
-                className="text-white font-['Epilogue',sans-serif] text-lg font-bold hover:text-theme transition-colors duration-300 block mb-2"
+                onMouseEnter={() => prefetchRoute(`/shop/${item.id}`)}
+                className="text-white  text-lg font-bold hover:text-theme transition-colors duration-300 block mb-2"
               >
                 {item.name}
               </Link>
@@ -216,7 +237,7 @@ const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, 
                   )}
                 </div>
               )}
-              <div className="text-theme font-['Epilogue',sans-serif] font-bold text-base mb-3">
+              <div className="text-theme  font-bold text-base mb-3">
                 {formatCurrency(itemPrice)}
               </div>
 
@@ -232,7 +253,7 @@ const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, 
                   >
                     <Minus className="w-4 h-4" />
                   </motion.button>
-                  <span className="text-white font-['Epilogue',sans-serif] font-semibold text-base min-w-8 text-center">
+                  <span className="text-white  font-semibold text-base min-w-8 text-center">
                     {item.quantity}
                   </span>
                   <motion.button
@@ -246,7 +267,7 @@ const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, 
                   </motion.button>
                 </div>
                 <div className="text-right">
-                  <div className="text-theme3 font-['Epilogue',sans-serif] font-bold text-lg">
+                  <div className="text-theme3  font-bold text-lg">
                     {formatCurrency(itemPrice * item.quantity)}
                   </div>
                 </div>
@@ -283,7 +304,8 @@ const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, 
       );
     })}
   </div>
-));
+  );
+});
 
 MobileCardView.displayName = "MobileCardView";
 
@@ -331,7 +353,7 @@ const CartTable = memo(() => {
         >
           <Trash2 className="w-12 h-12 text-theme3" />
         </motion.div>
-        <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black mb-2">
+        <h3 className="text-white  text-2xl font-black mb-2">
           Your cart is empty
         </h3>
         <p className="text-text text-base mb-6">
@@ -340,7 +362,7 @@ const CartTable = memo(() => {
         <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white font-['Epilogue',sans-serif] text-base font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white  text-base font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30"
           >
             Continue Shopping
           </Link>

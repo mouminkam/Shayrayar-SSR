@@ -134,8 +134,9 @@ export default function BlogSection() {
                   width={400}
                   height={250}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  unoptimized={true}
-                  priority={false}
+                  quality={85}
+                  loading="lazy"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                 />
               </div>
 
@@ -159,7 +160,7 @@ export default function BlogSection() {
 
                 {/* Title */}
                 <Link href={`/blog/${blog.slug || blog.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`} className="flex-1">
-                  <h3 className="text-white font-['Epilogue',sans-serif] text-xl sm:text-2xl font-bold mb-4 transition-colors duration-300 line-clamp-2">
+                  <h3 className="text-white  text-xl sm:text-2xl font-bold mb-4 transition-colors duration-300 line-clamp-2">
                     {blog.title}
                   </h3>
                 </Link>

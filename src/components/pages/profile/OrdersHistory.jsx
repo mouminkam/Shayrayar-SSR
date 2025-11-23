@@ -42,7 +42,7 @@ export default function OrdersHistory({ orders, showViewAll = true, maxDisplay =
           >
             <ShoppingBag className="w-6 h-6 text-white fill-white" />
           </motion.div>
-          <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black uppercase">
+          <h3 className="text-white  text-2xl font-black uppercase">
             Order History
           </h3>
         </div>
@@ -62,7 +62,7 @@ export default function OrdersHistory({ orders, showViewAll = true, maxDisplay =
           </p>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white font-['Epilogue',sans-serif] text-sm font-semibold rounded-xl transition-all duration-300"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white  text-sm font-semibold rounded-xl transition-all duration-300"
           >
             Start Shopping
           </Link>
@@ -84,7 +84,7 @@ export default function OrdersHistory({ orders, showViewAll = true, maxDisplay =
             >
               <Link
                 href="/orders"
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-theme3/50 rounded-xl text-white font-['Epilogue',sans-serif] text-sm font-semibold transition-all duration-300 group"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-theme3/50 rounded-xl text-white  text-sm font-semibold transition-all duration-300 group"
               >
                 View All Orders ({ordersList.length})
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

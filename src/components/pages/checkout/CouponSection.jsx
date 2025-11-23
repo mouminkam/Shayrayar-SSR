@@ -105,7 +105,7 @@ export default function CouponSection() {
         >
           <Tag className="w-6 h-6 text-white fill-white" />
         </motion.div>
-        <h3 className="text-white font-['Epilogue',sans-serif] text-2xl font-black uppercase">
+        <h3 className="text-white  text-2xl font-black uppercase">
           Coupon Code
         </h3>
       </div>

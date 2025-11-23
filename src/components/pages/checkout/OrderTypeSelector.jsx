@@ -8,7 +8,7 @@ export default function OrderTypeSelector() {
 
   return (
     <div className="mb-6">
-      <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-3">
+      <label className="block text-text  text-sm font-medium mb-3">
         Order Type *
       </label>
       <div className="grid grid-cols-2 gap-4">
@@ -25,7 +25,7 @@ export default function OrderTypeSelector() {
         >
           <div className="flex flex-col items-center gap-2">
             <Package className={`w-6 h-6 ${orderType === "delivery" ? "text-theme3" : "text-text"}`} />
-            <span className={`font-['Epilogue',sans-serif] font-bold ${
+            <span className={` font-bold ${
               orderType === "delivery" ? "text-theme3" : "text-white"
             }`}>
               Delivery
@@ -46,7 +46,7 @@ export default function OrderTypeSelector() {
         >
           <div className="flex flex-col items-center gap-2">
             <Store className={`w-6 h-6 ${orderType === "pickup" ? "text-theme3" : "text-text"}`} />
-            <span className={`font-['Epilogue',sans-serif] font-bold ${
+            <span className={` font-bold ${
               orderType === "pickup" ? "text-theme3" : "text-white"
             }`}>
               Pickup

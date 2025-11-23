@@ -10,7 +10,7 @@ export default function CardPaymentForm({ formData, handleInputChange, handleCar
       className="space-y-4 p-4 bg-white/5 rounded-xl border border-white/10"
     >
       <div>
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           Card Number *
         </label>
         <input
@@ -25,7 +25,7 @@ export default function CardPaymentForm({ formData, handleInputChange, handleCar
         />
       </div>
       <div>
-        <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+        <label className="block text-text  text-sm font-medium mb-2">
           Cardholder Name *
         </label>
         <input
@@ -40,7 +40,7 @@ export default function CardPaymentForm({ formData, handleInputChange, handleCar
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+          <label className="block text-text  text-sm font-medium mb-2">
             Expiry Date *
           </label>
           <input
@@ -55,7 +55,7 @@ export default function CardPaymentForm({ formData, handleInputChange, handleCar
           />
         </div>
         <div>
-          <label className="block text-text font-['Roboto',sans-serif] text-sm font-medium mb-2">
+          <label className="block text-text  text-sm font-medium mb-2">
             CVC *
           </label>
           <input
