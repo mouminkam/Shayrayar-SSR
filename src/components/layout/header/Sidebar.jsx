@@ -69,9 +69,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                           alt="logo"
                           width={150}
                           height={60}
-                          className="h-25 w-auto object-contain"
+                          className="h-25 w-auto h-auto object-contain"
                           quality={90}
                           priority
+                          loading="eager"
                           sizes="150px"
                         />
                       </Link>

@@ -1,15 +1,17 @@
 "use client";
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ShoppingCart, Trash2, Heart, Package } from "lucide-react";
+import { ShoppingCart, Trash2, Heart, Package, Loader2 } from "lucide-react";
 import useWishlistStore from "../../../store/wishlistStore";
 import useCartStore from "../../../store/cartStore";
 
 const WishlistSummary = memo(() => {
   const items = useWishlistStore((state) => state.items);
   const clearWishlist = useWishlistStore((state) => state.clearWishlist);
+  const isLoading = useWishlistStore((state) => state.isLoading);
   const { addToCart } = useCartStore();
+  const [isClearing, setIsClearing] = useState(false);
 
   // Derived count - auto-recalculate when items change
   const itemCount = useMemo(() => {
@@ -27,9 +29,22 @@ const WishlistSummary = memo(() => {
     });
   };
 
-  const handleClearWishlist = () => {
-    if (confirm("Are you sure you want to clear your wishlist?")) {
-      clearWishlist();
+  const handleClearWishlist = async () => {
+    if (!confirm("Are you sure you want to clear your wishlist?")) {
+      return;
+    }
+
+    setIsClearing(true);
+    try {
+      const result = await clearWishlist();
+      if (!result.success) {
+        alert(result.error || "Failed to clear wishlist");
+      }
+    } catch (error) {
+      console.error("Error clearing wishlist:", error);
+      alert("An error occurred while clearing wishlist");
+    } finally {
+      setIsClearing(false);
     }
   };
 
@@ -88,10 +103,20 @@ const WishlistSummary = memo(() => {
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <button
             onClick={handleClearWishlist}
-            className="w-full border-2 border-theme text-theme py-3 px-6 hover:bg-theme hover:text-white transition-all duration-300 text-base  font-medium rounded-xl flex items-center justify-center gap-2"
+            disabled={isClearing || isLoading}
+            className="w-full border-2 border-theme text-theme py-3 px-6 hover:bg-theme hover:text-white transition-all duration-300 text-base  font-medium rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Trash2 className="w-5 h-5" />
-            Clear Wishlist
+            {isClearing || isLoading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Clearing...
+              </>
+            ) : (
+              <>
+                <Trash2 className="w-5 h-5" />
+                Clear Wishlist
+              </>
+            )}
           </button>
         </motion.div>
 

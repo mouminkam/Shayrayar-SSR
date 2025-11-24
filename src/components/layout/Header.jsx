@@ -160,6 +160,8 @@ const FreshHeatHeader = () => {
                 width={100}
                 height={100}
                 className="w-24 h-auto object-cover"
+                loading="eager"
+                priority
               />
             </Link>
           </div>
@@ -334,6 +336,7 @@ const FreshHeatHeader = () => {
                 className="h-12 sm:h-14 lg:h-16 xl:h-20 w-auto object-contain transition-transform duration-300 hover:scale-105"
                 quality={90}
                 priority
+                loading="eager"
                 sizes="(max-width: 640px) 80px, (max-width: 1024px) 100px, 120px"
               />
             </Link>

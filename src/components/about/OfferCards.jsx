@@ -42,11 +42,9 @@ export default function OfferCards() {
           {offers.map((offer, index) => (
             <motion.div
               key={index}
-              className="relative rounded-3xl overflow-hidden min-h-[300px] flex items-center p-8 sm:p-10 border-2 border-bgimg hover:translate-y-2 transition-all duration-300"
+              className="relative rounded-3xl overflow-hidden min-h-[300px] flex items-center p-8 sm:p-10 border-2 border-bgimg hover:translate-y-2 transition-all duration-300 bg-cover bg-center"
               style={{
                 backgroundImage: `url(${offer.bgImage})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
               }}
               variants={{
                 hidden: { y: -50, opacity: 0 },
@@ -94,7 +92,7 @@ export default function OfferCards() {
                     alt={offer.title}
                     width={200}
                     height={200}
-                    className="object-contain"
+                    className="object-contain w-auto h-auto"
                     quality={85}
                     loading="lazy"
                     sizes="200px"
@@ -106,7 +104,7 @@ export default function OfferCards() {
                       alt="shape"
                       width={100}
                       height={100}
-                      className="object-contain"
+                      className="object-contain w-auto h-auto"
                       unoptimized={true}
                     />
                   </div>

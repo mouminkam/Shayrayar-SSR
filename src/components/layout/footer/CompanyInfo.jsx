@@ -14,7 +14,7 @@ export default function CompanyInfo() {
             alt="logo"
             width={180}
             height={72}
-            className="h-14 sm:h-16 md:h-18 w-auto object-contain"
+            className="h-14 sm:h-16 md:h-18 w-auto h-auto object-contain"
             priority
           />
         </Link>

@@ -3,28 +3,12 @@ import { useState, useEffect } from "react";
 import useAuthStore from "../../../store/authStore";
 import useToastStore from "../../../store/toastStore";
 
-export default function OTPFooter() {
+export default function OTPFooter({ flowType, phone, email }) {
+  const { registerPhone, resetPasswordRequest, isLoading } = useAuthStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
+
   const [resendTimer, setResendTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
-  const [flowType, setFlowType] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const registrationPhone = sessionStorage.getItem("registrationPhone");
-      const resetEmail = sessionStorage.getItem("resetEmail");
-
-      if (registrationPhone) {
-        setPhone(registrationPhone);
-        setFlowType("registration");
-      } else if (resetEmail) {
-        setEmail(resetEmail);
-        setFlowType("reset");
-      }
-    }
-  }, []);
 
   useEffect(() => {
     if (resendTimer > 0) {
@@ -38,46 +22,51 @@ export default function OTPFooter() {
   }, [resendTimer]);
 
   const handleResend = async () => {
-    if (!canResend) return;
+    if (!canResend || isLoading) return;
 
-    try {
-      if (flowType === "registration") {
-        const { registerPhone } = useAuthStore.getState();
-        const storedPassword = typeof window !== "undefined" 
-          ? sessionStorage.getItem("registrationPassword") 
-          : "";
-
-        if (!storedPassword) {
-          toastError("Please go back and resubmit the registration form");
-          return;
-        }
-
-        const result = await registerPhone({
-          phone: phone,
-          password: storedPassword,
-          password_confirmation: storedPassword,
-        });
-
-        if (result.success) {
-          toastSuccess("OTP resent to your phone");
-          setResendTimer(60);
-          setCanResend(false);
-        } else {
-          toastError(result.error || "Failed to resend OTP");
-        }
-      } else if (flowType === "reset") {
-        const { resetPasswordRequest } = useAuthStore.getState();
-        const result = await resetPasswordRequest(email);
-        if (result.success) {
-          toastSuccess("OTP resent to your email");
-          setResendTimer(60);
-          setCanResend(false);
-        } else {
-          toastError(result.error || "Failed to resend OTP");
-        }
+    if (flowType === "registration") {
+      // Resend OTP for registration
+      if (!phone) {
+        toastError("Phone number not found");
+        return;
       }
-    } catch (error) {
-      toastError(error.message || "Failed to resend OTP");
+
+      // Get password from sessionStorage
+      const password = sessionStorage.getItem("registrationPassword");
+      if (!password) {
+        toastError("Registration data not found. Please start again.");
+        return;
+      }
+
+      const result = await registerPhone({
+        phone: phone,
+        password: password,
+        password_confirmation: password,
+      });
+
+      if (result.success) {
+        toastSuccess("OTP resent to your phone");
+        setResendTimer(60);
+        setCanResend(false);
+      } else {
+        toastError(result.error || "Failed to resend OTP");
+      }
+    } else if (flowType === "reset") {
+      // Resend OTP for password reset
+      if (!email) {
+        toastError("Email not found");
+        return;
+      }
+
+      const result = await resetPasswordRequest(email);
+
+      if (result.success) {
+        toastSuccess("OTP resent to your email");
+        setResendTimer(60);
+        setCanResend(false);
+      } else {
+        toastError(result.error || "Failed to resend OTP");
+      }
     }
   };
 

@@ -46,7 +46,7 @@ export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage 
         {/* Sort & View Controls */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
           {/* Sort Select */}
-          <div className="shrink-0">
+          {/* <div className="shrink-0">
             <form className="woocommerce-ordering flex justify-between items-center gap-4" method="get">
               <label
                 htmlFor="sort-select"
@@ -69,7 +69,7 @@ export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage 
                 <option value="price-desc">Sort by price: high to low</option>
               </select>
             </form>
-          </div>
+          </div> */}
 
           {/* View Mode Toggle */}
           <div className="shrink-0">

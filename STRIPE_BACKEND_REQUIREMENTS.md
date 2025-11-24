@@ -24,43 +24,189 @@
 
 ---
 
-## 🔄 Flow الجديد (كامل)
+## 🔄 Flow الكامل - خطوة بخطوة
 
-### الخطوات:
+### 📊 Flow Diagram:
 
-1. **User يضغط "Place Order"**:
-   ```
-   POST /api/v1/orders
-   Body: { branch_id, order_type, items, customer_name, ... }
-   Response: { success: true, data: { order: { id: 84, ... } } }
-   ```
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    STRIPE PAYMENT FLOW                          │
+└─────────────────────────────────────────────────────────────────┘
 
-2. **Create Payment Intent**:
-   ```
-   POST /api/v1/payments/stripe/create-payment-intent
-   Body: { order_id: 84, amount: 2.75, currency: "USD" }
-   Response: { 
-     success: true, 
-     data: { 
-       client_secret: "pi_xxx_secret_xxx",
-       payment_intent_id: "pi_xxx"
-     }
-   }
-   ```
+[1] User clicks "Place Order" button
+        |
+        v
+[2] Frontend: POST /api/v1/orders
+        |
+        Body: {
+          branch_id: 1,
+          order_type: "pickup",
+          items: [...],
+          payment_method: "stripe",
+          total_amount: 49.50,
+          ...
+        }
+        |
+        v
+[3] Response: { success: true, data: { order: { id: 114, status: "pending", payment_status: "pending" } } }
+        |
+        ✅ Order created successfully
+        |
+        v
+[4] Frontend: POST /api/v1/payments/stripe/create-payment-intent
+        |
+        Body: {
+          order_id: 114,
+          amount: 49.5,
+          currency: "USD",
+          branch_id: 1
+        }
+        |
+        v
+[5] Response: {
+        success: true,
+        data: {
+          client_secret: "pi_xxx_secret_xxx",
+          payment_intent_id: "pi_xxx"
+        }
+      }
+        |
+        ✅ Payment Intent created in Stripe
+        |
+        v
+[6] Frontend opens Stripe Payment Page
+        |
+        URL: /checkout/stripe/pay?order_id=114&client_secret=pi_xxx_secret_xxx
+        |
+        v
+[7] User enters card details in Stripe Elements
+        |
+        Test Card: 4242 4242 4242 4242
+        Expiry: Any future date
+        CVC: Any 3 digits
+        |
+        v
+[8] User clicks "Pay Now"
+        |
+        v
+[9] Frontend: stripe.confirmPayment()
+        |
+        Stripe processes payment
+        |
+        v
+[10] Stripe redirects automatically
+        |
+        Success URL: /checkout/stripe/success?order_id=114&payment_intent=pi_xxx
+        |
+        ✅ Payment succeeded in Stripe
+        |
+        v
+[11] Success Page loads
+        |
+        - Clears cart immediately
+        - Calls confirm-payment API
+        |
+        v
+[12] Frontend: POST /api/v1/payments/stripe/confirm-payment
+        |
+        Body: {
+          payment_intent_id: "pi_xxx",
+          order_id: 114,
+          branch_id: 1
+        }
+        |
+        v
+[13] Backend: Verify payment with Stripe API
+        |
+        - Retrieve payment_intent from Stripe
+        - Check if status === "succeeded"
+        |
+        v
+[14] Backend: Update Order Status ⚠️ **هنا المشكلة الحالية**
+        |
+        ❌ Currently: Only updates payment_status = "paid"
+        ✅ Should also: Update status = "confirmed" (or "processing")
+        |
+        Code needed:
+        $order->payment_status = 'paid';
+        $order->status = 'confirmed';  // ← هذا ناقص!
+        $order->payment_intent_id = $paymentIntent->id;
+        $order->paid_at = now();
+        $order->save();
+        |
+        v
+[15] Response: {
+        success: true,
+        data: {
+          order: {
+            id: 114,
+            payment_status: "paid",      // ✅ Updated
+            status: "confirmed",         // ❌ Still "pending" (should be "confirmed")
+            payment_intent_id: "pi_xxx",
+            paid_at: "2025-11-24T13:09:59Z"
+          }
+        }
+      }
+        |
+        v
+[16] Frontend: Check order status
+        |
+        if (order.payment_status === 'paid' && order.status === 'confirmed') {
+          ✅ Show success message
+        } else {
+          ⚠️ Start polling...
+        }
+        |
+        v
+[17] Frontend: Poll GET /api/v1/orders/114 (if needed)
+        |
+        - Poll every 2 seconds
+        - Max 10 attempts (20 seconds)
+        - Check: payment_status === 'paid' && status === 'confirmed'
+        |
+        v
+[18] Show Success Page
+        |
+        ✅ Payment successful message
+        ✅ Order details displayed
+        ✅ Cart cleared
+        ✅ Links to view order / continue shopping
+```
 
-3. **فتح Popup للدفع**:
-   - Frontend يفتح popup: `/checkout/stripe/pay?order_id=84&client_secret=pi_xxx_secret_xxx`
-   - User يكمل الدفع في Stripe Elements
+---
 
-4. **بعد نجاح الدفع**:
-   - Stripe يعيد توجيه تلقائي إلى: `/checkout/stripe/success?order_id=84&payment_intent_id=pi_xxx`
-   - **هنا المشكلة الحالية**: Frontend يستدعي `confirm-payment` لكن Backend لا يحدّث order status
+### 📝 تفاصيل كل خطوة:
 
-5. **Success Page Logic**:
-   - يستدعي `confirm-payment` API
-   - يبدأ polling للـ order status كل 2 ثانية (حتى 10 محاولات)
-   - إذا `payment_status === 'paid'` → يعرض success message
-   - إذا لم يتم التأكيد بعد 20 ثانية → يعرض warning
+#### **الخطوة 1-3: إنشاء Order**
+- User يملأ بيانات الطلب ويختار Stripe كطريقة دفع
+- Frontend يرسل Order إلى Backend
+- Backend ينشئ Order مع `status: "pending"` و `payment_status: "pending"`
+
+#### **الخطوة 4-5: إنشاء Payment Intent**
+- Frontend يطلب إنشاء Payment Intent من Stripe
+- Backend يستدعي Stripe API لإنشاء Payment Intent
+- Stripe يرجع `client_secret` و `payment_intent_id`
+
+#### **الخطوة 6-9: معالجة الدفع**
+- Frontend يفتح صفحة Stripe Payment
+- User يدخل بيانات البطاقة (في Test Mode: `4242 4242 4242 4242`)
+- Stripe يعالج الدفع
+
+#### **الخطوة 10-12: Redirect و Confirm Payment**
+- Stripe يعيد التوجيه تلقائياً إلى Success Page
+- Success Page تستدعي `confirm-payment` API فوراً
+
+#### **الخطوة 13-15: تحديث Order Status** ⚠️ **المشكلة هنا**
+- Backend يجب أن:
+  1. ✅ يتحقق من Payment Intent مع Stripe
+  2. ✅ يحدّث `payment_status = "paid"` ← **هذا يعمل**
+  3. ❌ يحدّث `status = "confirmed"` ← **هذا ناقص!**
+  4. ✅ يحفظ `payment_intent_id` و `paid_at`
+
+#### **الخطوة 16-18: عرض النتيجة**
+- Frontend يتحقق من Order Status
+- إذا تم التأكيد → يعرض Success Message
+- إذا لم يتم → يبدأ Polling (كل 2 ثانية، حتى 10 محاولات)
 
 ---
 
@@ -71,16 +217,53 @@
 1. ✅ Payment Intent يتم إنشاؤه بنجاح
 2. ✅ User يكمل الدفع في Stripe بنجاح
 3. ✅ Redirect إلى success page يحدث
-4. ❌ **Backend لا يحدّث `order.payment_status` و `order.status`**
-5. ❌ Order status يبقى `"pending"` حتى بعد confirm payment
-6. ❌ Frontend polling لا يجد order confirmed
+4. ✅ Frontend يستدعي `confirm-payment` API
+5. ✅ Backend يحدّث `payment_status = "paid"` ✅
+6. ❌ **Backend لا يحدّث `status = "confirmed"`** ❌
+7. ❌ Order `status` يبقى `"pending"` حتى بعد confirm payment
+8. ⚠️ Frontend polling يجد `payment_status = "paid"` لكن `status = "pending"`
 
 ### الأعراض:
 
-- Payment ناجح في Stripe
-- لكن order status في Backend يبقى `"pending"`
-- Success page لا يعرض success message
-- User لا يعرف إذا تم الدفع بنجاح أم لا
+- ✅ Payment ناجح في Stripe
+- ✅ `payment_status` يتم تحديثه إلى `"paid"`
+- ❌ `status` يبقى `"pending"` بدلاً من `"confirmed"`
+- ⚠️ Success page قد تعمل بشكل جزئي (تعتمد على `payment_status` فقط)
+- ⚠️ لكن Order لا يعتبر "confirmed" بشكل كامل
+
+### مثال على Response الحالي:
+
+```json
+{
+  "success": true,
+  "data": {
+    "order": {
+      "id": 114,
+      "payment_status": "paid",      // ✅ تم التحديث
+      "status": "pending",            // ❌ لم يتم التحديث (يجب أن يكون "confirmed")
+      "payment_intent_id": "pi_xxx",  // ✅ تم الحفظ
+      "paid_at": "2025-11-24T13:09:59Z" // ✅ تم الحفظ
+    }
+  }
+}
+```
+
+### Response المطلوب:
+
+```json
+{
+  "success": true,
+  "data": {
+    "order": {
+      "id": 114,
+      "payment_status": "paid",      // ✅
+      "status": "confirmed",          // ✅ يجب تحديثه
+      "payment_intent_id": "pi_xxx",  // ✅
+      "paid_at": "2025-11-24T13:09:59Z" // ✅
+    }
+  }
+}
+```
 
 ---
 
@@ -107,11 +290,15 @@
 
 2. **تحديث Order Status**:
    ```php
-   // يجب تحديث:
-   $order->payment_status = 'paid';
-   $order->status = 'confirmed'; // أو 'processing' حسب business logic
+   // يجب تحديث جميع الحقول التالية:
+   $order->payment_status = 'paid';              // ✅ هذا يعمل حالياً
+   $order->status = 'confirmed';                // ❌ هذا ناقص! (أو 'processing' حسب business logic)
+   $order->payment_intent_id = $paymentIntent->id; // ✅ هذا يعمل حالياً
+   $order->paid_at = now();                     // ✅ هذا يعمل حالياً
    $order->save();
    ```
+   
+   **ملاحظة مهمة**: حالياً Backend يحدّث `payment_status` فقط، لكن لا يحدّث `status`. يجب إضافة `$order->status = 'confirmed';`
 
 3. **Idempotency**:
    - يجب أن يكون الـ endpoint **idempotent** (آمن للاستدعاء أكثر من مرة)
@@ -221,9 +408,11 @@ public function confirmStripePayment(Request $request)
             ]);
         }
         
-        // Update order status
-        $order->payment_status = 'paid';
-        $order->status = 'confirmed'; // or 'processing' based on your business logic
+        // Update order status - ⚠️ تأكد من تحديث جميع الحقول
+        $order->payment_status = 'paid';              // ✅ تحديث payment status
+        $order->status = 'confirmed';                // ⚠️ هذا مهم جداً! (أو 'processing' حسب business logic)
+        $order->payment_intent_id = $paymentIntent->id; // ✅ حفظ payment intent ID
+        $order->paid_at = now();                     // ✅ حفظ وقت الدفع
         $order->save();
         
         // Reload order with relationships
@@ -252,10 +441,12 @@ public function confirmStripePayment(Request $request)
 ### 1. Test Confirm Payment Success:
 - ✅ Create order
 - ✅ Create payment intent
-- ✅ Complete payment in Stripe (use test card: 4242 4242 4242 4242)
+- ✅ Complete payment in Stripe (use test card: **4242 4242 4242 4242**)
 - ✅ Call `confirm-payment` API
-- ✅ Verify `order.payment_status === 'paid'`
-- ✅ Verify `order.status === 'confirmed'` (or 'processing')
+- ✅ Verify `order.payment_status === 'paid'` ← **هذا يعمل حالياً**
+- ❌ Verify `order.status === 'confirmed'` ← **هذا لا يعمل (يجب إصلاحه)**
+- ✅ Verify `order.payment_intent_id` is saved
+- ✅ Verify `order.paid_at` is set
 
 ### 2. Test Idempotency:
 - ✅ Call `confirm-payment` twice
@@ -302,10 +493,67 @@ public function confirmStripePayment(Request $request)
 1. ✅ User يكمل الدفع في Stripe
 2. ✅ Redirect إلى success page
 3. ✅ Frontend يستدعي `confirm-payment`
-4. ✅ **Backend يحدّث order status → `'paid'` و `'confirmed'`**
+4. ✅ **Backend يحدّث order status → `payment_status: 'paid'` و `status: 'confirmed'`**
 5. ✅ Success page يعرض success message
 6. ✅ Cart يتم مسحه تلقائياً
 7. ✅ User يرى order details
+
+---
+
+## 📊 ملخص الحالة الحالية
+
+### ✅ ما يعمل حالياً:
+
+1. ✅ إنشاء Order بنجاح
+2. ✅ إنشاء Payment Intent في Stripe
+3. ✅ معالجة الدفع في Stripe
+4. ✅ Redirect إلى Success Page
+5. ✅ استدعاء `confirm-payment` API
+6. ✅ تحديث `payment_status = "paid"`
+7. ✅ حفظ `payment_intent_id` و `paid_at`
+
+### ❌ ما يحتاج إصلاح:
+
+1. ❌ **تحديث `order.status` من `"pending"` إلى `"confirmed"`**
+
+### 🔧 الحل المطلوب:
+
+في endpoint `confirm-payment`، أضف هذا السطر:
+
+```php
+$order->status = 'confirmed'; // أو 'processing' حسب business logic
+```
+
+قبل `$order->save();`
+
+---
+
+## 🧪 بطاقات الاختبار (Test Cards)
+
+### بطاقة نجاح الدفع (الأساسية):
+```
+Card Number: 4242 4242 4242 4242
+Expiry Date: أي تاريخ في المستقبل (مثلاً: 12/25)
+CVC: أي 3 أرقام (مثلاً: 123)
+ZIP: أي 5 أرقام (مثلاً: 12345)
+```
+
+### بطاقات اختبار أخرى:
+
+**بطاقة تتطلب 3D Secure:**
+```
+Card Number: 4000 0025 0000 3155
+```
+
+**بطاقة فشل الدفع:**
+```
+Card Number: 4000 0000 0000 0002
+```
+
+**بطاقة رفض الدفع:**
+```
+Card Number: 4000 0000 0000 9995
+```
 
 ---
 

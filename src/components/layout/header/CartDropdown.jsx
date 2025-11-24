@@ -137,11 +137,7 @@ export default function CartDropdown({
 
             {/* Cart Items */}
             <div 
-              className="space-y-3 md:space-y-4 mb-4 max-h-64 overflow-y-auto overflow-x-hidden pr-2"
-              style={{
-                scrollbarWidth: 'thin',
-                scrollbarColor: '#cbd5e1 #f1f5f9'
-              }}
+              className="space-y-3 md:space-y-4 mb-4 max-h-64 overflow-y-auto overflow-x-hidden pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-slate-100 [&::-webkit-scrollbar-thumb]:bg-slate-300 [scrollbar-width:thin] [scrollbar-color:#cbd5e1_#f1f5f9]"
             >
               {cartItems.length === 0 ? (
                 <motion.div

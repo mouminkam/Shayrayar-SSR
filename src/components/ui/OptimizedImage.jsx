@@ -51,10 +51,15 @@ export default function OptimizedImage({
 
   // Fallback for broken images
   if (imageError) {
+    const minHeight = rest.height || 200;
+    const minWidth = rest.width || 200;
     return (
       <div 
         className={`bg-gray-800/50 flex items-center justify-center ${className}`}
-        style={{ minHeight: rest.height || 200, minWidth: rest.width || 200 }}
+        style={{
+          minHeight: `${minHeight}px`,
+          minWidth: `${minWidth}px`,
+        }}
       >
         <span className="text-gray-500 text-sm">Image not available</span>
       </div>

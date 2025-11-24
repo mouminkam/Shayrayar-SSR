@@ -1,10 +1,12 @@
 "use client";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import dynamic from "next/dynamic";
 import AnimatedSection from "../../components/ui/AnimatedSection";
 import ErrorBoundary from "../../components/ui/ErrorBoundary";
 import SectionSkeleton from "../../components/ui/SectionSkeleton";
 import Breadcrumb from "../../components/ui/Breadcrumb";
+import useWishlistStore from "../../store/wishlistStore";
+import useAuthStore from "../../store/authStore";
 
 // Lazy load wishlist components
 const WishlistTable = dynamic(
@@ -24,6 +26,16 @@ const WishlistSummary = dynamic(
 );
 
 export default function WishlistPage() {
+  const { fetchFavorites, isLoading } = useWishlistStore();
+  const { isAuthenticated } = useAuthStore();
+
+  // Fetch favorites on mount if authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchFavorites(true); // Force refresh on page load
+    }
+  }, [isAuthenticated, fetchFavorites]);
+
   return (
     <div className="bg-bg3 min-h-screen">
       <AnimatedSection>

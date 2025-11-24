@@ -19,18 +19,29 @@ const axiosInstance = axios.create({
 });
 
 /**
- * Get authentication token from localStorage
+ * Get authentication token from localStorage or sessionStorage
  * Token is stored in Zustand persist storage under 'auth-storage'
+ * Or in sessionStorage as 'registrationToken' for multi-step registration
  */
 const getToken = () => {
   if (typeof window === 'undefined') return null;
   
   try {
+    // First, try to get token from localStorage (normal auth)
     const authStorage = localStorage.getItem('auth-storage');
     if (authStorage) {
       const parsed = JSON.parse(authStorage);
       // Token might be stored in state.user.token or directly in state.token
-      return parsed.state?.user?.token || parsed.state?.token || null;
+      const token = parsed.state?.user?.token || parsed.state?.token || null;
+      if (token) {
+        return token;
+      }
+    }
+    
+    // If no token in localStorage, check sessionStorage for registration token
+    const registrationToken = sessionStorage.getItem('registrationToken');
+    if (registrationToken) {
+      return registrationToken;
     }
   } catch (error) {
     console.error('Error reading token from storage:', error);
@@ -99,6 +110,13 @@ axiosInstance.interceptors.request.use(
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      // Debug: Log when token is missing for complete-registration
+      if (config.url?.includes('complete-registration')) {
+        console.warn('No token found for complete-registration request');
+        console.log('localStorage auth-storage:', localStorage.getItem('auth-storage'));
+        console.log('sessionStorage registrationToken:', sessionStorage.getItem('registrationToken'));
+      }
     }
     
     // Add branch_id if available and URL doesn't exclude it

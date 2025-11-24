@@ -10,22 +10,11 @@ export default function Breadcrumb({ title, showLinks = true }) {
   return (
     <section className="relative">
       <div
-        className="relative bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url('/img/bg/breadcumb.jpg')",
-        }}
+        className="relative bg-cover bg-center bg-no-repeat bg-[url('/img/bg/breadcumb.jpg')]"
       >
         {/* Overlay for gradient effect */}
         <div
-          className="absolute inset-0 pointer-events-none z-5"
-          style={{
-            background: `
-              linear-gradient(to left, rgba(0,0,0,0.7) 0%, transparent 30%),
-              linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 30%),
-              linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 40%)
-            `,
-            backgroundBlendMode: 'normal'
-          }}
+          className="absolute inset-0 pointer-events-none z-5 bg-[linear-gradient(to_left,rgba(0,0,0,0.7)_0%,transparent_30%),linear-gradient(to_right,rgba(0,0,0,0.7)_0%,transparent_30%),linear-gradient(to_top,rgba(0,0,0,1)_0%,transparent_40%)]"
         />
 
         {/* Breadcrumb content */}

@@ -9,10 +9,7 @@ export default function BlogDetailsContent({ slug }) {
       <div className="single-blog-post">
         {/* Featured Image */}
         <div
-          className="post-featured-thumb w-full h-[300px] sm:h-[400px] rounded-lg bg-cover bg-center bg-no-repeat mb-8"
-          style={{
-            backgroundImage: "url('/img/blog/blogThumb3_1.jpg')",
-          }}
+          className="post-featured-thumb w-full h-[300px] sm:h-[400px] rounded-lg bg-cover bg-center bg-no-repeat mb-8 bg-[url('/img/blog/blogThumb3_1.jpg')]"
         />
 
         {/* Post Content */}

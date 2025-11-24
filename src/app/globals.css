@@ -11,7 +11,8 @@
   --color-bg3: black;
   /* --color-bg3: #131313; */
   --color-bgimg: #1E1E1E;
-  --font-urbanist: var(--font-urbanist);
+  --font-oswald: var(--font-oswald);
+  /* --font-urbanist: var(--font-urbanist); Temporarily disabled */
 }
 
 /* Custom CSS Variables */
@@ -40,9 +41,10 @@
   box-sizing: border-box;
 }
 
-/* Font Family - Urbanist as default */
+/* Font Family - Oswald as default (Urbanist temporarily disabled) */
 body {
-  font-family: var(--font-urbanist), sans-serif;
+  font-family: var(--font-oswald), sans-serif;
+  /* font-family: var(--font-urbanist), sans-serif; Temporarily disabled */
 }
 
 /* Animations */

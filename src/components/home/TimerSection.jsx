@@ -41,9 +41,7 @@ export default function TimerSection() {
   };
 
   return (
-    <div className="timer-section fix relative overflow-hidden"
-      style={{ backgroundImage: "url('/img/bg/ctaBG1_1.jpg') ", backgroundSize: "cover", backgroundPosition: "center" }}
-    >
+    <div className="timer-section fix relative overflow-hidden bg-cover bg-center bg-[url('/img/bg/ctaBG1_1.jpg')]">
       <div className="timer-wrapper style1">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="timer-wrap style1 relative">

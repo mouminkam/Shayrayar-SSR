@@ -1,33 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, ArrowRight } from "lucide-react";
-import useAuthStore from "../../../store/authStore";
-import useToastStore from "../../../store/toastStore";
 
 export default function PhoneInputForm() {
-  const router = useRouter();
-  const { registerPhone, isLoading } = useAuthStore();
-  const { success: toastSuccess, error: toastError } = useToastStore();
-
   const [formData, setFormData] = useState({
     phone: "",
   });
   const [errors, setErrors] = useState({});
-
-  // Check if user came from Google login flow
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const googleFlow = sessionStorage.getItem("googleFlow");
-      const googleUser = sessionStorage.getItem("googleUser");
-      
-      if (!googleFlow || !googleUser) {
-        // Not from Google login flow, redirect to register
-        router.push("/register");
-      }
-    }
-  }, [router]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -57,59 +37,10 @@ export default function PhoneInputForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    // Check if we have Google user data
-    if (typeof window !== "undefined") {
-      const googleFlow = sessionStorage.getItem("googleFlow");
-      if (!googleFlow) {
-        toastError("Session expired. Please try again.");
-        router.push("/register");
-        return;
-      }
-    }
-
-    try {
-      const phoneNumber = formData.phone.replace(/\s/g, "");
-      
-      // Send OTP to phone
-      const result = await registerPhone({
-        phone: phoneNumber,
-        password: null, // No password for Google login
-        password_confirmation: null,
-      });
-
-      if (result.success) {
-        // Save phone in sessionStorage
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem("registrationPhone", phoneNumber);
-        }
-
-        toastSuccess(result.message || "OTP sent to your phone! Please check your messages.");
-        router.push("/enter-otp");
-      } else {
-        const errorMessage = result.error || "Failed to send OTP. Please try again.";
-        toastError(errorMessage);
-        
-        // Set field-specific errors if available
-        if (result.errors) {
-          const apiErrors = {};
-          Object.keys(result.errors).forEach((key) => {
-            apiErrors[key] = Array.isArray(result.errors[key]) 
-              ? result.errors[key][0] 
-              : result.errors[key];
-          });
-          setErrors({ ...errors, ...apiErrors });
-        }
-      }
-    } catch (error) {
-      toastError(error.message || "An unexpected error occurred. Please try again.");
-    }
+    // Pure frontend - basic UI validation only
+    validateForm();
   };
 
   return (
@@ -141,26 +72,12 @@ export default function PhoneInputForm() {
       {/* Submit Button */}
       <motion.button
         type="submit"
-        disabled={isLoading}
-        whileHover={{ scale: isLoading ? 1 : 1.02 }}
-        whileTap={{ scale: isLoading ? 1 : 0.98 }}
-        className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2"
       >
-        {isLoading ? (
-          <>
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-            />
-            Sending OTP...
-          </>
-        ) : (
-          <>
-            Continue
-            <ArrowRight className="w-5 h-5" />
-          </>
-        )}
+        Continue
+        <ArrowRight className="w-5 h-5" />
       </motion.button>
     </form>
   );

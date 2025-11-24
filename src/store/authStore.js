@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import api from "../api";
+import useWishlistStore from "./wishlistStore";
 
 
 // User structure
@@ -28,18 +29,26 @@ const useAuthStore = create(
             const { user, token } = response.data;
             
             // Store user with token
-            const userData = {
+            const userDataWithToken = {
               ...user,
               token: token,
             };
 
             set({
-              user: userData,
+              user: userDataWithToken,
               isAuthenticated: true,
               isLoading: false,
             });
 
-            return { success: true, user: userData };
+            // Fetch wishlist after successful login
+            try {
+              await useWishlistStore.getState().fetchFavorites(true);
+            } catch (error) {
+              console.warn("Failed to fetch wishlist after login:", error);
+              // Don't fail login if wishlist fetch fails
+            }
+
+            return { success: true, user: userDataWithToken };
           } else {
             set({ isLoading: false });
             return { 
@@ -91,6 +100,14 @@ const useAuthStore = create(
               isLoading: false,
             });
 
+            // Fetch wishlist after successful registration
+            try {
+              await useWishlistStore.getState().fetchFavorites(true);
+            } catch (error) {
+              console.warn("Failed to fetch wishlist after registration:", error);
+              // Don't fail registration if wishlist fetch fails
+            }
+
             return { success: true, user: userDataWithToken };
           } else {
             set({ isLoading: false });
@@ -123,6 +140,15 @@ const useAuthStore = create(
           console.error("Logout error:", error);
           // Continue with logout even if API call fails
         } finally {
+          // Clear wishlist on logout
+          try {
+            await useWishlistStore.getState().clearWishlist();
+          } catch (error) {
+            console.warn("Failed to clear wishlist on logout:", error);
+            // Clear local state anyway
+            useWishlistStore.setState({ items: [] });
+          }
+          
           set({
             user: null,
             isAuthenticated: false,
@@ -335,6 +361,7 @@ const useAuthStore = create(
             if (typeof window !== "undefined") {
               sessionStorage.setItem("registrationToken", token);
               sessionStorage.setItem("registrationPhone", phone);
+              console.log("Token saved to sessionStorage:", token ? "Token exists" : "Token is null/undefined");
             }
             
             return { 
@@ -386,6 +413,7 @@ const useAuthStore = create(
             if (typeof window !== "undefined") {
               sessionStorage.removeItem("registrationToken");
               sessionStorage.removeItem("registrationPhone");
+              sessionStorage.removeItem("registrationPassword");
             }
 
             return { success: true, user: userDataWithToken };
@@ -409,10 +437,10 @@ const useAuthStore = create(
       },
 
       getRegistrationBranches: async (lang = 'ar') => {
-        set({ isLoading: true });
+        // Don't update global isLoading to avoid re-renders
+        // This is a lightweight call that shouldn't affect the global loading state
         try {
           const response = await api.auth.getRegistrationBranches(lang);
-          set({ isLoading: false });
           
           if (response.success && response.data) {
             return { 
@@ -426,7 +454,6 @@ const useAuthStore = create(
             };
           }
         } catch (error) {
-          set({ isLoading: false });
           return { 
             success: false, 
             error: error.message || "An error occurred while fetching branches" 

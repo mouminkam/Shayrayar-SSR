@@ -20,7 +20,7 @@ export default function PopularDishes() {
   const { navigate, prefetchRoute } = usePrefetchRoute();
   const { selectedBranch } = useBranchStore();
   const { addToCart } = useCartStore();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistStore();
+  const { addToWishlist, removeFromWishlist, items: wishlistItems } = useWishlistStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
   
@@ -91,38 +91,62 @@ export default function PopularDishes() {
       return;
     }
     
+    // Use menu_item_id if available, otherwise fall back to id
+    const menuItemId = dish.menu_item_id || dish.id;
+    if (!menuItemId) {
+      console.error("handleWishlistToggle: Missing menuItemId", dish);
+      toastError("Invalid product information");
+      return;
+    }
+    
+    // Check if item is in wishlist by checking items array directly
+    const isInWishlistState = wishlistItems.some((item) => {
+      const itemId = item.id ? String(item.id) : null;
+      const itemMenuItemId = item.menu_item_id ? String(item.menu_item_id) : null;
+      const productIdStr = String(menuItemId);
+      return itemId === productIdStr || itemMenuItemId === productIdStr;
+    });
+    
     try {
-      if (isInWishlist(dish.id)) {
-        const result = await removeFromWishlist(dish.id);
+      if (isInWishlistState) {
+        const result = await removeFromWishlist(menuItemId);
         if (result.success) {
-          toastSuccess(`${dish.title} removed from wishlist`);
+          toastSuccess(`${dish.title || dish.name} removed from wishlist`);
         } else {
           if (result.requiresAuth) {
             navigate("/login");
+          } else {
+            toastError(result.error || "Failed to remove from wishlist");
           }
-          toastError(result.error || "Failed to remove from wishlist");
         }
       } else {
         const result = await addToWishlist({
           id: dish.id,
-          name: dish.title,
+          menu_item_id: menuItemId,
+          name: dish.title || dish.name,
           price: dish.price,
           image: dish.image,
-          title: dish.title,
+          title: dish.title || dish.name,
         });
         if (result.success) {
-          toastSuccess(`${dish.title} added to wishlist`);
+          if (result.alreadyExists) {
+            // Item already exists, no need to show success message
+            return;
+          }
+          toastSuccess(`${dish.title || dish.name} added to wishlist`);
         } else {
           if (result.requiresAuth) {
             navigate("/login");
+          } else {
+            toastError(result.error || "Failed to add to wishlist");
           }
-          toastError(result.error || "Failed to add to wishlist");
         }
       }
-    } catch {
-      toastError("Failed to update wishlist");
+    } catch (error) {
+      console.error("handleWishlistToggle error:", error);
+      toastError("Failed to update wishlist. Please try again.");
     }
-  }, [addToWishlist, removeFromWishlist, isInWishlist, toastSuccess, toastError, isAuthenticated, navigate]);
+  }, [addToWishlist, removeFromWishlist, wishlistItems, toastSuccess, toastError, isAuthenticated, navigate]);
 
   return (
     <section className="popular-dishes-section py-10 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
@@ -164,7 +188,14 @@ export default function PopularDishes() {
           ) : (
             <div className="dishes-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 sm:gap-8">
               {dishes.map((dish) => {
-                const isInWishlistState = isInWishlist(dish.id);
+                const menuItemId = dish.menu_item_id || dish.id;
+                // Check if item is in wishlist by checking items array directly
+    const isInWishlistState = wishlistItems.some((item) => {
+      const itemId = item.id ? String(item.id) : null;
+      const itemMenuItemId = item.menu_item_id ? String(item.menu_item_id) : null;
+      const productIdStr = String(menuItemId);
+      return itemId === productIdStr || itemMenuItemId === productIdStr;
+    });
                 return (
                   <div
                     key={dish.id}

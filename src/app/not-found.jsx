@@ -22,9 +22,8 @@ export default function NotFound() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-9xl sm:text-[12rem] font-black text-transparent bg-clip-text bg-linear-to-r from-theme via-theme3 to-theme mb-4 "
+              className="text-9xl sm:text-[12rem] font-black text-transparent bg-clip-text bg-gradient-to-r from-theme via-theme3 to-theme mb-4"
               style={{
-                backgroundImage: "linear-gradient(to right, var(--theme), var(--theme3), var(--theme))",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}

@@ -28,10 +28,7 @@ export const register = async (userData) => {
  * @returns {Promise<Object>} Response with user data and token
  */
 export const login = async (email, password) => {
-  const response = await axiosInstance.post('/auth/login', {
-    email,
-    password,
-  });
+  const response = await axiosInstance.post('/auth/login', { email, password });
   return response;
 };
 

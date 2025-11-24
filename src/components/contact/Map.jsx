@@ -67,11 +67,10 @@ export default function Map() {
           src={mapUrl}
           width="100%"
           height="100%"
-          style={{ border: 0 }}
           allowFullScreen
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          className="absolute inset-0"
+          className="absolute inset-0 border-0"
         ></iframe>
       )}
     </section>

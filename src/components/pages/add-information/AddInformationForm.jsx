@@ -22,45 +22,32 @@ export default function AddInformationForm() {
   const [loadingBranches, setLoadingBranches] = useState(true);
   const [errors, setErrors] = useState({});
 
-  // Load registration token and branches
+  // Load branches and check for registration token
   useEffect(() => {
-    const loadData = async () => {
-      // Check if we have registration token
-      if (typeof window !== "undefined") {
-        const token = sessionStorage.getItem("registrationToken");
-        if (!token) {
-          toastError("Session expired. Please start registration again.");
-          setTimeout(() => {
-            router.push("/register");
-          }, 2000);
-          return;
-        }
+    const loadBranches = async () => {
+      if (typeof window === "undefined") return;
 
-        // Load branches
-        try {
-          const result = await getRegistrationBranches("ar");
-          if (result.success && result.branches) {
-            setBranches(result.branches);
-            // Set default branch if available
-            if (result.branches.length > 0 && !formData.branch_id) {
-              setFormData((prev) => ({
-                ...prev,
-                branch_id: result.branches[0].id.toString(),
-              }));
-            }
-          } else {
-            toastError(result.error || "Failed to load branches");
-          }
-        } catch (error) {
-          toastError(error.message || "Failed to load branches");
-        } finally {
-          setLoadingBranches(false);
-        }
+      // Check for registration token
+      const registrationToken = sessionStorage.getItem("registrationToken");
+      if (!registrationToken) {
+        toastError("Registration session expired. Please start again.");
+        router.push("/register");
+        return;
       }
+
+      // Load branches
+      setLoadingBranches(true);
+      const result = await getRegistrationBranches("ar");
+      if (result.success) {
+        setBranches(result.branches || []);
+      } else {
+        toastError(result.error || "Failed to load branches");
+      }
+      setLoadingBranches(false);
     };
 
-    loadData();
-  }, [router, toastError, getRegistrationBranches]);
+    loadBranches();
+  }, [router, getRegistrationBranches, toastError]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -109,69 +96,46 @@ export default function AddInformationForm() {
       return;
     }
 
-    // Check if we have registration token
-    if (typeof window !== "undefined") {
-      const token = sessionStorage.getItem("registrationToken");
-      if (!token) {
-        toastError("Session expired. Please start registration again.");
-        router.push("/register");
-        return;
-      }
+    // Get registration token from sessionStorage
+    const registrationToken = sessionStorage.getItem("registrationToken");
+    if (!registrationToken) {
+      toastError("Registration session expired. Please start again.");
+      router.push("/register");
+      return;
     }
 
-    try {
-      // Combine first and last name
-      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+    // Combine first and last name
+    const fullName = `${formData.firstName} ${formData.lastName}`.trim();
 
-      const result = await completeRegistration({
-        name: fullName,
-        email: formData.email,
-        branch_id: parseInt(formData.branch_id),
-      });
+    const result = await completeRegistration({
+      name: fullName,
+      email: formData.email,
+      branch_id: formData.branch_id,
+    });
 
-      if (result.success) {
-        toastSuccess("Registration completed successfully! Welcome!");
-        // Clean up sessionStorage
-        if (typeof window !== "undefined") {
-          sessionStorage.removeItem("registrationToken");
-          sessionStorage.removeItem("registrationPhone");
-          sessionStorage.removeItem("registrationPassword");
-        }
-        setTimeout(() => {
-          router.push("/");
-        }, 2000);
-      } else {
-        const errorMessage = result.error || "Failed to complete registration. Please try again.";
-        toastError(errorMessage);
-        
-        // Set field-specific errors if available
-        if (result.errors) {
-          const apiErrors = {};
-          Object.keys(result.errors).forEach((key) => {
-            // Map API error keys to form field names
-            if (key === "name") {
-              // Split name errors between first and last name
-              apiErrors.firstName = Array.isArray(result.errors[key]) 
-                ? result.errors[key][0] 
-                : result.errors[key];
-            } else {
-              apiErrors[key] = Array.isArray(result.errors[key]) 
-                ? result.errors[key][0] 
-                : result.errors[key];
-            }
-          });
-          setErrors({ ...errors, ...apiErrors });
-        }
+    if (result.success) {
+      // Cleanup sessionStorage
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("registrationToken");
+        sessionStorage.removeItem("registrationPhone");
+        sessionStorage.removeItem("registrationPassword");
       }
-    } catch (error) {
-      toastError(error.message || "An unexpected error occurred. Please try again.");
+
+      toastSuccess("Registration completed successfully! Welcome!");
+      router.push("/");
+    } else {
+      // Handle errors
+      if (result.errors) {
+        setErrors(result.errors);
+      } else {
+        toastError(result.error || "Failed to complete registration. Please try again.");
+      }
     }
   };
 
   const handleLocationClick = () => {
     // Location picker logic will be added later
-    // For now, just show a message
-    toastError("Location picker will be implemented soon");
+    console.log("Location picker will be implemented soon");
   };
 
   return (
@@ -243,7 +207,7 @@ export default function AddInformationForm() {
       <div>
         <label className="block text-text  text-sm font-medium mb-2">
           <MapPin className="w-4 h-4 inline mr-1" />
-          Branch
+          Branch <span className="text-red-400">*</span>
         </label>
         <select
           name="branch_id"
@@ -252,11 +216,16 @@ export default function AddInformationForm() {
           disabled={loadingBranches}
           className={`w-full px-4 py-3 bg-white/10 border ${
             errors.branch_id ? "border-red-500" : "border-white/20"
-          } rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
+          } rounded-xl text-white focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
+          style={{ 
+            color: formData.branch_id ? '#fff' : 'rgba(255, 255, 255, 0.5)',
+          }}
         >
-          <option value="">Select a branch</option>
+          <option value="" disabled className="bg-bg3 text-white/50">
+            {loadingBranches ? "Loading branches..." : "Select a branch"}
+          </option>
           {branches.map((branch) => (
-            <option key={branch.id} value={branch.id} className="bg-bg3">
+            <option key={branch.id} value={branch.id} className="bg-bg3 text-white">
               {branch.name || branch.title || `Branch ${branch.id}`}
             </option>
           ))}
@@ -295,18 +264,14 @@ export default function AddInformationForm() {
       <motion.button
         type="submit"
         disabled={isLoading || loadingBranches}
-        whileHover={{ scale: isLoading || loadingBranches ? 1 : 1.02 }}
-        whileTap={{ scale: isLoading || loadingBranches ? 1 : 0.98 }}
+        whileHover={!isLoading && !loadingBranches ? { scale: 1.02 } : {}}
+        whileTap={!isLoading && !loadingBranches ? { scale: 0.98 } : {}}
         className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
       >
         {isLoading ? (
           <>
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-            />
-            Completing Registration...
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            Completing...
           </>
         ) : (
           <>

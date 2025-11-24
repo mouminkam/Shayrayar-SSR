@@ -1,18 +1,27 @@
 "use client";
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Trash2, ShoppingCart, Heart } from "lucide-react";
+import { Trash2, ShoppingCart, Heart, Loader2 } from "lucide-react";
 import useWishlistStore from "../../../store/wishlistStore";
 import useCartStore from "../../../store/cartStore";
+import useAuthStore from "../../../store/authStore";
 import OptimizedImage from "../../ui/OptimizedImage";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 
 const WishlistTable = memo(() => {
-  const { items, removeFromWishlist } = useWishlistStore();
+  const { items, removeFromWishlist, fetchFavorites, isLoading, error } = useWishlistStore();
   const { addToCart } = useCartStore();
+  const { isAuthenticated } = useAuthStore();
 
-  const handleMoveToCart = (item) => {
+  // Fetch favorites if not loaded and user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && items.length === 0 && !isLoading) {
+      fetchFavorites();
+    }
+  }, [isAuthenticated, items.length, isLoading, fetchFavorites]);
+
+  const handleMoveToCart = async (item) => {
     addToCart({
       id: item.id,
       name: item.name,
@@ -20,9 +29,54 @@ const WishlistTable = memo(() => {
       image: item.image,
     });
     // Optionally remove from wishlist after adding to cart
-    // removeFromWishlist(item.id);
+    // const menuItemId = item.menu_item_id || item.id;
+    // await removeFromWishlist(menuItemId);
   };
 
+  const handleRemoveFromWishlist = async (item) => {
+    // Use menu_item_id if available, otherwise fall back to id
+    const menuItemId = item.menu_item_id || item.id;
+    if (!menuItemId) {
+      console.error("Cannot remove item: missing menu_item_id and id", item);
+      return;
+    }
+    
+    const result = await removeFromWishlist(menuItemId);
+    if (!result.success) {
+      console.error("Failed to remove from wishlist:", result.error);
+    }
+  };
+
+  // Show loading state
+  if (isLoading && items.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-theme3 animate-spin mx-auto mb-4" />
+          <p className="text-text text-lg">Loading wishlist...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error && items.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="text-center">
+          <p className="text-red-400 text-lg mb-4">{error}</p>
+          <button
+            onClick={() => fetchFavorites(true)}
+            className="px-6 py-2 bg-theme text-white rounded-lg hover:bg-theme3 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state
   if (items.length === 0) {
     return (
       <motion.div
@@ -148,7 +202,7 @@ const WishlistTable = memo(() => {
               </td>
               <td className="text-center py-6 px-4">
                 <motion.button
-                  onClick={() => removeFromWishlist(item.id)}
+                  onClick={() => handleRemoveFromWishlist(item)}
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   whileTap={{ scale: 0.9 }}
                   className="w-10 h-10 flex items-center justify-center text-white/60 hover:text-theme hover:bg-theme/10 rounded-lg transition-all duration-300 mx-auto"
@@ -238,7 +292,7 @@ const WishlistTable = memo(() => {
                   Add to Cart
                 </motion.button>
                 <motion.button
-                  onClick={() => removeFromWishlist(item.id)}
+                  onClick={() => handleRemoveFromWishlist(item)}
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   whileTap={{ scale: 0.9 }}
                   className="w-10 h-10 flex items-center justify-center text-white/60 hover:text-theme hover:bg-theme/10 rounded-lg transition-all duration-300"

@@ -6,12 +6,7 @@ import { ArrowRight } from "lucide-react";
 export default function CTASection() {
   return (
     <section
-      className="py-12 sm:py-16 md:py-20 lg:py-24 relative px-4 sm:px-6 lg:px-15 mt-10"
-      style={{
-        backgroundImage: "url('/img/bg/ctaBG1_1.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+      className="py-12 sm:py-16 md:py-20 lg:py-24 relative px-4 sm:px-6 lg:px-15 mt-10 bg-cover bg-center bg-[url('/img/bg/ctaBG1_1.jpg')]"
     >
       <div className="relative rounded-3xl ">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-12 items-center">

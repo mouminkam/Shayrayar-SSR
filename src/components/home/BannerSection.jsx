@@ -65,7 +65,9 @@ export default function BannerSection() {
             <SwiperSlide key={slide.id}>
               <div
                 className="banner-wrapper style1 bg-img relative bg-cover bg-center min-h-[600px] lg:min-h-[800px]"
-                style={{ backgroundImage: `url(${slide.bgImage})` }}
+                style={{
+                  backgroundImage: `url(${slide.bgImage})`,
+                }}
               >
                 {/* Shapes */}
                 <div className="shape1_1 hidden xxl:block">

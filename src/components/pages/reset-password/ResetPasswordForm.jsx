@@ -46,28 +46,18 @@ export default function ResetPasswordForm() {
       return;
     }
 
-    try {
-      const result = await resetPasswordRequest(email);
+    const result = await resetPasswordRequest(email);
 
-      if (result.success) {
-        // Save email to sessionStorage for OTP verification
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem("resetEmail", email);
-          // Clear any old token
-          sessionStorage.removeItem("resetToken");
-        }
-
-        toastSuccess(result.message || "OTP sent to your email! Please check your inbox.");
-        router.push("/enter-otp");
-      } else {
-        const errorMessage = result.error || "Failed to send OTP. Please try again.";
-        toastError(errorMessage);
-        setErrors({ email: errorMessage });
+    if (result.success) {
+      // Save email in sessionStorage for OTP verification
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("resetEmail", email);
       }
-    } catch (error) {
-      const errorMessage = error.message || "An unexpected error occurred. Please try again.";
-      toastError(errorMessage);
-      setErrors({ email: errorMessage });
+
+      toastSuccess("OTP sent to your email. Please check your inbox.");
+      router.push("/enter-otp");
+    } else {
+      toastError(result.error || "Failed to send OTP. Please try again.");
     }
   };
 
@@ -95,17 +85,13 @@ export default function ResetPasswordForm() {
       <motion.button
         type="submit"
         disabled={isLoading}
-        whileHover={{ scale: isLoading ? 1 : 1.02 }}
-        whileTap={{ scale: isLoading ? 1 : 0.98 }}
+        whileHover={!isLoading ? { scale: 1.02 } : {}}
+        whileTap={!isLoading ? { scale: 0.98 } : {}}
         className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? (
           <>
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-            />
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
             Sending...
           </>
         ) : (

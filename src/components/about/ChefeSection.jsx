@@ -127,8 +127,7 @@ export default function ChefeSection() {
               <div
                 className="marquee-inner flex items-center gap-0 transition-transform duration-700 ease-in-out"
                 style={{
-                  transform: `translateX(-${currentIndex * (100 / itemsPerView)
-                    }%)`,
+                  transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
                 }}
               >
                 {/* Duplicate logos for infinite seamless loop */}
@@ -136,7 +135,9 @@ export default function ChefeSection() {
                   <div
                     key={`logo-${index}`}
                     className="shrink-0 py-2 px-7 transition-opacity duration-300"
-                    style={{ minWidth: `${100 / itemsPerView}%` }}
+                    style={{
+                      minWidth: `${100 / itemsPerView}%`,
+                    }}
                   >
                     <Image
                       src={`/img/logo/clientLogoDark1_1.png`}

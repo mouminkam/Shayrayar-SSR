@@ -22,7 +22,7 @@ export default function ShopSidebar() {
   const searchParams = useSearchParams();
   const { selectedBranch } = useBranchStore();
   const { addToCart } = useCartStore();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistStore();
+  const { addToWishlist, removeFromWishlist, items: wishlistItems } = useWishlistStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
   
@@ -145,38 +145,62 @@ export default function ShopSidebar() {
       return;
     }
     
+    // Use menu_item_id if available, otherwise fall back to id
+    const menuItemId = product.menu_item_id || product.id;
+    if (!menuItemId) {
+      console.error("handleWishlistToggle: Missing menuItemId", product);
+      toastError("Invalid product information");
+      return;
+    }
+    
+    // Check if item is in wishlist by checking items array directly
+    const isInWishlistState = wishlistItems.some((item) => {
+      const itemId = item.id ? String(item.id) : null;
+      const itemMenuItemId = item.menu_item_id ? String(item.menu_item_id) : null;
+      const productIdStr = String(menuItemId);
+      return itemId === productIdStr || itemMenuItemId === productIdStr;
+    });
+    
     try {
-      if (isInWishlist(product.id)) {
-        const result = await removeFromWishlist(product.id);
+      if (isInWishlistState) {
+        const result = await removeFromWishlist(menuItemId);
         if (result.success) {
-          toastSuccess(`${product.title} removed from wishlist`);
+          toastSuccess(`${product.title || product.name} removed from wishlist`);
         } else {
           if (result.requiresAuth) {
             navigate("/login");
+          } else {
+            toastError(result.error || "Failed to remove from wishlist");
           }
-          toastError(result.error || "Failed to remove from wishlist");
         }
       } else {
         const result = await addToWishlist({
           id: product.id,
-          name: product.title,
+          menu_item_id: menuItemId,
+          name: product.title || product.name,
           price: product.price,
           image: product.image,
-          title: product.title,
+          title: product.title || product.name,
         });
         if (result.success) {
-          toastSuccess(`${product.title} added to wishlist`);
+          if (result.alreadyExists) {
+            // Item already exists, no need to show success message
+            return;
+          }
+          toastSuccess(`${product.title || product.name} added to wishlist`);
         } else {
           if (result.requiresAuth) {
             navigate("/login");
+          } else {
+            toastError(result.error || "Failed to add to wishlist");
           }
-          toastError(result.error || "Failed to add to wishlist");
         }
       }
-    } catch {
-      toastError("Failed to update wishlist");
+    } catch (error) {
+      console.error("handleWishlistToggle error:", error);
+      toastError("Failed to update wishlist. Please try again.");
     }
-  }, [addToWishlist, removeFromWishlist, isInWishlist, toastSuccess, toastError, isAuthenticated, navigate]);
+  }, [addToWishlist, removeFromWishlist, wishlistItems, toastSuccess, toastError, isAuthenticated, navigate]);
 
   // Update search query when URL changes
   useEffect(() => {
@@ -305,7 +329,14 @@ export default function ShopSidebar() {
           ) : (
             <div className="grid grid-cols-1 gap-4 lg:gap-6 relative z-10">
               {recentProducts.map((product) => {
-                const isInWishlistState = isInWishlist(product.id);
+                const menuItemId = product.menu_item_id || product.id;
+                // Check if item is in wishlist by checking items array directly
+    const isInWishlistState = wishlistItems.some((item) => {
+      const itemId = item.id ? String(item.id) : null;
+      const itemMenuItemId = item.menu_item_id ? String(item.menu_item_id) : null;
+      const productIdStr = String(menuItemId);
+      return itemId === productIdStr || itemMenuItemId === productIdStr;
+    });
                 return (
                   <div
                     key={product.id}

@@ -38,10 +38,17 @@ const WishlistPreview = dynamic(
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
-  const wishlistItems = useWishlistStore((state) => state.items);
+  const { items: wishlistItems, fetchFavorites } = useWishlistStore();
   const [orders, setOrders] = useState([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'pending', 'completed', 'cancelled'
+
+  // Fetch wishlist on mount if authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchFavorites(true); // Force refresh on page load
+    }
+  }, [isAuthenticated, fetchFavorites]);
 
   useEffect(() => {
     if (!isAuthenticated) {

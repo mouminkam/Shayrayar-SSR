@@ -117,22 +117,30 @@ export default function UserDropdown({
 
             <motion.div variants={itemVariants} className="space-y-2">
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Link
-                  href="/login"
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setUserOpen(false);
+                    router.push("/login");
+                  }}
                   className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-3 px-4 transition-all duration-300 text-sm font-semibold block text-center rounded-lg shadow-lg"
-                  onClick={() => setUserOpen(false)}
                 >
                   Sign In
-                </Link>
+                </button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Link
-                  href="/register"
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setUserOpen(false);
+                    router.push("/register");
+                  }}
                   className="w-full border-2 border-theme text-theme py-2 px-4 hover:bg-theme hover:text-white transition-all duration-300 text-sm font-medium block text-center rounded-lg"
-                  onClick={() => setUserOpen(false)}
                 >
                   Create Account
-                </Link>
+                </button>
               </motion.div>
             </motion.div>
           </motion.div>

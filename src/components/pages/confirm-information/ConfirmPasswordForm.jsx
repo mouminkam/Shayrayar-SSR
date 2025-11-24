@@ -11,8 +11,6 @@ export default function ConfirmPasswordForm() {
   const { resetPassword, isLoading } = useAuthStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
 
-  const [resetToken, setResetToken] = useState("");
-  const [resetEmail, setResetEmail] = useState("");
   const [formData, setFormData] = useState({
     newPassword: "",
     confirmPassword: "",
@@ -20,29 +18,24 @@ export default function ConfirmPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [resetToken, setResetToken] = useState("");
+  const [resetEmail, setResetEmail] = useState("");
 
+  // Load reset token and email from sessionStorage
   useEffect(() => {
-    // Get token and email from sessionStorage
-    if (typeof window !== "undefined") {
-      const token = sessionStorage.getItem("resetToken");
-      const storedEmail = sessionStorage.getItem("resetEmail");
-      
-      if (token) {
-        setResetToken(token);
-      }
-      
-      if (storedEmail) {
-        setResetEmail(storedEmail);
-      }
-      
-      // Redirect if token or email is missing
-      if (!token || !storedEmail) {
-        toastError("Session expired. Please start the password reset process again.");
-        setTimeout(() => {
-          router.push("/reset-password");
-        }, 2000);
-      }
+    if (typeof window === "undefined") return;
+
+    const token = sessionStorage.getItem("resetToken");
+    const email = sessionStorage.getItem("resetEmail");
+
+    if (!token || !email) {
+      toastError("Reset session expired. Please start again.");
+      router.push("/reset-password");
+      return;
     }
+
+    setResetToken(token);
+    setResetEmail(email);
   }, [router, toastError]);
 
   const handleInputChange = (e) => {
@@ -86,56 +79,35 @@ export default function ConfirmPasswordForm() {
       return;
     }
 
-    // Validate that we have token and email
     if (!resetToken || !resetEmail) {
-      toastError("Session expired. Please start the password reset process again.");
+      toastError("Reset session expired. Please start again.");
       router.push("/reset-password");
       return;
     }
 
-    // Prepare reset data according to API requirements
-    const resetData = {
+    const result = await resetPassword({
       token: resetToken,
       email: resetEmail,
       password: formData.newPassword,
       password_confirmation: formData.confirmPassword,
-    };
+    });
 
-    try {
-      const result = await resetPassword(resetData);
-
-      if (result.success) {
-        toastSuccess("Password reset successfully! You can now login with your new password.");
-        // Clean up sessionStorage
-        if (typeof window !== "undefined") {
-          sessionStorage.removeItem("resetEmail");
-          sessionStorage.removeItem("resetToken");
-        }
-        setTimeout(() => {
-          router.push("/login");
-        }, 2000);
-      } else {
-        // Handle API validation errors
-        const errorMessage = result.error || "Failed to reset password. Please try again.";
-        toastError(errorMessage);
-        
-        // Set field-specific errors if available from API
-        if (result.errors) {
-          const apiErrors = {};
-          Object.keys(result.errors).forEach((key) => {
-            // Map API error keys to form field names
-            const fieldName = key === "password" ? "newPassword" : 
-                             key === "password_confirmation" ? "confirmPassword" : key;
-            apiErrors[fieldName] = Array.isArray(result.errors[key]) 
-              ? result.errors[key][0] 
-              : result.errors[key];
-          });
-          setErrors({ ...errors, ...apiErrors });
-        }
+    if (result.success) {
+      // Cleanup sessionStorage
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("resetToken");
+        sessionStorage.removeItem("resetEmail");
       }
-    } catch (error) {
-      // Handle unexpected errors
-      toastError(error.message || "An unexpected error occurred. Please try again.");
+
+      toastSuccess("Password reset successfully! Please login with your new password.");
+      router.push("/login");
+    } else {
+      // Handle errors
+      if (result.errors) {
+        setErrors(result.errors);
+      } else {
+        toastError(result.error || "Failed to reset password. Please try again.");
+      }
     }
   };
 
@@ -212,19 +184,15 @@ export default function ConfirmPasswordForm() {
       {/* Submit Button */}
       <motion.button
         type="submit"
-        disabled={isLoading}
-        whileHover={{ scale: isLoading ? 1 : 1.02 }}
-        whileTap={{ scale: isLoading ? 1 : 0.98 }}
+        disabled={isLoading || !resetToken || !resetEmail}
+        whileHover={!isLoading && resetToken && resetEmail ? { scale: 1.02 } : {}}
+        whileTap={!isLoading && resetToken && resetEmail ? { scale: 0.98 } : {}}
         className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? (
           <>
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-            />
-            Resetting Password...
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            Resetting...
           </>
         ) : (
           <>
