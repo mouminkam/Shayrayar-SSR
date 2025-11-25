@@ -1,11 +1,46 @@
 "use client";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { X, MapPin, Mail, Clock, Phone, ShoppingCart, Facebook, Twitter, Youtube, Linkedin } from "lucide-react";
+import { X, MapPin, Mail, Clock, Phone, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import BranchSelector from "./BranchSelector";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
+import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
+
+// Helper function to format working hours from array to string
+const formatWorkingHours = (hours) => {
+  if (!hours || !Array.isArray(hours) || hours.length === 0) {
+    return null;
+  }
+
+  // If it's an array of objects with day, open, close
+  if (hours.length > 0 && typeof hours[0] === 'object') {
+    const formattedDays = hours
+      .map(item => {
+        const dayName = item.day ? item.day.charAt(0).toUpperCase() + item.day.slice(1) : '';
+        const timeRange = item.open && item.close ? `${item.open} - ${item.close}` : '';
+        return dayName && timeRange ? `${dayName}: ${timeRange}` : null;
+      })
+      .filter(Boolean);
+
+    return formattedDays.length > 0 ? formattedDays.join(' | ') : null;
+  }
+
+  return null;
+};
 
 export default function Sidebar({ isOpen, setIsOpen }) {
+  const { selectedBranch, initialize } = useBranchStore();
+  const { prefetchRoute, navigate } = usePrefetchRoute();
+  const [contactInfo, setContactInfo] = useState({
+    address: "Main Street, Melbourne, Australia",
+    email: "info@fresheat.com",
+    phone: "+11002345909",
+    workingHours: "Mon-Friday, 09am - 05pm",
+  });
+
   const navItems = [
     { href: "/", label: "Home" },
     { href: "/shop", label: "Shop" },
@@ -22,6 +57,54 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     "/img/header/05.jpg",
     "/img/header/06.jpg",
   ];
+
+  // Initialize branch if not loaded
+  useEffect(() => {
+    if (!selectedBranch) {
+      initialize();
+    }
+  }, [selectedBranch, initialize]);
+
+  // Fetch branch contact information
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      if (!selectedBranch) {
+        return;
+      }
+
+      try {
+        const response = await api.branches.getBranchById(selectedBranch.id || selectedBranch.branch_id);
+
+        if (response && response.success && response.data) {
+          const branchData = response.data.branch || response.data;
+
+          // Default values
+          const defaultInfo = {
+            address: "Main Street, Melbourne, Australia",
+            email: "info@fresheat.com",
+            phone: "+11002345909",
+            workingHours: "Mon-Friday, 09am - 05pm",
+          };
+
+          // Format working hours
+          const rawWorkingHours = branchData.working_hours || branchData.opening_hours || branchData.hours;
+          const formattedWorkingHours = formatWorkingHours(rawWorkingHours) || defaultInfo.workingHours;
+
+          setContactInfo({
+            address: branchData.address || branchData.location || defaultInfo.address,
+            email: branchData.email || branchData.contact_email || defaultInfo.email,
+            phone: branchData.phone || branchData.contact_phone || branchData.telephone || defaultInfo.phone,
+            workingHours: formattedWorkingHours,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching contact info:", error);
+        // Keep default values on error
+      }
+    };
+
+    fetchContactInfo();
+  }, [selectedBranch]);
 
   return (
     <AnimatePresence>
@@ -44,10 +127,18 @@ export default function Sidebar({ isOpen, setIsOpen }) {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.3, easeInOut: [0.25, 0.1, 0.25, 1] }}
-            className="fix-area fixed right-0 top-0 h-full w-full max-w-md bg-bgimg z-9999 shadow-2xl overflow-y-auto"
+            className="fixed right-0 top-0 h-screen w-full max-w-md bg-bgimg z-9999 shadow-2xl overflow-y-auto sidebar-hide-scrollbar"
+            onWheel={(e) => {
+              // منع انتشار الـ scroll إلى الموقع
+              e.stopPropagation();
+            }}
+            onTouchMove={(e) => {
+              // منع انتشار الـ touch scroll إلى الموقع
+              e.stopPropagation();
+            }}
           >
-            <div className="offcanvas__info h-full">
-              <div className="offcanvas__wrapper h-full">
+            <div className="offcanvas__info min-h-full">
+              <div className="offcanvas__wrapper min-h-full">
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -69,7 +160,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                           alt="logo"
                           width={150}
                           height={60}
-                          className="h-25 w-auto h-auto object-contain"
+                          className="w-auto h-25 object-contain"
                           quality={90}
                           priority
                           loading="eager"
@@ -186,7 +277,11 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                           >
                             <Link
                               href={item.href}
-                              onClick={() => setIsOpen(false)}
+                              onMouseEnter={() => prefetchRoute(item.href)}
+                              onClick={() => {
+                                setIsOpen(false);
+                                navigate(item.href, { prefetch: false });
+                              }}
                               className="block text-white  text-lg font-normal hover:text-theme3 transition-colors duration-300 py-2"
                             >
                               {item.label}
@@ -224,7 +319,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                             target="_blank"
                             className="text-text  text-base font-normal hover:text-theme3 transition-colors duration-300"
                           >
-                            Main Street, Melbourne, Australia
+                            {contactInfo.address}
                           </Link>
                         </div>
                       </motion.li>
@@ -241,10 +336,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                         </div>
                         <div className="offcanvas__contact-text">
                           <Link
-                            href="mailto:info@fresheat.com"
+                            href={`mailto:${contactInfo.email}`}
                             className="text-text  text-base font-normal hover:text-theme3 transition-colors duration-300"
                           >
-                            info@fresheat.com
+                            {contactInfo.email}
                           </Link>
                         </div>
                       </motion.li>
@@ -265,7 +360,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                             target="_blank"
                             className="text-text  text-base font-normal hover:text-theme3 transition-colors duration-300"
                           >
-                            Mod-friday, 09am -05pm
+                            {contactInfo.workingHours}
                           </Link>
                         </div>
                       </motion.li>
@@ -282,10 +377,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                         </div>
                         <div className="offcanvas__contact-text">
                           <Link
-                            href="tel:+11002345909"
+                            href={`tel:${contactInfo.phone}`}
                             className="text-text  text-base font-normal hover:text-theme3 transition-colors duration-300"
                           >
-                            +11002345909
+                            {contactInfo.phone}
                           </Link>
                         </div>
                       </motion.li>
@@ -296,69 +391,20 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.9, duration: 0.4, ease: "easeOut" }}
-                      className="header-button  mb-12"
+                      className="header-button"
                     >
                       <Link
                         href="/shop"
-                        onClick={() => setIsOpen(false)}
+                        onMouseEnter={() => prefetchRoute("/shop")}
+                        onClick={() => {
+                          setIsOpen(false);
+                          navigate("/shop", { prefetch: false });
+                        }}
                         className="theme-btn px-6 py-3 bg-theme3 text-white  text-sm font-normal hover:bg-theme transition-colors duration-300 rounded-md flex items-center justify-center gap-2 shadow-lg"
                       >
                         <ShoppingCart className="w-4 h-4" />
                         <span>ORDER NOW</span>
                       </Link>
-                    </motion.div>
-
-                    {/* Social Icons */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1.0, duration: 0.4, ease: "easeOut" }}
-                      className="social-icon flex items-center justify-center gap-6"
-                    >
-                      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                        <Link
-                          href="https://facebook.com"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-9 h-9 bg-theme3 text-white rounded-full flex items-center justify-center hover:bg-theme transition-colors duration-300"
-                          aria-label="Facebook"
-                        >
-                          <Facebook className="w-4 h-4" />
-                        </Link>
-                      </motion.div>
-                      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                        <Link
-                          href="https://twitter.com"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-9 h-9 bg-theme3 text-white rounded-full flex items-center justify-center hover:bg-theme transition-colors duration-300"
-                          aria-label="Twitter"
-                        >
-                          <Twitter className="w-4 h-4" />
-                        </Link>
-                      </motion.div>
-                      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                        <Link
-                          href="https://youtube.com"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-9 h-9 bg-theme3 text-white rounded-full flex items-center justify-center hover:bg-theme transition-colors duration-300"
-                          aria-label="YouTube"
-                        >
-                          <Youtube className="w-4 h-4" />
-                        </Link>
-                      </motion.div>
-                      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                        <Link
-                          href="https://linkedin.com"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-9 h-9 bg-theme3 text-white rounded-full flex items-center justify-center hover:bg-theme transition-colors duration-300"
-                          aria-label="LinkedIn"
-                        >
-                          <Linkedin className="w-4 h-4" />
-                        </Link>
-                      </motion.div>
                     </motion.div>
                   </motion.div>
                 </motion.div>

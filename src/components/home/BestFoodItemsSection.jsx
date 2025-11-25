@@ -4,10 +4,12 @@ import { Pagination, Autoplay } from "swiper/modules";
 import Image from "next/image";
 import Link from "next/link";
 import { formatCurrency } from "../../lib/utils/formatters";
+import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 
 import "swiper/swiper-bundle.css";
 
 export default function BestFoodItemsSection() {
+  const { prefetchRoute } = usePrefetchRoute();
   const foodItems = [
     {
       id: 1,
@@ -168,7 +170,10 @@ export default function BestFoodItemsSection() {
                     </div>
                     <div className="item-content mt-20 flex flex-col grow justify-between">
                       <div>
-                        <Link href="/shop">
+                        <Link 
+                          href="/shop"
+                          onMouseEnter={() => prefetchRoute("/shop")}
+                        >
                           <h3 className="text-theme3  text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
                             {item.title}
                           </h3>

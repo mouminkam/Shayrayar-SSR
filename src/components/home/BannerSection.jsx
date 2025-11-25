@@ -6,10 +6,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 
 import "swiper/swiper-bundle.css";
 
 export default function BannerSection() {
+  const { prefetchRoute } = usePrefetchRoute();
   const [activeIndex, setActiveIndex] = useState(0);
 
   const slides = [
@@ -204,6 +206,7 @@ export default function BannerSection() {
                             <Link
                               className="theme-btn px-6 py-2.5 sm:px-8 sm:py-3 bg-theme3 text-white  text-sm sm:text-base font-medium hover:bg-theme transition-colors duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
                               href={currentSlide.link}
+                              onMouseEnter={() => prefetchRoute(currentSlide.link)}
                             >
                               ORDER NOW
                               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />

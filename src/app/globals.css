@@ -104,6 +104,57 @@ body {
   }
 }
 
+/* Hide Scrollbar for Sidebar - إخفاء الـ scrollbar مع بقاء إمكانية الـ scroll */
+.sidebar-hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.sidebar-hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Global Custom Scrollbar - للمشروع كله */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #FFBA00 #1E1E1E;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) - Global */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #1E1E1E;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #FFBA00;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 186, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #FC791A;
+  box-shadow: 0 0 10px rgba(255, 186, 0, 0.6);
+  transform: scale(1.1);
+}
+
+/* Horizontal scrollbar */
+*::-webkit-scrollbar:horizontal {
+  height: 10px;
+}
+
+/* Scrollbar corner (where horizontal and vertical meet) */
+*::-webkit-scrollbar-corner {
+  background: #1E1E1E;
+  border-radius: 10px;
+}
+
 /* Rotate Animation - للدوران المستمر */
 @keyframes rotate {
   0% {

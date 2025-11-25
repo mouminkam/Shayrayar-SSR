@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 
 /**
  * Reusable Breadcrumb component
@@ -7,6 +8,8 @@ import Link from "next/link";
  * @param {boolean} showLinks - Whether to show navigation links (default: true)
  */
 export default function Breadcrumb({ title, showLinks = true }) {
+  const { prefetchRoute } = usePrefetchRoute();
+  
   return (
     <section className="relative">
       <div
@@ -28,6 +31,7 @@ export default function Breadcrumb({ title, showLinks = true }) {
                 <li>
                   <Link
                     href="/"
+                    onMouseEnter={() => prefetchRoute("/")}
                     className="text-white/90  text-xl font-medium hover:text-theme hover:scale-105 transition-all duration-300 px-3 py-1 rounded-lg hover:bg-white/10 backdrop-blur-sm"
                   >
                     Home

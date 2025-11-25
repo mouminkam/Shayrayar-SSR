@@ -5,6 +5,7 @@ import ShopSidebar from "./ShopSidebar";
 import SortBar from "./SortBar";
 import ProductCard from "../ui/ProductCard";
 import ProductCardSkeleton from "../ui/ProductCardSkeleton";
+import LazyProductCard from "../ui/LazyProductCard";
 import AnimatedSection from "../ui/AnimatedSection";
 import { ChevronDown } from "lucide-react";
 import api from "../../api";
@@ -207,8 +208,14 @@ export default function ShopSection() {
                 ) : viewMode === "grid" ? (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
-                      {products.map((product) => (
-                        <ProductCard key={product.id} product={product} viewMode="grid" />
+                      {products.map((product, index) => (
+                        <LazyProductCard 
+                          key={product.id} 
+                          product={product} 
+                          viewMode="grid"
+                          // Load first 4 cards immediately (above the fold)
+                          options={index < 4 ? { rootMargin: "0px" } : {}}
+                        />
                       ))}
                     </div>
                     {/* Show More Button (only for client-side pagination) */}
@@ -227,8 +234,14 @@ export default function ShopSection() {
                 ) : (
                   <>
                     <div className="flex flex-col gap-4">
-                      {products.map((product) => (
-                        <ProductCard key={product.id} product={product} viewMode="list" />
+                      {products.map((product, index) => (
+                        <LazyProductCard 
+                          key={product.id} 
+                          product={product} 
+                          viewMode="list"
+                          // Load first 2 cards immediately (above the fold)
+                          options={index < 2 ? { rootMargin: "0px" } : {}}
+                        />
                       ))}
                     </div>
                     {/* Show More Button (only for client-side pagination) */}

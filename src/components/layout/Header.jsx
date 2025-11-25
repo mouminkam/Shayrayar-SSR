@@ -21,10 +21,12 @@ import BranchSelector from "./header/BranchSelector";
 import { useCart } from "../../hooks/useCart";
 import { useScroll } from "../../hooks/useScroll";
 import useAuthStore from "../../store/authStore";
+import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 import { NAV_LINKS, SOCIAL_LINKS, BUSINESS_HOURS, IMAGE_PATHS } from "../../data/constants";
 
 const FreshHeatHeader = () => {
   const router = useRouter();
+  const { prefetchRoute, navigate } = usePrefetchRoute();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
@@ -153,7 +155,11 @@ const FreshHeatHeader = () => {
             />
 
             {/* Logo */}
-            <Link href="/" className="relative z-20 transform">
+            <Link 
+              href="/" 
+              onMouseEnter={() => prefetchRoute("/")}
+              className="relative z-20 transform"
+            >
               <Image
                 src={IMAGE_PATHS.logo}
                 alt="logo"
@@ -210,6 +216,7 @@ const FreshHeatHeader = () => {
                   <li key={link.href} className="transition-all duration-300 hover:translate-x-1">
                     <Link
                       href={link.href}
+                      onMouseEnter={() => prefetchRoute(link.href)}
                       className="hover:text-theme3 transition-colors duration-300 cursor-pointer"
                     >
                       {link.label}
@@ -241,6 +248,7 @@ const FreshHeatHeader = () => {
                   {isAuthenticated ? (
                     <Link
                       href="/profile"
+                      onMouseEnter={() => prefetchRoute("/profile")}
                       aria-label={`Go to profile for ${user?.name}`}
                       className="outline-none focus:outline-none rounded cursor-pointer relative"
                     >
@@ -327,7 +335,11 @@ const FreshHeatHeader = () => {
         <div className="container mx-auto flex flex-row items-center justify-between gap-4 lg:gap-8 px-4 sm:px-6 lg:px-8 xl:px-12 py-3 lg:py-4 w-full">
           {/* Logo Section */}
           <div className="flex items-center justify-start shrink-0 lg:ml-10">
-            <Link href="/" className="flex items-center">
+            <Link 
+              href="/" 
+              onMouseEnter={() => prefetchRoute("/")}
+              className="flex items-center"
+            >
               <Image
                 src={IMAGE_PATHS.logo}
                 alt="logo"
@@ -349,6 +361,7 @@ const FreshHeatHeader = () => {
                 <li key={link.href}>
                   <Link
                     href={link.href}
+                    onMouseEnter={() => prefetchRoute(link.href)}
                     className="text-sm xl:text-base hover:text-theme3 transition-colors duration-300 cursor-pointer relative group"
                   >
                     {link.label}
@@ -386,6 +399,7 @@ const FreshHeatHeader = () => {
               {isAuthenticated ? (
                 <Link
                   href="/profile"
+                  onMouseEnter={() => prefetchRoute("/profile")}
                   aria-label={`Go to profile for ${user?.name}`}
                   className="flex items-center justify-center p-2 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-theme3 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer relative hover:bg-white/10 transition-all duration-300"
                 >

@@ -1,8 +1,10 @@
-// Removed "use client" - This component only uses static JSX and Link components which are SSR-compatible
+"use client";
 import Link from "next/link";
 import { ChevronsRight } from "lucide-react";
+import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 
 export default function QuickLinks() {
+  const { prefetchRoute } = usePrefetchRoute();
   const links = [
     { href: "/about-us", label: "About Us" },
     // { href: "/blog", label: "Our Blogs" }, // Blog section temporarily disabled
@@ -25,6 +27,7 @@ export default function QuickLinks() {
           <li key={index} className="transition-all duration-300 hover:translate-x-1">
             <Link
               href={link.href}
+              onMouseEnter={() => prefetchRoute(link.href)}
               className="flex items-center gap-2 text-white hover:text-theme3 transition-colors duration-300"
             >
               <ChevronsRight className="w-4 h-4" />

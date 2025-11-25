@@ -6,25 +6,12 @@
 
 ---
 
-## ✅ Sections مع API متاح
+## ✅ Sections مع API متاح (مربوطة)
 
 ### 1. **BannerSection** ✅
 **الملف:** `src/components/home/BannerSection.jsx`
 
-**الحالة:** ❌ **لا يوجد API** (بيانات static حالياً)
-
-**البيانات الحالية (Static):**
-```javascript
-{
-  id: 1,
-  subtitle: "WELCOME FRESHEAT",
-  title: "SPICY FRIED CHICKEN",
-  image: "/img/banner/bannerThumb1_1.png",
-  bgImage: "/img/bg/bannerBG1_1.jpg",
-  link: "/shop",
-  shape4Float: false
-}
-```
+**الحالة:** ✅ **مربوط بالـ API** (يحتاج ربط فقط)
 
 **API المطلوب:**
 ```
@@ -66,18 +53,7 @@ GET /api/v1/slides?branch_id={branch_id}
 ### 2. **BestFoodItemsSection** ✅
 **الملف:** `src/components/home/BestFoodItemsSection.jsx`
 
-**الحالة:** ❌ **لا يوجد API** (بيانات static حالياً)
-
-**البيانات الحالية (Static):**
-```javascript
-{
-  id: 1,
-  title: "Chicken Pizza",
-  description: "The registration fee",
-  price: 26.99,
-  image: "/img/food-items/item1_1.png"
-}
-```
+**الحالة:** ✅ **مربوط بالـ API** (يحتاج ربط فقط)
 
 **API المطلوب:**
 ```
@@ -123,6 +99,29 @@ GET /api/v1/menu-items?branch_id={branch_id}&featured=true&limit=6
 GET /api/v1/menu-items/highlights?branch_id={branch_id}&limit=5
 ```
 
+**Response المتوقع:**
+```json
+{
+  "success": true,
+  "data": {
+    "menu_items": [
+      {
+        "id": 1,
+        "name": "Chicken Pizza",
+        "description": "Delicious chicken pizza",
+        "price": 26.99,
+        "image": "https://example.com/food-items/item1_1.png",
+        "category_id": 1,
+        "category_name": "Fast Food",
+        "is_featured": true,
+        "is_available": true
+      }
+    ]
+  },
+  "message": "Highlights retrieved successfully"
+}
+```
+
 **ملاحظات:**
 - ✅ هذا الـ section متصل بالـ API بالفعل
 - ✅ يعمل بشكل صحيح
@@ -132,13 +131,9 @@ GET /api/v1/menu-items/highlights?branch_id={branch_id}&limit=5
 ### 4. **FoodMenuSection** ✅
 **الملف:** `src/components/home/FoodMenuSection.jsx`
 
-**الحالة:** ❌ **لا يوجد API** (بيانات static حالياً)
+**الحالة:** ✅ **مربوط بالـ API** (يحتاج ربط فقط)
 
-**البيانات الحالية (Static):**
-- Tabs: FastFood, DrinkJuice, ChickenPizza, FreshPasta
-- Menu Items لكل tab
-
-**API المطلوب:**
+**APIs المطلوبة:**
 
 **1. للحصول على Categories (Tabs):**
 ```
@@ -206,25 +201,10 @@ GET /api/v1/menu-items?branch_id={branch_id}&category_id={category_id}&limit=10
 
 ---
 
-## ❌ Sections بدون API (تحتاج إنشاء API جديد)
-
-### 5. **OfferCards** ❌
+### 5. **OfferCards** ✅
 **الملف:** `src/components/about/OfferCards.jsx`
 
-**الحالة:** ❌ **لا يوجد API** (بيانات static حالياً)
-
-**البيانات الحالية (Static):**
-```javascript
-{
-  title: "SPICY FRIED CHICKEN",
-  subtitle: "ON THIS WEEK",
-  description: "limits Time Offer",
-  image: "/img/offer/offerThumb1_1.png",
-  shape: "/img/shape/offerShape1_4.png",
-  bgImage: "/img/bg/offerBG1_1.jpg",
-  buttonStyle: "style4"
-}
-```
+**الحالة:** ✅ **مربوط بالـ API** (يحتاج إنشاء API جديد)
 
 **API المطلوب:**
 ```
@@ -281,7 +261,7 @@ CREATE TABLE offers (
     start_date DATE NULL,
     end_date DATE NULL,
     is_active BOOLEAN DEFAULT true,
-    order INT DEFAULT 0,
+    `order` INT DEFAULT 0,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
     FOREIGN KEY (branch_id) REFERENCES branches(id),
@@ -291,22 +271,14 @@ CREATE TABLE offers (
 
 ---
 
-### 6. **GallerySection** ❌
-**الملف:** `src/components/home/GallerySection.jsx`
+### 6. **CTASection** ✅
+**الملف:** `src/components/about/CTASection.jsx`
 
-**الحالة:** ❌ **لا يوجد API** (بيانات static حالياً)
-
-**البيانات الحالية (Static):**
-```javascript
-{
-  id: 1,
-  image: "/img/gallery/galleryThumb1_5.jpg"
-}
-```
+**الحالة:** ✅ **مربوط بالـ API** (يحتاج إنشاء API جديد)
 
 **API المطلوب:**
 ```
-GET /api/v1/gallery?branch_id={branch_id}
+GET /api/v1/cta?branch_id={branch_id}
 ```
 
 **Response المتوقع:**
@@ -314,35 +286,37 @@ GET /api/v1/gallery?branch_id={branch_id}
 {
   "success": true,
   "data": {
-    "gallery_items": [
-      {
-        "id": 1,
-        "branch_id": 1,
-        "image": "https://example.com/gallery/galleryThumb1_5.jpg",
-        "title": "Gallery Image 1",
-        "description": "Description of gallery image",
-        "link": "/shop",
-        "order": 1,
-        "is_active": true,
-        "created_at": "2024-01-01T00:00:00.000000Z",
-        "updated_at": "2024-01-01T00:00:00.000000Z"
-      }
-    ]
+    "cta": {
+      "id": 1,
+      "branch_id": 1,
+      "subtitle": "WELCOME FRESHEAT",
+      "title": "TODAY SPACIAL FOOD",
+      "description": "limits Time Offer",
+      "image": "https://example.com/cta/ctaThumb1_1.png",
+      "bg_image": "https://example.com/bg/ctaBG1_1.jpg",
+      "button_text": "ORDER NOW",
+      "button_link": "/shop",
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00.000000Z",
+      "updated_at": "2024-01-01T00:00:00.000000Z"
+    }
   },
-  "message": "Gallery items retrieved successfully"
+  "message": "CTA content retrieved successfully"
 }
 ```
 
 **Database Schema المقترح:**
 ```sql
-CREATE TABLE gallery_items (
+CREATE TABLE cta_sections (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     branch_id BIGINT UNSIGNED NOT NULL,
-    image VARCHAR(500) NOT NULL,
-    title VARCHAR(255) NULL,
+    subtitle VARCHAR(255) NULL,
+    title VARCHAR(255) NOT NULL,
     description TEXT NULL,
-    link VARCHAR(255) NULL,
-    order INT DEFAULT 0,
+    image VARCHAR(500) NULL,
+    bg_image VARCHAR(500) NULL,
+    button_text VARCHAR(100) DEFAULT 'ORDER NOW',
+    button_link VARCHAR(255) DEFAULT '/shop',
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
@@ -350,26 +324,67 @@ CREATE TABLE gallery_items (
 );
 ```
 
-**بديل:** يمكن استخدام menu items images كـ gallery إذا لم تريد إنشاء table منفصل
+---
+
+### 7. **TimerSection** ✅
+**الملف:** `src/components/home/TimerSection.jsx`
+
+**الحالة:** ✅ **مربوط بالـ API** (يحتاج إنشاء API جديد)
+
+**API المطلوب:**
+```
+GET /api/v1/special-offer?branch_id={branch_id}
+```
+
+**Response المتوقع:**
+```json
+{
+  "success": true,
+  "data": {
+    "special_offer": {
+      "id": 1,
+      "branch_id": 1,
+      "subtitle": "Special Offer",
+      "title": "Get 30% Discount Every Item",
+      "discount_percentage": 30,
+      "end_date": "2025-12-31T23:59:59",
+      "image": "https://example.com/timer/timerThumb1_1.png",
+      "button_text": "ORDER NOW",
+      "button_link": "/shop",
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00.000000Z",
+      "updated_at": "2024-01-01T00:00:00.000000Z"
+    }
+  },
+  "message": "Special offer retrieved successfully"
+}
+```
+
+**Database Schema المقترح:**
+```sql
+CREATE TABLE special_offers (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    branch_id BIGINT UNSIGNED NOT NULL,
+    subtitle VARCHAR(255) NULL,
+    title VARCHAR(255) NOT NULL,
+    discount_percentage DECIMAL(5,2) NULL,
+    end_date DATETIME NOT NULL,
+    image VARCHAR(500) NULL,
+    button_text VARCHAR(100) DEFAULT 'ORDER NOW',
+    button_link VARCHAR(255) DEFAULT '/shop',
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (branch_id) REFERENCES branches(id)
+);
+```
 
 ---
 
-### 7. **TestimonialSection** ❌
+### 8. **TestimonialSection** ✅
 **الملف:** `src/components/about/TestimonialSection.jsx`
 
-**الحالة:** ❌ **لا يوجد API** (بيانات static حالياً)
-
-**البيانات الحالية (Static):**
-```javascript
-{
-  id: 1,
-  name: "Albert Flores",
-  role: "Web Designer",
-  image: "/img/shape/testimonialProfile1_1.png",
-  rating: "/img/icon/star.svg",
-  text: "Penatibus magnis dis point..."
-}
-```
+**الحالة:** ✅ **مربوط بالـ API** (يحتاج إنشاء API جديد)
 
 **API المطلوب:**
 ```
@@ -419,7 +434,7 @@ CREATE TABLE testimonials (
     customer_id BIGINT UNSIGNED NULL,
     is_approved BOOLEAN DEFAULT false,
     is_featured BOOLEAN DEFAULT false,
-    order INT DEFAULT 0,
+    `order` INT DEFAULT 0,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
     FOREIGN KEY (branch_id) REFERENCES branches(id),
@@ -428,27 +443,16 @@ CREATE TABLE testimonials (
 );
 ```
 
-**بديل:** يمكن استخدام reviews من orders إذا كان لديك نظام reviews
-
 ---
 
-### 8. **ChefeSection** ❌
-**الملف:** `src/components/about/ChefeSection.jsx`
+### 9. **GallerySection** ✅
+**الملف:** `src/components/home/GallerySection.jsx`
 
-**الحالة:** ❌ **لا يوجد API** (بيانات static حالياً)
-
-**البيانات الحالية (Static):**
-```javascript
-{
-  name: "Ralph Edwards",
-  role: "Chef Lead",
-  image: "/img/chefe/chefeThumb1_1.png"
-}
-```
+**الحالة:** ✅ **مربوط بالـ API** (يحتاج إنشاء API جديد)
 
 **API المطلوب:**
 ```
-GET /api/v1/chefs?branch_id={branch_id}
+GET /api/v1/gallery?branch_id={branch_id}
 ```
 
 **Response المتوقع:**
@@ -456,20 +460,14 @@ GET /api/v1/chefs?branch_id={branch_id}
 {
   "success": true,
   "data": {
-    "chefs": [
+    "gallery_items": [
       {
         "id": 1,
         "branch_id": 1,
-        "name": "Ralph Edwards",
-        "role": "Chef Lead",
-        "image": "https://example.com/chefe/chefeThumb1_1.png",
-        "bio": "Experienced chef with 10 years of experience",
-        "specialization": "Italian Cuisine",
-        "social_media": {
-          "facebook": "https://facebook.com/ralph",
-          "linkedin": "https://linkedin.com/in/ralph",
-          "twitter": "https://twitter.com/ralph"
-        },
+        "image": "https://example.com/gallery/galleryThumb1_5.jpg",
+        "title": "Gallery Image 1",
+        "description": "Description of gallery image",
+        "link": "/shop",
         "order": 1,
         "is_active": true,
         "created_at": "2024-01-01T00:00:00.000000Z",
@@ -477,24 +475,20 @@ GET /api/v1/chefs?branch_id={branch_id}
       }
     ]
   },
-  "message": "Chefs retrieved successfully"
+  "message": "Gallery items retrieved successfully"
 }
 ```
 
 **Database Schema المقترح:**
 ```sql
-CREATE TABLE chefs (
+CREATE TABLE gallery_items (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     branch_id BIGINT UNSIGNED NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    role VARCHAR(255) NOT NULL,
-    image VARCHAR(500) NULL,
-    bio TEXT NULL,
-    specialization VARCHAR(255) NULL,
-    facebook_url VARCHAR(500) NULL,
-    linkedin_url VARCHAR(500) NULL,
-    twitter_url VARCHAR(500) NULL,
-    order INT DEFAULT 0,
+    image VARCHAR(500) NOT NULL,
+    title VARCHAR(255) NULL,
+    description TEXT NULL,
+    link VARCHAR(255) NULL,
+    `order` INT DEFAULT 0,
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
@@ -506,191 +500,62 @@ CREATE TABLE chefs (
 
 ## 📝 Sections Static (لا تحتاج API)
 
-### 9. **AboutUsSection** 📝
+### 10. **AboutUsSection** 📝
 **الملف:** `src/components/home/AboutUsSection.jsx`
 
 **الحالة:** 📝 **Static Content** (لا يحتاج API)
 
 **ملاحظات:**
 - هذا section يحتوي على محتوى ثابت (نص عن المطعم)
-- يمكن إبقاؤه static أو إنشاء API لإدارة المحتوى من Admin Panel
-
-**API اختياري (لإدارة المحتوى):**
-```
-GET /api/v1/about?branch_id={branch_id}
-```
-
-**Response المتوقع:**
-```json
-{
-  "success": true,
-  "data": {
-    "about": {
-      "id": 1,
-      "branch_id": 1,
-      "subtitle": "About US",
-      "title": "Variety of flavours from american cuisine",
-      "description": "It is a long established fact that a reader will be distracted the readable content of a page when looking at layout the point established fact that",
-      "button_text": "ORDER NOW",
-      "button_link": "/shop"
-    }
-  },
-  "message": "About content retrieved successfully"
-}
-```
+- سيتم إبقاؤه static كما هو
 
 ---
 
-### 10. **CTASection** 📝
-**الملف:** `src/components/about/CTASection.jsx`
+### 11. **ChefeSection** 📝
+**الملف:** `src/components/about/ChefeSection.jsx`
 
 **الحالة:** 📝 **Static Content** (لا يحتاج API)
 
 **ملاحظات:**
-- هذا section يحتوي على محتوى ثابت (Call to Action)
-- يمكن إبقاؤه static أو إنشاء API لإدارة المحتوى من Admin Panel
-
-**API اختياري (لإدارة المحتوى):**
-```
-GET /api/v1/cta?branch_id={branch_id}
-```
-
-**Response المتوقع:**
-```json
-{
-  "success": true,
-  "data": {
-    "cta": {
-      "id": 1,
-      "branch_id": 1,
-      "subtitle": "WELCOME FRESHEAT",
-      "title": "TODAY SPACIAL FOOD",
-      "description": "limits Time Offer",
-      "image": "https://example.com/cta/ctaThumb1_1.png",
-      "bg_image": "https://example.com/bg/ctaBG1_1.jpg",
-      "button_text": "ORDER NOW",
-      "button_link": "/shop"
-    }
-  },
-  "message": "CTA content retrieved successfully"
-}
-```
-
----
-
-### 11. **TimerSection** 📝
-**الملف:** `src/components/home/TimerSection.jsx`
-
-**الحالة:** 📝 **Static Content** (لا يحتاج API)
-
-**ملاحظات:**
-- هذا section يحتوي على countdown timer
-- التاريخ محدد في الكود: `2025-12-31T23:59:59`
-- يمكن إبقاؤه static أو إنشاء API لإدارة التاريخ من Admin Panel
-
-**API اختياري (لإدارة التاريخ):**
-```
-GET /api/v1/special-offer?branch_id={branch_id}
-```
-
-**Response المتوقع:**
-```json
-{
-  "success": true,
-  "data": {
-    "special_offer": {
-      "id": 1,
-      "branch_id": 1,
-      "subtitle": "Special Offer",
-      "title": "Get 30% Discount Every Item",
-      "discount_percentage": 30,
-      "end_date": "2025-12-31T23:59:59",
-      "image": "https://example.com/timer/timerThumb1_1.png",
-      "button_text": "ORDER NOW",
-      "button_link": "/shop",
-      "is_active": true
-    }
-  },
-  "message": "Special offer retrieved successfully"
-}
-```
-
----
-
-### 12. **MarqueeSection** 📝
-**الملف:** `src/components/about/MarqueeSection.jsx`
-
-**الحالة:** 📝 **Static Content** (لا يحتاج API)
-
-**ملاحظات:**
-- هذا section يحتوي على قائمة من النصوص المتحركة
-- يمكن إبقاؤه static أو إنشاء API لإدارة النصوص من Admin Panel
-
-**API اختياري (لإدارة النصوص):**
-```
-GET /api/v1/marquee-items?branch_id={branch_id}
-```
-
-**Response المتوقع:**
-```json
-{
-  "success": true,
-  "data": {
-    "marquee_items": [
-      {
-        "id": 1,
-        "branch_id": 1,
-        "text": "chicken pizza",
-        "order": 1,
-        "is_active": true
-      }
-    ]
-  },
-  "message": "Marquee items retrieved successfully"
-}
-```
+- هذا section يحتوي على بيانات static للشيفات
+- سيتم إبقاؤه static كما هو
 
 ---
 
 ## 📊 ملخص
 
-### ✅ Sections مع API متاح (يحتاج ربط فقط):
-1. **BannerSection** - `/slides?branch_id={branch_id}`
-2. **BestFoodItemsSection** - `/menu-items?featured=true&branch_id={branch_id}`
-3. **FoodMenuSection** - `/menu-categories` + `/menu-items?category_id={category_id}`
-4. **PopularDishes** - ✅ متصل بالفعل
+### ✅ Sections مربوطة بالـ API (موجودة أو تحتاج ربط):
+1. **BannerSection** - `/slides?branch_id={branch_id}` ✅ موجود
+2. **BestFoodItemsSection** - `/menu-items?featured=true&branch_id={branch_id}` ✅ موجود
+3. **PopularDishes** - `/menu-items/highlights?branch_id={branch_id}` ✅ متصل بالفعل
+4. **FoodMenuSection** - `/menu-categories` + `/menu-items?category_id={category_id}` ✅ موجود
+5. **OfferCards** - `/offers?branch_id={branch_id}` ❌ يحتاج إنشاء
+6. **CTASection** - `/cta?branch_id={branch_id}` ❌ يحتاج إنشاء
+7. **TimerSection** - `/special-offer?branch_id={branch_id}` ❌ يحتاج إنشاء
+8. **TestimonialSection** - `/testimonials?branch_id={branch_id}` ❌ يحتاج إنشاء
+9. **GallerySection** - `/gallery?branch_id={branch_id}` ❌ يحتاج إنشاء
 
-### ❌ Sections تحتاج إنشاء API جديد:
-5. **OfferCards** - `/offers?branch_id={branch_id}`
-6. **GallerySection** - `/gallery?branch_id={branch_id}`
-7. **TestimonialSection** - `/testimonials?branch_id={branch_id}`
-8. **ChefeSection** - `/chefs?branch_id={branch_id}`
-
-### 📝 Sections Static (اختياري):
-9. **AboutUsSection** - يمكن إبقاؤه static أو إنشاء API
-10. **CTASection** - يمكن إبقاؤه static أو إنشاء API
-11. **TimerSection** - يمكن إبقاؤه static أو إنشاء API
-12. **MarqueeSection** - يمكن إبقاؤه static أو إنشاء API
+### 📝 Sections Static (لا تحتاج API):
+10. **AboutUsSection** - static
+11. **ChefeSection** - static
 
 ---
 
 ## 🎯 الأولويات
 
-### المرحلة الأولى (High Priority):
+### المرحلة الأولى (High Priority - APIs موجودة تحتاج ربط):
 1. ✅ ربط **BannerSection** بالـ API الموجود
 2. ✅ ربط **BestFoodItemsSection** بالـ API الموجود
 3. ✅ ربط **FoodMenuSection** بالـ API الموجود
 
-### المرحلة الثانية (Medium Priority):
+### المرحلة الثانية (Medium Priority - APIs تحتاج إنشاء):
 4. ❌ إنشاء API للـ **OfferCards**
-5. ❌ إنشاء API للـ **GallerySection**
+5. ❌ إنشاء API للـ **CTASection**
+6. ❌ إنشاء API للـ **TimerSection**
+7. ❌ إنشاء API للـ **GallerySection**
 
-### المرحلة الثالثة (Low Priority):
-6. ❌ إنشاء API للـ **TestimonialSection**
-7. ❌ إنشاء API للـ **ChefeSection**
-
-### المرحلة الرابعة (Optional):
-8. 📝 إنشاء APIs للـ Static Sections (AboutUs, CTA, Timer, Marquee) إذا أردت إدارتها من Admin Panel
+### المرحلة الثالثة (Low Priority - APIs تحتاج إنشاء):
+8. ❌ إنشاء API للـ **TestimonialSection**
 
 ---
 
@@ -715,4 +580,3 @@ GET /api/v1/marquee-items?branch_id={branch_id}
 
 **تاريخ الإنشاء:** 2024-01-XX  
 **آخر تحديث:** 2024-01-XX
-

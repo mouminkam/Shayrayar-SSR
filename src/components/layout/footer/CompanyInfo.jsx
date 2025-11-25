@@ -1,14 +1,21 @@
-// Removed "use client" - This component only uses static JSX, Image, and Link components which are SSR-compatible
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { Facebook, Twitter, Youtube, Linkedin } from "lucide-react";
+import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 
 export default function CompanyInfo() {
+  const { prefetchRoute } = usePrefetchRoute();
+  
   return (
     <div className="mt-6 sm:mt-8 md:mt-0 sm:col-span-2 lg:col-span-1">
       {/* Logo */}
       <div className="mb-6 sm:mb-8">
-        <Link href="/" className="inline-block">
+        <Link 
+          href="/" 
+          onMouseEnter={() => prefetchRoute("/")}
+          className="inline-block"
+        >
           <Image
             src="/img/logo/mainlogo.png"
             alt="logo"

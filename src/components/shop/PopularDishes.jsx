@@ -9,7 +9,6 @@ import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 import api from "../../api";
 import useBranchStore from "../../store/branchStore";
 import { transformMenuItemsToProducts } from "../../lib/utils/productTransform";
-import { extractMenuItemsFromResponse } from "../../lib/utils/responseExtractor";
 import useCartStore from "../../store/cartStore";
 import useWishlistStore from "../../store/wishlistStore";
 import useToastStore from "../../store/toastStore";
@@ -36,16 +35,29 @@ export default function PopularDishes() {
 
       setIsLoading(true);
       try {
-        const response = await api.menu.getHighlights({ limit: 5 });
-        const { menuItems } = extractMenuItemsFromResponse(response);
+        const response = await api.menu.getHighlights();
         
-        if (Array.isArray(menuItems) && menuItems.length > 0) {
-          const transformed = transformMenuItemsToProducts(menuItems);
-          setDishes(transformed);
-        } else {
+        if (!response?.success || !response.data) {
           setDishes([]);
+          return;
         }
-      } catch {
+
+        // Combine arrays: popular first, then latest, then chef_special
+        const allItems = [
+          ...(response.data.popular || []),
+          ...(response.data.latest || []),
+          ...(response.data.chef_special || [])
+        ];
+
+        // Remove duplicates by id and limit to 5
+        const uniqueItems = Array.from(
+          new Map(allItems.map(item => [item.id, item])).values()
+        ).slice(0, 5);
+
+        const transformed = transformMenuItemsToProducts(uniqueItems);
+        setDishes(transformed);
+      } catch (error) {
+        console.error("Error fetching popular dishes:", error);
         setDishes([]);
       } finally {
         setIsLoading(false);

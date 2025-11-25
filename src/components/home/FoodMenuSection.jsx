@@ -3,8 +3,10 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { formatCurrency } from "../../lib/utils/formatters";
+import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 
 export default function fFoodMenuSection() {
+  const { prefetchRoute } = usePrefetchRoute();
   const [activeTab, setActiveTab] = useState("FastFood");
 
   const menuItems = {
@@ -147,7 +149,10 @@ export default function fFoodMenuSection() {
                           />
                         </div>
                         <div className="menu-content flex-1">
-                          <Link href="/shop">
+                          <Link 
+                            href="/shop"
+                            onMouseEnter={() => prefetchRoute("/shop")}
+                          >
                             <h3 className={`text-white  text-lg font-bold mb-2 hover:text-theme transition-colors duration-300 ${activeTab === "FastFood" && item.id === 1 ? "text-theme" : ""}`}>
                               {item.title}
                             </h3>

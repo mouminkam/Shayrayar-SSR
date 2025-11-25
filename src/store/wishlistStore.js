@@ -15,22 +15,51 @@ const useWishlistStore = create((set, get) => ({
 
   // Transform API response to local structure
   transformFavoriteItem: (apiItem) => {
-    const menuItem = apiItem.menu_item || {};
-    return {
-      id: menuItem.id || apiItem.menu_item_id,
-      menu_item_id: apiItem.menu_item_id || menuItem.id,
-      name: menuItem.name || "",
-      title: menuItem.name || "", // For compatibility with ProductCard
-      price: parseFloat(menuItem.price || menuItem.default_price || 0),
-      originalPrice: menuItem.default_price ? parseFloat(menuItem.default_price) : null,
-      image: menuItem.image_url || menuItem.image || "",
-      description: menuItem.description || "",
-      category_id: menuItem.category_id || null,
-      is_available: menuItem.is_available ?? true,
-      is_featured: menuItem.is_featured ?? false,
-      // Keep original API data for reference
-      _apiData: apiItem,
-    };
+    try {
+      // Validate apiItem structure
+      if (!apiItem || typeof apiItem !== 'object') {
+        console.error("transformFavoriteItem: Invalid apiItem", apiItem);
+        return null;
+      }
+
+      const menuItem = apiItem.menu_item || {};
+      
+      // Validate that we have at least menu_item_id or menu_item.id
+      if (!apiItem.menu_item_id && !menuItem.id) {
+        console.error("transformFavoriteItem: Missing menu_item_id and menu_item.id", apiItem);
+        return null;
+      }
+
+      const transformed = {
+        id: menuItem.id || apiItem.menu_item_id,
+        menu_item_id: apiItem.menu_item_id || menuItem.id,
+        name: menuItem.name || "",
+        title: menuItem.name || "", // For compatibility with ProductCard
+        price: parseFloat(menuItem.price || menuItem.default_price || 0),
+        originalPrice: menuItem.default_price ? parseFloat(menuItem.default_price) : null,
+        image: menuItem.image_url || menuItem.image || "",
+        description: menuItem.description || "",
+        category_id: menuItem.category_id || null,
+        is_available: menuItem.is_available ?? true,
+        is_featured: menuItem.is_featured ?? false,
+        // Keep original API data for reference
+        _apiData: apiItem,
+      };
+
+      // Validate transformed item has required fields
+      if (!transformed.id || !transformed.menu_item_id) {
+        console.error("transformFavoriteItem: Failed to extract id or menu_item_id", {
+          apiItem,
+          transformed
+        });
+        return null;
+      }
+
+      return transformed;
+    } catch (error) {
+      console.error("transformFavoriteItem: Error transforming item", error, apiItem);
+      return null;
+    }
   },
 
   // Actions
@@ -248,45 +277,115 @@ const useWishlistStore = create((set, get) => ({
     try {
       const response = await api.customer.getFavorites();
       
-      if (response.success && response.data) {
-        // Transform API response to match local structure
-        let favorites = [];
-        
-        if (Array.isArray(response.data)) {
-          // Direct array
-          favorites = response.data;
-        } else if (response.data.favorites && Array.isArray(response.data.favorites)) {
-          // Nested favorites array
-          favorites = response.data.favorites;
-        } else if (response.data.items && Array.isArray(response.data.items)) {
-          // Alternative structure
-          favorites = response.data.items;
-        }
-        
-        // Transform each item
-        const transformedItems = favorites.map((item) => get().transformFavoriteItem(item));
-        
-        set({
-          items: transformedItems,
-          isLoading: false,
-          error: null,
-          lastFetched: Date.now(),
-        });
-        
-        return { success: true, items: transformedItems };
-      } else {
-        set({ isLoading: false, error: response.message || "Failed to fetch favorites" });
-        return { success: false, error: response.message || "Failed to fetch favorites" };
+      // Validate response structure
+      if (!response || typeof response !== 'object') {
+        const errorMsg = "Invalid response structure from API";
+        console.error("fetchFavorites: Invalid response", response);
+        set({ isLoading: false, error: errorMsg });
+        return { success: false, error: errorMsg };
       }
+
+      if (!response.success) {
+        const errorMsg = response.message || "Failed to fetch favorites";
+        console.error("fetchFavorites: API returned success: false", response);
+        set({ isLoading: false, error: errorMsg });
+        return { success: false, error: errorMsg };
+      }
+
+      if (!response.data || typeof response.data !== 'object') {
+        const errorMsg = "Response data is missing or invalid";
+        console.error("fetchFavorites: Invalid response.data", response);
+        set({ isLoading: false, error: errorMsg });
+        return { success: false, error: errorMsg };
+      }
+
+      // Transform API response to match local structure
+      let favorites = [];
+      
+      if (Array.isArray(response.data)) {
+        // Direct array structure
+        favorites = response.data;
+        if (process.env.NODE_ENV === 'development') {
+          console.log("fetchFavorites: Using direct array structure", favorites.length);
+        }
+      } else if (response.data.favorites && Array.isArray(response.data.favorites)) {
+        // Nested favorites array (current API structure)
+        favorites = response.data.favorites;
+        if (process.env.NODE_ENV === 'development') {
+          console.log("fetchFavorites: Using nested favorites structure", favorites.length);
+        }
+      } else if (response.data.items && Array.isArray(response.data.items)) {
+        // Alternative structure
+        favorites = response.data.items;
+        if (process.env.NODE_ENV === 'development') {
+          console.log("fetchFavorites: Using items structure", favorites.length);
+        }
+      } else {
+        // Unknown structure - log for debugging
+        console.warn("fetchFavorites: Unknown response structure", {
+          data: response.data,
+          keys: Object.keys(response.data || {})
+        });
+        // Try to extract any array from data
+        const dataKeys = Object.keys(response.data);
+        for (const key of dataKeys) {
+          if (Array.isArray(response.data[key])) {
+            favorites = response.data[key];
+            console.warn(`fetchFavorites: Using array from key '${key}'`, favorites.length);
+            break;
+          }
+        }
+      }
+
+      // Validate favorites array
+      if (!Array.isArray(favorites)) {
+        const errorMsg = "Favorites data is not an array";
+        console.error("fetchFavorites: favorites is not an array", favorites);
+        set({ isLoading: false, error: errorMsg });
+        return { success: false, error: errorMsg };
+      }
+
+      // Transform each item and filter out null values (failed transformations)
+      const transformedItems = favorites
+        .map((item) => {
+          try {
+            return get().transformFavoriteItem(item);
+          } catch (error) {
+            console.error("fetchFavorites: Error transforming item", error, item);
+            return null;
+          }
+        })
+        .filter((item) => item !== null); // Remove failed transformations
+
+      // Log transformation results
+      if (process.env.NODE_ENV === 'development') {
+        const failedCount = favorites.length - transformedItems.length;
+        if (failedCount > 0) {
+          console.warn(`fetchFavorites: Failed to transform ${failedCount} out of ${favorites.length} items`);
+        }
+        console.log(`fetchFavorites: Successfully transformed ${transformedItems.length} items`);
+      }
+
+      // Update state with transformed items
+      set({
+        items: transformedItems,
+        isLoading: false,
+        error: null,
+        lastFetched: Date.now(),
+      });
+      
+      return { success: true, items: transformedItems };
     } catch (error) {
+      const errorMsg = error.message || "Failed to fetch favorites";
+      console.error("fetchFavorites: Exception caught", error);
       set({ 
         isLoading: false, 
-        error: error.message || "Failed to fetch favorites",
+        error: errorMsg,
         items: [] // Clear items on error
       });
       return { 
         success: false, 
-        error: error.message || "Failed to fetch favorites",
+        error: errorMsg,
         requiresAuth: error.status === 401
       };
     }

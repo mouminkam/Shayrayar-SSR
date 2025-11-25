@@ -43,6 +43,7 @@ export const transformMenuItemToProduct = (menuItem) => {
 
   return {
     id: menuItem.id,
+    menu_item_id: menuItem.id, // Add menu_item_id for wishlist compatibility
     title: menuItem.name || "",
     price: displayPrice,
     base_price: basePrice,

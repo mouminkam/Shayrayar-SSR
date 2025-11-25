@@ -4,10 +4,12 @@ import { Autoplay } from "swiper/modules";
 import Image from "next/image";
 import Link from "next/link";
 import { Camera } from "lucide-react";
+import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 
 import "swiper/swiper-bundle.css";
 
 export default function GallerySection() {
+  const { prefetchRoute } = usePrefetchRoute();
   const galleryItems = [
     { id: 1, image: "/img/gallery/galleryThumb1_5.jpg" },
     { id: 2, image: "/img/gallery/galleryThumb1_1.jpg" },
@@ -50,7 +52,10 @@ export default function GallerySection() {
               {galleryItems.map((item) => (
                 <SwiperSlide key={item.id}>
                   <div className="gallery-thumb relative group overflow-hidden rounded-2xl">
-                    <Link href="/shop">
+                    <Link 
+                      href="/shop"
+                      onMouseEnter={() => prefetchRoute("/shop")}
+                    >
                       <Image
                         src={item.image}
                         alt="gallery"

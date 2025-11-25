@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import { ArrowLeft, Package, Calendar, CreditCard, MapPin, CheckCircle, Clock, XCircle, X, Navigation } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -11,10 +12,13 @@ import { formatCurrency } from "../../../lib/utils/formatters";
 import AnimatedSection from "../../../components/ui/AnimatedSection";
 import ErrorBoundary from "../../../components/ui/ErrorBoundary";
 import Breadcrumb from "../../../components/ui/Breadcrumb";
+import SectionSkeleton from "../../../components/ui/SectionSkeleton";
+import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 
 export default function OrderDetailsPage() {
   const router = useRouter();
   const params = useParams();
+  const { prefetchRoute, navigate } = usePrefetchRoute();
   const orderId = params?.id;
   const { error: toastError, success: toastSuccess } = useToastStore();
   const [order, setOrder] = useState(null);
@@ -161,6 +165,11 @@ export default function OrderDetailsPage() {
               <p className="text-text text-lg">Order not found</p>
               <Link
                 href="/profile"
+                onMouseEnter={() => prefetchRoute("/profile")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/profile", { prefetch: false });
+                }}
                 className="px-6 py-3 bg-theme3 text-white rounded-xl hover:bg-theme transition-colors"
               >
                 Back to Profile
@@ -194,6 +203,11 @@ export default function OrderDetailsPage() {
           >
             <Link
               href="/profile"
+              onMouseEnter={() => prefetchRoute("/profile")}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/profile", { prefetch: false });
+              }}
               className="inline-flex items-center gap-2 text-text hover:text-theme3 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
