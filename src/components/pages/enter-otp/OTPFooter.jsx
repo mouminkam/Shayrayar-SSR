@@ -24,7 +24,7 @@ export default function OTPFooter({ flowType, phone, email }) {
   const handleResend = async () => {
     if (!canResend || isLoading) return;
 
-    if (flowType === "registration") {
+      if (flowType === "registration") {
       // Resend OTP for registration
       if (!phone) {
         toastError("Phone number not found");
@@ -35,38 +35,38 @@ export default function OTPFooter({ flowType, phone, email }) {
       const password = sessionStorage.getItem("registrationPassword");
       if (!password) {
         toastError("Registration data not found. Please start again.");
-        return;
-      }
+          return;
+        }
 
-      const result = await registerPhone({
-        phone: phone,
+        const result = await registerPhone({
+          phone: phone,
         password: password,
         password_confirmation: password,
-      });
+        });
 
-      if (result.success) {
-        toastSuccess("OTP resent to your phone");
-        setResendTimer(60);
-        setCanResend(false);
-      } else {
-        toastError(result.error || "Failed to resend OTP");
-      }
-    } else if (flowType === "reset") {
+        if (result.success) {
+          toastSuccess("OTP resent to your phone");
+          setResendTimer(60);
+          setCanResend(false);
+        } else {
+          toastError(result.error || "Failed to resend OTP");
+        }
+      } else if (flowType === "reset") {
       // Resend OTP for password reset
       if (!email) {
         toastError("Email not found");
         return;
       }
 
-      const result = await resetPasswordRequest(email);
+        const result = await resetPasswordRequest(email);
 
-      if (result.success) {
-        toastSuccess("OTP resent to your email");
-        setResendTimer(60);
-        setCanResend(false);
-      } else {
-        toastError(result.error || "Failed to resend OTP");
-      }
+        if (result.success) {
+          toastSuccess("OTP resent to your email");
+          setResendTimer(60);
+          setCanResend(false);
+        } else {
+          toastError(result.error || "Failed to resend OTP");
+        }
     }
   };
 

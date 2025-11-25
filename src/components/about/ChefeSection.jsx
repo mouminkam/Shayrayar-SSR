@@ -83,45 +83,23 @@ export default function ChefeSection() {
                   alt={chef.name}
                   width={400}
                   height={400}
-                  className="w-full h-auto  object-cover transition-transform duration-300 group-hover:scale-110"
+                  className="w-full h-auto  object-cover transition-transform duration-300 group-hover:scale-105"
                   quality={85}
                   loading="lazy"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                 />
-                {/* Social Icons */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Link
-                    href="#"
-                    className="w-10 h-10 bg-white text-theme rounded-full flex items-center justify-center hover:bg-theme hover:text-white transition-colors duration-300"
-                  >
-                    <Facebook className="w-4 h-4" />
-                  </Link>
-                  <Link
-                    href="#"
-                    className="w-10 h-10 bg-white text-theme rounded-full flex items-center justify-center hover:bg-theme hover:text-white transition-colors duration-300"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </Link>
-                  <Link
-                    href="#"
-                    className="w-10 h-10 bg-white text-theme rounded-full flex items-center justify-center hover:bg-theme hover:text-white transition-colors duration-300"
-                  >
-                    <Linkedin className="w-4 h-4" />
-                  </Link>
-                </div>
+
               </div>
-              <Link href="/chef-details">
-                <h3 className="text-white  text-2xl font-bold mb-1 hover:text-theme transition-colors duration-300">
+                <h3 className="text-white cursor-default text-2xl font-bold mb-1 hover:text-theme transition-colors duration-300">
                   {chef.name}
                 </h3>
-              </Link>
-
+                
             </div>
           ))}
         </div>
 
         {/* Client Logos Slider */}
-        <div className="pt-8 ">
+        {/* <div className="pt-8 ">
           <div className="relative overflow-hidden">
             <div className="marquee-wrapper">
               <div
@@ -130,7 +108,7 @@ export default function ChefeSection() {
                   transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
                 }}
               >
-                {/* Duplicate logos for infinite seamless loop */}
+            
                 {[...logos, ...logos, ...logos].map((item, index) => (
                   <div
                     key={`logo-${index}`}
@@ -151,7 +129,7 @@ export default function ChefeSection() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

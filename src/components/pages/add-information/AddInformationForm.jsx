@@ -37,10 +37,10 @@ export default function AddInformationForm() {
 
       // Load branches
       setLoadingBranches(true);
-      const result = await getRegistrationBranches("ar");
+        const result = await getRegistrationBranches("ar");
       if (result.success) {
         setBranches(result.branches || []);
-      } else {
+        } else {
         toastError(result.error || "Failed to load branches");
       }
       setLoadingBranches(false);
@@ -100,29 +100,29 @@ export default function AddInformationForm() {
     const registrationToken = sessionStorage.getItem("registrationToken");
     if (!registrationToken) {
       toastError("Registration session expired. Please start again.");
-      router.push("/register");
+        router.push("/register");
       return;
     }
 
-    // Combine first and last name
-    const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+      // Combine first and last name
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
 
-    const result = await completeRegistration({
-      name: fullName,
-      email: formData.email,
+      const result = await completeRegistration({
+        name: fullName,
+        email: formData.email,
       branch_id: formData.branch_id,
-    });
+      });
 
-    if (result.success) {
+      if (result.success) {
       // Cleanup sessionStorage
-      if (typeof window !== "undefined") {
-        sessionStorage.removeItem("registrationToken");
-        sessionStorage.removeItem("registrationPhone");
-        sessionStorage.removeItem("registrationPassword");
-      }
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("registrationToken");
+          sessionStorage.removeItem("registrationPhone");
+          sessionStorage.removeItem("registrationPassword");
+        }
 
       toastSuccess("Registration completed successfully! Welcome!");
-      router.push("/");
+          router.push("/");
     } else {
       // Handle errors
       if (result.errors) {
@@ -209,19 +209,19 @@ export default function AddInformationForm() {
           <MapPin className="w-4 h-4 inline mr-1" />
           Branch <span className="text-red-400">*</span>
         </label>
-        <select
-          name="branch_id"
-          value={formData.branch_id}
-          onChange={handleInputChange}
+          <select
+            name="branch_id"
+            value={formData.branch_id}
+            onChange={handleInputChange}
           disabled={loadingBranches}
-          className={`w-full px-4 py-3 bg-white/10 border ${
-            errors.branch_id ? "border-red-500" : "border-white/20"
+            className={`w-full px-4 py-3 bg-white/10 border ${
+              errors.branch_id ? "border-red-500" : "border-white/20"
           } rounded-xl text-white focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
-          style={{ 
-            color: formData.branch_id ? '#fff' : 'rgba(255, 255, 255, 0.5)',
-          }}
-        >
-          <option value="" disabled className="bg-bg3 text-white/50">
+            style={{ 
+              color: formData.branch_id ? '#fff' : 'rgba(255, 255, 255, 0.5)',
+            }}
+          >
+            <option value="" disabled className="bg-bg3 text-white/50">
             {loadingBranches ? "Loading branches..." : "Select a branch"}
           </option>
           {branches.map((branch) => (
@@ -229,7 +229,7 @@ export default function AddInformationForm() {
               {branch.name || branch.title || `Branch ${branch.id}`}
             </option>
           ))}
-        </select>
+          </select>
         {errors.branch_id && (
           <p className="mt-1 text-red-400 text-sm">{errors.branch_id}</p>
         )}

@@ -17,25 +17,25 @@ export default function OTPSection() {
     if (typeof window === "undefined") return;
 
     // Check for registration flow
-    const registrationPhone = sessionStorage.getItem("registrationPhone");
-    if (registrationPhone) {
-      setPhone(registrationPhone);
-      setFlowType("registration");
-      setIsLoading(false);
+      const registrationPhone = sessionStorage.getItem("registrationPhone");
+      if (registrationPhone) {
+        setPhone(registrationPhone);
+        setFlowType("registration");
+        setIsLoading(false);
       return;
     }
 
     // Check for reset password flow
     const resetEmail = sessionStorage.getItem("resetEmail");
     if (resetEmail) {
-      setEmail(resetEmail);
-      setFlowType("reset");
-      setIsLoading(false);
+        setEmail(resetEmail);
+        setFlowType("reset");
+        setIsLoading(false);
       return;
     }
 
     // No flow data found - redirect to register
-    router.push("/register");
+        router.push("/register");
   }, [router]);
 
   if (isLoading || !flowType) {

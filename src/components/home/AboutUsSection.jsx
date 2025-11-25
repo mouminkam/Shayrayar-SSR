@@ -8,16 +8,6 @@ export default function AboutUsSection() {
     <section className="about-us-section  section-padding pb-0 py-0 sm:py-12  relative overflow-hidden">
       <div className="about-wrapper style1 relative h-[450px]">
         {/* Shapes */}
-        <div className="shape1 hidden xl:block absolute top-0 left-0 z-10">
-          <Image
-            src="/img/shape/aboutShape1_1.png"
-            alt="shape"
-            width={100}
-            height={100}
-            unoptimized={true}
-            className="w-full h-full object-contain"
-          />
-        </div>
         <div className="shape5 hidden xl:block absolute -bottom-25 right-100 z-0">
           <Image
             src="/img/shape/aboutShape1_2.png"
@@ -28,24 +18,14 @@ export default function AboutUsSection() {
             className="w-full h-full object-contain"
           />
         </div>
-        <div className="shape3 hidden xl:block absolute -bottom-1 left-19 z-10 animate-spin-slow">
+        <div className="shape3 hidden xl:block absolute -bottom-1 left-0 z-10 animate-float-bob-y">
           <Image
-            src="/img/shape/aboutShape1_3.png"
+            src="/img/shape/shawerma.png"
             alt="shape"
             width={80}
             height={80}
             unoptimized={true}
-            className="w-full h-full object-contain"
-          />
-        </div>
-        <div className="shape4 hidden xl:block absolute top-0 right-0 z-0">
-          <Image
-            src="/img/shape/aboutShape1_4.png"
-            alt="shape"
-            width={90}
-            height={90}
-            unoptimized={true}
-            className="w-full h-full object-contain"
+            className="w-full h-130 object-contain"
           />
         </div>
         <div className="shape5 hidden xl:block absolute bottom-25 left-100 z-0">
@@ -58,14 +38,14 @@ export default function AboutUsSection() {
             className="w-full h-full object-contain"
           />
         </div>
-        <div className="shape6 hidden xl:block absolute -bottom-1 right-20 z-10 animate-spin-slow">
+        <div className="shape6 hidden xl:block absolute bottom-0 right-0 z-10 animate-float-bob-y">
           <Image
-            src="/img/shape/aboutShape1_6.png"
+            src="/img/shape/shawerma.png"
             alt="shape"
             width={100}
             height={100}
             unoptimized={true}
-            className="w-full h-full object-contain"
+            className="w-full h-130 object-contain"
           />
         </div>
 
@@ -95,12 +75,14 @@ export default function AboutUsSection() {
                     /> */}
                   </div>
                   <h2 className="title text-white  text-3xl sm:text-4xl lg:text-5xl font-black mb-10 sm:w-1/2 text-center mx-auto">
-                    Variety of flavours from american cuisine
+                    Authentic Middle Eastern Flavors Crafted with Passion
                   </h2>
                   <div className="text text-text  text-base leading-relaxed mb-8 max-w-3xl mx-auto sm:w-1/3 text-center ">
-                    It is a long established fact that a reader will be
-                    distracted the readable content of a page when looking at
-                    layout the point established fact that
+                    At Shahryar Restaurant, we bring you the finest Middle Eastern cuisine made with fresh, 
+                    premium ingredients and traditional recipes passed down through generations. From our 
+                    signature shawarma to our mouthwatering grilled specialties, every dish is prepared 
+                    with care and served with genuine hospitality. Experience the rich flavors and 
+                    authentic taste that make us a beloved destination for food lovers.
                   </div>
                   <div className="btn-wrapper flex justify-center">
                     <Link

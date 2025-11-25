@@ -1,73 +1,116 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { formatCurrency } from "../../lib/utils/formatters";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
+import api from "../../api";
+import useBranchStore from "../../store/branchStore";
+import { transformCategories, transformMenuItemsToProducts } from "../../lib/utils/productTransform";
+import { extractMenuItemsFromResponse } from "../../lib/utils/responseExtractor";
 
-export default function fFoodMenuSection() {
+export default function FoodMenuSection() {
   const { prefetchRoute } = usePrefetchRoute();
-  const [activeTab, setActiveTab] = useState("FastFood");
+  const { selectedBranch, getSelectedBranchId, initialize } = useBranchStore();
+  
+  // State for categories
+  const [categories, setCategories] = useState([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  
+  // State for menu items
+  const [menuItems, setMenuItems] = useState([]);
+  const [isLoadingItems, setIsLoadingItems] = useState(false);
+  
+  // State for active tab (category ID)
+  const [activeTab, setActiveTab] = useState(null);
 
-  const menuItems = {
-    FastFood: [
-      { id: 1, title: "Chinese Pasta", description: "It's a testament to our.", price: 15.99, image: "/img/menu/menuThumb1_1.png" },
-      { id: 2, title: "Chicken Fried Rice", description: "It's a testament to our.", price: 25.99, image: "/img/menu/menuThumb1_2.png" },
-      { id: 3, title: "Chicken Pizza", description: "It's a testament to our.", price: 115.99, image: "/img/menu/menuThumb1_3.png" },
-      { id: 4, title: "Chicken Noodles", description: "It's a testament to our.", price: 154.99, image: "/img/menu/menuThumb1_4.png" },
-      { id: 5, title: "Grilled Chicken", description: "It's a testament to our.", price: 55.99, image: "/img/menu/menuThumb1_5.png" },
-      { id: 6, title: "Egg and Cucumber", description: "It's a testament to our.", price: 65.99, image: "/img/menu/menuThumb1_6.png" },
-      { id: 7, title: "Chicken White Rice", description: "It's a testament to our.", price: 135.99, image: "/img/menu/menuThumb1_7.png" },
-      { id: 8, title: "Spatial Barger", description: "It's a testament to our.", price: 95.99, image: "/img/menu/menuThumb1_8.png" },
-      { id: 9, title: "Vegetables Burger", description: "It's a testament to our.", price: 75.99, image: "/img/menu/menuThumb1_9.png" },
-      { id: 10, title: "Brief Chicken", description: "It's a testament to our.", price: 44.99, image: "/img/menu/menuThumb1_10.png" },
-    ],
-    DrinkJuice: [
-      { id: 1, title: "Chinese Pasta", description: "It's a testament to our.", price: 15.99, image: "/img/menu/menuThumb1_1.png" },
-      { id: 2, title: "Chicken Fried Rice", description: "It's a testament to our.", price: 25.99, image: "/img/menu/menuThumb1_2.png" },
-      { id: 3, title: "Chicken Pizza", description: "It's a testament to our.", price: 115.99, image: "/img/menu/menuThumb1_3.png" },
-      { id: 4, title: "Chicken Noodles", description: "It's a testament to our.", price: 154.99, image: "/img/menu/menuThumb1_4.png" },
-      { id: 5, title: "Grilled Chicken", description: "It's a testament to our.", price: 55.99, image: "/img/menu/menuThumb1_5.png" },
-      { id: 6, title: "Egg and Cucumber", description: "It's a testament to our.", price: 65.99, image: "/img/menu/menuThumb1_6.png" },
-      { id: 7, title: "Chicken White Rice", description: "It's a testament to our.", price: 135.99, image: "/img/menu/menuThumb1_7.png" },
-      { id: 8, title: "Spatial Barger", description: "It's a testament to our.", price: 95.99, image: "/img/menu/menuThumb1_8.png" },
-      { id: 9, title: "Vegetables Burger", description: "It's a testament to our.", price: 75.99, image: "/img/menu/menuThumb1_9.png" },
-      { id: 10, title: "Brief Chicken", description: "It's a testament to our.", price: 44.99, image: "/img/menu/menuThumb1_10.png" },
-    ],
-    ChickenPizza: [
-      { id: 1, title: "Chinese Pasta", description: "It's a testament to our.", price: 15.99, image: "/img/menu/menuThumb1_1.png" },
-      { id: 2, title: "Chicken Fried Rice", description: "It's a testament to our.", price: 25.99, image: "/img/menu/menuThumb1_2.png" },
-      { id: 3, title: "Chicken Pizza", description: "It's a testament to our.", price: 115.99, image: "/img/menu/menuThumb1_3.png" },
-      { id: 4, title: "Chicken Noodles", description: "It's a testament to our.", price: 154.99, image: "/img/menu/menuThumb1_4.png" },
-      { id: 5, title: "Grilled Chicken", description: "It's a testament to our.", price: 55.99, image: "/img/menu/menuThumb1_5.png" },
-      { id: 6, title: "Egg and Cucumber", description: "It's a testament to our.", price: 65.99, image: "/img/menu/menuThumb1_6.png" },
-      { id: 7, title: "Chicken White Rice", description: "It's a testament to our.", price: 135.99, image: "/img/menu/menuThumb1_7.png" },
-      { id: 8, title: "Spatial Barger", description: "It's a testament to our.", price: 95.99, image: "/img/menu/menuThumb1_8.png" },
-      { id: 9, title: "Vegetables Burger", description: "It's a testament to our.", price: 75.99, image: "/img/menu/menuThumb1_9.png" },
-      { id: 10, title: "Brief Chicken", description: "It's a testament to our.", price: 44.99, image: "/img/menu/menuThumb1_10.png" },
-    ],
-    FreshPasta: [
-      { id: 1, title: "Chinese Pasta", description: "It's a testament to our.", price: 15.99, image: "/img/menu/menuThumb1_1.png" },
-      { id: 2, title: "Chicken Fried Rice", description: "It's a testament to our.", price: 25.99, image: "/img/menu/menuThumb1_2.png" },
-      { id: 3, title: "Chicken Pizza", description: "It's a testament to our.", price: 115.99, image: "/img/menu/menuThumb1_3.png" },
-      { id: 4, title: "Chicken Noodles", description: "It's a testament to our.", price: 154.99, image: "/img/menu/menuThumb1_4.png" },
-      { id: 5, title: "Grilled Chicken", description: "It's a testament to our.", price: 55.99, image: "/img/menu/menuThumb1_5.png" },
-      { id: 6, title: "Egg and Cucumber", description: "It's a testament to our.", price: 65.99, image: "/img/menu/menuThumb1_6.png" },
-      { id: 7, title: "Chicken White Rice", description: "It's a testament to our.", price: 135.99, image: "/img/menu/menuThumb1_7.png" },
-      { id: 8, title: "Spatial Barger", description: "It's a testament to our.", price: 95.99, image: "/img/menu/menuThumb1_8.png" },
-      { id: 9, title: "Vegetables Burger", description: "It's a testament to our.", price: 75.99, image: "/img/menu/menuThumb1_9.png" },
-      { id: 10, title: "Brief Chicken", description: "It's a testament to our.", price: 44.99, image: "/img/menu/menuThumb1_10.png" },
-    ],
-  };
+  // Initialize branch if not loaded
+  useEffect(() => {
+    if (!selectedBranch) {
+      initialize();
+    }
+  }, [selectedBranch, initialize]);
 
-  const tabs = [
-    { id: "FastFood", label: "Fast Food", icon: "/img/menu/menuIcon1_1.png" },
-    { id: "DrinkJuice", label: "Drink & Juice", icon: "/img/menu/menuIcon1_2.png" },
-    { id: "ChickenPizza", label: "Chicken Pizza", icon: "/img/menu/menuIcon1_3.png" },
-    { id: "FreshPasta", label: "Fresh Pasta", icon: "/img/menu/menuIcon1_4.png" },
-  ];
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (!selectedBranch) {
+        setIsLoadingCategories(false);
+        return;
+      }
 
-  const currentItems = menuItems[activeTab] || [];
+      setIsLoadingCategories(true);
+      try {
+        const response = await api.menu.getMenuCategories();
+        
+        // Handle different response structures
+        let categoriesData = [];
+        
+        if (response && response.success && response.data) {
+          categoriesData = Array.isArray(response.data)
+            ? response.data
+            : response.data.categories || response.data.data || [];
+        } else if (Array.isArray(response)) {
+          categoriesData = response;
+        } else if (response && response.data && Array.isArray(response.data)) {
+          categoriesData = response.data;
+        } else if (response && response.data) {
+          categoriesData = response.data.categories || response.data.data || [];
+        } else if (response && typeof response === 'object') {
+          categoriesData = response.categories || response.data || [];
+        }
+        
+        const transformed = transformCategories(categoriesData);
+        setCategories(transformed);
+        
+        // Set first category as active tab if no active tab is set
+        if (transformed.length > 0) {
+          setActiveTab((prev) => prev || transformed[0].id);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setCategories([]);
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, [selectedBranch]);
+
+  // Fetch menu items when activeTab (category) changes
+  const fetchMenuItems = useCallback(async (categoryId) => {
+    const branchId = getSelectedBranchId();
+    if (!branchId || !categoryId) {
+      setMenuItems([]);
+      return;
+    }
+
+    setIsLoadingItems(true);
+    try {
+      const response = await api.menu.getMenuItems({
+        branch_id: branchId,
+        category_id: categoryId,
+        limit: 10,
+      });
+      
+      const { menuItems: items } = extractMenuItemsFromResponse(response);
+      const transformed = transformMenuItemsToProducts(items);
+      setMenuItems(transformed);
+    } catch (error) {
+      console.error("Error fetching menu items:", error);
+      setMenuItems([]);
+    } finally {
+      setIsLoadingItems(false);
+    }
+  }, [getSelectedBranchId]);
+
+  // Fetch menu items when activeTab changes
+  useEffect(() => {
+    if (activeTab) {
+      fetchMenuItems(activeTab);
+    }
+  }, [activeTab, fetchMenuItems]);
 
   return (
     <section className="food-menu-section fix section-padding py-12 sm:py-16 md:py-20 lg:py-24">
@@ -102,43 +145,69 @@ export default function fFoodMenuSection() {
 
             {/* Tabs */}
             <div className="food-menu-tab mb-8">
-              <ul className="nav nav-pills flex flex-wrap justify-center gap-4 mb-8" role="tablist">
-                {tabs.map((tab) => (
-                  <li key={tab.id} className="nav-item mb-10" role="presentation">
-                    <button
-                      className={`nav-link px-6 py-3 rounded-xl  text-base cursor-pointer font-medium transition-all duration-300 flex items-center gap-2 ${activeTab === tab.id
-                        ? "bg-theme text-white"
-                        : "text-white hover:bg-theme hover:text-white"
-                        }`}
-                      onClick={() => setActiveTab(tab.id)}
-                      type="button"
-                      role="tab"
-                    >
-                      <Image
-                        src={tab.icon}
-                        alt={tab.label}
-                        width={24}
-                        height={24}
-                        unoptimized={true}
-                      />
-                      {tab.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              {isLoadingCategories ? (
+                <div className="flex flex-wrap justify-center gap-4 mb-8">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div
+                      key={i}
+                      className="h-12 w-32 bg-bgimg rounded-xl animate-pulse"
+                    />
+                  ))}
+                </div>
+              ) : categories.length > 0 ? (
+                <ul className="nav nav-pills flex flex-wrap justify-center gap-4 mb-8" role="tablist">
+                  {categories.map((category) => (
+                    <li key={category.id} className="nav-item mb-10" role="presentation">
+                      <button
+                        className={`nav-link px-6 py-3 rounded-xl  text-base cursor-pointer font-medium transition-all duration-300 ${activeTab === category.id
+                          ? "bg-theme text-white"
+                          : "text-white hover:bg-theme hover:text-white"
+                          }`}
+                        onClick={() => setActiveTab(category.id)}
+                        type="button"
+                        role="tab"
+                      >
+                        {category.name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="text-center text-text py-8">
+                  <p>No categories available</p>
+                </div>
+              )}
 
               {/* Tab Content */}
               <div className="tab-content sm:px-20">
-                <div
-                  className={`tab-pane ${activeTab === "FastFood" ? "show active" : ""}`}
-                  role="tabpanel"
-                >
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 ">
-                    {currentItems.map((item) => (
-                      <div key={item.id} className="single-menu-items border-2 border-bgimg flex items-center gap-6 p-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                {isLoadingItems ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <div
+                        key={i}
+                        className="single-menu-items border-2 border-bgimg flex items-center gap-6 p-4 rounded-2xl"
+                      >
+                        <div className="w-24 h-24 bg-bgimg rounded-full animate-pulse shrink-0" />
+                        <div className="flex-1">
+                          <div className="h-5 bg-bgimg rounded mb-2 w-3/4 animate-pulse" />
+                          <div className="h-4 bg-bgimg rounded w-1/2 animate-pulse" />
+                        </div>
+                        <div className="w-20 h-6 bg-bgimg rounded animate-pulse shrink-0" />
+                      </div>
+                    ))}
+                  </div>
+                ) : menuItems.length > 0 ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {menuItems.map((item) => (
+                      <Link
+                        key={item.id}
+                        href={`/shop/${item.id}`}
+                        onMouseEnter={() => prefetchRoute(`/shop/${item.id}`)}
+                        className="single-menu-items border-2 border-bgimg flex items-center gap-6 p-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+                      >
                         <div className="menu-item-thumb shrink-0">
                           <Image
-                            src={item.image}
+                            src={item.image || "/img/placeholder.png"}
                             alt={item.title}
                             width={96}
                             height={96}
@@ -149,23 +218,24 @@ export default function fFoodMenuSection() {
                           />
                         </div>
                         <div className="menu-content flex-1">
-                          <Link 
-                            href="/shop"
-                            onMouseEnter={() => prefetchRoute("/shop")}
-                          >
-                            <h3 className={`text-white  text-lg font-bold mb-2 hover:text-theme transition-colors duration-300 ${activeTab === "FastFood" && item.id === 1 ? "text-theme" : ""}`}>
-                              {item.title}
-                            </h3>
-                          </Link>
-                          <p className="text-text  text-sm">{item.description}</p>
+                          <h3 className="text-white  text-lg font-bold mb-2 hover:text-theme transition-colors duration-300">
+                            {item.title}
+                          </h3>
+                          <p className="text-text  text-sm line-clamp-2">
+                            {item.description || "Delicious food item"}
+                          </p>
                         </div>
                         <h6 className="text-theme  text-xl font-bold shrink-0">
                           {formatCurrency(item.price)}
                         </h6>
-                      </div>
+                      </Link>
                     ))}
                   </div>
-                </div>
+                ) : (
+                  <div className="text-center text-text py-12">
+                    <p>No items available in this category</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

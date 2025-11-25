@@ -62,11 +62,11 @@ const useAuthStore = create(
           const errorMessage = error.message || "An error occurred during login";
           const apiErrors = error.data?.errors || null;
           
-          return { 
-            success: false, 
+        return { 
+          success: false, 
             error: errorMessage,
             errors: apiErrors
-          };
+        };
         }
       },
 

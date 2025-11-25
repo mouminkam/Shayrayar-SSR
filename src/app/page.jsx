@@ -163,13 +163,13 @@ export default function HomePage() {
       </ErrorBoundary>
 
       {/* CTA Section - Priority 4 */}
-      <ErrorBoundary>
+      {/* <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-48" />}>
           <AnimatedSection>
             <CTASection />
           </AnimatedSection>
         </Suspense>
-      </ErrorBoundary>
+      </ErrorBoundary> */}
 
       {/* Food Menu Section - Priority 1 (High) */}
       <ErrorBoundary>
@@ -190,13 +190,13 @@ export default function HomePage() {
       </ErrorBoundary>
 
       {/* Timer Section - Priority 4 */}
-      <ErrorBoundary>
+      {/* <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-64" />}>
           <AnimatedSection>
             <TimerSection />
           </AnimatedSection>
         </Suspense>
-      </ErrorBoundary>
+      </ErrorBoundary> */}
 
       {/* Chef Section - Priority 3 */}
       <ErrorBoundary>
@@ -208,22 +208,22 @@ export default function HomePage() {
       </ErrorBoundary>
       
       {/* Testimonial Section - Priority 2 (High) */}
-      <ErrorBoundary>
+      {/* <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="testimonial" height="h-96" />}>
           <AnimatedSection>
             <TestimonialSection />
           </AnimatedSection>
         </Suspense>
-      </ErrorBoundary>
+      </ErrorBoundary> */}
 
       {/* Gallery Section - Priority 2 (High) */}
-      <ErrorBoundary>
+      {/* <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="gallery" cardCount={8} height="h-64" />}>
           <AnimatedSection>
             <GallerySection />
           </AnimatedSection>
         </Suspense>
-      </ErrorBoundary>
+      </ErrorBoundary> */}
     </div>
   );
 }

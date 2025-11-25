@@ -76,8 +76,8 @@ export default function PhoneInputForm() {
         whileTap={{ scale: 0.98 }}
         className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2"
       >
-        Continue
-        <ArrowRight className="w-5 h-5" />
+            Continue
+            <ArrowRight className="w-5 h-5" />
       </motion.button>
     </form>
   );

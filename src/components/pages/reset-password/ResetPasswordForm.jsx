@@ -46,17 +46,17 @@ export default function ResetPasswordForm() {
       return;
     }
 
-    const result = await resetPasswordRequest(email);
+      const result = await resetPasswordRequest(email);
 
-    if (result.success) {
+      if (result.success) {
       // Save email in sessionStorage for OTP verification
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem("resetEmail", email);
-      }
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("resetEmail", email);
+        }
 
       toastSuccess("OTP sent to your email. Please check your inbox.");
-      router.push("/enter-otp");
-    } else {
+        router.push("/enter-otp");
+      } else {
       toastError(result.error || "Failed to send OTP. Please try again.");
     }
   };

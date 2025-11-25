@@ -25,12 +25,12 @@ export default function ConfirmPasswordForm() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const token = sessionStorage.getItem("resetToken");
+      const token = sessionStorage.getItem("resetToken");
     const email = sessionStorage.getItem("resetEmail");
-
+      
     if (!token || !email) {
       toastError("Reset session expired. Please start again.");
-      router.push("/reset-password");
+          router.push("/reset-password");
       return;
     }
 
@@ -92,15 +92,15 @@ export default function ConfirmPasswordForm() {
       password_confirmation: formData.confirmPassword,
     });
 
-    if (result.success) {
+      if (result.success) {
       // Cleanup sessionStorage
-      if (typeof window !== "undefined") {
+        if (typeof window !== "undefined") {
         sessionStorage.removeItem("resetToken");
-        sessionStorage.removeItem("resetEmail");
-      }
+          sessionStorage.removeItem("resetEmail");
+        }
 
       toastSuccess("Password reset successfully! Please login with your new password.");
-      router.push("/login");
+          router.push("/login");
     } else {
       // Handle errors
       if (result.errors) {

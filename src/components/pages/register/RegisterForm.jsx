@@ -71,21 +71,21 @@ export default function RegisterForm() {
       return;
     }
 
-    const result = await registerPhone({
+      const result = await registerPhone({
       phone: formData.phone,
-      password: formData.password,
-      password_confirmation: formData.confirmPassword,
-    });
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
+      });
 
-    if (result.success) {
+      if (result.success) {
       // Save phone and password in sessionStorage for OTP verification and resend
-      if (typeof window !== "undefined") {
+        if (typeof window !== "undefined") {
         sessionStorage.setItem("registrationPhone", formData.phone);
-        sessionStorage.setItem("registrationPassword", formData.password);
-      }
+          sessionStorage.setItem("registrationPassword", formData.password);
+        }
 
       toastSuccess("OTP sent to your phone. Please verify your number.");
-      router.push("/enter-otp");
+        router.push("/enter-otp");
     } else {
       // Handle errors
       if (result.errors) {

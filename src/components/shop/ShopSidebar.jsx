@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Search, Star, Heart, ShoppingBasket } from "lucide-react";
+import { ArrowRight, /* Search, */ Star, Heart, ShoppingBasket } from "lucide-react"; // Search temporarily disabled
 import OptimizedImage from "../ui/OptimizedImage";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 import api from "../../api";
@@ -27,9 +27,9 @@ export default function ShopSidebar() {
   const { isAuthenticated } = useAuthStore();
   
   const currentCategory = searchParams.get("category");
-  const currentSearch = searchParams.get("search") || "";
+  // const currentSearch = searchParams.get("search") || ""; // Temporarily disabled
   
-  const [searchQuery, setSearchQuery] = useState(currentSearch);
+  // const [searchQuery, setSearchQuery] = useState(currentSearch); // Temporarily disabled
   const [categories, setCategories] = useState([]);
   const [recentProducts, setRecentProducts] = useState([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
@@ -202,10 +202,10 @@ export default function ShopSidebar() {
     }
   }, [addToWishlist, removeFromWishlist, wishlistItems, toastSuccess, toastError, isAuthenticated, navigate]);
 
-  // Update search query when URL changes
-  useEffect(() => {
-    setSearchQuery(currentSearch);
-  }, [currentSearch]);
+  // Update search query when URL changes - Temporarily disabled
+  // useEffect(() => {
+  //   setSearchQuery(currentSearch);
+  // }, [currentSearch]);
 
   // Handle category selection
   const handleCategoryClick = useCallback((categoryId) => {
@@ -222,28 +222,28 @@ export default function ShopSidebar() {
     navigate(`/shop?${params.toString()}`);
   }, [navigate, searchParams, currentCategory]);
 
-  // Handle search
-  const handleSearch = useCallback((e) => {
-    e.preventDefault();
-    const params = new URLSearchParams(searchParams.toString());
-    
-    if (searchQuery.trim()) {
-      params.set("search", searchQuery.trim());
-      params.delete("page"); // Reset to first page
-    } else {
-      params.delete("search");
-      params.delete("page");
-    }
-    
-    navigate(`/shop?${params.toString()}`);
-  }, [searchQuery, navigate, searchParams]);
+  // Handle search - Temporarily disabled
+  // const handleSearch = useCallback((e) => {
+  //   e.preventDefault();
+  //   const params = new URLSearchParams(searchParams.toString());
+  //   
+  //   if (searchQuery.trim()) {
+  //     params.set("search", searchQuery.trim());
+  //     params.delete("page"); // Reset to first page
+  //   } else {
+  //     params.delete("search");
+  //     params.delete("page");
+  //   }
+  //   
+  //   navigate(`/shop?${params.toString()}`);
+  // }, [searchQuery, navigate, searchParams]);
 
 
 
   return (
     <aside className="main-sidebar space-y-6 lg:space-y-8">
-      {/* Search Widget */}
-      <div className="bg-bgimg p-6 sm:p-8 rounded-2xl shadow-sm">
+      {/* Search Widget - Temporarily disabled */}
+      {/* <div className="bg-bgimg p-6 sm:p-8 rounded-2xl shadow-sm">
         <h5 className="text-white  text-lg sm:text-xl font-bold relative pb-3 mb-6 capitalize">
           Search
           <span className="absolute bottom-0 left-0 h-0.5 w-16 sm:w-20 bg-theme3"></span>
@@ -264,7 +264,7 @@ export default function ShopSidebar() {
             <Search className="w-4 h-4 cursor-pointer sm:w-5 sm:h-5" />
           </button>
         </form>
-      </div>
+      </div> */}
 
       {/* Categories Widget */}
       <div className="bg-bgimg p-6 sm:p-8 rounded-2xl shadow-sm">

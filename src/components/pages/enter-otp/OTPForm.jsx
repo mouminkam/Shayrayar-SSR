@@ -38,9 +38,9 @@ export default function OTPForm({ flowType, phone, email }) {
         return;
       }
 
-      const result = await verifyPhoneOTP(phone, otpString);
+        const result = await verifyPhoneOTP(phone, otpString);
 
-      if (result.success) {
+        if (result.success) {
         toastSuccess("Phone verified successfully!");
         router.push("/add-information");
       } else {
@@ -50,12 +50,12 @@ export default function OTPForm({ flowType, phone, email }) {
           toastError(result.error || "Invalid OTP code. Please try again.");
         }
         // Clear OTP on error
-        setOtp(["", "", "", ""]);
+          setOtp(["", "", "", ""]);
         if (inputRefs.current[0]) {
           inputRefs.current[0].focus();
         }
-      }
-    } else if (flowType === "reset") {
+        }
+      } else if (flowType === "reset") {
       // Reset password flow: verify email OTP
       if (!email) {
         toastError("Email not found. Please start password reset again.");
@@ -63,15 +63,15 @@ export default function OTPForm({ flowType, phone, email }) {
         return;
       }
 
-      const result = await verifyOTP(email, otpString);
+        const result = await verifyOTP(email, otpString);
 
-      if (result.success) {
+        if (result.success) {
         toastSuccess("OTP verified successfully!");
-        router.push("/confirm-information");
-      } else {
+          router.push("/confirm-information");
+        } else {
         toastError(result.error || "Invalid OTP code. Please try again.");
         // Clear OTP on error
-        setOtp(["", "", "", ""]);
+          setOtp(["", "", "", ""]);
         if (inputRefs.current[0]) {
           inputRefs.current[0].focus();
         }

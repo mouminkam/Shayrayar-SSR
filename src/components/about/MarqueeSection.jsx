@@ -1,13 +1,13 @@
 // Removed "use client" - This component only uses static JSX with CSS animations which are SSR-compatible
 export default function MarqueeSection() {
   const items = [
-    "chicken pizza ",
-    "GRILLED CHICKEN ",
-    "BURGER ",
-    "CHICKEN PIZZA ",
-    "FRESH PASTA ",
-    "ITALIANO FRENCH FRY ",
-    "CHICKEN FRY ",
+    "SHAWARMA ",
+    "BAKLAVA ",
+    "FRESH JUICES ",
+    "KEBAB ",
+    "Cordon bleu ",
+    "CHICKEN WINGS ",
+
   ];
 
   // Duplicate items for seamless loop
