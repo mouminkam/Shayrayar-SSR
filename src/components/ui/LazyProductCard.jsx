@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import ProductCard from "./ProductCard";
 import ProductCardSkeleton from "./ProductCardSkeleton";
@@ -29,10 +29,10 @@ export default function LazyProductCard({
 
   // Load card when it enters viewport
   useEffect(() => {
-    if (inView && !shouldLoad) {
+    if (inView) {
       setShouldLoad(true);
     }
-  }, [inView, shouldLoad]);
+  }, [inView]);
 
   // If already loaded, render immediately
   if (shouldLoad) {

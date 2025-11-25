@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import ShopSidebar from "./ShopSidebar";
 import SortBar from "./SortBar";
-import ProductCard from "../ui/ProductCard";
 import ProductCardSkeleton from "../ui/ProductCardSkeleton";
 import LazyProductCard from "../ui/LazyProductCard";
 import AnimatedSection from "../ui/AnimatedSection";
@@ -48,7 +47,6 @@ export default function ShopSection() {
   // Handle view mode change
   const handleViewModeChange = (newViewMode) => {
     setViewMode(newViewMode);
-    // If using client pagination, reset displayed products
     if (useClientPagination) {
       const newItemsPerPage = newViewMode === "grid" ? ITEMS_PER_PAGE_GRID : ITEMS_PER_PAGE_LIST;
       setProducts(allProducts.slice(0, newItemsPerPage));
@@ -149,10 +147,7 @@ export default function ShopSection() {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Calculate if there are more products to show
-  const hasMore = useClientPagination 
-    ? products.length < allProducts.length 
-    : false; // Server-side pagination handled by API
+  const hasMore = useClientPagination && products.length < allProducts.length;
 
   return (
     <AnimatedSection mobileOptimized={true}>
@@ -218,7 +213,6 @@ export default function ShopSection() {
                         />
                       ))}
                     </div>
-                    {/* Show More Button (only for client-side pagination) */}
                     {hasMore && (
                       <div className="flex justify-center mt-8">
                         <button
@@ -239,12 +233,10 @@ export default function ShopSection() {
                           key={product.id} 
                           product={product} 
                           viewMode="list"
-                          // Load first 2 cards immediately (above the fold)
                           options={index < 2 ? { rootMargin: "0px" } : {}}
                         />
                       ))}
                     </div>
-                    {/* Show More Button (only for client-side pagination) */}
                     {hasMore && (
                       <div className="flex justify-center mt-8">
                         <button
