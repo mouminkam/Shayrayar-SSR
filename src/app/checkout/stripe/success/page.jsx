@@ -17,6 +17,7 @@ function StripeSuccessContent() {
   const orderId = searchParams.get('order_id');
   // Stripe adds 'payment_intent' parameter to redirect URL automatically
   const paymentIntentId = searchParams.get('payment_intent') || searchParams.get('payment_intent_id');
+  const quoteId = searchParams.get('quote_id'); // Get quote_id from URL if available
   const { clearCart } = useCartStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const [order, setOrder] = useState(null);
@@ -47,8 +48,8 @@ function StripeSuccessContent() {
           const orderData = orderResponse.data.order || orderResponse.data;
           // If order has payment_intent_id stored, use it
           if (orderData.payment_intent_id) {
-            // Use the stored payment_intent_id
-            return await confirmPaymentWithId(orderData.payment_intent_id);
+            // Use the stored payment_intent_id and quote_id if available
+            return await confirmPaymentWithId(orderData.payment_intent_id, orderData.quote_id || null);
           }
         }
       } catch (error) {
@@ -60,19 +61,49 @@ function StripeSuccessContent() {
       return { success: false, error: 'Missing payment information' };
     }
 
-    return await confirmPaymentWithId(paymentIntentId);
+    return await confirmPaymentWithId(paymentIntentId, quoteId || null);
   };
 
-  const confirmPaymentWithId = async (intentId) => {
+  const confirmPaymentWithId = async (intentId, quoteIdParam = null) => {
     if (!intentId || !orderId) {
       return { success: false, error: 'Missing payment information' };
     }
 
     try {
-      const response = await api.payments.confirmStripePayment({
-        payment_intent_id: intentId,
-        order_id: parseInt(orderId),
-      });
+      // Get quote_id from parameter, URL, or order data
+      let finalQuoteId = quoteIdParam || quoteId;
+      
+      // If quote_id not in URL, try to get it from order
+      if (!finalQuoteId && orderId) {
+        try {
+          const orderResponse = await api.orders.getOrderById(orderId);
+          if (orderResponse.success && orderResponse.data) {
+            const orderData = orderResponse.data.order || orderResponse.data;
+            if (orderData.quote_id) {
+              finalQuoteId = orderData.quote_id;
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching order for quote_id:', error);
+        }
+      }
+
+      // Use new Web API - payment_intent_id, order_id, and optional quote_id
+      const response = await api.payments.confirmStripePaymentWeb(
+        intentId, 
+        parseInt(orderId),
+        finalQuoteId || null
+      );
+
+      // Log response for debugging
+      console.log('Confirm payment response:', response);
+      if (response.success && response.data?.order) {
+        console.log('Order after confirm:', {
+          id: response.data.order.id,
+          payment_status: response.data.order.payment_status,
+          // Note: order.status is managed separately by the restaurant
+        });
+      }
 
       return response;
     } catch (error) {
@@ -95,13 +126,23 @@ function StripeSuccessContent() {
         setOrder(orderData);
         
         // Check if payment is confirmed
-        if (orderData.payment_status === 'paid' || 
-            orderData.status === 'confirmed' || 
-            orderData.status === 'processing') {
-          toastSuccess('Payment successful! Order confirmed.');
+        // Only check payment_status - order.status is managed separately by the restaurant
+        if (orderData.payment_status === 'paid') {
+          // Use setTimeout to avoid React warning about updating state during render
+          setTimeout(() => {
+            toastSuccess('Payment successful! Your order has been paid.');
+          }, 0);
           setIsLoading(false);
           return true; // Payment confirmed
         }
+
+        // Log current order state for debugging
+        console.log('Order payment status check:', {
+          order_id: orderData.id,
+          payment_status: orderData.payment_status,
+          is_paid: orderData.payment_status === 'paid',
+          // Note: order.status is managed separately by the restaurant
+        });
         
         return false; // Payment not confirmed yet
       }
@@ -117,18 +158,42 @@ function StripeSuccessContent() {
 
     // Step 1: Confirm payment with backend
     if (paymentIntentId) {
+      console.log('Confirming payment with backend...', { paymentIntentId, orderId });
       const confirmResult = await confirmPayment();
+      
+      console.log('Confirm payment result:', {
+        success: confirmResult.success,
+        hasData: !!confirmResult.data,
+        paymentStatus: confirmResult.data?.order?.payment_status,
+        // Note: order.status is managed separately by the restaurant
+      });
       
       if (!confirmResult.success) {
         // Check if it's a requires_payment_method error
         if (confirmResult.data?.requires_payment_method === true) {
-          toastError(confirmResult.data?.message || 'Payment failed. Please try another payment method.');
+          // Use setTimeout to avoid React warning about updating state during render
+          setTimeout(() => {
+            toastError(confirmResult.data?.message || 'Payment failed. Please try another payment method.');
+          }, 0);
           setIsLoading(false);
           setIsConfirming(false);
           return;
         }
         // Other errors - continue to check order status
         console.warn('Payment confirmation returned error, but checking order status anyway:', confirmResult);
+      } else if (confirmResult.success && confirmResult.data?.order) {
+        // If confirm was successful and returned order, check if payment is paid
+        const orderFromConfirm = confirmResult.data.order;
+        if (orderFromConfirm.payment_status === 'paid') {
+          console.log('Payment already paid from confirm payment response');
+          setOrder(orderFromConfirm);
+          setTimeout(() => {
+            toastSuccess('Payment successful! Your order has been paid.');
+          }, 0);
+          setIsLoading(false);
+          setIsConfirming(false);
+          return;
+        }
       }
     }
 
@@ -139,10 +204,15 @@ function StripeSuccessContent() {
 
     // Step 3: If not confirmed, start polling
     if (!isConfirmed && pollingCount < maxPollingAttempts) {
+      console.log('Starting polling for order confirmation...', { pollingCount, maxPollingAttempts });
       startPolling();
     } else if (!isConfirmed) {
       // Max polling attempts reached
-      toastError('Payment confirmation is taking longer than expected. Please check your order status.');
+      console.warn('Max polling attempts reached, order not confirmed');
+      // Use setTimeout to avoid React warning about updating state during render
+      setTimeout(() => {
+        toastError('Payment confirmation is taking longer than expected. Please check your order status.');
+      }, 0);
       setIsLoading(false);
     } else {
       setIsLoading(false);
@@ -157,7 +227,10 @@ function StripeSuccessContent() {
         if (newCount >= maxPollingAttempts) {
           clearInterval(pollInterval);
           setIsLoading(false);
-          toastError('Payment confirmation is taking longer than expected. Please check your order status.');
+          // Use setTimeout to avoid React warning about updating state during render
+          setTimeout(() => {
+            toastError('Payment confirmation is taking longer than expected. Please check your order status.');
+          }, 0);
           return newCount;
         }
 

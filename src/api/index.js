@@ -21,6 +21,7 @@ import homeAPI from './home';
 import notificationsAPI from './notifications';
 import deliveryBoyAPI from './deliveryBoy';
 import contactAPI from './contact';
+import deliveryAPI from './delivery';
 import axiosInstance from './config/axios';
 
 // Export all API modules
@@ -36,6 +37,7 @@ export {
   notificationsAPI,
   deliveryBoyAPI,
   contactAPI,
+  deliveryAPI,
 };
 
 // Export axios instance for direct use if needed
@@ -54,6 +56,7 @@ const api = {
   notifications: notificationsAPI,
   deliveryBoy: deliveryBoyAPI,
   contact: contactAPI,
+  delivery: deliveryAPI,
 };
 
 export default api;

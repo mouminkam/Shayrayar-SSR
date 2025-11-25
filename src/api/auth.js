@@ -191,6 +191,26 @@ export const googleLogin = async (idToken) => {
   return response;
 };
 
+/**
+ * Google Web Login - New API for Next.js integration
+ * @param {string} authorizationCode - Authorization code from Google OAuth callback
+ * @param {string} redirectUri - Redirect URI used in OAuth flow
+ * @returns {Promise<Object>} Response with user data and token
+ */
+export const googleWebLogin = async (authorizationCode, redirectUri) => {
+  try {
+    const response = await axiosInstance.post('/auth/google/web-login', {
+      authorization_code: authorizationCode,
+      redirect_uri: redirectUri,
+    });
+    return response;
+  } catch (error) {
+    // Re-throw error to be handled by caller
+    // Axios interceptor already formats the error
+    throw error;
+  }
+};
+
 // Default export with all auth functions
 const authAPI = {
   register,
@@ -208,6 +228,7 @@ const authAPI = {
   getGoogleAuthUrl,
   googleCallback,
   googleLogin,
+  googleWebLogin,
 };
 
 export default authAPI;

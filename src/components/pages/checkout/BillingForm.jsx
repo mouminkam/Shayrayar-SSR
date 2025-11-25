@@ -31,14 +31,14 @@ const BillingForm = memo(() => {
 
   const [formData, setFormData] = useState({
     // Shipping address fields (only for delivery)
-    address: user?.address?.street || "",
-    city: user?.address?.city || "",
-    state: user?.address?.state || "",
-    zipCode: user?.address?.zipCode || "",
-    country: user?.address?.country || "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
     latitude: null,
     longitude: null,
-    address_id: null,
+    quote_id: null, // Delivery quote ID
     // Payment and order fields
     paymentMethod: "cash", // Default to cash
     scheduled_at: "",
@@ -47,19 +47,6 @@ const BillingForm = memo(() => {
 
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Update shipping address from user when user changes
-  useEffect(() => {
-    if (user?.address) {
-      setFormData((prev) => ({
-        ...prev,
-        address: user.address?.street || prev.address,
-        city: user.address?.city || prev.city,
-        state: user.address?.state || prev.state,
-        zipCode: user.address?.zipCode || prev.zipCode,
-        country: user.address?.country || prev.country,
-      }));
-    }
-  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -91,8 +78,8 @@ const BillingForm = memo(() => {
 
     // Validate address based on order type
     if (orderType === "delivery") {
-      if (!formData.address || !formData.city || !formData.state || !formData.zipCode) {
-        toastError("Please complete your delivery address");
+      if (!formData.address || !formData.latitude || !formData.longitude) {
+        toastError("Please select a delivery location on the map");
         return false;
       }
     }
@@ -128,6 +115,36 @@ const BillingForm = memo(() => {
     setIsProcessing(true);
 
     try {
+      // Validate cart items: Check if any item needs size but doesn't have one
+      // This validation prevents backend errors for products that require size selection
+      const itemsNeedingSize = items.filter((item) => {
+        // If item has size_id, it's valid
+        if (item.size_id) return false;
+        
+        // If item doesn't have size_id, we need to check if the product requires size
+        // Since we don't have has_sizes in cart items, we'll validate by checking
+        // if the item was added with a size_name (which indicates it should have size_id)
+        // OR if the item has sizes array (from original product data)
+        // For now, we'll check if size_name exists but size_id is null (inconsistent state)
+        if (item.size_name && !item.size_id) {
+          return true; // Inconsistent: has size_name but no size_id
+        }
+        
+        // If item has sizes array, it means the product has sizes and one should be selected
+        if (item.sizes && Array.isArray(item.sizes) && item.sizes.length > 0 && !item.size_id) {
+          return true; // Product has sizes but none selected
+        }
+        
+        return false;
+      });
+
+      if (itemsNeedingSize.length > 0) {
+        const itemNames = itemsNeedingSize.map(item => item.title || item.name).join(", ");
+        toastError(`Please select a size for: ${itemNames}`);
+        setIsProcessing(false);
+        return;
+      }
+
       // Calculate totals
       const subtotal = getSubtotal();
       const discount = getDiscount();
@@ -172,9 +189,9 @@ const BillingForm = memo(() => {
         notes: formData.notes || "",
       };
 
-      // Add address_id if available
-      if (formData.address_id) {
-        orderData.address_id = formData.address_id;
+      // Add quote_id if delivery order
+      if (orderType === "delivery" && formData.quote_id) {
+        orderData.quote_id = formData.quote_id;
       }
 
       // Add scheduled_at if provided
@@ -207,7 +224,12 @@ const BillingForm = memo(() => {
         }
 
         // Redirect to payment page in same window
-        const paymentUrl = `/checkout/stripe/pay?order_id=${orderId}&client_secret=${encodeURIComponent(intentResult.client_secret)}`;
+        // Note: publishable_key will be loaded from NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY env variable
+        let paymentUrl = `/checkout/stripe/pay?order_id=${orderId}&client_secret=${encodeURIComponent(intentResult.client_secret)}`;
+        // Add quote_id to URL if available (for delivery orders)
+        if (orderType === "delivery" && formData.quote_id) {
+          paymentUrl += `&quote_id=${encodeURIComponent(formData.quote_id)}`;
+        }
         router.push(paymentUrl);
         // Don't set isProcessing to false - page will change
         // Don't clear cart yet - wait for successful payment confirmation

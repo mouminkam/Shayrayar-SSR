@@ -1,6 +1,10 @@
 /**
  * Google OAuth Popup Utility Functions
  * Handles popup window management and postMessage communication
+ * 
+ * @deprecated This file is deprecated. The new Google OAuth flow uses direct redirect
+ * instead of popup windows. See buildGoogleOAuthUrl in authStore.js for the new approach.
+ * This file is kept for backward compatibility or potential mobile app usage.
  */
 
 /**

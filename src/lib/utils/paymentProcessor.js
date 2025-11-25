@@ -6,25 +6,27 @@
 import api from '../../api';
 
 /**
- * Create Stripe Payment Intent via API
+ * Create Stripe Payment Intent via API (Web API - New)
  * @param {number} orderId - Order ID
- * @param {number} amount - Payment amount (decimal, e.g., 25.50)
- * @param {string} currency - Currency code (default: USD)
- * @returns {Promise<Object>} { success: boolean, client_secret?: string, payment_intent_id?: string, error?: string }
+ * @param {number} amount - Payment amount (deprecated - now comes from backend)
+ * @param {string} currency - Currency code (deprecated - now comes from backend)
+ * @returns {Promise<Object>} { success: boolean, client_secret?: string, payment_intent_id?: string, amount?: number, currency?: string, error?: string }
+ * @note publishable_key is no longer returned - use NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY env variable instead
  */
 export const createStripePaymentIntent = async (orderId, amount, currency = 'USD') => {
   try {
-    const response = await api.payments.createStripePaymentIntent({
-      order_id: orderId,
-      amount: amount,
-      currency: currency,
-    });
+    // Use new Web API - only order_id is required
+    const response = await api.payments.createStripePaymentIntentWeb(orderId);
 
     if (response.success && response.data) {
       return {
         success: true,
         client_secret: response.data.client_secret,
         payment_intent_id: response.data.payment_intent_id,
+        // Note: publishable_key removed - use NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY env variable
+        amount: response.data.amount, // From backend
+        currency: response.data.currency, // From backend
+        order_number: response.data.order_number, // From backend
       };
     }
 

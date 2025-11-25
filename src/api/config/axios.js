@@ -76,6 +76,7 @@ const getBranchId = () => {
  * URLs that don't need branch_id:
  * - /branches (getting all branches - exact match or query params only)
  * - /auth/rbranches (registration branches)
+ * - /auth/google/web-login (Google OAuth web login)
  * - /customer/* (customer data)
  * - /notifications/* (notifications)
  */
@@ -93,8 +94,10 @@ const shouldExcludeBranchId = (url) => {
   // Pattern matches
   const excludePatterns = [
     '/auth/rbranches', // Registration branches
+    '/auth/google/web-login', // Google OAuth web login
     '/customer/', // Customer endpoints
     '/notifications/', // Notifications
+    '/payments/stripe/config', // Stripe config (public endpoint, no branch_id needed)
   ];
   
   return excludePatterns.some(pattern => urlPath.includes(pattern));
@@ -220,6 +223,32 @@ axiosInstance.interceptors.response.use(
         });
       }
       
+      // Handle 400 Bad Request
+      if (status === 400) {
+        // Extract error message from different possible locations
+        let errorMessage = 'Bad Request';
+        if (data?.errors?.error) {
+          errorMessage = data.errors.error;
+        } else if (data?.error) {
+          errorMessage = data.error;
+        } else if (data?.message) {
+          errorMessage = data.message;
+        } else if (data?.errors) {
+          // If errors is an object, try to extract values
+          const errorValues = Object.values(data.errors).flat();
+          if (errorValues.length > 0) {
+            errorMessage = errorValues.join(', ');
+          }
+        }
+        
+        return Promise.reject({
+          message: errorMessage,
+          status: 400,
+          data: data,
+          response: error.response,
+        });
+      }
+      
       // Handle 422 Validation Error
       if (status === 422) {
         const errorMessage = data?.errors 
@@ -243,10 +272,12 @@ axiosInstance.interceptors.response.use(
       }
       
       // Generic error handling
+      const errorMessage = data?.error || data?.message || data?.errors?.error || `API Error: ${error.message}`;
       return Promise.reject({
-        message: data?.error || data?.message || `API Error: ${error.message}`,
+        message: errorMessage,
         status: status,
         data: data,
+        response: error.response,
       });
     }
     

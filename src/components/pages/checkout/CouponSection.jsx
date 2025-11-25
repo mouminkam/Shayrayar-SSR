@@ -73,10 +73,17 @@ export default function CouponSection() {
         branch_id: branchId,
       });
 
-      if (response.success && response.data) {
+      if (response.success && response.data?.coupon) {
+        // Extract coupon data from API response
+        const couponFromAPI = response.data.coupon;
         const couponData = {
           code: couponCode.trim(),
-          ...response.data,
+          id: couponFromAPI.id,
+          type: couponFromAPI.type, // 'fixed_amount', 'percentage', or 'FREEDELIVERY'
+          value: parseFloat(couponFromAPI.value) || 0,
+          discount_amount: parseFloat(couponFromAPI.discount_amount) || 0,
+          is_free_delivery: couponFromAPI.is_free_delivery || false,
+          description: couponFromAPI.description || '',
         };
         applyCoupon(couponData);
         toastSuccess("Coupon applied successfully!");
@@ -121,11 +128,13 @@ export default function CouponSection() {
             <div>
               <p className="text-white font-semibold">{coupon.code}</p>
               <p className="text-text text-sm">
-                Discount: {coupon.discount_amount 
-                  ? `$${coupon.discount_amount.toFixed(2)}`
-                  : coupon.discount_type === 'percentage'
-                  ? `${coupon.discount_value}%`
-                  : `$${coupon.discount_value}`}
+                {coupon.type === 'FREEDELIVERY' 
+                  ? 'Free Delivery'
+                  : coupon.discount_amount > 0
+                  ? `Discount: ${coupon.discount_amount.toFixed(2)} SAR`
+                  : coupon.type === 'percentage'
+                  ? `Discount: ${coupon.value}%`
+                  : `Discount: ${coupon.value} SAR`}
               </p>
             </div>
           </div>

@@ -489,6 +489,51 @@ const useAuthStore = create(
         }
       },
 
+      // Build Google OAuth URL directly (new approach)
+      buildGoogleOAuthUrl: () => {
+        if (typeof window === "undefined") {
+          return { success: false, error: "Window is not available" };
+        }
+
+        const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+        const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
+
+        if (!clientId || !redirectUri) {
+          return {
+            success: false,
+            error: "Google OAuth configuration is missing. Please check environment variables.",
+          };
+        }
+
+        // Generate state for CSRF protection
+        const state = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+        
+        // Store state and redirect_uri in sessionStorage for verification
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("googleOAuthState", state);
+          sessionStorage.setItem("googleOAuthRedirectUri", redirectUri);
+        }
+
+        // Build Google OAuth URL
+        const params = new URLSearchParams({
+          client_id: clientId,
+          redirect_uri: redirectUri,
+          response_type: "code",
+          scope: "openid email profile",
+          access_type: "offline",
+          prompt: "consent",
+          state: state,
+        });
+
+        const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+
+        return {
+          success: true,
+          url: googleAuthUrl,
+          state: state,
+        };
+      },
+
       // Handle Google OAuth callback data
       handleGoogleOAuthCallback: async (callbackData) => {
         set({ isLoading: true });

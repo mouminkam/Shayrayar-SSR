@@ -8,7 +8,7 @@ import useToastStore from "../../../store/toastStore";
 
 export default function RegisterForm() {
   const router = useRouter();
-  const { registerPhone, isLoading } = useAuthStore();
+  const { registerPhone, isLoading, buildGoogleOAuthUrl } = useAuthStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const [formData, setFormData] = useState({
     phone: "",
@@ -96,6 +96,16 @@ export default function RegisterForm() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    const result = buildGoogleOAuthUrl();
+    
+    if (result.success) {
+      // Redirect to Google OAuth in same page
+      window.location.href = result.url;
+    } else {
+      toastError(result.error || "Failed to initialize Google login");
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -230,19 +240,20 @@ export default function RegisterForm() {
         )}
       </motion.button>
 
-      {/* Divider */}
-      <div className="relative my-6">
+      {/* Divider - Temporarily disabled */}
+      {/* <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-white/20"></div>
         </div>
         <div className="relative flex justify-center text-sm">
           <span className="px-4 bg-transparent text-text">Or continue with</span>
         </div>
-      </div>
+      </div> */}
 
-      {/* Google Button */}
-      <motion.button
+      {/* Google Button - Temporarily disabled */}
+      {/* <motion.button
         type="button"
+        onClick={handleGoogleLogin}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         className="w-full bg-white/10 hover:bg-white/20 text-white py-4 px-6 transition-all duration-300 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl border border-white/20 flex items-center justify-center gap-3"
@@ -266,7 +277,7 @@ export default function RegisterForm() {
           />
         </svg>
         Continue with Google
-      </motion.button>
+      </motion.button> */}
     </form>
   );
 }

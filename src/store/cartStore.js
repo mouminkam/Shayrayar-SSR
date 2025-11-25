@@ -26,6 +26,7 @@ const useCartStore = create(
       coupon: null, // Applied coupon { code, discount_amount, discount_type, ... }
       deliveryCharge: 0, // Delivery charge amount
       orderType: 'delivery', // 'pickup' or 'delivery'
+      quoteId: null, // Delivery quote ID
 
       // Actions
       addToCart: (product) => {
@@ -174,6 +175,7 @@ const useCartStore = create(
           items: [],
           coupon: null,
           deliveryCharge: 0,
+          quoteId: null,
         });
       },
 
@@ -194,10 +196,15 @@ const useCartStore = create(
       // Order type management
       setOrderType: (type) => {
         set({ orderType: type });
-        // Reset delivery charge if pickup
+        // Reset delivery charge and quote_id if pickup
         if (type === 'pickup') {
-          set({ deliveryCharge: 0 });
+          set({ deliveryCharge: 0, quoteId: null });
         }
+      },
+
+      // Quote ID management
+      setQuoteId: (quoteId) => {
+        set({ quoteId: quoteId || null });
       },
 
       // Update cart item (for editing customization)
@@ -333,14 +340,30 @@ const useCartStore = create(
         
         const subtotal = get().getSubtotal();
         
-        if (coupon.discount_type === 'percentage') {
-          return (subtotal * coupon.discount_value) / 100;
-        } else if (coupon.discount_type === 'fixed') {
-          return Math.min(coupon.discount_value, subtotal); // Don't exceed subtotal
+        // Handle different coupon types based on API response structure
+        if (coupon.type === 'percentage') {
+          // For percentage: use discount_amount from API if available (already calculated)
+          // Otherwise calculate from value
+          if (coupon.discount_amount && coupon.discount_amount > 0) {
+            return Math.min(coupon.discount_amount, subtotal);
+          }
+          // Fallback: calculate from percentage value
+          const discount = (subtotal * coupon.value) / 100;
+          return Math.min(discount, subtotal);
+        } else if (coupon.type === 'fixed_amount') {
+          // For fixed amount: use value directly (discount_amount might be 0 in API response)
+          return Math.min(coupon.value, subtotal); // Don't exceed subtotal
+        } else if (coupon.type === 'FREEDELIVERY') {
+          // Free delivery coupons don't affect subtotal discount
+          return 0;
         }
         
         // Fallback: use discount_amount if available
-        return coupon.discount_amount || 0;
+        if (coupon.discount_amount && coupon.discount_amount > 0) {
+          return Math.min(coupon.discount_amount, subtotal);
+        }
+        
+        return 0;
       },
 
       getDeliveryCharge: () => {
@@ -348,6 +371,13 @@ const useCartStore = create(
         if (orderType === 'pickup') {
           return 0;
         }
+        
+        // Check if coupon provides free delivery
+        const coupon = get().coupon;
+        if (coupon && (coupon.type === 'FREEDELIVERY' || coupon.is_free_delivery)) {
+          return 0;
+        }
+        
         return get().deliveryCharge || 0;
       },
 
