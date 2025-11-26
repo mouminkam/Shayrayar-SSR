@@ -7,7 +7,6 @@ export default function QuickLinks() {
   const { prefetchRoute } = usePrefetchRoute();
   const links = [
     { href: "/about-us", label: "About Us" },
-    // { href: "/blog", label: "Our Blogs" }, // Blog section temporarily disabled
     { href: "/contact-us", label: "Contact Us" },
   ];
 

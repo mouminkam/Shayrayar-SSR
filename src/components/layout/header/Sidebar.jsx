@@ -44,7 +44,6 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const navItems = [
     { href: "/", label: "Home" },
     { href: "/shop", label: "Shop" },
-    // { href: "/blog", label: "Blog" }, // Blog section temporarily disabled
     { href: "/contact-us", label: "ContactUs" },
     { href: "/about-us", label: "AboutUs" },
   ];
@@ -129,11 +128,11 @@ export default function Sidebar({ isOpen, setIsOpen }) {
             transition={{ type: "tween", duration: 0.3, easeInOut: [0.25, 0.1, 0.25, 1] }}
             className="fixed right-0 top-0 h-screen w-full max-w-md bg-bgimg z-9999 shadow-2xl overflow-y-auto sidebar-hide-scrollbar"
             onWheel={(e) => {
-              // منع انتشار الـ scroll إلى الموقع
+              // Prevent scroll propagation to the site
               e.stopPropagation();
             }}
             onTouchMove={(e) => {
-              // منع انتشار الـ touch scroll إلى الموقع
+              // Prevent touch scroll propagation to the site
               e.stopPropagation();
             }}
           >
@@ -196,7 +195,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     </div>
                   </motion.div>
 
-                  {/* Description Text - يظهر فقط على الشاشات الكبيرة */}
+                  {/* Description Text - Only visible on large screens */}
                   <motion.p
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -207,7 +206,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     customers&apos; needs and resolving their problems. Effective customer service is crucial.
                   </motion.p>
 
-                  {/* Gallery Area - يظهر فقط على الشاشات XL */}
+                  {/* Gallery Area - Only visible on XL screens */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -264,7 +263,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     </div>
                   </motion.div>
 
-                  {/* Mobile Menu - Navigation للأجهزة الصغيرة */}
+                  {/* Mobile Menu - Navigation for small devices */}
                   <div className="mobile-menu fix mb-6 lg:hidden">
                     <nav>
                       <ul className="flex flex-col  gap-5 py-4 ">

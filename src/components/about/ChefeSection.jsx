@@ -1,8 +1,5 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
-import { Facebook, Share2, Linkedin } from "lucide-react";
-import { useState, useEffect } from "react";
 
 export default function ChefeSection() {
   const chefs = [
@@ -23,25 +20,6 @@ export default function ChefeSection() {
     },
   ];
 
-  const logos = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-  ];
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerView = 6; // عدد العناصر المعروضة في كل مرة
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => {
-        // إذا وصلنا للنهاية، نعود للبداية بشكل سلس
-        if (prevIndex >= logos.length - itemsPerView) {
-          return 0;
-        }
-        return prevIndex + 1;
-      });
-    }, 3000); // كل 3 ثواني
-
-    return () => clearInterval(interval);
-  }, [logos.length, itemsPerView]);
 
   return (
     <section className="py-12 sm:py-16 md:py-20 lg:py-24 relative">
@@ -49,21 +27,9 @@ export default function ChefeSection() {
         {/* Title */}
         <div className="text-center mb-12 lg:mb-16">
           <div className="flex items-center justify-center gap-2 mb-4">
-            {/* <Image
-              src="/img/icon/titleIcon.svg"
-              alt="icon"
-              width={20}
-              height={20}
-            /> */}
             <span className="text-theme3  text-3xl font-bold uppercase">
               OUR CHEFE
             </span>
-            {/* <Image
-              src="/img/icon/titleIcon.svg"
-              alt="icon"
-              width={20}
-              height={20}
-            /> */}
           </div>
           <h2 className="text-white  text-3xl sm:text-4xl lg:text-5xl font-black">
             Meet Our Expert Chefe
@@ -97,39 +63,6 @@ export default function ChefeSection() {
             </div>
           ))}
         </div>
-
-        {/* Client Logos Slider */}
-        {/* <div className="pt-8 ">
-          <div className="relative overflow-hidden">
-            <div className="marquee-wrapper">
-              <div
-                className="marquee-inner flex items-center gap-0 transition-transform duration-700 ease-in-out"
-                style={{
-                  transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
-                }}
-              >
-            
-                {[...logos, ...logos, ...logos].map((item, index) => (
-                  <div
-                    key={`logo-${index}`}
-                    className="shrink-0 py-2 px-7 transition-opacity duration-300"
-                    style={{
-                      minWidth: `${100 / itemsPerView}%`,
-                    }}
-                  >
-                    <Image
-                      src={`/img/logo/clientLogoDark1_1.png`}
-                      alt={`Client ${item}`}
-                      width={120}
-                      height={60}
-                      className="w-auto h-25 mx-auto object-contain grayscale hover:grayscale-0 transition-all duration-300"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div> */}
       </div>
     </section>
   );

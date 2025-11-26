@@ -1,4 +1,3 @@
-// import { Urbanist } from "next/font/google";
 import { Oswald } from "next/font/google";
 import FreshHeatHeader from "../components/layout/Header";
 import FreshHeatFooter from "../components/layout/Footer";
@@ -6,14 +5,6 @@ import Toast from "../components/ui/Toast";
 import BranchInitializer from "../components/layout/BranchInitializer";
 import LenisScrollProvider from "../components/layout/LenisScrollProvider";
 import "./globals.css";
-
-// Temporarily disabled - Urbanist font
-// const urbanist = Urbanist({
-//   subsets: ["latin"],
-//   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-//   variable: "--font-urbanist",
-//   display: "swap",
-// });
 
 const oswald = Oswald({
   subsets: ["latin"],

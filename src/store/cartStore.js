@@ -21,8 +21,8 @@ export const getCartItemKey = (item) => {
 const useCartStore = create(
   persist(
     (set, get) => ({
-      // State - الحالة الأساسية للـ cart
-      items: [], // Cart فارغ افتراضياً
+      // State - Basic cart state
+      items: [], // Cart is empty by default
       coupon: null, // Applied coupon { code, discount_amount, discount_type, ... }
       deliveryCharge: 0, // Delivery charge amount
       orderType: 'delivery', // 'pickup' or 'delivery'

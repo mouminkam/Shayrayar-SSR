@@ -240,7 +240,21 @@ export default function ShippingAddressSection({ formData, setFormData }) {
 
   // Initialize map
   const initializeMap = useCallback(() => {
-    if (!mapRef.current || !window.L) return;
+    if (!mapRef.current) {
+      // If mapRef is not ready, try again after a short delay
+      setTimeout(() => {
+        if (mapRef.current && window.L) {
+          initializeMap();
+        }
+      }, 100);
+      return;
+    }
+    
+    if (!window.L) {
+      setMapError('Map library not loaded. Click on the map area to retry.');
+      return;
+    }
+    
     if (mapInstanceRef.current) {
       if (formData.latitude && formData.longitude) {
         mapInstanceRef.current.setView([formData.latitude, formData.longitude], 15);
@@ -250,6 +264,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
     if (mapRef.current._leaflet_id) return;
 
     try {
+      setMapError(null);
       const center = formData.latitude && formData.longitude 
         ? [formData.latitude, formData.longitude] 
         : SOFIA_CENTER;
@@ -275,6 +290,16 @@ export default function ShippingAddressSection({ formData, setFormData }) {
 
       if (formData.latitude && formData.longitude) {
         createMarker({ lat: formData.latitude, lng: formData.longitude }, map);
+        reverseGeocode(formData.latitude, formData.longitude);
+      } else {
+        // Always initialize with Sofia center
+        createMarker({ lat: SOFIA_CENTER[0], lng: SOFIA_CENTER[1] }, map);
+        reverseGeocode(SOFIA_CENTER[0], SOFIA_CENTER[1]);
+        
+        // Try to get user location in background (non-blocking)
+        setTimeout(() => {
+          getCurrentLocation();
+        }, 500);
       }
 
       if (!map._clickListenerAdded) {
@@ -286,16 +311,10 @@ export default function ShippingAddressSection({ formData, setFormData }) {
         });
         map._clickListenerAdded = true;
       }
-
-      if (!formData.latitude || !formData.longitude) {
-        createMarker({ lat: SOFIA_CENTER[0], lng: SOFIA_CENTER[1] }, map);
-        reverseGeocode(SOFIA_CENTER[0], SOFIA_CENTER[1]);
-        getCurrentLocation();
-      }
     } catch (error) {
       if (error.message?.includes('already initialized')) return;
-      setMapError('Failed to initialize map. Please refresh the page.');
-      toastError('Failed to initialize map. Please refresh the page.');
+      setMapError('Failed to initialize map. Click on the map area to retry.');
+      toastError('Failed to initialize map. Click on the map area to retry.');
     }
   }, [formData.latitude, formData.longitude, getCurrentLocation, createMarker, reverseGeocode, updateMarkerPosition, validateLocation, toastError]);
 
@@ -303,11 +322,17 @@ export default function ShippingAddressSection({ formData, setFormData }) {
   useEffect(() => {
     if (!isDelivery) return;
 
+    // If Leaflet is already loaded, initialize map immediately
     if (window.L && leafletLoadedRef.current) {
-      initializeMap();
+      setLoading(prev => ({ ...prev, map: false }));
+      // Small delay to ensure mapRef is ready
+      setTimeout(() => {
+        initializeMap();
+      }, 50);
       return;
     }
 
+    // Load CSS first
     const existingCSS = document.querySelector('link[href*="leaflet.css"]');
     if (!existingCSS) {
       const link = document.createElement('link');
@@ -320,28 +345,35 @@ export default function ShippingAddressSection({ formData, setFormData }) {
       document.head.appendChild(link);
     }
 
+    // Check if script already exists
     const existingScript = document.querySelector('script[src*="leaflet"]');
     if (existingScript) {
       if (window.L) {
         leafletLoadedRef.current = true;
         setLoading(prev => ({ ...prev, map: false }));
-        initializeMap();
+        setTimeout(() => {
+          initializeMap();
+        }, 50);
         return;
       }
+      // Script is loading, wait for it
       existingScript.addEventListener('load', () => {
         leafletLoadedRef.current = true;
         setLoading(prev => ({ ...prev, map: false }));
-        initializeMap();
+        setTimeout(() => {
+          initializeMap();
+        }, 50);
       });
       existingScript.addEventListener('error', () => {
         setLoading(prev => ({ ...prev, map: false }));
-        setMapError('Failed to load Leaflet.js. Please refresh the page.');
-        toastError('Failed to load Leaflet.js. Please refresh the page.');
+        setMapError('Failed to load Leaflet.js. Click on the map area to retry.');
+        toastError('Failed to load Leaflet.js. Click on the map area to retry.');
       });
       setLoading(prev => ({ ...prev, map: true }));
       return;
     }
 
+    // Load script
     setLoading(prev => ({ ...prev, map: true }));
     leafletLoadedRef.current = false;
     
@@ -356,14 +388,17 @@ export default function ShippingAddressSection({ formData, setFormData }) {
     script.onload = () => {
       leafletLoadedRef.current = true;
       setLoading(prev => ({ ...prev, map: false }));
-      initializeMap();
+      // Small delay to ensure mapRef is ready
+      setTimeout(() => {
+        initializeMap();
+      }, 50);
     };
     
     script.onerror = () => {
       leafletLoadedRef.current = false;
       setLoading(prev => ({ ...prev, map: false }));
-      setMapError('Failed to load Leaflet.js. Please check your internet connection.');
-      toastError('Failed to load Leaflet.js. Please check your internet connection.');
+      setMapError('Failed to load Leaflet.js. Click on the map area to retry.');
+      toastError('Failed to load Leaflet.js. Click on the map area to retry.');
     };
     
     document.head.appendChild(script);
@@ -461,23 +496,56 @@ export default function ShippingAddressSection({ formData, setFormData }) {
       <div className="mb-4">
         <div className="relative w-full h-[400px] rounded-xl overflow-hidden border-2 border-white/20">
           {loading.map ? (
-            <div className="absolute inset-0 flex items-center justify-center bg-bgimg">
+            <div className="absolute inset-0 flex items-center justify-center bg-bgimg z-10">
               <div className="text-center">
                 <Loader2 className="w-8 h-8 text-theme3 animate-spin mx-auto mb-2" />
                 <p className="text-text">Loading map...</p>
               </div>
             </div>
-          ) : mapError ? (
-            <div className="absolute inset-0 flex items-center justify-center bg-bgimg p-4">
+          ) : mapError && !mapInstanceRef.current ? (
+            <div 
+              className="absolute inset-0 flex items-center justify-center bg-bgimg p-4 cursor-pointer hover:bg-bgimg/80 transition-colors z-10"
+              onClick={() => {
+                setMapError(null);
+                setLoading(prev => ({ ...prev, map: true }));
+                if (window.L && mapRef.current) {
+                  setTimeout(() => {
+                    initializeMap();
+                    setLoading(prev => ({ ...prev, map: false }));
+                  }, 100);
+                } else {
+                  // Retry loading Leaflet
+                  const script = document.querySelector('script[src*="leaflet"]');
+                  if (script) {
+                    script.addEventListener('load', () => {
+                      initializeMap();
+                      setLoading(prev => ({ ...prev, map: false }));
+                    });
+                  } else {
+                    window.location.reload();
+                  }
+                }
+              }}
+            >
               <div className="text-center max-w-md">
                 <p className="text-red-400 mb-3 font-semibold">{mapError}</p>
-                <button onClick={() => window.location.reload()} className="px-4 py-2 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors">
-                  Reload Page
+                <p className="text-text text-sm mb-2">Click here to load the map</p>
+                <button className="px-4 py-2 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors">
+                  Load Map
                 </button>
               </div>
             </div>
           ) : (
-            <div ref={mapRef} className="w-full h-full" />
+            <div 
+              ref={mapRef} 
+              className="w-full h-full"
+              onClick={() => {
+                // If map is not initialized, try to initialize on click
+                if (!mapInstanceRef.current && window.L && mapRef.current) {
+                  initializeMap();
+                }
+              }}
+            />
           )}
         </div>
       </div>

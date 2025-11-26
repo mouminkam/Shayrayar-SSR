@@ -2,7 +2,7 @@
 export default function BackgroundShapes() {
   return (
     <>
-      {/* Background Shapes - يمكن إضافة صور هنا لاحقاً */}
+      {/* Background Shapes - Images can be added here later */}
       <div className="absolute bottom-0 left-0 w-48 h-64 opacity-10 pointer-events-none hidden 2xl:block">
         <div className="w-full h-full bg-green-500 rounded-tl-full"></div>
       </div>

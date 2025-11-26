@@ -2,10 +2,9 @@
 import { useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingBasket, Heart, Star } from "lucide-react";
+import { ShoppingBasket, Star } from "lucide-react";
 import { formatCurrency } from "../../lib/utils/formatters";
 import useCartStore from "../../store/cartStore";
-import useWishlistStore from "../../store/wishlistStore";
 import useToastStore from "../../store/toastStore";
 import useAuthStore from "../../store/authStore";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
@@ -14,19 +13,9 @@ import OptimizedImage from "./OptimizedImage";
 export default function ProductCard({ product, viewMode = "grid" }) {
   const { navigate, prefetchRoute } = usePrefetchRoute();
   const { addToCart } = useCartStore();
-  const { addToWishlist, removeFromWishlist, items: wishlistItems } = useWishlistStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
   
-  // Use menu_item_id if available, otherwise fall back to id
-  const menuItemId = product.menu_item_id || product.id;
-  // Check if item is in wishlist by checking items array directly (this will re-render when items change)
-  const isInWishlistState = wishlistItems.some((item) => {
-    const itemId = item.id ? String(item.id) : null;
-    const itemMenuItemId = item.menu_item_id ? String(item.menu_item_id) : null;
-    const productIdStr = String(menuItemId);
-    return itemId === productIdStr || itemMenuItemId === productIdStr;
-  });
   const productUrl = `/shop/${product.id}`;
 
   // Prefetch route on hover
@@ -90,65 +79,6 @@ export default function ProductCard({ product, viewMode = "grid" }) {
     }
   };
 
-  // Handle wishlist toggle
-  const handleWishlistToggle = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Check authentication first
-    if (!isAuthenticated) {
-      toastError("Please login to add items to wishlist");
-      navigate("/login");
-      return;
-    }
-    
-    // Validate menuItemId
-    if (!menuItemId) {
-      console.error("handleWishlistToggle: Missing menuItemId", product);
-      toastError("Invalid product information");
-      return;
-    }
-    
-    try {
-      if (isInWishlistState) {
-        const result = await removeFromWishlist(menuItemId);
-        if (result.success) {
-          toastSuccess(`${product.title || product.name} removed from wishlist`);
-        } else {
-          if (result.requiresAuth) {
-            navigate("/login");
-          } else {
-            toastError(result.error || "Failed to remove from wishlist");
-          }
-        }
-      } else {
-        const result = await addToWishlist({
-          id: product.id,
-          menu_item_id: menuItemId,
-          name: product.title || product.name,
-          price: product.price,
-          image: product.image,
-          title: product.title || product.name,
-        });
-        if (result.success) {
-          if (result.alreadyExists) {
-            // Item already exists, no need to show success message
-            return;
-          }
-          toastSuccess(`${product.title || product.name} added to wishlist`);
-        } else {
-          if (result.requiresAuth) {
-            navigate("/login");
-          } else {
-            toastError(result.error || "Failed to add to wishlist");
-          }
-        }
-      }
-    } catch (error) {
-      console.error("handleWishlistToggle error:", error);
-      toastError("Failed to update wishlist. Please try again.");
-    }
-  };
   if (viewMode === "list") {
     return (
       <div 
@@ -187,18 +117,6 @@ export default function ProductCard({ product, viewMode = "grid" }) {
               {product.title}
             </h3>
           </Link>
-          <div className="icon absolute top-4 right-4">
-            <button
-              onClick={handleWishlistToggle}
-              className={`w-8 h-8 flex items-center justify-center rounded-full transition-all duration-300 ${
-                isInWishlistState
-                  ? "bg-theme3 text-white"
-                  : "bg-theme2 text-white hover:bg-theme"
-              }`}
-            >
-              <Heart className={`w-4 h-4 ${isInWishlistState ? "fill-current" : ""}`} />
-            </button>
-          </div>
           <div className="star mb-3 flex items-center gap-0.5">
             {[...Array(5)].map((_, i) => (
               <Star
@@ -243,20 +161,6 @@ export default function ProductCard({ product, viewMode = "grid" }) {
       className="dishes-card style2 p-6 sm:p-7 mt-38 rounded-2xl bg-bgimg shadow-lg hover:shadow-xl text-center transition-all duration-300 hover:-translate-y-2 relative min-h-[200px] flex flex-col"
       onMouseEnter={handleMouseEnter}
     >
-      {/* Heart Button - Top Right */}
-      <div className="absolute top-4 right-4 z-20">
-        <button
-          onClick={handleWishlistToggle}
-          className={`w-8 h-8 flex items-center justify-center rounded-full transition-all duration-300 ${
-            isInWishlistState
-              ? "bg-theme3 text-white"
-              : "bg-theme2 text-white hover:bg-theme"
-          }`}
-        >
-          <Heart className={`w-4 h-4 ${isInWishlistState ? "fill-current" : ""}`} />
-        </button>
-      </div>
-
       <div className="absolute -top-20 left-1/2 -translate-x-1/2 flex justify-center items-center shrink-0 w-full">
         {/* Circle Shape - Behind the food image */}
         <Image

@@ -1,6 +1,6 @@
 /**
  * Customer API endpoints
- * Handles customer addresses, favorites (wishlist), and order history
+ * Handles customer addresses and order history
  */
 
 import axiosInstance from './config/axios';
@@ -29,35 +29,6 @@ export const saveAddress = async (addressData) => {
 };
 
 /**
- * Get customer favorites (wishlist)
- * @returns {Promise<Object>} Response with favorites list
- */
-export const getFavorites = async () => {
-  const response = await axiosInstance.get('/customer/favorites');
-  return response;
-};
-
-/**
- * Add item to favorites
- * @param {number} menuItemId - Menu item ID to add to favorites
- * @returns {Promise<Object>} Response confirming item added to favorites
- */
-export const addToFavorites = async (menuItemId) => {
-  const response = await axiosInstance.post(`/customer/favorites/${menuItemId}`);
-  return response;
-};
-
-/**
- * Remove item from favorites
- * @param {number} menuItemId - Menu item ID to remove from favorites
- * @returns {Promise<Object>} Response confirming item removed from favorites
- */
-export const removeFromFavorites = async (menuItemId) => {
-  const response = await axiosInstance.delete(`/customer/favorites/${menuItemId}`);
-  return response;
-};
-
-/**
  * Get customer order history
  * @param {Object} params - Query parameters
  * @param {string} params.status - Filter by order status (optional)
@@ -74,9 +45,6 @@ export const getOrderHistory = async (params = {}) => {
 const customerAPI = {
   getAddresses,
   saveAddress,
-  getFavorites,
-  addToFavorites,
-  removeFromFavorites,
   getOrderHistory,
 };
 

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import {
-  // Search, // Temporarily disabled
   ShoppingCart,
   Menu,
   Facebook,
@@ -13,7 +12,6 @@ import {
   Linkedin,
   User,
 } from "lucide-react";
-// import SearchModal from "./header/SearchModal"; // Temporarily disabled
 import CartDropdown from "./header/CartDropdown";
 import UserDropdown from "./header/UserDropdown";
 import Sidebar from "./header/Sidebar";
@@ -26,8 +24,7 @@ import { NAV_LINKS, SOCIAL_LINKS, BUSINESS_HOURS, IMAGE_PATHS } from "../../data
 
 const FreshHeatHeader = () => {
   const router = useRouter();
-  const { prefetchRoute, navigate } = usePrefetchRoute();
-  // const [isSearchOpen, setIsSearchOpen] = useState(false); // Temporarily disabled
+  const { prefetchRoute } = usePrefetchRoute();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -43,10 +40,6 @@ const FreshHeatHeader = () => {
 
   // Use scroll hook
   const isScrolled = useScroll(150);
-
-  // const handleSearchClick = () => {
-  //   setIsSearchOpen(true);
-  // }; // Temporarily disabled
 
   const handleCartClick = (headerId) => {
     setActiveHeader(headerId);
@@ -225,20 +218,8 @@ const FreshHeatHeader = () => {
                 ))}
               </ul>
 
-              {/* Search, Cart, and User */}
+              {/* Cart and User */}
               <div className="flex items-center gap-8 mr-5">
-                {/* Search Icon - Temporarily disabled */}
-                {/* <button
-                  onClick={handleSearchClick}
-                  aria-label="Open search"
-                  className="focus:outline-none focus:ring-2 focus:ring-theme2 focus:ring-offset-2 focus:ring-offset-title rounded cursor-pointer"
-                >
-                  <Search
-                    className="h-6 w-6 text-text hover:text-theme3 transition-colors duration-300"
-                    strokeWidth={2}
-                  />
-                </button> */}
-
                 {/* User Icon with Dropdown */}
                 <div
                   className="relative"
@@ -378,18 +359,6 @@ const FreshHeatHeader = () => {
               <BranchSelector isMobile={true} />
             </div>
             
-            {/* Search Icon - Temporarily disabled */}
-            {/* <button
-              onClick={handleSearchClick}
-              aria-label="Open search"
-              className="flex items-center justify-center p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-theme focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer hover:bg-white/10 transition-all duration-300"
-            >
-              <Search
-                className="h-5 w-5 sm:h-6 sm:w-6 text-white hover:text-theme3 transition-colors duration-300"
-                strokeWidth={2}
-              />
-            </button> */}
-
             {/* User Icon with Dropdown */}
             <div
               className="relative flex items-center"
@@ -478,9 +447,6 @@ const FreshHeatHeader = () => {
 
       {/* Sidebar */}
       <Sidebar isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
-
-      {/* Search Modal - Temporarily disabled */}
-      {/* <SearchModal searchOpen={isSearchOpen} setSearchOpen={setIsSearchOpen} /> */}
     </>
   );
 };

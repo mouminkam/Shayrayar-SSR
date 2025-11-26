@@ -191,10 +191,15 @@ axiosInstance.interceptors.response.use(
       
       // Handle 401 Unauthorized - Token expired or invalid
       if (status === 401) {
-        // Clear auth storage
-        if (typeof window !== 'undefined') {
+        // Only redirect if it's not a login/register request (to avoid refresh on login failure)
+        const isAuthRequest = error.config?.url?.includes('/auth/login') || 
+                             error.config?.url?.includes('/auth/register') ||
+                             error.config?.url?.includes('/auth/google');
+        
+        if (!isAuthRequest && typeof window !== 'undefined') {
+          // Clear auth storage
           localStorage.removeItem('auth-storage');
-          // Redirect to login page
+          // Redirect to login page only for authenticated requests
           window.location.href = '/login';
         }
         

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import api from "../../../../api/auth";
+import { authAPI } from "../../../../api";
 import useAuthStore from "../../../../store/authStore";
 import useToastStore from "../../../../store/toastStore";
 
@@ -100,7 +100,7 @@ function GoogleCallbackContent() {
           fullCode: code
         });
         
-        const response = await api.googleWebLogin(code, redirectUri);
+        const response = await authAPI.googleWebLogin(code, redirectUri);
         console.log("Google web login response:", response);
 
         if (response.success && response.data) {

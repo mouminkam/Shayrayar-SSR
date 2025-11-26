@@ -7,7 +7,6 @@
 export const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/shop', label: 'Shop' },
-  // { href: '/blog', label: 'Blog' }, // Blog section temporarily disabled
   { href: '/contact-us', label: 'Contact Us' },
   { href: '/about-us', label: 'About US' },
 ];

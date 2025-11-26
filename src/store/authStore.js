@@ -2,7 +2,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import api from "../api";
-import useWishlistStore from "./wishlistStore";
+import useCartStore from "./cartStore";
 
 
 // User structure
@@ -39,14 +39,6 @@ const useAuthStore = create(
               isAuthenticated: true,
               isLoading: false,
             });
-
-            // Fetch wishlist after successful login
-            try {
-              await useWishlistStore.getState().fetchFavorites(true);
-            } catch (error) {
-              console.warn("Failed to fetch wishlist after login:", error);
-              // Don't fail login if wishlist fetch fails
-            }
 
             return { success: true, user: userDataWithToken };
           } else {
@@ -100,14 +92,6 @@ const useAuthStore = create(
               isLoading: false,
             });
 
-            // Fetch wishlist after successful registration
-            try {
-              await useWishlistStore.getState().fetchFavorites(true);
-            } catch (error) {
-              console.warn("Failed to fetch wishlist after registration:", error);
-              // Don't fail registration if wishlist fetch fails
-            }
-
             return { success: true, user: userDataWithToken };
           } else {
             set({ isLoading: false });
@@ -140,19 +124,85 @@ const useAuthStore = create(
           console.error("Logout error:", error);
           // Continue with logout even if API call fails
         } finally {
-          // Clear wishlist on logout
-          try {
-            await useWishlistStore.getState().clearWishlist();
-          } catch (error) {
-            console.warn("Failed to clear wishlist on logout:", error);
-            // Clear local state anyway
-            useWishlistStore.setState({ items: [] });
-          }
-          
+          // Clear all state
           set({
             user: null,
             isAuthenticated: false,
           });
+
+          // Clear cart store
+          try {
+            useCartStore.getState().clearCart();
+          } catch (error) {
+            console.warn("Failed to clear cart:", error);
+          }
+
+          // Clear all localStorage items
+          if (typeof window !== "undefined") {
+            // Clear Zustand stores
+            localStorage.removeItem("auth-storage");
+            localStorage.removeItem("cart-storage");
+            localStorage.removeItem("branch-storage");
+            
+            // Clear other localStorage items
+            localStorage.removeItem("rememberedEmail");
+            
+            // Clear all sessionStorage items
+            sessionStorage.removeItem("resetToken");
+            sessionStorage.removeItem("resetEmail");
+            sessionStorage.removeItem("registrationToken");
+            sessionStorage.removeItem("registrationPhone");
+            sessionStorage.removeItem("registrationPassword");
+            sessionStorage.removeItem("googleOAuthState");
+            sessionStorage.removeItem("googleOAuthRedirectUri");
+            sessionStorage.removeItem("googleUser");
+            sessionStorage.removeItem("googleToken");
+            sessionStorage.removeItem("googleFlow");
+
+            // Clear browser cache (caches API)
+            if ("caches" in window) {
+              try {
+                const cacheNames = await caches.keys();
+                await Promise.all(
+                  cacheNames.map((cacheName) => caches.delete(cacheName))
+                );
+              } catch (cacheError) {
+                console.warn("Failed to clear cache:", cacheError);
+              }
+            }
+
+            // Clear service worker cache if available
+            if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+              try {
+                navigator.serviceWorker.controller.postMessage({ type: "CLEAR_CACHE" });
+              } catch (swError) {
+                console.warn("Failed to clear service worker cache:", swError);
+              }
+            }
+
+            // Force clear all cookies
+            // This will clear all cookies for the current domain
+            try {
+              document.cookie.split(";").forEach((cookie) => {
+                const eqPos = cookie.indexOf("=");
+                const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+                if (name) {
+                  // Clear cookie by setting it to expire in the past
+                  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+                  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+                  // Also try with www subdomain
+                  if (window.location.hostname.startsWith("www.")) {
+                    const domainWithoutWww = window.location.hostname.replace(/^www\./, "");
+                    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${domainWithoutWww}`;
+                  } else {
+                    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${window.location.hostname}`;
+                  }
+                }
+              });
+            } catch (cookieError) {
+              console.warn("Failed to clear cookies:", cookieError);
+            }
+          }
         }
       },
 
@@ -461,35 +511,7 @@ const useAuthStore = create(
         }
       },
 
-      // Google authentication
-      getGoogleAuthUrl: async () => {
-        set({ isLoading: true });
-        try {
-          const response = await api.auth.getGoogleAuthUrl();
-          set({ isLoading: false });
-          
-          if (response.success && response.data) {
-            return { 
-              success: true, 
-              data: response.data,
-              url: response.data.redirect_url || response.data.url || response.data.auth_url 
-            };
-          } else {
-            return { 
-              success: false, 
-              error: response.message || "Failed to get Google auth URL" 
-            };
-          }
-        } catch (error) {
-          set({ isLoading: false });
-          return { 
-            success: false, 
-            error: error.message || "An error occurred while getting Google auth URL" 
-          };
-        }
-      },
-
-      // Build Google OAuth URL directly (new approach)
+      // Build Google OAuth URL directly
       buildGoogleOAuthUrl: () => {
         if (typeof window === "undefined") {
           return { success: false, error: "Window is not available" };

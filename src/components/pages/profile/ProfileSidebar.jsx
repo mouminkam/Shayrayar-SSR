@@ -1,14 +1,12 @@
 "use client";
 import { motion } from "framer-motion";
-import { User, Mail, Phone, MapPin, Package, LogOut, Heart } from "lucide-react";
+import { User, Mail, Phone, MapPin, Package, LogOut } from "lucide-react";
 import useAuthStore from "../../../store/authStore";
-import useWishlistStore from "../../../store/wishlistStore";
 import { useRouter } from "next/navigation";
 
 export default function ProfileSidebar({ user, orders }) {
   const router = useRouter();
   const { logout } = useAuthStore();
-  const wishlistItems = useWishlistStore((state) => state.items);
 
   const handleLogout = async () => {
     try {
@@ -81,20 +79,13 @@ export default function ProfileSidebar({ user, orders }) {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-6 pt-6 border-t border-white/10">
+      <div className="grid grid-cols-1 gap-4 mb-6 pt-6 border-t border-white/10">
         <div className="text-center p-3 bg-white/5 rounded-xl">
           <Package className="w-6 h-6 text-theme3 mx-auto mb-2" />
           <p className="text-white  text-xl font-black">
             {orders.length}
           </p>
           <p className="text-text text-xs">Orders</p>
-        </div>
-        <div className="text-center p-3 bg-white/5 rounded-xl">
-          <Heart className="w-6 h-6 text-theme3 mx-auto mb-2" />
-          <p className="text-white  text-xl font-black">
-            {wishlistItems.length}
-          </p>
-          <p className="text-text text-xs">Wishlist</p>
         </div>
       </div>
 

@@ -7,7 +7,6 @@ import ErrorBoundary from "../../components/ui/ErrorBoundary";
 import SectionSkeleton from "../../components/ui/SectionSkeleton";
 import Breadcrumb from "../../components/ui/Breadcrumb";
 import useAuthStore from "../../store/authStore";
-import useWishlistStore from "../../store/wishlistStore";
 import api from "../../api";
 
 // Lazy load profile components
@@ -27,28 +26,12 @@ const OrdersHistory = dynamic(
   }
 );
 
-const WishlistPreview = dynamic(
-  () => import("../../components/pages/profile/WishlistPreview"),
-  {
-    loading: () => <SectionSkeleton variant="grid" cardCount={4} height="h-64" />,
-    ssr: false,
-  }
-);
-
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
-  const { items: wishlistItems, fetchFavorites } = useWishlistStore();
   const [orders, setOrders] = useState([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'pending', 'completed', 'cancelled'
-
-  // Fetch wishlist on mount if authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchFavorites(true); // Force refresh on page load
-    }
-  }, [isAuthenticated, fetchFavorites]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -197,13 +180,6 @@ export default function ProfilePage() {
                     ) : (
                       <OrdersHistory orders={orders} maxDisplay={2}/>
                     )}
-                  </AnimatedSection>
-                </Suspense>
-              </ErrorBoundary>
-              <ErrorBoundary>
-                <Suspense fallback={<SectionSkeleton variant="grid" cardCount={4} height="h-64" />}>
-                  <AnimatedSection>
-                    <WishlistPreview wishlistItems={wishlistItems} />
                   </AnimatedSection>
                 </Suspense>
               </ErrorBoundary>

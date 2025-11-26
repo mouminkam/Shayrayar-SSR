@@ -2,10 +2,9 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Heart, Facebook, Youtube, Twitter, Instagram, Plus, Minus, Star } from "lucide-react";
+import { ShoppingCart, Facebook, Youtube, Twitter, Instagram, Plus, Minus, Star } from "lucide-react";
 import { formatCurrency } from "../../lib/utils/formatters";
 import useCartStore from "../../store/cartStore";
-import useWishlistStore from "../../store/wishlistStore";
 import useToastStore from "../../store/toastStore";
 import useAuthStore from "../../store/authStore";
 import ProductCustomization from "./ProductCustomization";
@@ -21,7 +20,6 @@ const SOCIAL_LINKS = [
 export default function ProductAbout({ product }) {
   const router = useRouter();
   const { addToCart } = useCartStore();
-  const { addToWishlist, removeFromWishlist, items: wishlistItems } = useWishlistStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
 
@@ -31,16 +29,6 @@ export default function ProductAbout({ product }) {
     ingredientIds: [],
     finalPrice: product?.price || product?.base_price || 0,
   }));
-
-  // Use menu_item_id if available, otherwise fall back to id
-  const menuItemId = product?.menu_item_id || product?.id;
-  // Check if item is in wishlist by checking items array directly (this will re-render when items change)
-  const isInWishlistState = menuItemId ? wishlistItems.some((item) => {
-    const itemId = item.id ? String(item.id) : null;
-    const itemMenuItemId = item.menu_item_id ? String(item.menu_item_id) : null;
-    const productIdStr = String(menuItemId);
-    return itemId === productIdStr || itemMenuItemId === productIdStr;
-  }) : false;
 
   const handleCustomizationChange = useCallback((data) => {
     setCustomization(data);
@@ -100,62 +88,6 @@ export default function ProductAbout({ product }) {
       setQuantity(1);
     } catch {
       toastError("Failed to add product to cart");
-    }
-  };
-
-  const handleWishlistToggle = async () => {
-    if (!product) return;
-
-    if (!isAuthenticated) {
-      toastError("Please login to add items to wishlist");
-      router.push("/login");
-      return;
-    }
-
-    if (!menuItemId) {
-      console.error("handleWishlistToggle: Missing menuItemId", product);
-      toastError("Invalid product information");
-      return;
-    }
-
-    try {
-      if (isInWishlistState) {
-        const result = await removeFromWishlist(menuItemId);
-        if (result.success) {
-          toastSuccess(`${product.title || product.name} removed from wishlist`);
-        } else {
-          if (result.requiresAuth) {
-            router.push("/login");
-          } else {
-            toastError(result.error || "Failed to remove from wishlist");
-          }
-        }
-      } else {
-        const result = await addToWishlist({
-          id: product.id,
-          menu_item_id: menuItemId,
-          name: product.title || product.name,
-          price: product.price,
-          image: product.image,
-          title: product.title || product.name,
-        });
-        if (result.success) {
-          if (result.alreadyExists) {
-            // Item already exists, no need to show success message
-            return;
-          }
-          toastSuccess(`${product.title || product.name} added to wishlist`);
-        } else {
-          if (result.requiresAuth) {
-            router.push("/login");
-          } else {
-            toastError(result.error || "Failed to add to wishlist");
-          }
-        }
-      }
-    } catch (error) {
-      console.error("handleWishlistToggle error:", error);
-      toastError("Failed to update wishlist. Please try again.");
     }
   };
 
@@ -237,15 +169,6 @@ export default function ProductAbout({ product }) {
           >
             <ShoppingCart className="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform duration-300" />
             Add to Cart
-          </button>
-          <button
-            onClick={handleWishlistToggle}
-            className={`theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3  text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30 ${isInWishlistState ? "bg-theme3/20" : ""
-              }`}
-          >
-            <Heart className={`w-5 h-5 mr-2 transform group-hover:scale-110 transition-all duration-300 ${isInWishlistState ? "fill-white" : ""
-              }`} />
-            {isInWishlistState ? "Remove from Wishlist" : "Add to Wishlist"}
           </button>
         </div>
       </div>

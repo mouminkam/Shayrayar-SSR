@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { ArrowRight, Loader2 } from "lucide-react";
-import api from "../../api";
+import { branchesAPI } from "../../api";
 import useToastStore from "../../store/toastStore";
 import useBranchStore from "../../store/branchStore";
 
@@ -33,7 +33,7 @@ export default function ContactForm() {
       if (!selectedBranch) return;
 
       try {
-        const response = await api.branches.getBranchById(selectedBranch.id || selectedBranch.branch_id);
+        const response = await branchesAPI.getBranchById(selectedBranch.id || selectedBranch.branch_id);
         
         if (response && response.success && response.data) {
           const branchData = response.data.branch || response.data;

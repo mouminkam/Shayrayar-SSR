@@ -190,13 +190,13 @@ export default function HomePage() {
       </ErrorBoundary>
 
       {/* Timer Section - Priority 4 */}
-      {/* <ErrorBoundary>
+      <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-64" />}>
           <AnimatedSection>
             <TimerSection />
           </AnimatedSection>
         </Suspense>
-      </ErrorBoundary> */}
+      </ErrorBoundary>
 
       {/* Chef Section - Priority 3 */}
       <ErrorBoundary>

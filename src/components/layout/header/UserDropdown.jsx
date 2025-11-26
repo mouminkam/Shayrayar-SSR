@@ -3,9 +3,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, LogOut, Package, Heart } from "lucide-react";
+import { User, LogOut, Package } from "lucide-react";
 import useAuthStore from "../../../store/authStore";
-import useWishlistStore from "../../../store/wishlistStore";
 import useToastStore from "../../../store/toastStore";
 
 export default function UserDropdown({
@@ -15,7 +14,6 @@ export default function UserDropdown({
   const router = useRouter();
   const userTimeoutRef = useRef(null);
   const { user, isAuthenticated, logout } = useAuthStore();
-  const wishlistItems = useWishlistStore((state) => state.items);
   const { success: toastSuccess } = useToastStore();
 
   const handleMouseEnter = () => {
@@ -200,24 +198,6 @@ export default function UserDropdown({
                   {user?.orders?.length > 0 && (
                     <span className="ml-2 text-xs bg-theme3 text-white px-2 py-0.5 rounded-full">
                       {user.orders.length}
-                    </span>
-                  )}
-                </span>
-              </Link>
-            </motion.div>
-
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Link
-                href="/wishlist"
-                className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200"
-                onClick={() => setUserOpen(false)}
-              >
-                <Heart className="w-5 h-5 text-theme3" />
-                <span className="text-sm font-medium">
-                  Wishlist
-                  {wishlistItems.length > 0 && (
-                    <span className="ml-2 text-xs bg-theme3 text-white px-2 py-0.5 rounded-full">
-                      {wishlistItems.length}
                     </span>
                   )}
                 </span>
