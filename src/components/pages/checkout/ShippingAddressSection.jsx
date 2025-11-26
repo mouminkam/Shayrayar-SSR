@@ -1,104 +1,149 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Loader2, Navigation, Edit } from "lucide-react";
+import { MapPin, Loader2, Navigation, Edit, RefreshCw } from "lucide-react";
 import useCartStore from "../../../store/cartStore";
 import useToastStore from "../../../store/toastStore";
 import OrderTypeSelector from "./OrderTypeSelector";
 import api from "../../../api";
 
-// Sofia constants
-const SOFIA_CENTER = [42.6977, 23.3219];
-const SOFIA_BOUNDS = [[42.60, 23.20], [42.80, 23.50]];
-const SOFIA_BOUNDS_CHECK = { minLat: 42.60, maxLat: 42.80, minLng: 23.20, maxLng: 23.50 };
+const SOFIA_CENTER = { lat: 42.6977, lng: 23.3219 };
+const SOFIA_BOUNDS = [
+  [42.6, 23.2],
+  [42.8, 23.5],
+];
+const SOFIA_LIMITS = {
+  minLat: 42.6,
+  maxLat: 42.8,
+  minLng: 23.2,
+  maxLng: 23.5,
+};
 
-const isInSofia = (lat, lng) => 
-  lat >= SOFIA_BOUNDS_CHECK.minLat && lat <= SOFIA_BOUNDS_CHECK.maxLat &&
-  lng >= SOFIA_BOUNDS_CHECK.minLng && lng <= SOFIA_BOUNDS_CHECK.maxLng;
+const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+
+const isInsideSofia = (lat, lng) =>
+  lat >= SOFIA_LIMITS.minLat &&
+  lat <= SOFIA_LIMITS.maxLat &&
+  lng >= SOFIA_LIMITS.minLng &&
+  lng <= SOFIA_LIMITS.maxLng;
 
 export default function ShippingAddressSection({ formData, setFormData }) {
   const { orderType, setDeliveryCharge } = useCartStore();
   const { error: toastError, success: toastSuccess } = useToastStore();
-  const isDelivery = orderType === 'delivery';
-  
-  const [loading, setLoading] = useState({ quote: false, map: false, location: false, geocoding: false });
+  const isDelivery = orderType === "delivery";
+
+  const initialLocation = useMemo(
+    () => ({
+      lat: Number(formData.latitude) || SOFIA_CENTER.lat,
+      lng: Number(formData.longitude) || SOFIA_CENTER.lng,
+    }),
+    [formData.latitude, formData.longitude]
+  );
+
+  const [selectedLocation, setSelectedLocation] = useState(initialLocation);
   const [deliveryQuote, setDeliveryQuote] = useState(null);
-  const [mapError, setMapError] = useState(null);
   const [showManualInput, setShowManualInput] = useState(false);
   const [manualAddress, setManualAddress] = useState("");
-  
+  const [mapError, setMapError] = useState(null);
+  const [loading, setLoading] = useState({
+    map: false,
+    location: false,
+    geocoding: false,
+    quote: false,
+  });
+
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markerRef = useRef(null);
-  const leafletLoadedRef = useRef(false);
-  const lastGeocodeTimeRef = useRef(0);
+  const leafletPromiseRef = useRef(null);
+  const lastValidLocationRef = useRef(initialLocation);
+  const lastGeocodeCallRef = useRef(0);
 
-  // Fetch delivery quote
-  const fetchDeliveryQuote = useCallback(async (dropoff) => {
-    if (!dropoff?.lat || !dropoff?.lng || !dropoff?.address) return;
+  useEffect(() => {
+    setSelectedLocation(initialLocation);
+    lastValidLocationRef.current = initialLocation;
+  }, [initialLocation]);
 
-    setLoading(prev => ({ ...prev, quote: true }));
-    setDeliveryQuote(null);
+  const updateMarker = useCallback((lat, lng, { focus = true } = {}) => {
+    if (typeof window === "undefined" || !window.L || !mapInstanceRef.current) return;
 
-    try {
-      const response = await api.delivery.getDeliveryQuote(dropoff);
-      if (response.success && response.data) {
-        const quote = response.data;
-        setDeliveryQuote(quote);
-        if (quote.fee_bgn) setDeliveryCharge(quote.fee_bgn);
-        setFormData(prev => ({ ...prev, quote_id: quote.quote_id }));
-      } else {
-        const errorCode = response?.data?.error_code || response?.error_code;
-        const reason = response?.data?.reason || response?.reason;
-        if (errorCode === 'DROPOFF_OUTSIDE_OF_DELIVERY_AREA' || reason?.includes('outside')) {
-          toastError('This location is outside our delivery area. Please select a different location.');
-          setMapError('This location is outside our delivery area.');
-        } else {
-          toastError(response.message || response?.data?.message || 'Failed to get delivery quote');
+    if (!markerRef.current) {
+      markerRef.current = window.L.marker([lat, lng], {
+        draggable: false,
+        title: "Delivery Location",
+      }).addTo(mapInstanceRef.current);
+    } else {
+      markerRef.current.setLatLng([lat, lng]);
+    }
+
+    if (focus) {
+      mapInstanceRef.current.setView([lat, lng], 15);
+    }
+  }, []);
+
+  const fetchDeliveryQuote = useCallback(
+    async ({ lat, lng, address }) => {
+      if (!lat || !lng || !address) return;
+      setLoading((prev) => ({ ...prev, quote: true }));
+      setDeliveryQuote(null);
+
+      try {
+        const response = await api.delivery.getDeliveryQuote({ lat, lng, address });
+        if (response?.success && response.data) {
+          const quote = response.data;
+          setDeliveryQuote(quote);
+          setDeliveryCharge(Number(quote.fee_bgn) || 0);
+          setFormData((prev) => ({ ...prev, quote_id: quote.quote_id }));
+          return;
         }
+        throw new Error(response?.message || "Failed to get delivery quote");
+      } catch (error) {
+        const reason =
+          error?.response?.data?.reason ||
+          error?.data?.reason ||
+          error?.message ||
+          "Unable to get delivery quote";
+        toastError(reason);
+      } finally {
+        setLoading((prev) => ({ ...prev, quote: false }));
       }
-    } catch (error) {
-      const errorData = error?.data || error?.response?.data || {};
-      const errorCode = errorData.error_code;
-      const reason = errorData.reason || errorData.message;
-      if (errorCode === 'DROPOFF_OUTSIDE_OF_DELIVERY_AREA' || reason?.includes('outside') || reason?.includes('delivery area')) {
-        toastError('This location is outside our delivery area. Please select a different location.');
-        setMapError('This location is outside our delivery area.');
-      } else {
-        toastError(error?.message || errorData?.message || 'Failed to get delivery quote. Please try again.');
+    },
+    [setDeliveryCharge, setFormData, toastError]
+  );
+
+  const reverseGeocodeAndQuote = useCallback(
+    async (lat, lng) => {
+      const now = Date.now();
+      const diff = now - lastGeocodeCallRef.current;
+      if (diff < 1000) {
+        await new Promise((resolve) => setTimeout(resolve, 1000 - diff));
       }
-    } finally {
-      setLoading(prev => ({ ...prev, quote: false }));
-    }
-  }, [setDeliveryCharge, setFormData, toastError]);
+      lastGeocodeCallRef.current = Date.now();
 
-  // Reverse geocode using Nominatim
-  const reverseGeocode = useCallback(async (lat, lng) => {
-    const now = Date.now();
-    if (now - lastGeocodeTimeRef.current < 1000) {
-      await new Promise(resolve => setTimeout(resolve, 1000 - (now - lastGeocodeTimeRef.current)));
-    }
-    lastGeocodeTimeRef.current = Date.now();
+      setLoading((prev) => ({ ...prev, geocoding: true }));
+      setShowManualInput(false);
 
-    setLoading(prev => ({ ...prev, geocoding: true }));
-    setShowManualInput(false);
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+          { headers: { "User-Agent": "PeakLink/1.0" } }
+        );
+        if (!response.ok) throw new Error("Geocoding failed");
+        const data = await response.json();
+        if (!data?.address) throw new Error("Unable to detect address automatically");
 
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
-        { headers: { 'User-Agent': 'DeliveryApp/1.0' } }
-      );
-
-      if (!response.ok) throw new Error('Geocoding failed');
-      const data = await response.json();
-
-      if (data?.address) {
         const addr = data.address;
-        const fullAddress = data.display_name || `${addr.road || ''}, ${addr.city || addr.town || addr.village || ''}`.trim();
-        
-        setFormData(prev => ({
+        const detectedAddress =
+          data.display_name ||
+          [addr.road, addr.neighbourhood, addr.city || addr.town || addr.village]
+            .filter(Boolean)
+            .join(", ");
+
+        setFormData((prev) => ({
           ...prev,
-          address: fullAddress,
+          address: detectedAddress,
           city: addr.city || addr.town || addr.village || addr.municipality || prev.city,
           state: addr.state || addr.region || prev.state,
           zipCode: addr.postcode || prev.zipCode,
@@ -107,353 +152,212 @@ export default function ShippingAddressSection({ formData, setFormData }) {
           longitude: lng,
         }));
 
-        fetchDeliveryQuote({ lat, lng, address: fullAddress });
-      } else {
+        fetchDeliveryQuote({ lat, lng, address: detectedAddress });
+      } catch (error) {
         setShowManualInput(true);
-        toastError('Unable to get address automatically. Please enter it manually.');
+        toastError(error.message || "Unable to detect address. Please enter it manually.");
+      } finally {
+        setLoading((prev) => ({ ...prev, geocoding: false }));
       }
-    } catch (error) {
-      console.error('Geocoding error:', error);
-      setShowManualInput(true);
-      toastError('Geocoding service unavailable. Please enter address manually.');
-    } finally {
-      setLoading(prev => ({ ...prev, geocoding: false }));
-    }
-  }, [setFormData, toastError, fetchDeliveryQuote]);
+    },
+    [fetchDeliveryQuote, setFormData, toastError]
+  );
 
-  // Validate and normalize location to Sofia
-  const validateLocation = useCallback((lat, lng) => {
-    if (!isInSofia(lat, lng)) {
-      toastError('Please select a location within Sofia area only.');
-      return SOFIA_CENTER;
-    }
-    return [lat, lng];
-  }, [toastError]);
+  const selectLocation = useCallback(
+    (lat, lng, options = {}) => {
+      if (!isInsideSofia(lat, lng)) {
+        const message = "Please select a point inside the Sofia delivery zone.";
+        setMapError(message);
+        toastError(message);
+        const fallback = lastValidLocationRef.current || SOFIA_CENTER;
+        updateMarker(fallback.lat, fallback.lng, { focus: true });
+        return;
+      }
 
-  // Create marker
-  const createMarker = useCallback((position, map = null) => {
-    if (!window.L) return;
-    const mapInstance = map || mapInstanceRef.current;
-    if (!mapInstance) return;
+      const normalized = { lat: Number(lat), lng: Number(lng) };
+      setMapError(null);
+      lastValidLocationRef.current = normalized;
+      setSelectedLocation(normalized);
+      updateMarker(normalized.lat, normalized.lng, options);
 
-    if (markerRef.current) mapInstance.removeLayer(markerRef.current);
+      setFormData((prev) => ({
+        ...prev,
+        latitude: normalized.lat,
+        longitude: normalized.lng,
+      }));
 
-    const marker = window.L.marker([position.lat, position.lng], {
-      draggable: false,
-      title: 'Delivery Location',
-    }).addTo(mapInstance);
+      // Only geocode when explicitly selecting (not on initial load)
+      if (options.geocode !== false) {
+        reverseGeocodeAndQuote(normalized.lat, normalized.lng);
+      }
+    },
+    [setFormData, toastError, updateMarker, reverseGeocodeAndQuote]
+  );
 
-    markerRef.current = marker;
+  const loadLeafletAssets = useCallback(() => {
+    if (typeof window === "undefined") return Promise.reject(new Error("No window"));
+    if (window.L) return Promise.resolve();
+    if (leafletPromiseRef.current) return leafletPromiseRef.current;
+
+    leafletPromiseRef.current = new Promise((resolve, reject) => {
+      if (!document.querySelector(`link[href="${LEAFLET_CSS}"]`)) {
+        const link = document.createElement("link");
+        Object.assign(link, {
+          rel: "stylesheet",
+          href: LEAFLET_CSS,
+          integrity: "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=",
+          crossOrigin: "",
+        });
+        document.head.appendChild(link);
+      }
+
+      const script = document.createElement("script");
+      Object.assign(script, {
+        src: LEAFLET_JS,
+        integrity: "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=",
+        crossOrigin: "",
+      });
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error("Leaflet failed to load"));
+      document.body.appendChild(script);
+    });
+
+    return leafletPromiseRef.current;
   }, []);
 
-  // Update marker position
-  const updateMarkerPosition = useCallback((lat, lng) => {
-    const [finalLat, finalLng] = validateLocation(lat, lng);
-    
-    if (markerRef.current) {
-      markerRef.current.setLatLng([finalLat, finalLng]);
-    } else {
-      createMarker({ lat: finalLat, lng: finalLng });
-    }
-
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.setView([finalLat, finalLng], 15);
-    }
-  }, [validateLocation, createMarker]);
-
-  // Initialize map with location
-  const initializeMapWithLocation = useCallback((lat, lng) => {
-    if (!mapRef.current || !window.L || mapRef.current._leaflet_id) return;
+  const initializeMap = useCallback(() => {
+    if (!mapRef.current || !window.L || mapInstanceRef.current) return;
 
     const map = window.L.map(mapRef.current, {
-      center: [lat, lng],
-      zoom: 15,
+      center: [selectedLocation.lat, selectedLocation.lng],
+      zoom: 13,
       maxBounds: SOFIA_BOUNDS,
       maxBoundsViscosity: 1.0,
     });
 
-    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
+    window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors",
       maxZoom: 19,
     }).addTo(map);
 
-    mapInstanceRef.current = map;
-    createMarker({ lat, lng }, map);
-    reverseGeocode(lat, lng);
-  }, [createMarker, reverseGeocode]);
+    map.on("click", (event) => {
+      const { lat, lng } = event.latlng;
+      selectLocation(lat, lng);
+    });
 
-  // Get current location
+    mapInstanceRef.current = map;
+    updateMarker(selectedLocation.lat, selectedLocation.lng, { focus: false });
+    
+    // Only geocode on initial load if we don't have an address yet
+    if (!formData.address) {
+      reverseGeocodeAndQuote(selectedLocation.lat, selectedLocation.lng);
+    }
+  }, [selectLocation, selectedLocation.lat, selectedLocation.lng, updateMarker, formData.address, reverseGeocodeAndQuote]);
+
+  useEffect(() => {
+    if (!isDelivery) return;
+    let cancelled = false;
+
+    setLoading((prev) => ({ ...prev, map: true }));
+
+    loadLeafletAssets()
+      .then(() => {
+        if (cancelled) return;
+        initializeMap();
+        setLoading((prev) => ({ ...prev, map: false }));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setMapError("Failed to load the map. Click to retry.");
+        setLoading((prev) => ({ ...prev, map: false }));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isDelivery, loadLeafletAssets, initializeMap]);
+
+  useEffect(() => {
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.off();
+        mapInstanceRef.current.remove();
+      }
+      mapInstanceRef.current = null;
+      markerRef.current = null;
+    };
+  }, []);
+
   const getCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.setView(SOFIA_CENTER, 12);
-        if (!markerRef.current) createMarker({ lat: SOFIA_CENTER[0], lng: SOFIA_CENTER[1] });
-        else markerRef.current.setLatLng(SOFIA_CENTER);
-        reverseGeocode(SOFIA_CENTER[0], SOFIA_CENTER[1]);
-      }
+      toastError("Geolocation is not supported by this browser.");
+      selectLocation(SOFIA_CENTER.lat, SOFIA_CENTER.lng);
       return;
     }
 
-    setLoading(prev => ({ ...prev, location: true }));
-    setMapError(null);
-
+    setLoading((prev) => ({ ...prev, location: true }));
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude: lat, longitude: lng } = position.coords;
-        const [finalLat, finalLng] = isInSofia(lat, lng) ? [lat, lng] : SOFIA_CENTER;
-        
-        if (!isInSofia(lat, lng)) toastError('Your location is outside Sofia. Defaulting to Sofia center.');
-
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.setView([finalLat, finalLng], isInSofia(lat, lng) ? 15 : 12);
-          if (markerRef.current) markerRef.current.setLatLng([finalLat, finalLng]);
-          else createMarker({ lat: finalLat, lng: finalLng });
-          reverseGeocode(finalLat, finalLng);
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        if (!isInsideSofia(latitude, longitude)) {
+          toastError("You are outside Sofia. Using the city center instead.");
+          selectLocation(SOFIA_CENTER.lat, SOFIA_CENTER.lng, { focus: true });
         } else {
-          initializeMapWithLocation(finalLat, finalLng);
+          toastSuccess("Location detected!");
+          selectLocation(latitude, longitude, { focus: true });
         }
-        
-        setLoading(prev => ({ ...prev, location: false }));
-        if (isInSofia(lat, lng)) toastSuccess('Location found!');
+        setLoading((prev) => ({ ...prev, location: false }));
       },
       (error) => {
-        setLoading(prev => ({ ...prev, location: false }));
         const messages = {
-          [error.PERMISSION_DENIED]: 'Please allow location access.',
-          [error.POSITION_UNAVAILABLE]: 'Location information is unavailable.',
-          [error.TIMEOUT]: 'Location request timed out.',
+          [error.PERMISSION_DENIED]: "Please allow location access.",
+          [error.POSITION_UNAVAILABLE]: "Location information is unavailable.",
+          [error.TIMEOUT]: "Location request timed out.",
         };
-        const errorMsg = `Unable to get your location. ${messages[error.code] || 'An unknown error occurred.'}`;
-        setMapError(errorMsg);
-        toastError(errorMsg);
-        
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.setView(SOFIA_CENTER, 12);
-          if (!markerRef.current) createMarker({ lat: SOFIA_CENTER[0], lng: SOFIA_CENTER[1] });
-          else markerRef.current.setLatLng(SOFIA_CENTER);
-          reverseGeocode(SOFIA_CENTER[0], SOFIA_CENTER[1]);
-        }
+        toastError(messages[error.code] || "Unable to get your location.");
+        setLoading((prev) => ({ ...prev, location: false }));
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
-  }, [toastError, toastSuccess, createMarker, reverseGeocode, initializeMapWithLocation]);
-
-  // Initialize map
-  const initializeMap = useCallback(() => {
-    if (!mapRef.current) {
-      // If mapRef is not ready, try again after a short delay
-      setTimeout(() => {
-        if (mapRef.current && window.L) {
-          initializeMap();
-        }
-      }, 100);
-      return;
-    }
-    
-    if (!window.L) {
-      setMapError('Map library not loaded. Click on the map area to retry.');
-      return;
-    }
-    
-    if (mapInstanceRef.current) {
-      if (formData.latitude && formData.longitude) {
-        mapInstanceRef.current.setView([formData.latitude, formData.longitude], 15);
-      }
-      return;
-    }
-    if (mapRef.current._leaflet_id) return;
-
-    try {
-      setMapError(null);
-      const center = formData.latitude && formData.longitude 
-        ? [formData.latitude, formData.longitude] 
-        : SOFIA_CENTER;
-      const zoom = formData.latitude && formData.longitude ? 15 : 12;
-
-      const map = window.L.map(mapRef.current, {
-        center,
-        zoom,
-        maxBounds: SOFIA_BOUNDS,
-        maxBoundsViscosity: 1.0,
-      });
-
-      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19,
-      }).addTo(map);
-
-      if (!formData.latitude || !formData.longitude) {
-        map.setView(SOFIA_CENTER, 12);
-      }
-
-      mapInstanceRef.current = map;
-
-      if (formData.latitude && formData.longitude) {
-        createMarker({ lat: formData.latitude, lng: formData.longitude }, map);
-        reverseGeocode(formData.latitude, formData.longitude);
-      } else {
-        // Always initialize with Sofia center
-        createMarker({ lat: SOFIA_CENTER[0], lng: SOFIA_CENTER[1] }, map);
-        reverseGeocode(SOFIA_CENTER[0], SOFIA_CENTER[1]);
-        
-        // Try to get user location in background (non-blocking)
-        setTimeout(() => {
-          getCurrentLocation();
-        }, 500);
-      }
-
-      if (!map._clickListenerAdded) {
-        map.on('click', (e) => {
-          const { lat, lng } = e.latlng;
-          const [finalLat, finalLng] = validateLocation(lat, lng);
-          updateMarkerPosition(finalLat, finalLng);
-          reverseGeocode(finalLat, finalLng);
-        });
-        map._clickListenerAdded = true;
-      }
-    } catch (error) {
-      if (error.message?.includes('already initialized')) return;
-      setMapError('Failed to initialize map. Click on the map area to retry.');
-      toastError('Failed to initialize map. Click on the map area to retry.');
-    }
-  }, [formData.latitude, formData.longitude, getCurrentLocation, createMarker, reverseGeocode, updateMarkerPosition, validateLocation, toastError]);
-
-  // Load Leaflet
-  useEffect(() => {
-    if (!isDelivery) return;
-
-    // If Leaflet is already loaded, initialize map immediately
-    if (window.L && leafletLoadedRef.current) {
-      setLoading(prev => ({ ...prev, map: false }));
-      // Small delay to ensure mapRef is ready
-      setTimeout(() => {
-        initializeMap();
-      }, 50);
-      return;
-    }
-
-    // Load CSS first
-    const existingCSS = document.querySelector('link[href*="leaflet.css"]');
-    if (!existingCSS) {
-      const link = document.createElement('link');
-      Object.assign(link, {
-        rel: 'stylesheet',
-        href: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-        integrity: 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=',
-        crossOrigin: '',
-      });
-      document.head.appendChild(link);
-    }
-
-    // Check if script already exists
-    const existingScript = document.querySelector('script[src*="leaflet"]');
-    if (existingScript) {
-      if (window.L) {
-        leafletLoadedRef.current = true;
-        setLoading(prev => ({ ...prev, map: false }));
-        setTimeout(() => {
-          initializeMap();
-        }, 50);
-        return;
-      }
-      // Script is loading, wait for it
-      existingScript.addEventListener('load', () => {
-        leafletLoadedRef.current = true;
-        setLoading(prev => ({ ...prev, map: false }));
-        setTimeout(() => {
-          initializeMap();
-        }, 50);
-      });
-      existingScript.addEventListener('error', () => {
-        setLoading(prev => ({ ...prev, map: false }));
-        setMapError('Failed to load Leaflet.js. Click on the map area to retry.');
-        toastError('Failed to load Leaflet.js. Click on the map area to retry.');
-      });
-      setLoading(prev => ({ ...prev, map: true }));
-      return;
-    }
-
-    // Load script
-    setLoading(prev => ({ ...prev, map: true }));
-    leafletLoadedRef.current = false;
-    
-    const script = document.createElement('script');
-    Object.assign(script, {
-      src: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-      integrity: 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=',
-      crossOrigin: '',
-      id: 'leaflet-script',
-    });
-    
-    script.onload = () => {
-      leafletLoadedRef.current = true;
-      setLoading(prev => ({ ...prev, map: false }));
-      // Small delay to ensure mapRef is ready
-      setTimeout(() => {
-        initializeMap();
-      }, 50);
-    };
-    
-    script.onerror = () => {
-      leafletLoadedRef.current = false;
-      setLoading(prev => ({ ...prev, map: false }));
-      setMapError('Failed to load Leaflet.js. Click on the map area to retry.');
-      toastError('Failed to load Leaflet.js. Click on the map area to retry.');
-    };
-    
-    document.head.appendChild(script);
-
-    const mapContainer = mapRef.current;
-    const mapInstance = mapInstanceRef.current;
-    const marker = markerRef.current;
-
-    return () => {
-      if (mapInstance) {
-        try {
-          mapInstance.off();
-          mapInstance.remove();
-          mapInstanceRef.current = null;
-        } catch (error) {
-          console.warn('Error cleaning up map:', error);
-        }
-      }
-      if (marker) {
-        try {
-          marker.off();
-          markerRef.current = null;
-        } catch (error) {
-          console.warn('Error cleaning up marker:', error);
-        }
-      }
-      if (mapContainer) mapContainer._leaflet_id = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDelivery, initializeMap]);
+  }, [selectLocation, toastError, toastSuccess]);
 
   const handleManualSubmit = useCallback(() => {
-    if (!manualAddress.trim() || !formData.latitude || !formData.longitude) {
-      toastError(manualAddress.trim() ? 'Please select a location on the map first' : 'Please enter an address');
+    if (!manualAddress.trim()) {
+      toastError("Please enter an address.");
+      return;
+    }
+    if (!selectedLocation) {
+      toastError("Please select a location on the map first.");
       return;
     }
 
-    setFormData(prev => ({ ...prev, address: manualAddress.trim() }));
-    fetchDeliveryQuote({ lat: formData.latitude, lng: formData.longitude, address: manualAddress.trim() });
+    setFormData((prev) => ({ ...prev, address: manualAddress.trim() }));
+    fetchDeliveryQuote({
+      lat: selectedLocation.lat,
+      lng: selectedLocation.lng,
+      address: manualAddress.trim(),
+    });
     setShowManualInput(false);
-    toastSuccess('Address saved successfully');
-  }, [manualAddress, formData.latitude, formData.longitude, setFormData, fetchDeliveryQuote, toastError, toastSuccess]);
+    toastSuccess("Address saved successfully.");
+  }, [fetchDeliveryQuote, manualAddress, selectedLocation, setFormData, toastError, toastSuccess]);
 
   if (!isDelivery) {
     return (
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-6">
-          <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="w-12 h-12 shadow-2xl rounded-xl bg-theme3 flex items-center justify-center">
+          <motion.div
+            whileHover={{ scale: 1.05, rotate: 3 }}
+            className="w-12 h-12 shadow-2xl rounded-xl bg-theme3 flex items-center justify-center"
+          >
             <MapPin className="w-6 h-6 text-white fill-white" />
           </motion.div>
           <h3 className="text-white text-2xl font-black uppercase">Pickup Information</h3>
         </div>
         <OrderTypeSelector />
         <div className="p-4 bg-theme3/20 border border-theme3/50 rounded-xl">
-          <p className="text-white text-sm">You will pick up your order from the selected branch.</p>
+          <p className="text-white text-sm">
+            You will pick up your order from the selected branch.
+          </p>
         </div>
       </div>
     );
@@ -462,7 +366,10 @@ export default function ShippingAddressSection({ formData, setFormData }) {
   return (
     <div className="mb-8">
       <div className="flex items-center gap-3 mb-6">
-        <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="w-12 h-12 shadow-2xl rounded-xl bg-theme3 flex items-center justify-center">
+        <motion.div
+          whileHover={{ scale: 1.05, rotate: 3 }}
+          className="w-12 h-12 shadow-2xl rounded-xl bg-theme3 flex items-center justify-center"
+        >
           <MapPin className="w-6 h-6 text-white fill-white" />
         </motion.div>
         <h3 className="text-white text-2xl font-black uppercase">Delivery Address</h3>
@@ -491,6 +398,53 @@ export default function ShippingAddressSection({ formData, setFormData }) {
             </>
           )}
         </motion.button>
+
+        <motion.button
+          type="button"
+          whileHover={{ scale: 1.02}}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => {
+            setMapError(null);
+            setLoading((prev) => ({ ...prev, map: true }));
+            // Reset map instance
+            if (mapInstanceRef.current) {
+              try {
+                mapInstanceRef.current.off();
+                mapInstanceRef.current.remove();
+              } catch (error) {
+                console.warn("Error removing map:", error);
+              }
+              mapInstanceRef.current = null;
+              markerRef.current = null;
+              if (mapRef.current) {
+                mapRef.current._leaflet_id = null;
+              }
+            }
+            // Reload Leaflet and reinitialize
+            leafletPromiseRef.current = null;
+            loadLeafletAssets()
+              .then(() => {
+                initializeMap();
+                setLoading((prev) => ({ ...prev, map: false }));
+                toastSuccess("Map reloaded successfully");
+              })
+              .catch(() => {
+                setMapError("Failed to reload the map. Please try again.");
+                setLoading((prev) => ({ ...prev, map: false }));
+                toastError("Failed to reload the map. Please try again.");
+              });
+          }}
+          disabled={loading.map}
+          className="flex items-center gap-2 px-4 py-2 bg-white/10 border-2 border-white/20 rounded-xl text-white font-semibold hover:bg-white/20 hover:border-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Reload Map"
+        >
+          {loading.map ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <RefreshCw className="w-4 h-4" />
+          )}
+          <span className="hidden sm:inline">Reload Map</span>
+        </motion.button>
       </div>
 
       <div className="mb-4">
@@ -503,46 +457,31 @@ export default function ShippingAddressSection({ formData, setFormData }) {
               </div>
             </div>
           ) : mapError && !mapInstanceRef.current ? (
-            <div 
+            <div
               className="absolute inset-0 flex items-center justify-center bg-bgimg p-4 cursor-pointer hover:bg-bgimg/80 transition-colors z-10"
               onClick={() => {
                 setMapError(null);
-                setLoading(prev => ({ ...prev, map: true }));
-                if (window.L && mapRef.current) {
-                  setTimeout(() => {
-                    initializeMap();
-                    setLoading(prev => ({ ...prev, map: false }));
-                  }, 100);
-                } else {
-                  // Retry loading Leaflet
-                  const script = document.querySelector('script[src*="leaflet"]');
-                  if (script) {
-                    script.addEventListener('load', () => {
-                      initializeMap();
-                      setLoading(prev => ({ ...prev, map: false }));
-                    });
-                  } else {
-                    window.location.reload();
-                  }
-                }
+                setLoading((prev) => ({ ...prev, map: true }));
+                loadLeafletAssets()
+                  .then(() => initializeMap())
+                  .finally(() => setLoading((prev) => ({ ...prev, map: false })));
               }}
             >
               <div className="text-center max-w-md">
                 <p className="text-red-400 mb-3 font-semibold">{mapError}</p>
-                <p className="text-text text-sm mb-2">Click here to load the map</p>
+                <p className="text-text text-sm mb-2">Click here to reload the map.</p>
                 <button className="px-4 py-2 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors">
-                  Load Map
+                  Reload Map
                 </button>
               </div>
             </div>
           ) : (
-            <div 
-              ref={mapRef} 
+            <div
+              ref={mapRef}
               className="w-full h-full"
               onClick={() => {
-                // If map is not initialized, try to initialize on click
-                if (!mapInstanceRef.current && window.L && mapRef.current) {
-                  initializeMap();
+                if (!mapInstanceRef.current) {
+                  loadLeafletAssets().then(() => initializeMap());
                 }
               }}
             />
@@ -551,12 +490,18 @@ export default function ShippingAddressSection({ formData, setFormData }) {
       </div>
 
       {showManualInput && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-4 p-4 bg-yellow-500/20 border border-yellow-500/50 rounded-xl">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 p-4 bg-yellow-500/20 border border-yellow-500/50 rounded-xl"
+        >
           <div className="flex items-start gap-3 mb-3">
             <Edit className="w-5 h-5 text-yellow-400 mt-0.5 shrink-0" />
             <div className="flex-1">
               <p className="text-yellow-400 font-semibold mb-2">Enter Address Manually</p>
-              <p className="text-text text-xs mb-3">Unable to get address automatically. Please enter your delivery address below.</p>
+              <p className="text-text text-xs mb-3">
+                Unable to detect the address automatically. Please type it below.
+              </p>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -564,12 +509,21 @@ export default function ShippingAddressSection({ formData, setFormData }) {
                   onChange={(e) => setManualAddress(e.target.value)}
                   placeholder="Enter your full address..."
                   className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20"
-                  onKeyPress={(e) => e.key === 'Enter' && handleManualSubmit()}
+                  onKeyDown={(e) => e.key === "Enter" && handleManualSubmit()}
                 />
-                <button onClick={handleManualSubmit} className="px-4 py-2 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors font-semibold">
+                <button
+                  onClick={handleManualSubmit}
+                  className="px-4 py-2 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors font-semibold"
+                >
                   Save
                 </button>
-                <button onClick={() => { setShowManualInput(false); setManualAddress(""); }} className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors">
+                <button
+                  onClick={() => {
+                    setShowManualInput(false);
+                    setManualAddress("");
+                  }}
+                  className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+                >
                   Cancel
                 </button>
               </div>
@@ -579,7 +533,11 @@ export default function ShippingAddressSection({ formData, setFormData }) {
       )}
 
       {formData.address && !showManualInput && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-4 p-4 bg-white/5 border border-white/10 rounded-xl">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 p-4 bg-white/5 border border-white/10 rounded-xl"
+        >
           <div className="flex items-start gap-3">
             <MapPin className="w-5 h-5 text-theme3 mt-0.5 shrink-0" />
             <div className="flex-1">
@@ -594,7 +552,9 @@ export default function ShippingAddressSection({ formData, setFormData }) {
                 </div>
               )}
               {formData.latitude && formData.longitude && (
-                <p className="text-text text-xs mt-2">📍 {Number(formData.latitude).toFixed(6)}, {Number(formData.longitude).toFixed(6)}</p>
+                <p className="text-text text-xs mt-2">
+                  📍 {Number(formData.latitude).toFixed(6)}, {Number(formData.longitude).toFixed(6)}
+                </p>
               )}
             </div>
             {loading.geocoding && <Loader2 className="w-4 h-4 text-theme3 animate-spin" />}
@@ -612,34 +572,51 @@ export default function ShippingAddressSection({ formData, setFormData }) {
       )}
 
       {deliveryQuote && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-4 p-4 bg-theme3/20 border border-theme3/50 rounded-xl">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 p-4 bg-theme3/20 border border-theme3/50 rounded-xl"
+        >
           <div className="flex items-center justify-between mb-2">
             <span className="text-text text-sm font-semibold">Delivery Fee:</span>
-            <span className="text-theme3 font-bold text-lg">{deliveryQuote.fee_bgn} {deliveryQuote.currency || 'BGN'}</span>
+            <span className="text-theme3 font-bold text-lg">
+              {deliveryQuote.fee_bgn} {deliveryQuote.currency || "BGN"}
+            </span>
           </div>
           {deliveryQuote.eta_min && (
             <div className="flex items-center justify-between">
               <span className="text-text text-xs">Estimated Time:</span>
-              <span className="text-white text-xs font-semibold">{deliveryQuote.eta_min} minutes</span>
+              <span className="text-white text-xs font-semibold">
+                {deliveryQuote.eta_min} minutes
+              </span>
             </div>
           )}
         </motion.div>
       )}
 
-      {mapError && mapError.includes('outside our delivery area') && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-4 p-4 bg-red-500/20 border border-red-500/50 rounded-xl">
+      {mapError && mapError.includes("outside") && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 p-4 bg-red-500/20 border border-red-500/50 rounded-xl"
+        >
           <div className="flex items-start gap-3">
             <MapPin className="w-5 h-5 text-red-400 mt-0.5 shrink-0" />
             <div className="flex-1">
-              <p className="text-red-400 font-semibold mb-1">Location Outside Delivery Area</p>
-              <p className="text-text text-sm">The selected location is outside our delivery service area. Please select a different location on the map.</p>
+              <p className="text-red-400 font-semibold mb-1">Outside Delivery Area</p>
+              <p className="text-text text-sm">
+                The selected location is outside our service area. Please choose a place inside Sofia.
+              </p>
             </div>
           </div>
         </motion.div>
       )}
 
       <div className="p-3 bg-white/5 border border-white/10 rounded-xl mb-4">
-        <p className="text-text text-xs">💡 Click on the map to select your delivery location. Your address will be automatically detected.</p>
+        <p className="text-text text-xs">
+          💡 Click anywhere on the map to update your delivery location. We will keep the marker inside
+          Sofia automatically.
+        </p>
       </div>
 
       <input type="hidden" name="address" value={formData.address || ""} />
@@ -652,3 +629,4 @@ export default function ShippingAddressSection({ formData, setFormData }) {
     </div>
   );
 }
+
