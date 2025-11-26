@@ -1,11 +1,13 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ShoppingBasket, Star } from "lucide-react";
 import OptimizedImage from "../ui/OptimizedImage";
 import ProductCardSkeleton from "../ui/ProductCardSkeleton";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
+import { HighlightsContext } from "../../context/HighlightsContext";
 import api from "../../api";
 import useBranchStore from "../../store/branchStore";
 import { transformMenuItemsToProducts } from "../../lib/utils/productTransform";
@@ -13,10 +15,15 @@ import useCartStore from "../../store/cartStore";
 import useToastStore from "../../store/toastStore";
 import useAuthStore from "../../store/authStore";
 import { formatCurrency } from "../../lib/utils/formatters";
+import { useInView } from "react-intersection-observer";
 
 export default function PopularDishes() {
-  const { navigate, prefetchRoute } = usePrefetchRoute();
-  const { selectedBranch } = useBranchStore();
+  // Always call useContext first (before any other hooks) to maintain hook order
+  const contextData = useContext(HighlightsContext);
+  
+  const router = useRouter();
+  const { prefetchRoute } = usePrefetchRoute();
+  const { selectedBranch, getSelectedBranchId } = useBranchStore();
   const { addToCart } = useCartStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
@@ -24,9 +31,19 @@ export default function PopularDishes() {
   const [dishes, setDishes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // If context is available, use it; otherwise fetch directly
   useEffect(() => {
+    if (contextData) {
+      // Use context data
+      setDishes(contextData.popular || []);
+      setIsLoading(contextData.isLoading);
+      return;
+    }
+
+    // Fetch directly if no context
     const fetchDishes = async () => {
-      if (!selectedBranch) {
+      const branchId = getSelectedBranchId();
+      if (!branchId) {
         setIsLoading(false);
         return;
       }
@@ -40,19 +57,8 @@ export default function PopularDishes() {
           return;
         }
 
-        // Combine arrays: popular first, then latest, then chef_special
-        const allItems = [
-          ...(response.data.popular || []),
-          ...(response.data.latest || []),
-          ...(response.data.chef_special || [])
-        ];
-
-        // Remove duplicates by id and limit to 5
-        const uniqueItems = Array.from(
-          new Map(allItems.map(item => [item.id, item])).values()
-        ).slice(0, 5);
-
-        const transformed = transformMenuItemsToProducts(uniqueItems);
+        const popularItems = response.data.popular || [];
+        const transformed = transformMenuItemsToProducts(popularItems);
         setDishes(transformed);
       } catch (error) {
         console.error("Error fetching popular dishes:", error);
@@ -63,7 +69,7 @@ export default function PopularDishes() {
     };
 
     fetchDishes();
-  }, [selectedBranch]);
+  }, [contextData, selectedBranch, getSelectedBranchId]);
 
   const handleAddToCart = useCallback((e, dish) => {
     e.preventDefault();
@@ -72,7 +78,7 @@ export default function PopularDishes() {
     // Check authentication first
     if (!isAuthenticated) {
       toastError("Please login to add items to cart");
-      navigate("/login");
+      router.push("/login", { scroll: false });
       return;
     }
     
@@ -88,7 +94,7 @@ export default function PopularDishes() {
     } catch {
       toastError("Failed to add product to cart");
     }
-  }, [addToCart, toastSuccess, toastError, isAuthenticated, navigate]);
+  }, [addToCart, toastSuccess, toastError, isAuthenticated, router]);
 
 
   return (
@@ -121,93 +127,24 @@ export default function PopularDishes() {
           </div>
 
           {isLoading ? (
-            <div className="dishes-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 sm:gap-8">
-              <ProductCardSkeleton viewMode="grid" count={5} />
+            <div className="dishes-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              <ProductCardSkeleton viewMode="grid" count={3} />
             </div>
-          ) : dishes.length === 0 ? (
+          ) : !dishes || dishes.length === 0 ? (
             <div className="flex items-center justify-center py-20">
               <p className="text-text text-lg">No popular dishes available</p>
             </div>
           ) : (
-            <div className="dishes-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 sm:gap-8">
-              {dishes.map((dish) => {
+            <div className="dishes-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {dishes.map((dish, index) => {
                 return (
-                  <div
+                  <LazyPopularCard
                     key={dish.id}
-                    className="dishes-card style2 p-6 sm:p-7 mt-38 rounded-2xl bg-bgimg shadow-lg hover:shadow-xl text-center transition-all duration-300 hover:-translate-y-2 relative min-h-[200px] flex flex-col"
-                  >
-
-                    {/* Product Image */}
-                    <div 
-                      className="absolute -top-20 left-1/2 -translate-x-1/2 flex justify-center items-center shrink-0 w-full"
-                      onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
-                    >
-                      <Image
-                        src="/img/food-items/circleShape.png"
-                        alt="shape"
-                        width={150}
-                        height={150}
-                        className="w-51 h-51 -top-[46px] absolute z-0 animate-spin-slow"
-                        unoptimized={true}
-                      />
-                      <OptimizedImage
-                        src={dish.image}
-                        alt={dish.title}
-                        width={192}
-                        height={192}
-                        className="w-48 h-48 object-cover rounded-full -top-10 relative z-10"
-                        quality={85}
-                        loading="lazy"
-                        sizes="192px"
-                      />
-                    </div>
-
-                    {/* Content */}
-                    <div className="item-content mt-20 flex flex-col grow justify-between">
-                      <div>
-                        <Link 
-                          href={`/shop/${dish.id}`}
-                          onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
-                        >
-                          <h3 className="text-white  text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
-                            {dish.title}
-                          </h3>
-                        </Link>
-                        <p className="text-text  text-sm sm:text-base mb-4 line-clamp-2">
-                          {dish.description}
-                        </p>
-                      </div>
-                      <div className="mt-auto">
-                        <div className="star mb-3 flex items-center justify-center gap-0.5">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className="w-4 h-4 fill-theme3 text-theme3"
-                            />
-                          ))}
-                        </div>
-                        <h6 className="text-theme  text-base sm:text-lg font-bold mb-4">
-                          {formatCurrency(dish.price)}
-                        </h6>
-                        <div className="flex items-center justify-center gap-2">
-                          <Link
-                            href={`/shop/${dish.id}`}
-                            onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
-                            className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white  text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 flex-1"
-                          >
-                            Order
-                          </Link>
-                          <button
-                            onClick={(e) => handleAddToCart(e, dish)}
-                            className="w-12 h-12 flex items-center justify-center rounded-full bg-theme3 text-white hover:bg-theme transition-all duration-300"
-                            title="Add to Cart"
-                          >
-                            <ShoppingBasket className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    dish={dish}
+                    index={index}
+                    prefetchRoute={prefetchRoute}
+                    handleAddToCart={handleAddToCart}
+                  />
                 );
               })}
             </div>
@@ -218,3 +155,99 @@ export default function PopularDishes() {
   );
 }
 
+// Lazy Popular Card Component - Loads only when in viewport
+function LazyPopularCard({ dish, index, prefetchRoute, handleAddToCart }) {
+  const shouldLoadImmediately = index < 3; // Load first 3 immediately
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    rootMargin: "100px",
+    triggerOnce: true,
+  });
+
+  const shouldLoad = shouldLoadImmediately || inView;
+
+  if (!shouldLoad) {
+    return (
+      <div ref={ref} className="dishes-card style2 p-6 sm:p-7 mt-38 rounded-2xl bg-bgimg min-h-[200px]">
+        <ProductCardSkeleton viewMode="grid" count={1} />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="dishes-card style2 p-6 sm:p-7 mt-38 rounded-2xl bg-bgimg shadow-lg hover:shadow-xl text-center transition-all duration-300 hover:-translate-y-2 relative min-h-[200px] flex flex-col"
+    >
+      {/* Product Image */}
+      <div 
+        className="absolute -top-20 left-1/2 -translate-x-1/2 flex justify-center items-center shrink-0 w-full"
+        onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
+      >
+        <Image
+          src="/img/food-items/circleShape.png"
+          alt="shape"
+          width={150}
+          height={150}
+          className="w-51 h-51 -top-[46px] absolute z-0 animate-spin-slow"
+          unoptimized={true}
+        />
+        <OptimizedImage
+          src={dish.image}
+          alt={dish.title}
+          width={192}
+          height={192}
+          className="w-48 h-48 object-cover rounded-full -top-10 relative z-10"
+          quality={85}
+          loading="lazy"
+          sizes="192px"
+        />
+      </div>
+
+      {/* Content */}
+      <div className="item-content mt-20 flex flex-col grow justify-between">
+        <div>
+          <Link 
+            href={`/shop/${dish.id}`}
+            onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
+          >
+            <h3 className="text-white  text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
+              {dish.title}
+            </h3>
+          </Link>
+          <p className="text-text  text-sm sm:text-base mb-4 line-clamp-2">
+            {dish.description}
+          </p>
+        </div>
+        <div className="mt-auto">
+          <div className="star mb-3 flex items-center justify-center gap-0.5">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                className="w-4 h-4 fill-theme3 text-theme3"
+              />
+            ))}
+          </div>
+          <h6 className="text-theme  text-base sm:text-lg font-bold mb-4">
+            {formatCurrency(dish.price)}
+          </h6>
+          <div className="flex items-center justify-center gap-2">
+            <Link
+              href={`/shop/${dish.id}`}
+              onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
+              className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white  text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 flex-1"
+            >
+              Order
+            </Link>
+            <button
+              onClick={(e) => handleAddToCart(e, dish)}
+              className="w-12 h-12 flex items-center justify-center rounded-full bg-theme3 text-white hover:bg-theme transition-all duration-300"
+              title="Add to Cart"
+            >
+              <ShoppingBasket className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

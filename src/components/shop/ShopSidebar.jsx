@@ -25,9 +25,9 @@ const extractCategories = (response) => {
 };
 
 export default function ShopSidebar() {
-  const { navigate, prefetchRoute } = usePrefetchRoute();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { prefetchRoute } = usePrefetchRoute();
   const { selectedBranch } = useBranchStore();
   const { addToCart } = useCartStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
@@ -89,10 +89,10 @@ export default function ShopSidebar() {
   const handleAddToCart = useCallback((e, product) => {
     e.preventDefault();
     e.stopPropagation();
-
+    
     if (!isAuthenticated) {
       toastError("Please login to add items to cart");
-      navigate("/login");
+      router.push("/login", { scroll: false });
       return;
     }
 
@@ -102,7 +102,7 @@ export default function ShopSidebar() {
     } catch {
       toastError("Failed to add product to cart");
     }
-  }, [addToCart, toastSuccess, toastError, isAuthenticated, navigate]);
+  }, [addToCart, toastSuccess, toastError, isAuthenticated, router]);
 
   const handleCategoryClick = useCallback((categoryId) => {
     const params = new URLSearchParams(searchParams.toString());

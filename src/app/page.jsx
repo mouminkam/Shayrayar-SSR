@@ -3,6 +3,7 @@ import { useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import useBranchStore from "../store/branchStore";
+import { HighlightsProvider } from "../context/HighlightsContext";
 import AnimatedSection from "../components/ui/AnimatedSection";
 import ErrorBoundary from "../components/ui/ErrorBoundary";
 import SectionSkeleton from "../components/ui/SectionSkeleton";
@@ -45,10 +46,18 @@ const GallerySection = dynamic(
 );
 
 // Priority 3: Medium Priority - Lazy load
-const BestFoodItemsSection = dynamic(
-  () => import("../components/home/BestFoodItemsSection"),
+const LatestItemsSection = dynamic(
+  () => import("../components/home/LatestItemsSection"),
   {
     loading: () => <SectionSkeleton variant="slider" cardCount={4} height="h-80" />,
+    ssr: false,
+  }
+);
+
+const ChefSpecialSection = dynamic(
+  () => import("../components/home/ChefSpecialSection"),
+  {
+    loading: () => <SectionSkeleton variant="grid" cardCount={3} height="h-96" />,
     ssr: false,
   }
 );
@@ -120,50 +129,53 @@ export default function HomePage() {
   }, [selectedBranch, router]);
 
   return (
-    <div className="bg-bg3 min-h-screen">
-      {/* Banner Section - Above the fold, load immediately */}
-      <AnimatedSection>
-        <BannerSection />
-      </AnimatedSection>
+    <HighlightsProvider>
+      <div className="bg-bg3 min-h-screen">
+        {/* Banner Section - Above the fold, load immediately */}
+        <AnimatedSection>
+          <BannerSection />
+        </AnimatedSection>
 
-      {/* Best Food Items Section - Priority 3 */}
-      <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="slider" cardCount={4} height="h-80" />}>
-          <AnimatedSection>
-            <BestFoodItemsSection />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary>
+        {/* Latest Items Section - Priority 3 */}
+        <ErrorBoundary>
+          <Suspense fallback={<SectionSkeleton variant="slider" cardCount={4} height="h-80" />}>
+            <AnimatedSection>
+              <LatestItemsSection />
+            </AnimatedSection>
+          </Suspense>
+        </ErrorBoundary>
 
-      {/* Offer Cards Section - Priority 3 */}
-      <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="default" cardCount={3} height="h-80" />}>
-          <AnimatedSection>
-            <OfferCards />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary>
+        {/* Offer Cards Section - Priority 3 */}
+        <ErrorBoundary>
+          <Suspense fallback={<SectionSkeleton variant="default" cardCount={3} height="h-80" />}>
+            <AnimatedSection>
+              <OfferCards />
+            </AnimatedSection>
+          </Suspense>
+        </ErrorBoundary>
 
-      {/* About Us Section - Lightweight */}
-      <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-64" />}>
-          <AnimatedSection>
-            <AboutUsSection />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary>
+        {/* About Us Section - Lightweight */}
+        <ErrorBoundary>
+          <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-64" />}>
+            <AnimatedSection>
+              <AboutUsSection />
+            </AnimatedSection>
+          </Suspense>
+        </ErrorBoundary>
 
-      {/* Popular Dishes Section - Priority 1 (High) */}
-      <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="grid" cardCount={5} height="h-96" />}>
-          <AnimatedSection>
-            <PopularDishes />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary>
+        {/* Popular Dishes Section - Priority 1 (High) */}
+        <ErrorBoundary>
+          <Suspense fallback={<SectionSkeleton variant="grid" cardCount={5} height="h-96" />}>
+            <AnimatedSection>
+              <PopularDishes />
+            </AnimatedSection>
+          </Suspense>
+        </ErrorBoundary>
 
-      {/* CTA Section - Priority 4 */}
-      {/* <ErrorBoundary>
+
+
+        {/* CTA Section - Priority 4 */}
+        {/* <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-48" />}>
           <AnimatedSection>
             <CTASection />
@@ -171,44 +183,53 @@ export default function HomePage() {
         </Suspense>
       </ErrorBoundary> */}
 
-      {/* Food Menu Section - Priority 1 (High) */}
-      <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="default" cardCount={10} height="h-96" />}>
-          <AnimatedSection>
-            <FoodMenuSection />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary>
+        {/* Food Menu Section - Priority 1 (High) */}
+        <ErrorBoundary>
+          <Suspense fallback={<SectionSkeleton variant="default" cardCount={10} height="h-96" />}>
+            <AnimatedSection>
+              <FoodMenuSection />
+            </AnimatedSection>
+          </Suspense>
+        </ErrorBoundary>
 
-      {/* Marquee Section - Lightweight */}
-      <ErrorBoundary>
-        <Suspense fallback={<div className="h-24 bg-bgimg animate-pulse rounded"></div>}>
-          <AnimatedSection>
-            <MarqueeSection />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary>
+        {/* Marquee Section - Lightweight */}
+        <ErrorBoundary>
+          <Suspense fallback={<div className="h-24 bg-bgimg animate-pulse rounded"></div>}>
+            <AnimatedSection>
+              <MarqueeSection />
+            </AnimatedSection>
+          </Suspense>
+        </ErrorBoundary>
 
-      {/* Timer Section - Priority 4 */}
-      <ErrorBoundary>
+        {/* Timer Section - Priority 4 */}
+        {/* <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-64" />}>
           <AnimatedSection>
             <TimerSection />
           </AnimatedSection>
         </Suspense>
-      </ErrorBoundary>
+      </ErrorBoundary> */}
 
-      {/* Chef Section - Priority 3 */}
-      <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="grid" cardCount={3} height="h-96" />}>
-          <AnimatedSection>
-            <ChefeSection />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary>
-      
-      {/* Testimonial Section - Priority 2 (High) */}
-      {/* <ErrorBoundary>
+        {/* Chef Special Section - Priority 1 (High) */}
+        <ErrorBoundary>
+          <Suspense fallback={<SectionSkeleton variant="grid" cardCount={3} height="h-96" />}>
+            <AnimatedSection>
+              <ChefSpecialSection />
+            </AnimatedSection>
+          </Suspense>
+        </ErrorBoundary>
+
+        {/* Chef Section - Priority 3 */}
+        <ErrorBoundary>
+          <Suspense fallback={<SectionSkeleton variant="grid" cardCount={3} height="h-96" />}>
+            <AnimatedSection>
+              <ChefeSection />
+            </AnimatedSection>
+          </Suspense>
+        </ErrorBoundary>
+
+        {/* Testimonial Section - Priority 2 (High) */}
+        {/* <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="testimonial" height="h-96" />}>
           <AnimatedSection>
             <TestimonialSection />
@@ -216,14 +237,15 @@ export default function HomePage() {
         </Suspense>
       </ErrorBoundary> */}
 
-      {/* Gallery Section - Priority 2 (High) */}
-      {/* <ErrorBoundary>
+        {/* Gallery Section - Priority 2 (High) */}
+        {/* <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="gallery" cardCount={8} height="h-64" />}>
           <AnimatedSection>
             <GallerySection />
           </AnimatedSection>
         </Suspense>
       </ErrorBoundary> */}
-    </div>
+      </div>
+    </HighlightsProvider>
   );
 }

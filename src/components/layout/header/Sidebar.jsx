@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { X, MapPin, Mail, Clock, Phone, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import BranchSelector from "./BranchSelector";
@@ -32,8 +33,9 @@ const formatWorkingHours = (hours) => {
 };
 
 export default function Sidebar({ isOpen, setIsOpen }) {
+  const router = useRouter();
   const { selectedBranch, initialize } = useBranchStore();
-  const { prefetchRoute, navigate } = usePrefetchRoute();
+  const { prefetchRoute } = usePrefetchRoute();
   const [contactInfo, setContactInfo] = useState({
     address: "Main Street, Melbourne, Australia",
     email: "info@fresheat.com",
@@ -279,7 +281,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                               onMouseEnter={() => prefetchRoute(item.href)}
                               onClick={() => {
                                 setIsOpen(false);
-                                navigate(item.href, { prefetch: false });
+                                router.push(item.href, { scroll: false });
                               }}
                               className="block text-white  text-lg font-normal hover:text-theme3 transition-colors duration-300 py-2"
                             >
@@ -397,7 +399,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                         onMouseEnter={() => prefetchRoute("/shop")}
                         onClick={() => {
                           setIsOpen(false);
-                          navigate("/shop", { prefetch: false });
+                          router.push("/shop", { scroll: false });
                         }}
                         className="theme-btn px-6 py-3 bg-theme3 text-white  text-sm font-normal hover:bg-theme transition-colors duration-300 rounded-md flex items-center justify-center gap-2 shadow-lg"
                       >

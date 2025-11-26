@@ -18,7 +18,7 @@ import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 export default function OrderDetailsPage() {
   const router = useRouter();
   const params = useParams();
-  const { prefetchRoute, navigate } = usePrefetchRoute();
+  const { prefetchRoute } = usePrefetchRoute();
   const orderId = params?.id;
   const { error: toastError, success: toastSuccess } = useToastStore();
   const [order, setOrder] = useState(null);
@@ -168,7 +168,7 @@ export default function OrderDetailsPage() {
                 onMouseEnter={() => prefetchRoute("/profile")}
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate("/profile", { prefetch: false });
+                  router.push("/profile", { scroll: false });
                 }}
                 className="px-6 py-3 bg-theme3 text-white rounded-xl hover:bg-theme transition-colors"
               >
@@ -206,7 +206,7 @@ export default function OrderDetailsPage() {
               onMouseEnter={() => prefetchRoute("/profile")}
               onClick={(e) => {
                 e.preventDefault();
-                navigate("/profile", { prefetch: false });
+                router.push("/profile", { scroll: false });
               }}
               className="inline-flex items-center gap-2 text-text hover:text-theme3 transition-colors"
             >

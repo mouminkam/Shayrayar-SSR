@@ -2,6 +2,7 @@
 import { useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ShoppingBasket, Star } from "lucide-react";
 import { formatCurrency } from "../../lib/utils/formatters";
 import useCartStore from "../../store/cartStore";
@@ -11,7 +12,8 @@ import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 import OptimizedImage from "./OptimizedImage";
 
 export default function ProductCard({ product, viewMode = "grid" }) {
-  const { navigate, prefetchRoute } = usePrefetchRoute();
+  const router = useRouter();
+  const { prefetchRoute } = usePrefetchRoute();
   const { addToCart } = useCartStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
@@ -23,11 +25,11 @@ export default function ProductCard({ product, viewMode = "grid" }) {
     prefetchRoute(productUrl);
   }, [prefetchRoute, productUrl]);
 
-  // Handle navigation with transition
+  // Handle navigation
   const handleOrderClick = useCallback((e) => {
     e.preventDefault();
-    navigate(productUrl);
-  }, [navigate, productUrl]);
+    router.push(productUrl, { scroll: false });
+  }, [router, productUrl]);
 
   // Handle add to cart
   const handleAddToCart = (e) => {
@@ -37,7 +39,7 @@ export default function ProductCard({ product, viewMode = "grid" }) {
     // Check authentication first
     if (!isAuthenticated) {
       toastError("Please login to add items to cart");
-      navigate("/login");
+      router.push("/login", { scroll: false });
       return;
     }
     

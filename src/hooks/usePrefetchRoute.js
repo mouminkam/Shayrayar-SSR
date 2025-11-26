@@ -50,10 +50,10 @@ export function usePrefetchRoute() {
       prefetchRoute(href);
     }
 
-    // Navigate with transition
+    // Navigate with transition (no scroll)
     startTransition(() => {
       try {
-        router.push(href);
+        router.push(href, { scroll: false });
       } catch (error) {
         console.error("Navigation error:", error);
       }

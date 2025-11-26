@@ -1,15 +1,17 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import OptimizedImage from "../../ui/OptimizedImage";
 
 export default function OrderCard({ order, index }) {
-  const { navigate, prefetchRoute } = usePrefetchRoute();
+  const router = useRouter();
+  const { prefetchRoute } = usePrefetchRoute();
 
   const handleCardClick = () => {
-    navigate(`/orders/${order.id}`);
+    router.push(`/orders/${order.id}`, { scroll: false });
   };
 
   return (
