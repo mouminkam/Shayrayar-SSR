@@ -28,23 +28,6 @@ const FoodMenuSection = dynamic(
   }
 );
 
-// Priority 2: High Priority - Lazy load
-const TestimonialSection = dynamic(
-  () => import("../components/about/TestimonialSection"),
-  {
-    loading: () => <SectionSkeleton variant="testimonial" height="h-96" />,
-    ssr: false,
-  }
-);
-
-const GallerySection = dynamic(
-  () => import("../components/home/GallerySection"),
-  {
-    loading: () => <SectionSkeleton variant="gallery" cardCount={8} height="h-64" />,
-    ssr: false,
-  }
-);
-
 // Priority 3: Medium Priority - Lazy load
 const LatestItemsSection = dynamic(
   () => import("../components/home/LatestItemsSection"),
@@ -78,37 +61,12 @@ const OfferCards = dynamic(
   }
 );
 
-// Priority 4: Low Priority - Lazy load (optional)
-const TimerSection = dynamic(
-  () => import("../components/home/TimerSection"),
-  {
-    loading: () => <SectionSkeleton variant="default" showCards={false} height="h-64" />,
-    ssr: false,
-  }
-);
-
-const CTASection = dynamic(
-  () => import("../components/about/CTASection"),
-  {
-    loading: () => <SectionSkeleton variant="default" showCards={false} height="h-48" />,
-    ssr: false,
-  }
-);
-
 // Lightweight sections - Can be lazy loaded but low impact
 const AboutUsSection = dynamic(
   () => import("../components/home/AboutUsSection"),
   {
     loading: () => <SectionSkeleton variant="default" showCards={false} height="h-64" />,
     ssr: true, // Can be SSR as it's lightweight
-  }
-);
-
-const MarqueeSection = dynamic(
-  () => import("../components/about/MarqueeSection"),
-  {
-    loading: () => <div className="h-24 bg-bgimg animate-pulse rounded"></div>,
-    ssr: true, // Can be SSR as it's very lightweight
   }
 );
 
@@ -174,15 +132,6 @@ export default function HomePage() {
 
 
 
-        {/* CTA Section - Priority 4 */}
-        {/* <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-48" />}>
-          <AnimatedSection>
-            <CTASection />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary> */}
-
         {/* Food Menu Section - Priority 1 (High) */}
         <ErrorBoundary>
           <Suspense fallback={<SectionSkeleton variant="default" cardCount={10} height="h-96" />}>
@@ -191,24 +140,6 @@ export default function HomePage() {
             </AnimatedSection>
           </Suspense>
         </ErrorBoundary>
-
-        {/* Marquee Section - Lightweight */}
-        <ErrorBoundary>
-          <Suspense fallback={<div className="h-24 bg-bgimg animate-pulse rounded"></div>}>
-            <AnimatedSection>
-              <MarqueeSection />
-            </AnimatedSection>
-          </Suspense>
-        </ErrorBoundary>
-
-        {/* Timer Section - Priority 4 */}
-        {/* <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-64" />}>
-          <AnimatedSection>
-            <TimerSection />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary> */}
 
         {/* Chef Special Section - Priority 1 (High) */}
         <ErrorBoundary>
@@ -237,14 +168,6 @@ export default function HomePage() {
         </Suspense>
       </ErrorBoundary> */}
 
-        {/* Gallery Section - Priority 2 (High) */}
-        {/* <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="gallery" cardCount={8} height="h-64" />}>
-          <AnimatedSection>
-            <GallerySection />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary> */}
       </div>
     </HighlightsProvider>
   );

@@ -23,34 +23,10 @@ const AboutSection = dynamic(
   }
 );
 
-const MarqueeSection = dynamic(
-  () => import("../../components/about/MarqueeSection"),
-  {
-    loading: () => <div className="h-24 bg-bgimg animate-pulse rounded"></div>,
-    ssr: true,
-  }
-);
-
-const CTASection = dynamic(
-  () => import("../../components/about/CTASection"),
-  {
-    loading: () => <SectionSkeleton variant="default" showCards={false} height="h-48" />,
-    ssr: false,
-  }
-);
-
 const ChefeSection = dynamic(
   () => import("../../components/about/ChefeSection"),
   {
     loading: () => <SectionSkeleton variant="grid" cardCount={3} height="h-96" />,
-    ssr: false,
-  }
-);
-
-const TestimonialSection = dynamic(
-  () => import("../../components/about/TestimonialSection"),
-  {
-    loading: () => <SectionSkeleton variant="testimonial" height="h-96" />,
     ssr: false,
   }
 );
@@ -76,30 +52,9 @@ export default function AboutUsPage() {
         </Suspense>
       </ErrorBoundary>
       <ErrorBoundary>
-        <Suspense fallback={<div className="h-24 bg-bgimg animate-pulse rounded"></div>}>
-          <AnimatedSection>
-            <MarqueeSection />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary>
-      <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-48" />}>
-          <AnimatedSection>
-            <CTASection />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary>
-      <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="grid" cardCount={3} height="h-96" />}>
           <AnimatedSection>
             <ChefeSection />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary>
-      <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="testimonial" height="h-96" />}>
-          <AnimatedSection>
-            <TestimonialSection />
           </AnimatedSection>
         </Suspense>
       </ErrorBoundary>
