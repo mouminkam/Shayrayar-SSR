@@ -4,10 +4,13 @@ import { motion } from "framer-motion";
 import { ShoppingBag, Package, ArrowRight } from "lucide-react";
 import OrderCard from "./OrderCard";
 
-export default function OrdersHistory({ orders, showViewAll = true, maxDisplay = null }) {
+export default function OrdersHistory({ orders, showViewAll = true, maxDisplay = null, totalOrders = null }) {
   // Ensure orders is always an array
   const ordersList = Array.isArray(orders) ? orders : [];
   const DISPLAY_LIMIT = 5;
+  
+  // Use totalOrders if provided (from pagination), otherwise use ordersList.length
+  const totalOrdersCount = totalOrders !== null ? totalOrders : ordersList.length;
   
   // If maxDisplay is provided, use it; otherwise use default logic
   let displayedOrders;
@@ -46,9 +49,9 @@ export default function OrdersHistory({ orders, showViewAll = true, maxDisplay =
             Order History
           </h3>
         </div>
-        {ordersList.length > 0 && (
+        {totalOrdersCount > 0 && (
           <span className="text-text text-sm font-medium">
-            {ordersList.length} {ordersList.length === 1 ? 'order' : 'orders'}
+            {totalOrdersCount} {totalOrdersCount === 1 ? 'order' : 'orders'}
           </span>
         )}
       </div>
@@ -86,7 +89,7 @@ export default function OrdersHistory({ orders, showViewAll = true, maxDisplay =
                 href="/orders"
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-theme3/50 rounded-xl text-white  text-sm font-semibold transition-all duration-300 group"
               >
-                View All Orders ({ordersList.length})
+                View All Orders ({totalOrdersCount})
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>

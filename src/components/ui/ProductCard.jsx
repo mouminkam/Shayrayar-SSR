@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShoppingBasket, Star } from "lucide-react";
+import { ShoppingBasket } from "lucide-react";
 import { formatCurrency } from "../../lib/utils/formatters";
 import useCartStore from "../../store/cartStore";
 import useToastStore from "../../store/toastStore";
@@ -119,14 +119,6 @@ export default function ProductCard({ product, viewMode = "grid" }) {
               {product.title}
             </h3>
           </Link>
-          <div className="star mb-3 flex items-center gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className="w-4 h-4 fill-theme3 text-theme3"
-              />
-            ))}
-          </div>
           <div className="text text-text  text-base font-normal leading-relaxed mb-5">
             {product.longDescription || "Neque porro est qui dolorem ipsum quia quaed inventor veritatis et quasi architecto beatae vitae dicta sunt explicabo. Aelltes port lacus quis enim var sed efficitur turpis gilla sed sit amet finibus eros. Lorem Ipsum is simply dummy text of the printing and typesetting industry.When an unknown printer took a galley of type"}
           </div>
@@ -202,14 +194,6 @@ export default function ProductCard({ product, viewMode = "grid" }) {
           </p>
         </div>
         <div className="mt-auto">
-          <div className="star mb-3 flex items-center justify-center gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className="w-4 h-4 fill-theme3 text-theme3"
-              />
-            ))}
-          </div>
           <h6 className="text-theme  text-base sm:text-lg font-bold mb-4">
             {formatCurrency(product.price)}
           </h6>

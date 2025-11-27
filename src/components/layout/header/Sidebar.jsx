@@ -9,6 +9,7 @@ import BranchSelector from "./BranchSelector";
 import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
+import { NAV_LINKS } from "../../../data/constants";
 
 // Helper function to format working hours from array to string
 const formatWorkingHours = (hours) => {
@@ -42,13 +43,6 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     phone: "+11002345909",
     workingHours: "Mon-Friday, 09am - 05pm",
   });
-
-  const navItems = [
-    { href: "/", label: "Home" },
-    { href: "/shop", label: "Shop" },
-    { href: "/contact-us", label: "ContactUs" },
-    { href: "/about-us", label: "AboutUs" },
-  ];
 
   const galleryImages = [
     "/img/header/01.jpg",
@@ -269,7 +263,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   <div className="mobile-menu fix mb-6 lg:hidden">
                     <nav>
                       <ul className="flex flex-col  gap-5 py-4 ">
-                        {navItems.map((item, index) => (
+                        {NAV_LINKS.map((item, index) => (
                           <motion.li
                             key={index}
                             initial={{ opacity: 0, x: -20 }}

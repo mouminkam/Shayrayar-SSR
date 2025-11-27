@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import OptimizedImage from "../../ui/OptimizedImage";
+import { IMAGE_PATHS } from "../../../data/constants";
 
 export default function OrderCard({ order, index }) {
   const router = useRouter();
@@ -12,6 +13,23 @@ export default function OrderCard({ order, index }) {
 
   const handleCardClick = () => {
     router.push(`/orders/${order.id}`, { scroll: false });
+  };
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'delivered':
+        return 'bg-green-500/20 text-green-300';
+      case 'confirmed':
+      case 'preparing':
+      case 'ready':
+      case 'out_for_delivery':
+        return 'bg-blue-500/20 text-blue-300';
+      case 'cancelled':
+        return 'bg-red-500/20 text-red-300';
+      case 'pending':
+      default:
+        return 'bg-yellow-500/20 text-yellow-300';
+    }
   };
 
   return (
@@ -25,7 +43,7 @@ export default function OrderCard({ order, index }) {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
           <p className="text-white  font-bold text-lg mb-1">
-            Order #{String(order.id || '').slice(-8).toUpperCase()}
+            {order.orderNumber || `Order #${String(order.id || '').slice(-8).toUpperCase()}`}
           </p>
           <p className="text-text text-sm">
             {order.date ? new Date(order.date).toLocaleDateString("en-US", {
@@ -42,15 +60,9 @@ export default function OrderCard({ order, index }) {
             {formatCurrency(order.total)}
           </p>
           <span
-            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-              order.status === "completed"
-                ? "bg-green-500/20 text-green-300"
-                : order.status === "processing"
-                ? "bg-blue-500/20 text-blue-300"
-                : "bg-yellow-500/20 text-yellow-300"
-            }`}
+            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusColor(order.status)}`}
           >
-            {order.status}
+            {order.status?.replace('_', ' ') || 'pending'}
           </span>
         </div>
       </div>
@@ -65,7 +77,7 @@ export default function OrderCard({ order, index }) {
                 onMouseEnter={() => item.id && prefetchRoute(`/shop/${item.id}`)}
               >
                 <OptimizedImage
-                  src={item.image || "/img/placeholder.png"}
+                  src={item.image || IMAGE_PATHS.placeholder}
                   alt={item.name || 'Item'}
                   fill
                   className="object-cover"

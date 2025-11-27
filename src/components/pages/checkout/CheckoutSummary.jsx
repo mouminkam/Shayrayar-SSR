@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ShoppingCart, Package, Tag, Truck } from "lucide-react";
 import useCartStore, { getCartItemKey } from "../../../store/cartStore";
 import { formatCurrency } from "../../../lib/utils/formatters";
+import { IMAGE_PATHS } from "../../../data/constants";
 
 const CheckoutSummary = memo(() => {
   const {
@@ -69,7 +70,7 @@ const CheckoutSummary = memo(() => {
           >
             <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
               <Image
-                src={item.image || "/img/placeholder.png"}
+                src={item.image || IMAGE_PATHS.placeholder}
                 alt={item.name}
                 fill
                 className="object-cover"

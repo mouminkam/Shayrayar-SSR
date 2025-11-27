@@ -8,6 +8,7 @@ import api from "../../api";
 import useBranchStore from "../../store/branchStore";
 import { transformCategories, transformMenuItemsToProducts } from "../../lib/utils/productTransform";
 import { extractMenuItemsFromResponse } from "../../lib/utils/responseExtractor";
+import { IMAGE_PATHS } from "../../data/constants";
 
 export default function FoodMenuSection() {
   const { prefetchRoute } = usePrefetchRoute();
@@ -207,7 +208,7 @@ export default function FoodMenuSection() {
                       >
                         <div className="menu-item-thumb shrink-0">
                           <Image
-                            src={item.image || "/img/placeholder.png"}
+                            src={item.image || IMAGE_PATHS.placeholder}
                             alt={item.title}
                             width={96}
                             height={96}

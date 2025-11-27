@@ -131,10 +131,10 @@ export default function CouponSection() {
                 {coupon.type === 'FREEDELIVERY' 
                   ? 'Free Delivery'
                   : coupon.discount_amount > 0
-                  ? `Discount: ${coupon.discount_amount.toFixed(2)} SAR`
+                  ? `Discount: ${coupon.discount_amount.toFixed(2)} BGN`
                   : coupon.type === 'percentage'
                   ? `Discount: ${coupon.value}%`
-                  : `Discount: ${coupon.value} SAR`}
+                  : `Discount: ${coupon.value} BGN`}
               </p>
             </div>
           </div>

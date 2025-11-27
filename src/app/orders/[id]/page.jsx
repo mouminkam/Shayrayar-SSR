@@ -8,6 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import api from "../../../api";
 import useToastStore from "../../../store/toastStore";
+import { IMAGE_PATHS } from "../../../data/constants";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import AnimatedSection from "../../../components/ui/AnimatedSection";
 import ErrorBoundary from "../../../components/ui/ErrorBoundary";
@@ -259,7 +260,7 @@ export default function OrderDetailsPage() {
                       const imageUrl = item.menu_item?.image_url || 
                                      item.menu_item?.image || 
                                      item.image || 
-                                     '/img/placeholder.png';
+                                     IMAGE_PATHS.placeholder;
                       const itemName = item.item_name || item.menu_item?.name || item.name || 'Unknown Item';
                       const itemPrice = parseFloat(item.item_price || item.price || item.menu_item?.price || 0);
                       const quantity = item.quantity || 1;

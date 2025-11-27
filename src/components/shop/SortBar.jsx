@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Grid, List } from "lucide-react";
+import { ITEMS_PER_PAGE } from "../../data/constants";
 
-export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage = 12, onViewChange, viewMode = "grid" }) {
+export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage = ITEMS_PER_PAGE, onViewChange, viewMode = "grid" }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentSort = searchParams.get("sort") || "menu_order";

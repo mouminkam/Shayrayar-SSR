@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingBasket, Star, ChefHat } from "lucide-react";
+import { ShoppingBasket, ChefHat } from "lucide-react";
 import { formatCurrency } from "../../lib/utils/formatters";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 import { useHighlights } from "../../context/HighlightsContext";
@@ -177,14 +177,6 @@ function LazyChefCard({ dish, index, prefetchRoute, handleAddToCart }) {
           </p>
         </div>
         <div className="mt-auto">
-          <div className="star mb-3 flex items-center justify-center gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className="w-4 h-4 fill-theme3 text-theme3"
-              />
-            ))}
-          </div>
           <h6 className="text-theme3 text-base sm:text-lg font-bold mb-4">
             {formatCurrency(dish.price)}
           </h6>

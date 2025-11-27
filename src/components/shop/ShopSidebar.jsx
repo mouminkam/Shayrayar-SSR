@@ -2,7 +2,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Star, ShoppingBasket } from "lucide-react";
+import { ArrowRight, ShoppingBasket } from "lucide-react";
 import OptimizedImage from "../ui/OptimizedImage";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 import api from "../../api";
@@ -200,11 +200,6 @@ export default function ShopSidebar() {
                         {product.title}
                       </Link>
 
-                      <div className="flex items-center justify-center gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-3 h-3 lg:w-3.5 lg:h-3.5 fill-theme3 text-theme3 transform group-hover:scale-110 transition-transform duration-300" />
-                        ))}
-                      </div>
 
                       <div className="flex items-center justify-center gap-2 lg:gap-3">
                         <span className="text-theme text-sm lg:text-base font-black bg-linear-to-r from-theme/10 to-theme3/10 px-2 lg:px-3 py-1 rounded-full">

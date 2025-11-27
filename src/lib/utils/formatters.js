@@ -10,10 +10,10 @@ export const formatPrice = (price) => {
 /**
  * Format currency with symbol
  * @param {number} price - The price to format
- * @param {string} symbol - Currency symbol (default: '$')
+ * @param {string} symbol - Currency symbol (default: 'BGN')
  * @returns {string} Formatted currency string
  */
-export const formatCurrency = (price, symbol = '$') => {
-  return `${symbol}${formatPrice(price)}`;
+export const formatCurrency = (price, symbol = 'BGN') => {
+  return `${symbol} ${formatPrice(price)}`;
 };
 

@@ -1,6 +1,7 @@
 "use client";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { TAX_RATE } from "../data/constants";
 
 // Cart item structure
 // { 
@@ -331,7 +332,7 @@ const useCartStore = create(
         const subtotal = get().getSubtotal();
         const discount = get().getDiscount();
         const taxableAmount = subtotal - discount;
-        return taxableAmount * 0.1; // 10% tax on amount after discount
+        return taxableAmount * TAX_RATE;
       },
 
       getDiscount: () => {

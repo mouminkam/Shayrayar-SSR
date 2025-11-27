@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User, Mail, MessageSquare, Star, ArrowRight, Loader2 } from "lucide-react";
+import { User, Mail, MessageSquare, ArrowRight, Loader2 } from "lucide-react";
 import useAuthStore from "../../store/authStore";
 import useToastStore from "../../store/toastStore";
 
@@ -9,7 +9,6 @@ export default function ReviewForm({ productId }) {
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
-  const [rating, setRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -37,11 +36,6 @@ export default function ReviewForm({ productId }) {
       return;
     }
 
-    if (rating === 0) {
-      toastError("Please select a rating");
-      return;
-    }
-
     if (!formData.message.trim()) {
       toastError("Please write a review message");
       return;
@@ -54,7 +48,6 @@ export default function ReviewForm({ productId }) {
       
       toastSuccess("Review submitted successfully!");
       
-      setRating(0);
       setFormData({
         name: user?.name || "",
         email: user?.email || "",
@@ -79,25 +72,6 @@ export default function ReviewForm({ productId }) {
         <p className="text-text text-sm sm:text-base mb-6">
           Your email address will not be published. Required fields are marked *
         </p>
-        <div className="rating flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mt-4 mb-9">
-          <p className="text-white  text-base sm:text-lg font-semibold m-0">Rate this product? *</p>
-          <ul className="star flex items-center gap-2">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <li key={star}>
-                <button
-                  type="button"
-                  onClick={() => setRating(star)}
-                  className="transition-all duration-300"
-                >
-                  <Star
-                    className={`w-6 h-6 sm:w-7 sm:h-7 ${rating >= star ? "text-theme3 fill-theme3" : "text-white/30 fill-white/10 hover:text-theme3 transition-all duration-300"
-                      }`}
-                  />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="relative z-10">
@@ -167,9 +141,9 @@ export default function ReviewForm({ productId }) {
         <div className="form-group mb-0">
           <button
             type="submit"
-            disabled={isSubmitting || rating === 0}
+            disabled={isSubmitting}
             className={`theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3  text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30 ${
-              isSubmitting || rating === 0 ? 'opacity-50 cursor-not-allowed' : ''
+              isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
             {isSubmitting ? (

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import useCartStore from "../../store/cartStore";
 import { formatCurrency } from "../../lib/utils/formatters";
+import { TAX_RATE } from "../../data/constants";
 
 const CartSummary = memo(() => {
   const items = useCartStore((state) => state.items);
@@ -15,7 +16,7 @@ const CartSummary = memo(() => {
   }, [items]);
 
   const tax = useMemo(() => {
-    return subtotal * 0.1; // 10% tax
+    return subtotal * TAX_RATE;
   }, [subtotal]);
 
   const total = useMemo(() => {
@@ -51,7 +52,7 @@ const CartSummary = memo(() => {
         {/* Tax */}
         <div className="flex justify-between items-center py-3 border-b border-white/10">
           <span className="text-text  text-base font-medium">
-            Tax (10%)
+            Tax ({(TAX_RATE * 100).toFixed(0)}%)
           </span>
           <span className="text-white  text-lg font-bold">
             {formatCurrency(tax)}

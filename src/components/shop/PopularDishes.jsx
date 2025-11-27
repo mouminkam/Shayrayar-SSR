@@ -3,7 +3,7 @@ import { useCallback, useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShoppingBasket, Star } from "lucide-react";
+import { ShoppingBasket } from "lucide-react";
 import OptimizedImage from "../ui/OptimizedImage";
 import ProductCardSkeleton from "../ui/ProductCardSkeleton";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
@@ -219,14 +219,6 @@ function LazyPopularCard({ dish, index, prefetchRoute, handleAddToCart }) {
           </p>
         </div>
         <div className="mt-auto">
-          <div className="star mb-3 flex items-center justify-center gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className="w-4 h-4 fill-theme3 text-theme3"
-              />
-            ))}
-          </div>
           <h6 className="text-theme  text-base sm:text-lg font-bold mb-4">
             {formatCurrency(dish.price)}
           </h6>

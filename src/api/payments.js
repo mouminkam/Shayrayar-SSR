@@ -10,7 +10,7 @@ import axiosInstance from './config/axios';
  * @param {Object} paymentData - Payment data
  * @param {number} paymentData.order_id - Order ID
  * @param {number} paymentData.amount - Payment amount
- * @param {string} paymentData.currency - Currency code (default: USD)
+ * @param {string} paymentData.currency - Currency code (default: BGN)
  * @returns {Promise<Object>} Response with Stripe payment intent client secret
  */
 export const createStripePaymentIntent = async (paymentData) => {
@@ -89,7 +89,7 @@ export const getStripePaymentStatus = async (paymentIntentId) => {
  * @param {Object} orderData - PayPal order data
  * @param {number} orderData.order_id - Order ID
  * @param {number} orderData.amount - Payment amount
- * @param {string} orderData.currency - Currency code (default: USD)
+ * @param {string} orderData.currency - Currency code (default: BGN)
  * @returns {Promise<Object>} Response with PayPal order ID
  */
 export const createPayPalOrder = async (orderData) => {

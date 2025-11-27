@@ -1,6 +1,7 @@
 /**
  * Utility functions to transform API menu item data to frontend product structure
  */
+import { IMAGE_PATHS } from "../../data/constants";
 
 /**
  * Get full image URL from API response
@@ -20,7 +21,7 @@ const getImageUrl = (menuItem) => {
     return `${storageBaseUrl}/storage/${cleanPath}`;
   }
   
-  return "/img/placeholder.png";
+  return IMAGE_PATHS.placeholder;
 };
 
 export const transformMenuItemToProduct = (menuItem) => {

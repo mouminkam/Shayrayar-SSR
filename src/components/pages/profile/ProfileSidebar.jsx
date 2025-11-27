@@ -4,7 +4,7 @@ import { User, Mail, Phone, MapPin, Package, LogOut } from "lucide-react";
 import useAuthStore from "../../../store/authStore";
 import { useRouter } from "next/navigation";
 
-export default function ProfileSidebar({ user, orders }) {
+export default function ProfileSidebar({ user, totalOrders = 0 }) {
   const router = useRouter();
   const { logout } = useAuthStore();
 
@@ -83,7 +83,7 @@ export default function ProfileSidebar({ user, orders }) {
         <div className="text-center p-3 bg-white/5 rounded-xl">
           <Package className="w-6 h-6 text-theme3 mx-auto mb-2" />
           <p className="text-white  text-xl font-black">
-            {orders.length}
+            {totalOrders}
           </p>
           <p className="text-text text-xs">Orders</p>
         </div>

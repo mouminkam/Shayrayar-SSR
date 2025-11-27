@@ -13,7 +13,7 @@ import api from '../../api';
  * @returns {Promise<Object>} { success: boolean, client_secret?: string, payment_intent_id?: string, amount?: number, currency?: string, error?: string }
  * @note publishable_key is no longer returned - use NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY env variable instead
  */
-export const createStripePaymentIntent = async (orderId, amount, currency = 'USD') => {
+export const createStripePaymentIntent = async (orderId, amount, currency = 'BGN') => {
   try {
     // Use new Web API - only order_id is required
     const response = await api.payments.createStripePaymentIntentWeb(orderId);

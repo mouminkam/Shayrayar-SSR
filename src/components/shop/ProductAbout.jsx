@@ -2,20 +2,16 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Facebook, Youtube, Twitter, Instagram, Plus, Minus, Star } from "lucide-react";
+import { ShoppingCart, Facebook, Youtube, Twitter, Instagram, Plus, Minus } from "lucide-react";
 import { formatCurrency } from "../../lib/utils/formatters";
 import useCartStore from "../../store/cartStore";
 import useToastStore from "../../store/toastStore";
 import useAuthStore from "../../store/authStore";
 import ProductCustomization from "./ProductCustomization";
+import { SOCIAL_LINKS } from "../../data/constants";
 
-// Social media links - memoized outside component
-const SOCIAL_LINKS = [
-  { icon: Facebook, href: "https://www.facebook.com", label: "Facebook" },
-  { icon: Youtube, href: "https://www.youtube.com", label: "YouTube" },
-  { icon: Twitter, href: "https://www.x.com", label: "Twitter" },
-  { icon: Instagram, href: "https://www.instagram.com", label: "Instagram" },
-];
+// Map icon names to lucide-react components
+const iconMap = { Facebook, Youtube, Twitter, Instagram };
 
 export default function ProductAbout({ product }) {
   const router = useRouter();
@@ -106,20 +102,6 @@ export default function ProductAbout({ product }) {
         </div>
       </div>
 
-      <div className="product-rating pb-6 mb-6 border-b border-white/10">
-        <div className="star-rating flex items-center gap-2 mb-3">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              className="w-5 h-5 fill-theme3 text-theme3 transform hover:scale-110 transition-transform duration-300"
-            />
-          ))}
-        </div>
-        <span className="woocommerce-review-link text-text text-sm sm:text-base inline-flex items-center gap-1">
-          <span>(2 customer reviews)</span>
-        </span>
-      </div>
-
       <p className="text text-white text-base sm:text-lg  font-normal leading-relaxed mb-8">
         {product?.description || product?.longDescription || "No description available."}
       </p>
@@ -178,19 +160,23 @@ export default function ProductAbout({ product }) {
           Share with friends
         </h6>
         <ul className="social-media flex items-center gap-3">
-          {SOCIAL_LINKS.map(({ icon: Icon, href, label }) => (
-            <li key={label}>
-              <Link
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center bg-white/10 text-white border border-white/20 rounded-full hover:bg-white hover:text-theme3 hover:border-theme3 transition-colors"
-                aria-label={label}
-              >
-                <Icon className="w-4 h-4" />
-              </Link>
-            </li>
-          ))}
+          {SOCIAL_LINKS.map((social) => {
+            const Icon = iconMap[social.icon];
+            if (!Icon) return null;
+            return (
+              <li key={social.label}>
+                <Link
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 flex items-center justify-center bg-white/10 text-white border border-white/20 rounded-full hover:bg-white hover:text-theme3 hover:border-theme3 transition-colors"
+                  aria-label={social.label}
+                >
+                  <Icon className="w-4 h-4" />
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>

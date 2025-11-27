@@ -12,10 +12,7 @@ import useBranchStore from "../../store/branchStore";
 import { transformMenuItemsToProducts } from "../../lib/utils/productTransform";
 import { extractMenuItemsFromResponse } from "../../lib/utils/responseExtractor";
 import useToastStore from "../../store/toastStore";
-
-// Constants
-const ITEMS_PER_PAGE_GRID = 12;
-const ITEMS_PER_PAGE_LIST = 5;
+import { ITEMS_PER_PAGE_GRID, ITEMS_PER_PAGE_LIST } from "../../data/constants";
 
 
 export default function ShopSection() {

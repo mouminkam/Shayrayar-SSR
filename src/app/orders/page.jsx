@@ -8,6 +8,7 @@ import SectionSkeleton from "../../components/ui/SectionSkeleton";
 import Breadcrumb from "../../components/ui/Breadcrumb";
 import useAuthStore from "../../store/authStore";
 import api from "../../api";
+import { IMAGE_PATHS } from "../../data/constants";
 
 // Lazy load orders component
 const OrdersHistory = dynamic(
@@ -41,7 +42,7 @@ export default function AllOrdersPage() {
     const imageUrl = item.menu_item?.image_url || 
                     item.menu_item?.image || 
                     item.image || 
-                    '/img/placeholder.png';
+                    IMAGE_PATHS.placeholder;
     
     return {
       id: item.id || item.order_item_id || String(item.id || ''),
@@ -175,7 +176,10 @@ export default function AllOrdersPage() {
                     {pagination && pagination.last_page > 1 && (
                       <div className="mt-8 flex items-center justify-center gap-2">
                         <button
-                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(prev => Math.max(1, prev - 1));
+                          }}
                           disabled={currentPage === 1}
                           className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >
@@ -198,7 +202,10 @@ export default function AllOrdersPage() {
                             return (
                               <button
                                 key={pageNum}
-                                onClick={() => setCurrentPage(pageNum)}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setCurrentPage(pageNum);
+                                }}
                                 className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                                   currentPage === pageNum
                                     ? 'bg-theme3 text-white'
@@ -212,7 +219,10 @@ export default function AllOrdersPage() {
                         </div>
                         
                         <button
-                          onClick={() => setCurrentPage(prev => Math.min(pagination.last_page, prev + 1))}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(prev => Math.min(pagination.last_page, prev + 1));
+                          }}
                           disabled={currentPage === pagination.last_page}
                           className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >

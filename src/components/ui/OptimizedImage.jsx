@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import NextImage from "next/image";
 import { getBlurPlaceholder } from "../../lib/utils/imageUtils";
+import { IMAGE_PATHS } from "../../data/constants";
 
 /**
  * OptimizedImage Component
@@ -33,7 +34,7 @@ export default function OptimizedImage({
   const retryTimeoutRef = useRef(null);
   
   // Fallback image path
-  const fallbackSrc = "/img/placeholder.png";
+  const fallbackSrc = IMAGE_PATHS.placeholder;
 
   // Generate blur placeholder synchronously on mount to avoid any async issues
   const initialBlurPlaceholder = useMemo(() => {

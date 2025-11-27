@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Star, MessageSquare } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 
 export default function ProductReviews({ productId }) {
   const reviews = [
@@ -71,22 +71,6 @@ export default function ProductReviews({ productId }) {
                     {review.author}
                   </h4>
                   <div className="commented-on text-text text-sm mb-4">{review.date}</div>
-                  <div className="star absolute top-0 right-0 sm:flex hidden items-center gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${i < (review.rating || 5) ? 'fill-theme3 text-theme3' : 'fill-white/10 text-white/30'}`}
-                      />
-                    ))}
-                  </div>
-                  <div className="star flex sm:hidden items-center gap-0.5 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${i < (review.rating || 5) ? 'fill-theme3 text-theme3' : 'fill-white/10 text-white/30'}`}
-                      />
-                    ))}
-                  </div>
                   <p className="text text-white text-base leading-relaxed">{review.comment}</p>
                 </div>
               </div>
