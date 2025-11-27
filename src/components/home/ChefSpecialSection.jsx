@@ -13,6 +13,8 @@ import useToastStore from "../../store/toastStore";
 import useAuthStore from "../../store/authStore";
 import { useCallback } from "react";
 import { useInView } from "react-intersection-observer";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 export default function ChefSpecialSection() {
   const router = useRouter();
@@ -21,6 +23,7 @@ export default function ChefSpecialSection() {
   const { addToCart } = useCartStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
+  const { lang } = useLanguage();
 
   const handleAddToCart = useCallback((e, dish) => {
     e.preventDefault();
@@ -54,11 +57,11 @@ export default function ChefSpecialSection() {
           <div className="title-area mb-12 sm:mb-14">
             <div className="sub-title text-center text-theme3 text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
               <ChefHat className="w-6 h-6" />
-              CHEF SPECIAL
+              {t(lang, "chef_special")}
               <ChefHat className="w-6 h-6" />
             </div>
             <div className="title text-center text-white text-3xl sm:text-5xl font-black capitalize">
-              Chef&apos;s Recommendations
+              {t(lang, "chef_recommendations")}
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -80,11 +83,11 @@ export default function ChefSpecialSection() {
           <div className="title-area mb-12 sm:mb-14">
             <div className="sub-title text-center text-theme3 text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
               <ChefHat className="w-6 h-6 text-theme3" />
-              CHEF SPECIAL
+              {t(lang, "chef_special")}
               <ChefHat className="w-6 h-6 text-theme3" />
             </div>
             <div className="title text-center text-white text-3xl sm:text-5xl font-black capitalize">
-              Chef&apos;s Recommendations
+              {t(lang, "chef_recommendations")}
             </div>
           </div>
 
@@ -109,6 +112,7 @@ export default function ChefSpecialSection() {
 
 // Lazy Chef Card Component - Loads only when in viewport
 function LazyChefCard({ dish, index, prefetchRoute, handleAddToCart }) {
+  const { lang } = useLanguage();
   const shouldLoadImmediately = index < 3; // Load first 3 immediately
   const { ref, inView } = useInView({
     threshold: 0.1,
@@ -173,7 +177,7 @@ function LazyChefCard({ dish, index, prefetchRoute, handleAddToCart }) {
             </h3>
           </Link>
           <p className="text-text text-sm sm:text-base mb-4 line-clamp-2">
-            {dish.description || "Chef&apos;s special recommendation"}
+            {dish.description || t(lang, "chef_special_recommendation")}
           </p>
         </div>
         <div className="mt-auto">
@@ -186,7 +190,7 @@ function LazyChefCard({ dish, index, prefetchRoute, handleAddToCart }) {
               onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
               className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 flex-1"
             >
-              Order
+              {t(lang, "order")}
             </Link>
             <button
               onClick={(e) => handleAddToCart(e, dish)}

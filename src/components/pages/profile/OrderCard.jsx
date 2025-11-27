@@ -6,10 +6,13 @@ import { formatCurrency } from "../../../lib/utils/formatters";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import OptimizedImage from "../../ui/OptimizedImage";
 import { IMAGE_PATHS } from "../../../data/constants";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function OrderCard({ order, index }) {
   const router = useRouter();
   const { prefetchRoute } = usePrefetchRoute();
+  const { lang } = useLanguage();
 
   const handleCardClick = () => {
     router.push(`/orders/${order.id}`, { scroll: false });
@@ -43,7 +46,7 @@ export default function OrderCard({ order, index }) {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
           <p className="text-white  font-bold text-lg mb-1">
-            {order.orderNumber || `Order #${String(order.id || '').slice(-8).toUpperCase()}`}
+            {order.orderNumber || `${t(lang, "order_number")}${String(order.id || '').slice(-8).toUpperCase()}`}
           </p>
           <p className="text-text text-sm">
             {order.date ? new Date(order.date).toLocaleDateString("en-US", {
@@ -52,7 +55,7 @@ export default function OrderCard({ order, index }) {
               day: "numeric",
               hour: "2-digit",
               minute: "2-digit",
-            }) : 'Date not available'}
+            }) : t(lang, "date_not_available")}
           </p>
         </div>
         <div className="text-right">
@@ -89,7 +92,7 @@ export default function OrderCard({ order, index }) {
               <div className="flex-1">
                 <p className="text-white font-medium">{item.name || 'Unknown Item'}</p>
                 <p className="text-text text-xs">
-                  Qty: {item.quantity || 1} × {formatCurrency(item.price || 0)}
+                  {t(lang, "quantity")}: {item.quantity || 1} × {formatCurrency(item.price || 0)}
                 </p>
               </div>
               <p className="text-theme3 font-bold">
@@ -99,7 +102,7 @@ export default function OrderCard({ order, index }) {
           ))}
           {order.items.length > 3 && (
             <p className="text-text text-xs text-center pt-2">
-              +{order.items.length - 3} more item(s)
+              +{order.items.length - 3} {t(lang, "more_items")}
             </p>
           )}
         </div>
@@ -108,13 +111,13 @@ export default function OrderCard({ order, index }) {
       {/* Payment Method */}
       <div className="flex items-center justify-between pt-4 border-t border-white/10">
         <p className="text-text text-sm">
-          Payment:{" "}
+          {t(lang, "payment")}{" "}
           <span className="text-white font-medium capitalize">
             {order.paymentMethod}
           </span>
         </p>
         <div className="flex items-center gap-2 text-theme3 group-hover:text-theme text-sm font-medium transition-colors">
-          <span>View Details</span>
+          <span>{t(lang, "view_details")}</span>
           <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>

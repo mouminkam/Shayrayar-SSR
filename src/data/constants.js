@@ -13,7 +13,7 @@ export const NAV_LINKS = [
 
 // Social media links
 export const SOCIAL_LINKS = [
-  { href: 'https://facebook.com', label: 'Facebook', icon: 'Facebook' },
+  { href: 'https://google.com', label: 'Facebook', icon: 'Facebook' },
   { href: 'https://twitter.com', label: 'Twitter', icon: 'Twitter' },
   { href: 'https://youtube.com', label: 'YouTube', icon: 'Youtube' },
   { href: 'https://linkedin.com', label: 'LinkedIn', icon: 'Linkedin' },

@@ -2,14 +2,17 @@
 import { motion } from "framer-motion";
 import { Package, Store } from "lucide-react";
 import useCartStore from "../../../store/cartStore";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function OrderTypeSelector() {
   const { orderType, setOrderType } = useCartStore();
+  const { lang } = useLanguage();
 
   return (
     <div className="mb-6">
       <label className="block text-text  text-sm font-medium mb-3">
-        Order Type *
+        {t(lang, "order_type")} *
       </label>
       <div className="grid grid-cols-2 gap-4">
         <motion.button
@@ -28,7 +31,7 @@ export default function OrderTypeSelector() {
             <span className={` font-bold ${
               orderType === "delivery" ? "text-theme3" : "text-white"
             }`}>
-              Delivery
+              {t(lang, "delivery_type")}
             </span>
           </div>
         </motion.button>
@@ -49,7 +52,7 @@ export default function OrderTypeSelector() {
             <span className={` font-bold ${
               orderType === "pickup" ? "text-theme3" : "text-white"
             }`}>
-              Pickup
+              {t(lang, "pickup_type")}
             </span>
           </div>
         </motion.button>

@@ -15,6 +15,8 @@ import ErrorBoundary from "../../../components/ui/ErrorBoundary";
 import Breadcrumb from "../../../components/ui/Breadcrumb";
 import SectionSkeleton from "../../../components/ui/SectionSkeleton";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function OrderDetailsPage() {
   const router = useRouter();
@@ -22,6 +24,7 @@ export default function OrderDetailsPage() {
   const { prefetchRoute } = usePrefetchRoute();
   const orderId = params?.id;
   const { error: toastError, success: toastSuccess } = useToastStore();
+  const { lang } = useLanguage();
   const [order, setOrder] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCancelling, setIsCancelling] = useState(false);
@@ -48,11 +51,11 @@ export default function OrderDetailsPage() {
         const orderData = response.data.order || response.data;
         setOrder(orderData);
       } else {
-        toastError("Failed to load order details");
+        toastError(t(lang, "failed_to_load_order_details"));
       }
     } catch (error) {
       console.error("Error fetching order:", error);
-      toastError("Failed to load order details");
+      toastError(t(lang, "failed_to_load_order_details"));
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +93,7 @@ export default function OrderDetailsPage() {
 
   const handleCancelOrder = async () => {
     if (!cancelReason.trim()) {
-      toastError("Please provide a cancellation reason");
+      toastError(t(lang, "please_provide_cancellation_reason"));
       return;
     }
 
@@ -99,17 +102,17 @@ export default function OrderDetailsPage() {
       const response = await api.orders.cancelOrder(orderId, { reason: cancelReason });
       
       if (response.success) {
-        toastSuccess("Order cancelled successfully");
+        toastSuccess(t(lang, "order_cancelled_successfully"));
         setShowCancelModal(false);
         setCancelReason("");
         // Refresh order data
         fetchOrderDetails();
       } else {
-        toastError(response.message || "Failed to cancel order");
+        toastError(response.message || t(lang, "failed_to_cancel_order"));
       }
     } catch (error) {
       console.error("Error cancelling order:", error);
-      toastError(error?.message || "Failed to cancel order");
+      toastError(error?.message || t(lang, "failed_to_cancel_order"));
     } finally {
       setIsCancelling(false);
     }
@@ -122,13 +125,13 @@ export default function OrderDetailsPage() {
       
       if (response.success && response.data) {
         setTrackingData(response.data);
-        toastSuccess("Tracking information loaded");
+        toastSuccess(t(lang, "tracking_information_loaded"));
       } else {
-        toastError(response.message || "Failed to load tracking information");
+        toastError(response.message || t(lang, "failed_to_load_tracking_information"));
       }
     } catch (error) {
       console.error("Error tracking order:", error);
-      toastError(error?.message || "Failed to load tracking information");
+      toastError(error?.message || t(lang, "failed_to_load_tracking_information"));
     } finally {
       setIsTracking(false);
     }
@@ -142,12 +145,12 @@ export default function OrderDetailsPage() {
   if (isLoading) {
     return (
       <div className="bg-bgimg min-h-screen">
-        <Breadcrumb title="Order Details" />
+        <Breadcrumb title={t(lang, "order_details")} />
         <section className="section-padding fix bg-bgimg py-12 px-1 sm:px-5 sm:py-16 md:py-20 lg:py-24">
           <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
             <div className="flex flex-col items-center justify-center py-20 gap-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme3"></div>
-              <p className="text-text text-base">Loading order details...</p>
+              <p className="text-text text-base">{t(lang, "loading_order_details")}</p>
             </div>
           </div>
         </section>
@@ -158,12 +161,12 @@ export default function OrderDetailsPage() {
   if (!order) {
     return (
       <div className="bg-bg3 min-h-screen">
-        <Breadcrumb title="Order Details" />
+        <Breadcrumb title={t(lang, "order_details")} />
         <section className="section-padding fix bg-bg3 py-12 px-1 sm:px-5 sm:py-16 md:py-20 lg:py-24">
           <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
             <div className="flex flex-col items-center justify-center py-20 gap-4">
               <Package className="w-16 h-16 text-text/30" />
-              <p className="text-text text-lg">Order not found</p>
+              <p className="text-text text-lg">{t(lang, "order_not_found")}</p>
               <Link
                 href="/profile"
                 onMouseEnter={() => prefetchRoute("/profile")}
@@ -173,7 +176,7 @@ export default function OrderDetailsPage() {
                 }}
                 className="px-6 py-3 bg-theme3 text-white rounded-xl hover:bg-theme transition-colors"
               >
-                Back to Profile
+                {t(lang, "back_to_profile")}
               </Link>
             </div>
           </div>
@@ -189,7 +192,7 @@ export default function OrderDetailsPage() {
     <div className="bg-bg3 min-h-screen">
       <ErrorBoundary>
         <AnimatedSection>
-          <Breadcrumb title="Order Details" />
+          <Breadcrumb title={t(lang, "order_details")} />
         </AnimatedSection>
       </ErrorBoundary>
       <section className="section-padding fix bg-bg3 py-12 px-1 sm:px-5 sm:py-16 md:py-20 lg:py-24">
@@ -212,7 +215,7 @@ export default function OrderDetailsPage() {
               className="inline-flex items-center gap-2 text-text hover:text-theme3 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
-              <span className="font-medium">Back to Profile</span>
+              <span className="font-medium">{t(lang, "back_to_profile")}</span>
             </Link>
             </motion.div>
           </AnimatedSection>
@@ -231,7 +234,7 @@ export default function OrderDetailsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                   <div>
                     <h1 className="text-white  text-3xl font-black mb-2">
-                      Order #{order.order_number || order.id}
+                      {t(lang, "order_number")}{order.order_number || order.id}
                     </h1>
                     <p className="text-text text-sm flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
@@ -241,7 +244,7 @@ export default function OrderDetailsPage() {
                         day: "numeric",
                         hour: "2-digit",
                         minute: "2-digit",
-                      }) : 'Date not available'}
+                      }) : t(lang, "date_not_available")}
                     </p>
                   </div>
                   <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${getStatusColor(order.status)}`}>
@@ -254,7 +257,7 @@ export default function OrderDetailsPage() {
                 {orderItems.length > 0 && (
                   <div className="space-y-4">
                     <h2 className="text-white  text-xl font-bold mb-4">
-                      Order Items ({orderItems.length})
+                      {t(lang, "order_items")} ({orderItems.length})
                     </h2>
                     {orderItems.map((item, idx) => {
                       const imageUrl = item.menu_item?.image_url || 
@@ -290,11 +293,11 @@ export default function OrderDetailsPage() {
                             </h3>
                             {item.size && (
                               <p className="text-text text-sm mb-1">
-                                Size: {item.size.name || item.size}
+                                {t(lang, "size")} {item.size.name || item.size}
                               </p>
                             )}
                             <p className="text-text text-sm">
-                              Quantity: {quantity} × {formatCurrency(itemPrice)}
+                              {t(lang, "quantity")}: {quantity} × {formatCurrency(itemPrice)}
                             </p>
                           </div>
                           <div className="text-right">
@@ -316,7 +319,7 @@ export default function OrderDetailsPage() {
                       className="flex items-center justify-center gap-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-xl text-red-300 font-semibold transition-all duration-300"
                     >
                       <X className="w-5 h-5" />
-                      Cancel Order
+                      {t(lang, "cancel_order")}
                     </button>
                   )}
                   <button
@@ -325,7 +328,7 @@ export default function OrderDetailsPage() {
                     className="flex items-center justify-center gap-2 px-6 py-3 bg-theme3/20 hover:bg-theme3/30 border border-theme3/30 rounded-xl text-theme3 font-semibold transition-all duration-300 disabled:opacity-50"
                   >
                     <Navigation className="w-5 h-5" />
-                    {isTracking ? "Tracking..." : "Track Order"}
+                    {isTracking ? t(lang, "tracking") : t(lang, "track_order")}
                     </button>
                   </div>
                 </motion.div>
@@ -340,12 +343,12 @@ export default function OrderDetailsPage() {
                   className="bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 p-6 lg:p-8"
                 >
                   <h2 className="text-white  text-xl font-bold mb-4">
-                    Order Tracking
+                    {t(lang, "order_tracking")}
                   </h2>
                   <div className="space-y-3">
                     {trackingData.status && (
                       <div className="flex justify-between items-center">
-                        <span className="text-text">Current Status</span>
+                        <span className="text-text">{t(lang, "current_status")}</span>
                         <span className={`font-semibold capitalize px-3 py-1 rounded-xl ${getStatusColor(trackingData.status)}`}>
                           {trackingData.status}
                         </span>
@@ -353,7 +356,7 @@ export default function OrderDetailsPage() {
                     )}
                     {trackingData.estimated_delivery_time && (
                       <div className="flex justify-between items-center">
-                        <span className="text-text">Estimated Delivery</span>
+                        <span className="text-text">{t(lang, "estimated_delivery")}</span>
                         <span className="text-white font-semibold">
                           {new Date(trackingData.estimated_delivery_time).toLocaleString()}
                         </span>
@@ -366,7 +369,7 @@ export default function OrderDetailsPage() {
                         rel="noopener noreferrer"
                         className="block text-center px-4 py-2 bg-theme3/20 hover:bg-theme3/30 border border-theme3/30 rounded-xl text-theme3 font-semibold transition-all"
                       >
-                        View Tracking Link
+                        {t(lang, "view_tracking_link")}
                       </a>
                     )}
                   </div>
@@ -385,7 +388,7 @@ export default function OrderDetailsPage() {
                 className="bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 p-6 lg:p-8 sticky top-8"
               >
                 <h2 className="text-white  text-xl font-black uppercase mb-6">
-                  Order Summary
+                  {t(lang, "order_summary")}
                 </h2>
 
                 <div className="space-y-4">
@@ -394,7 +397,7 @@ export default function OrderDetailsPage() {
                     <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
                       <Package className="w-5 h-5 text-theme3" />
                       <div>
-                        <p className="text-text text-xs">Order Type</p>
+                        <p className="text-text text-xs">{t(lang, "order_type")}</p>
                         <p className="text-white font-semibold capitalize">{order.order_type}</p>
                       </div>
                     </div>
@@ -405,7 +408,7 @@ export default function OrderDetailsPage() {
                     <div className="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
                       <MapPin className="w-5 h-5 text-theme3 shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-text text-xs mb-1">Delivery Address</p>
+                        <p className="text-text text-xs mb-1">{t(lang, "delivery_address")}</p>
                         <p className="text-white text-sm">{order.delivery_address}</p>
                       </div>
                     </div>
@@ -416,7 +419,7 @@ export default function OrderDetailsPage() {
                     <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
                       <CreditCard className="w-5 h-5 text-theme3" />
                       <div>
-                        <p className="text-text text-xs">Payment Method</p>
+                        <p className="text-text text-xs">{t(lang, "payment_method")}</p>
                         <p className="text-white font-semibold capitalize">{order.payment_method}</p>
                       </div>
                     </div>
@@ -427,7 +430,7 @@ export default function OrderDetailsPage() {
                     <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
                       <div className={`w-5 h-5 rounded-full ${order.payment_status === 'paid' ? 'bg-green-500' : 'bg-yellow-500'}`} />
                       <div>
-                        <p className="text-text text-xs">Payment Status</p>
+                        <p className="text-text text-xs">{t(lang, "payment_status")}</p>
                         <p className="text-white font-semibold capitalize">{order.payment_status}</p>
                       </div>
                     </div>
@@ -437,30 +440,30 @@ export default function OrderDetailsPage() {
                   <div className="pt-4 border-t border-white/10 space-y-3">
                     {order.subtotal && (
                       <div className="flex justify-between items-center">
-                        <span className="text-text">Subtotal</span>
+                        <span className="text-text">{t(lang, "subtotal")}</span>
                         <span className="text-white font-semibold">{formatCurrency(parseFloat(order.subtotal))}</span>
                       </div>
                     )}
                     {order.delivery_charge && parseFloat(order.delivery_charge) > 0 && (
                       <div className="flex justify-between items-center">
-                        <span className="text-text">Delivery</span>
+                        <span className="text-text">{t(lang, "delivery")}</span>
                         <span className="text-white font-semibold">{formatCurrency(parseFloat(order.delivery_charge))}</span>
                       </div>
                     )}
                     {order.tax_amount && (
                       <div className="flex justify-between items-center">
-                        <span className="text-text">Tax</span>
+                        <span className="text-text">{t(lang, "tax")}</span>
                         <span className="text-white font-semibold">{formatCurrency(parseFloat(order.tax_amount))}</span>
                       </div>
                     )}
                     {order.discount_amount && parseFloat(order.discount_amount) > 0 && (
                       <div className="flex justify-between items-center">
-                        <span className="text-text">Discount</span>
+                        <span className="text-text">{t(lang, "discount")}</span>
                         <span className="text-theme3 font-semibold">-{formatCurrency(parseFloat(order.discount_amount))}</span>
                       </div>
                     )}
                     <div className="flex justify-between items-center pt-3 border-t border-white/10">
-                      <span className="text-white  text-lg font-black uppercase">Total</span>
+                      <span className="text-white  text-lg font-black uppercase">{t(lang, "total")}</span>
                       <span className="text-theme3  text-2xl font-black">
                         {formatCurrency(parseFloat(order.total_amount || order.total || 0))}
                       </span>
@@ -484,15 +487,15 @@ export default function OrderDetailsPage() {
             className="bg-linear-to-br from-bgimg/95 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/10 p-6 lg:p-8 max-w-md w-full"
           >
             <h3 className="text-white  text-2xl font-black mb-4">
-              Cancel Order
+              {t(lang, "cancel_order")}
             </h3>
             <p className="text-text mb-4">
-              Are you sure you want to cancel this order? Please provide a reason for cancellation.
+              {t(lang, "cancel_order_confirmation")}
             </p>
             <textarea
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
-              placeholder="Enter cancellation reason..."
+              placeholder={t(lang, "enter_cancellation_reason")}
               rows={4}
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300 resize-none mb-4"
             />
@@ -504,14 +507,14 @@ export default function OrderDetailsPage() {
                 }}
                 className="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-semibold transition-all"
               >
-                Cancel
+                {t(lang, "cancel")}
               </button>
               <button
                 onClick={handleCancelOrder}
                 disabled={isCancelling || !cancelReason.trim()}
                 className="flex-1 px-4 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-xl text-red-300 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isCancelling ? "Cancelling..." : "Confirm Cancel"}
+                {isCancelling ? t(lang, "cancelling") : t(lang, "confirm_cancel")}
               </button>
             </div>
           </motion.div>

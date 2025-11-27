@@ -1,8 +1,107 @@
-// Removed "use client" - This component only uses static JSX, Link, and an uncontrolled form without state management, which are SSR-compatible
+"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
+
+// Helper function to format working hours from object to string
+const formatWorkingHours = (hours) => {
+  if (!hours) return null;
+
+  // If it's already a string, return it
+  if (typeof hours === 'string') return hours;
+
+  // If it's an object with days, format it
+  if (typeof hours === 'object') {
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const formattedDays = days
+      .filter(day => hours[day])
+      .map(day => {
+        const dayName = day.charAt(0).toUpperCase() + day.slice(1);
+        const hoursStr = hours[day];
+        return `${dayName}: ${hoursStr}`;
+      });
+
+    return formattedDays.length > 0 ? formattedDays.join(' | ') : null;
+  }
+
+  return null;
+};
 
 export default function ContactSection() {
+  const { selectedBranch, initialize } = useBranchStore();
+  const [contactInfo, setContactInfo] = useState({
+    workingHours: {
+      weekdays: "8am – 4pm",
+      saturday: "8am – 12am",
+    },
+  });
+
+  // Initialize branch if not loaded
+  useEffect(() => {
+    if (!selectedBranch) {
+      initialize();
+    }
+  }, [selectedBranch, initialize]);
+
+  // Fetch branch contact information
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      if (!selectedBranch) {
+        return;
+      }
+
+      try {
+        const response = await api.branches.getBranchById(selectedBranch.id || selectedBranch.branch_id);
+
+        if (response && response.success && response.data) {
+          const branchData = response.data.branch || response.data;
+
+          // Default values
+          const defaultInfo = {
+            workingHours: {
+              weekdays: "8am – 4pm",
+              saturday: "8am – 12am",
+            },
+          };
+
+          // Format working hours if it's an object
+          const rawWorkingHours = branchData.working_hours || branchData.opening_hours || branchData.hours;
+          const formattedWorkingHours = formatWorkingHours(rawWorkingHours);
+
+          // Parse working hours to extract weekdays and saturday if formatted
+          let weekdaysHours = defaultInfo.workingHours.weekdays;
+          let saturdayHours = defaultInfo.workingHours.saturday;
+
+          if (formattedWorkingHours) {
+            // Try to extract Monday-Friday and Saturday from formatted string
+            const mondayFridayMatch = formattedWorkingHours.match(/Monday.*?Friday[:\s]+([^|]+)/i);
+            const saturdayMatch = formattedWorkingHours.match(/Saturday[:\s]+([^|]+)/i);
+            
+            if (mondayFridayMatch) {
+              weekdaysHours = mondayFridayMatch[1].trim();
+            }
+            if (saturdayMatch) {
+              saturdayHours = saturdayMatch[1].trim();
+            }
+          }
+
+          setContactInfo({
+            workingHours: {
+              weekdays: weekdaysHours,
+              saturday: saturdayHours,
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching contact info:", error);
+        // Keep default values on error
+      }
+    };
+
+    fetchContactInfo();
+  }, [selectedBranch]);
   return (
     <div className="mt-6 sm:mt-8 md:mt-0 lg:pl-6 xl:pl-12 sm:col-span-2 lg:col-span-1">
       <div className="mb-6 sm:mb-8">

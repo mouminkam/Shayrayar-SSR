@@ -2,6 +2,8 @@
 import { memo, useMemo } from "react";
 import { Check, Plus } from "lucide-react";
 import { formatCurrency } from "../../lib/utils/formatters";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 /**
  * ProductIngredients Component
@@ -12,6 +14,8 @@ import { formatCurrency } from "../../lib/utils/formatters";
  * @param {Function} props.onIngredientToggle - Callback when ingredient is toggled
  */
 const ProductIngredients = memo(({ ingredients = [], selectedIngredientIds = [], onIngredientToggle }) => {
+  const { lang } = useLanguage();
+  
   if (!ingredients || ingredients.length === 0) {
     return null;
   }
@@ -82,7 +86,7 @@ const ProductIngredients = memo(({ ingredients = [], selectedIngredientIds = [],
                 {ingredient.name}
               </span>
               {ingredient.is_required && (
-                <span className="text-xs text-theme3 mt-1 block">Required</span>
+                <span className="text-xs text-theme3 mt-1 block">{t(lang, "required")}</span>
               )}
             </div>
           </div>
@@ -101,7 +105,7 @@ const ProductIngredients = memo(({ ingredients = [], selectedIngredientIds = [],
   return (
     <div className="product-ingredients mb-6">
       <h4 className="text-white  text-lg font-semibold mb-4">
-        Add-ons & Extras
+        {t(lang, "add_ons_extras")}
       </h4>
       <div className="space-y-4">
         {/* Render grouped ingredients */}
@@ -122,7 +126,7 @@ const ProductIngredients = memo(({ ingredients = [], selectedIngredientIds = [],
           <div>
             {Object.keys(groupedIngredients.grouped).length > 0 && (
               <h5 className="text-theme3  text-sm font-semibold mb-3 uppercase tracking-wide">
-                Other
+                {t(lang, "other")}
               </h5>
             )}
             <div className="space-y-2">

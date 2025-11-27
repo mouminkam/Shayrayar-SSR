@@ -3,9 +3,12 @@ import { motion } from "framer-motion";
 import { CreditCard } from "lucide-react";
 import useCartStore from "../../../store/cartStore";
 import PaymentMethodSelector from "./PaymentMethodSelector";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function PaymentMethodSection({ formData, setFormData }) {
   const { orderType } = useCartStore();
+  const { lang } = useLanguage();
   return (
     <div className="mb-8">
       <div className="flex items-center gap-3 mb-6">
@@ -16,7 +19,7 @@ export default function PaymentMethodSection({ formData, setFormData }) {
           <CreditCard className="w-6 h-6 text-white fill-white" />
         </motion.div>
         <h3 className="text-white  text-2xl font-black uppercase">
-          Payment Method
+          {t(lang, "payment_method")}
         </h3>
       </div>
 
@@ -32,7 +35,7 @@ export default function PaymentMethodSection({ formData, setFormData }) {
           className="p-4 bg-theme3/20 border border-theme3/50 rounded-xl"
         >
           <p className="text-white text-sm ">
-            Stripe payment method selected.
+            {t(lang, "stripe_payment_selected")}
           </p>
         </motion.div>
       )}
@@ -44,7 +47,7 @@ export default function PaymentMethodSection({ formData, setFormData }) {
           className="p-4 bg-green-500/20 border border-green-500/50 rounded-xl"
         >
           <p className="text-green-300 text-sm ">
-            You will pay in cash when the order is {orderType === 'pickup' ? 'picked up' : 'delivered'}.
+            {t(lang, "cash_payment_message")} {orderType === 'pickup' ? t(lang, "picked_up") : t(lang, "delivered")}.
           </p>
         </motion.div>
       )}

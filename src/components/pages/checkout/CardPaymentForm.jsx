@@ -1,7 +1,10 @@
 "use client";
 import { motion } from "framer-motion";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function CardPaymentForm({ formData, handleInputChange, handleCardNumberChange, handleExpiryChange }) {
+  const { lang } = useLanguage();
   return (
     <motion.div
       initial={{ opacity: 0, height: 0 }}
@@ -11,7 +14,7 @@ export default function CardPaymentForm({ formData, handleInputChange, handleCar
     >
       <div>
         <label className="block text-text  text-sm font-medium mb-2">
-          Card Number *
+          {t(lang, "card_number")}
         </label>
         <input
           type="text"
@@ -19,21 +22,21 @@ export default function CardPaymentForm({ formData, handleInputChange, handleCar
           value={formData.cardNumber}
           onChange={handleCardNumberChange}
           maxLength={19}
-          placeholder="1234 5678 9012 3456"
+          placeholder={t(lang, "card_number_placeholder")}
           required
           className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300"
         />
       </div>
       <div>
         <label className="block text-text  text-sm font-medium mb-2">
-          Cardholder Name *
+          {t(lang, "cardholder_name")}
         </label>
         <input
           type="text"
           name="cardName"
           value={formData.cardName}
           onChange={handleInputChange}
-          placeholder="John Doe"
+          placeholder={t(lang, "cardholder_name_placeholder")}
           required
           className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300"
         />
@@ -41,7 +44,7 @@ export default function CardPaymentForm({ formData, handleInputChange, handleCar
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-text  text-sm font-medium mb-2">
-            Expiry Date *
+            {t(lang, "expiry_date")}
           </label>
           <input
             type="text"
@@ -49,14 +52,14 @@ export default function CardPaymentForm({ formData, handleInputChange, handleCar
             value={formData.cardExpiry}
             onChange={handleExpiryChange}
             maxLength={5}
-            placeholder="MM/YY"
+            placeholder={t(lang, "expiry_date_placeholder")}
             required
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300"
           />
         </div>
         <div>
           <label className="block text-text  text-sm font-medium mb-2">
-            CVC *
+            {t(lang, "cvc")}
           </label>
           <input
             type="text"
@@ -64,7 +67,7 @@ export default function CardPaymentForm({ formData, handleInputChange, handleCar
             value={formData.cardCVC}
             onChange={handleInputChange}
             maxLength={4}
-            placeholder="123"
+            placeholder={t(lang, "cvc_placeholder")}
             required
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300"
           />

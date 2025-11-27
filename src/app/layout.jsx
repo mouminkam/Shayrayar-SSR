@@ -4,6 +4,8 @@ import FreshHeatFooter from "../components/layout/Footer";
 import Toast from "../components/ui/Toast";
 import BranchInitializer from "../components/layout/BranchInitializer";
 import LenisScrollProvider from "../components/layout/LenisScrollProvider";
+import HtmlLangUpdater from "../components/layout/HtmlLangUpdater";
+import { LanguageProvider } from "../context/LanguageContext";
 import "./globals.css";
 
 const oswald = Oswald({
@@ -15,8 +17,8 @@ const oswald = Oswald({
 
 
 export const metadata = {
-  title: "shahriar",
-  description: "shahriar website",
+  title: "shahrayar",
+  description: "shahrayar website",
 };
 
 
@@ -30,6 +32,8 @@ export default function RootLayout({ children }) {
       </head>
 
       <body suppressHydrationWarning className={oswald.className}>
+        <LanguageProvider>
+          <HtmlLangUpdater />
           <LenisScrollProvider>
             <BranchInitializer />
             <FreshHeatHeader />
@@ -39,6 +43,7 @@ export default function RootLayout({ children }) {
             <FreshHeatFooter />
             <Toast />
           </LenisScrollProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

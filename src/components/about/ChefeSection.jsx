@@ -1,21 +1,25 @@
 "use client";
 import Image from "next/image";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 export default function ChefeSection() {
+  const { lang } = useLanguage();
+  
   const chefs = [
     {
       name: "Ralph Edwards",
-      role: "Chef Lead",
+      role: t(lang, "chef_lead"),
       image: "/img/chefe/chefeThumb1_1.png",
     },
     {
       name: "Leslie Alexander",
-      role: "Chef Assistant",
+      role: t(lang, "chef_assistant"),
       image: "/img/chefe/chefeThumb1_2.png",
     },
     {
       name: "Ronald Richards",
-      role: "Chef Assistant",
+      role: t(lang, "chef_assistant"),
       image: "/img/chefe/chefeThumb1_3.png",
     },
   ];
@@ -28,11 +32,11 @@ export default function ChefeSection() {
         <div className="text-center mb-12 lg:mb-16">
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="text-theme3  text-3xl font-bold uppercase">
-              OUR CHEFE
+              {t(lang, "our_chefe")}
             </span>
           </div>
           <h2 className="text-white  text-3xl sm:text-4xl lg:text-5xl font-black">
-            Meet Our Expert Chefe
+            {t(lang, "meet_our_expert_chefe")}
           </h2>
         </div>
 

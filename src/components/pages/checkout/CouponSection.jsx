@@ -6,11 +6,14 @@ import useCartStore from "../../../store/cartStore";
 import useBranchStore from "../../../store/branchStore";
 import useToastStore from "../../../store/toastStore";
 import api from "../../../api";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function CouponSection() {
   const { coupon, applyCoupon, removeCoupon, items, getSubtotal } = useCartStore();
   const { getSelectedBranchId } = useBranchStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
+  const { lang } = useLanguage();
   
   const [couponCode, setCouponCode] = useState("");
   const [isValidating, setIsValidating] = useState(false);
@@ -55,13 +58,13 @@ export default function CouponSection() {
 
   const handleValidateCoupon = async () => {
     if (!couponCode.trim()) {
-      toastError("Please enter a coupon code");
+      toastError(t(lang, "please_enter_coupon_code"));
       return;
     }
 
     const branchId = getSelectedBranchId();
     if (!branchId) {
-      toastError("Please select a branch");
+      toastError(t(lang, "please_select_branch"));
       return;
     }
 
@@ -86,13 +89,13 @@ export default function CouponSection() {
           description: couponFromAPI.description || '',
         };
         applyCoupon(couponData);
-        toastSuccess("Coupon applied successfully!");
+        toastSuccess(t(lang, "coupon_applied_successfully"));
         setCouponCode("");
       } else {
-        toastError(response.message || "Invalid coupon code");
+        toastError(response.message || t(lang, "invalid_coupon_code"));
       }
     } catch (error) {
-      toastError(error.message || "Failed to validate coupon");
+      toastError(error.message || t(lang, "failed_to_validate_coupon"));
     } finally {
       setIsValidating(false);
     }
@@ -100,7 +103,7 @@ export default function CouponSection() {
 
   const handleRemoveCoupon = () => {
     removeCoupon();
-    toastSuccess("Coupon removed");
+    toastSuccess(t(lang, "coupon_removed"));
   };
 
   return (
@@ -113,7 +116,7 @@ export default function CouponSection() {
           <Tag className="w-6 h-6 text-white fill-white" />
         </motion.div>
         <h3 className="text-white  text-2xl font-black uppercase">
-          Coupon Code
+          {t(lang, "coupon_code")}
         </h3>
       </div>
 
@@ -129,12 +132,12 @@ export default function CouponSection() {
               <p className="text-white font-semibold">{coupon.code}</p>
               <p className="text-text text-sm">
                 {coupon.type === 'FREEDELIVERY' 
-                  ? 'Free Delivery'
+                  ? t(lang, "free_delivery")
                   : coupon.discount_amount > 0
-                  ? `Discount: ${coupon.discount_amount.toFixed(2)} BGN`
+                  ? `${t(lang, "discount_label")} ${coupon.discount_amount.toFixed(2)} BGN`
                   : coupon.type === 'percentage'
-                  ? `Discount: ${coupon.value}%`
-                  : `Discount: ${coupon.value} BGN`}
+                  ? `${t(lang, "discount_label")} ${coupon.value}%`
+                  : `${t(lang, "discount_label")} ${coupon.value} BGN`}
               </p>
             </div>
           </div>
@@ -154,7 +157,7 @@ export default function CouponSection() {
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
               onKeyPress={(e) => e.key === "Enter" && handleValidateCoupon()}
-              placeholder="Enter coupon code"
+              placeholder={t(lang, "enter_coupon_code")}
               className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300"
             />
             <motion.button
@@ -168,17 +171,17 @@ export default function CouponSection() {
               {isValidating ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Validating...
+                  {t(lang, "validating")}
                 </>
               ) : (
-                "Apply"
+                t(lang, "apply")
               )}
             </motion.button>
           </div>
 
           {availableCoupons.length > 0 && (
             <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-              <p className="text-text text-sm font-medium mb-2">Available Coupons:</p>
+              <p className="text-text text-sm font-medium mb-2">{t(lang, "available_coupons")}</p>
               <div className="space-y-2">
                 {availableCoupons.slice(0, 3).map((availCoupon, index) => (
                   <div
@@ -188,7 +191,7 @@ export default function CouponSection() {
                     <div>
                       <p className="text-white font-semibold text-sm">{availCoupon.code}</p>
                       <p className="text-text text-xs">
-                        {availCoupon.description || "Special discount"}
+                        {availCoupon.description || t(lang, "special_discount")}
                       </p>
                     </div>
                     <button
@@ -199,7 +202,7 @@ export default function CouponSection() {
                       }}
                       className="px-3 py-1 bg-theme3/20 text-theme3 rounded-lg text-xs font-semibold hover:bg-theme3/30 transition-colors"
                     >
-                      Use
+                      {t(lang, "use")}
                     </button>
                   </div>
                 ))}

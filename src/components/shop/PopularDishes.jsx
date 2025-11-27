@@ -16,6 +16,8 @@ import useToastStore from "../../store/toastStore";
 import useAuthStore from "../../store/authStore";
 import { formatCurrency } from "../../lib/utils/formatters";
 import { useInView } from "react-intersection-observer";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 export default function PopularDishes() {
   // Always call useContext first (before any other hooks) to maintain hook order
@@ -27,6 +29,7 @@ export default function PopularDishes() {
   const { addToCart } = useCartStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
+  const { lang } = useLanguage();
   
   const [dishes, setDishes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -111,7 +114,7 @@ export default function PopularDishes() {
                 className="w-5 h-5"
                 unoptimized={true}
               /> */}
-              POPULAR DISHES
+              {t(lang, "popular_dishes")}
               {/* <Image
                 src="/img/icon/titleIcon.svg"
                 alt="icon"
@@ -122,7 +125,7 @@ export default function PopularDishes() {
               /> */}
             </div>
             <div className="title text-center text-white  text-3xl sm:text-5xl font-black capitalize">
-              Best selling Dishes
+              {t(lang, "best_selling_dishes")}
             </div>
           </div>
 
@@ -132,7 +135,7 @@ export default function PopularDishes() {
             </div>
           ) : !dishes || dishes.length === 0 ? (
             <div className="flex items-center justify-center py-20">
-              <p className="text-text text-lg">No popular dishes available</p>
+              <p className="text-text text-lg">{t(lang, "no_popular_dishes_available")}</p>
             </div>
           ) : (
             <div className="dishes-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -157,6 +160,7 @@ export default function PopularDishes() {
 
 // Lazy Popular Card Component - Loads only when in viewport
 function LazyPopularCard({ dish, index, prefetchRoute, handleAddToCart }) {
+  const { lang } = useLanguage();
   const shouldLoadImmediately = index < 3; // Load first 3 immediately
   const { ref, inView } = useInView({
     threshold: 0.1,
@@ -228,7 +232,7 @@ function LazyPopularCard({ dish, index, prefetchRoute, handleAddToCart }) {
               onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
               className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white  text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 flex-1"
             >
-              Order
+              {t(lang, "order")}
             </Link>
             <button
               onClick={(e) => handleAddToCart(e, dish)}

@@ -3,13 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 export default function OfferCards() {
+  const { lang } = useLanguage();
+  
   const offers = [
     {
       title: "SPICY FRIED CHICKEN",
-      subtitle: "ON THIS WEEK",
-      description: "limits Time Offer",
+      subtitle: t(lang, "on_this_week"),
+      description: t(lang, "limited_time_offer"),
       image: "/img/offer/offerThumb1_1.png",
       shape: "/img/shape/offerShape1_4.png",
       bgImage: "/img/bg/offerBG1_1.jpg",
@@ -17,8 +21,8 @@ export default function OfferCards() {
     },
     {
       title: "TODAY SPACIAL FOOD",
-      subtitle: "WELCOME FRESHEAT",
-      description: "limits Time Offer",
+      subtitle: t(lang, "welcome_fresheat"),
+      description: t(lang, "limited_time_offer"),
       image: "/img/offer/offerThumb1_2.png",
       shape: "/img/shape/offerShape1_4.png",
       bgImage: "/img/bg/offerBG1_1.jpg",
@@ -26,8 +30,8 @@ export default function OfferCards() {
     },
     {
       title: "SPECIAL CHICKEN ROLL",
-      subtitle: "ON THIS WEEK",
-      description: "limits Time Offer",
+      subtitle: t(lang, "on_this_week"),
+      description: t(lang, "limited_time_offer"),
       image: "/img/offer/offerThumb1_3.png",
       shape: "/img/shape/offerShape1_4.png",
       bgImage: "/img/bg/offerBG1_1.jpg",
@@ -79,7 +83,7 @@ export default function OfferCards() {
                   href="/shop"
                   className={`inline-block px-4 py-3 text-xs sm:text-sm font-normal rounded-md transition-all duration-300 bg-theme3 text-white hover:bg-theme`}
                 >
-                  ORDER NOW <ArrowRight className="inline-block w-4 h-4 ml-2" />
+                  {t(lang, "order_now")} <ArrowRight className="inline-block w-4 h-4 ml-2" />
                 </Link>
               </div>
 

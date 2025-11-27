@@ -5,10 +5,13 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import { branchesAPI } from "../../api";
 import useToastStore from "../../store/toastStore";
 import useBranchStore from "../../store/branchStore";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 export default function ContactForm() {
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { selectedBranch, initialize } = useBranchStore();
+  const { lang } = useLanguage();
   const [branchEmail, setBranchEmail] = useState("info@example.com");
   const [formData, setFormData] = useState({
     fullName: "",
@@ -62,17 +65,17 @@ export default function ContactForm() {
 
     // Validation
     if (!formData.fullName || !formData.email || !formData.phone || !formData.message) {
-      toastError("Please fill in all required fields");
+      toastError(t(lang, "please_fill_all_required_fields"));
       return;
     }
 
     if (!formData.agree) {
-      toastError("Please agree to the terms");
+      toastError(t(lang, "please_agree_to_terms"));
       return;
     }
 
     if (formData.subject === "subject") {
-      toastError("Please select a subject");
+      toastError(t(lang, "please_select_subject"));
       return;
     }
 
@@ -81,29 +84,29 @@ export default function ContactForm() {
     try {
       // Format subject for email
       const subjectLabels = {
-        complain: "Complain",
-        greetings: "Greetings",
-        date: "Expire Date",
-        price: "About Price",
-        order: "About Order",
+        complain: t(lang, "complain"),
+        greetings: t(lang, "greetings"),
+        date: t(lang, "expire_date"),
+        price: t(lang, "about_price"),
+        order: t(lang, "about_order"),
       };
       const emailSubject = subjectLabels[formData.subject] || formData.subject;
 
       // Create email body with all form data
-      const emailBody = `Hello,
+      const emailBody = `${t(lang, "email_greeting")}
 
-I would like to contact you regarding: ${emailSubject}
+${t(lang, "email_contact_reason")} ${emailSubject}
 
-Name: ${formData.fullName}
-Email: ${formData.email}
-Phone: ${formData.phone}
-Subject: ${emailSubject}
+${t(lang, "name_label")} ${formData.fullName}
+${t(lang, "email_label")} ${formData.email}
+${t(lang, "phone_label")} ${formData.phone}
+${t(lang, "subject_label")} ${emailSubject}
 
-Message:
+${t(lang, "message_label")}
 ${formData.message}
 
 ---
-This message was sent from the contact form on the website.`;
+${t(lang, "email_footer")}`;
 
       // Create mailto link
       const mailtoLink = `mailto:${branchEmail}?subject=${encodeURIComponent(`Contact Form: ${emailSubject}`)}&body=${encodeURIComponent(emailBody)}`;
@@ -111,7 +114,7 @@ This message was sent from the contact form on the website.`;
       // Open email client
       window.location.href = mailtoLink;
 
-      toastSuccess("Opening your email client... Please send the message to complete your request.");
+      toastSuccess(t(lang, "opening_email_client"));
       
       // Reset form after a short delay
       setTimeout(() => {
@@ -127,7 +130,7 @@ This message was sent from the contact form on the website.`;
       }, 1000);
     } catch (error) {
       console.error("Contact form error:", error);
-      toastError("Failed to open email client. Please try again.");
+      toastError(t(lang, "failed_open_email_client"));
       setIsSubmitting(false);
     }
   };
@@ -157,7 +160,7 @@ This message was sent from the contact form on the website.`;
             <div className="w-full lg:w-1/2 xl:w-[45%] flex border-2">
               <div className="contact-form style2 bg-white rounded-2xl p-6 sm:p-8 lg:p-10 shadow-lg w-full">
                 <h2 className="text-title  text-2xl sm:text-3xl lg:text-4xl font-black mb-6 capitalize">
-                  Get in Touch
+                  {t(lang, "get_in_touch")}
                 </h2>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -166,7 +169,7 @@ This message was sent from the contact form on the website.`;
                       <input
                         type="text"
                         name="fullName"
-                        placeholder="Full Name"
+                        placeholder={t(lang, "full_name")}
                         value={formData.fullName}
                         onChange={handleChange}
                         className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
@@ -179,7 +182,7 @@ This message was sent from the contact form on the website.`;
                       <input
                         type="email"
                         name="email"
-                        placeholder="Email Address"
+                        placeholder={t(lang, "email_address")}
                         value={formData.email}
                         onChange={handleChange}
                         className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
@@ -192,7 +195,7 @@ This message was sent from the contact form on the website.`;
                       <input
                         type="number"
                         name="phone"
-                        placeholder="Phone Number"
+                        placeholder={t(lang, "phone_number")}
                         value={formData.phone}
                         onChange={handleChange}
                         className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
@@ -208,12 +211,12 @@ This message was sent from the contact form on the website.`;
                         onChange={handleChange}
                         className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base bg-white focus:outline-none focus:border-theme3 transition-colors duration-300 cursor-pointer"
                       >
-                        <option value="subject">Subject</option>
-                        <option value="complain">Complain</option>
-                        <option value="greetings">Greetings</option>
-                        <option value="date">Expire Date</option>
-                        <option value="price">About Price</option>
-                        <option value="order">About order</option>
+                        <option value="subject">{t(lang, "subject")}</option>
+                        <option value="complain">{t(lang, "complain")}</option>
+                        <option value="greetings">{t(lang, "greetings")}</option>
+                        <option value="date">{t(lang, "expire_date")}</option>
+                        <option value="price">{t(lang, "about_price")}</option>
+                        <option value="order">{t(lang, "about_order")}</option>
                       </select>
                     </div>
                   </div>
@@ -223,7 +226,7 @@ This message was sent from the contact form on the website.`;
                     <textarea
                       id="message"
                       name="message"
-                      placeholder="Write your message here..."
+                      placeholder={t(lang, "write_your_message_here")}
                       rows="5"
                       value={formData.message}
                       onChange={handleChange}
@@ -247,8 +250,7 @@ This message was sent from the contact form on the website.`;
                       htmlFor="reviewcheck"
                       className="text-text  text-sm sm:text-base leading-relaxed cursor-pointer"
                     >
-                      Collaboratively formulate principle capital. Progressively
-                      evolve user
+                      {t(lang, "terms_agreement_text")}
                       <span className="checkmark"></span>
                     </label>
                   </div>
@@ -263,11 +265,11 @@ This message was sent from the contact form on the website.`;
                       {isSubmitting ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          SENDING...
+                          {t(lang, "sending")}
                         </>
                       ) : (
                         <>
-                          SUBMIT NOW
+                          {t(lang, "submit_now")}
                           <ArrowRight className="w-4 h-4 bg-transparent text-white" />
                         </>
                       )}

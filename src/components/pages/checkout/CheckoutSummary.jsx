@@ -6,12 +6,16 @@ import { ShoppingCart, Package, Tag, Truck } from "lucide-react";
 import useCartStore, { getCartItemKey } from "../../../store/cartStore";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { IMAGE_PATHS } from "../../../data/constants";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 const CheckoutSummary = memo(() => {
+  const { lang } = useLanguage();
   const {
     items,
     coupon,
     orderType,
+    deliveryCharge,
     getSubtotal,
     getTax,
     getDiscount,
@@ -24,7 +28,7 @@ const CheckoutSummary = memo(() => {
   const subtotal = useMemo(() => getSubtotal(), [items, getSubtotal]);
   const tax = useMemo(() => getTax(), [subtotal, getTax]);
   const discount = useMemo(() => getDiscount(), [coupon, subtotal, getDiscount]);
-  const delivery = useMemo(() => getDeliveryCharge(), [orderType, getDeliveryCharge]);
+  const delivery = useMemo(() => getDeliveryCharge(), [orderType, deliveryCharge, coupon, getDeliveryCharge]);
   const total = useMemo(() => getTotal(), [subtotal, discount, tax, delivery, getTotal]);
   const itemCount = useMemo(() => getItemCount(), [items, getItemCount]);
 
@@ -47,7 +51,7 @@ const CheckoutSummary = memo(() => {
           <ShoppingCart className="w-6 h-6 text-white fill-white" />
         </motion.div>
         <h3 className="text-white  text-2xl font-black uppercase">
-          Order Summary
+          {t(lang, "order_summary")}
         </h3>
       </div>
 
@@ -84,9 +88,9 @@ const CheckoutSummary = memo(() => {
                 {item.name}
               </h4>
               <p className="text-text text-xs">
-                Qty: {item.quantity} × {formatCurrency(item.final_price || item.price)}
+                {t(lang, "quantity")}: {item.quantity} × {formatCurrency(item.final_price || item.price)}
                 {item.size_name && ` • ${item.size_name}`}
-                {item.ingredients_data?.length > 0 && ` • +${item.ingredients_data.length} add-ons`}
+                {item.ingredients_data?.length > 0 && ` • +${item.ingredients_data.length} ${t(lang, "add_ons")}`}
               </p>
             </div>
             <div className="text-theme3  text-sm font-bold">
@@ -104,7 +108,7 @@ const CheckoutSummary = memo(() => {
           <div className="flex items-center gap-2">
             <Package className="w-4 h-4 text-theme3" />
             <span className="text-text  text-sm font-medium">
-              Items ({itemCount})
+              {t(lang, "items")} ({itemCount})
             </span>
           </div>
           <span className="text-white  text-sm font-bold">
@@ -115,7 +119,7 @@ const CheckoutSummary = memo(() => {
         {/* Subtotal */}
         <div className="flex justify-between items-center py-2 border-b border-white/10">
           <span className="text-text  text-base font-medium">
-            Subtotal
+            {t(lang, "subtotal")}
           </span>
           <span className="text-white  text-lg font-bold">
             {formatCurrency(subtotal)}
@@ -128,7 +132,7 @@ const CheckoutSummary = memo(() => {
             <div className="flex items-center gap-2">
               <Tag className="w-4 h-4 text-theme3" />
               <span className="text-text  text-base font-medium">
-                Discount {coupon?.code && `(${coupon.code})`}
+                {t(lang, "discount")} {coupon?.code && `(${coupon.code})`}
               </span>
             </div>
             <span className="text-theme3  text-lg font-bold">
@@ -143,12 +147,12 @@ const CheckoutSummary = memo(() => {
             <div className="flex items-center gap-2">
               <Truck className="w-4 h-4 text-theme3" />
               <span className="text-text  text-base font-medium">
-                Delivery
+                {t(lang, "delivery")}
               </span>
             </div>
             <span className="text-white  text-lg font-bold">
               {delivery === 0 ? (
-                <span className="text-theme3">FREE</span>
+                <span className="text-theme3">{t(lang, "free")}</span>
               ) : (
                 formatCurrency(delivery)
               )}
@@ -159,7 +163,7 @@ const CheckoutSummary = memo(() => {
         {/* Tax */}
         <div className="flex justify-between items-center py-2 border-b border-white/10">
           <span className="text-text  text-base font-medium">
-            Tax (10%)
+            {t(lang, "tax_percentage")}
           </span>
           <span className="text-white  text-lg font-bold">
             {formatCurrency(tax)}
@@ -169,7 +173,7 @@ const CheckoutSummary = memo(() => {
         {/* Total */}
         <div className="flex justify-between items-center py-4 border-t-2 border-theme3/30">
           <span className="text-white  text-xl font-black uppercase">
-            Total
+            {t(lang, "total")}
           </span>
           <span className="text-theme3  text-2xl font-black">
             {formatCurrency(total)}

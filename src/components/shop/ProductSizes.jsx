@@ -2,6 +2,8 @@
 import { memo } from "react";
 import { Check } from "lucide-react";
 import { formatCurrency } from "../../lib/utils/formatters";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 /**
  * ProductSizes Component
@@ -12,6 +14,8 @@ import { formatCurrency } from "../../lib/utils/formatters";
  * @param {Function} props.onSizeChange - Callback when size is selected
  */
 const ProductSizes = memo(({ sizes = [], selectedSizeId = null, onSizeChange }) => {
+  const { lang } = useLanguage();
+  
   if (!sizes || sizes.length === 0) {
     return null;
   }
@@ -19,7 +23,7 @@ const ProductSizes = memo(({ sizes = [], selectedSizeId = null, onSizeChange }) 
   return (
     <div className="product-sizes mb-6">
       <h4 className="text-white  text-lg font-semibold mb-4">
-        Select Size
+        {t(lang, "select_size")}
       </h4>
       <div className="flex flex-wrap gap-3">
         {sizes.map((size) => {

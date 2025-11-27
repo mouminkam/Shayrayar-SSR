@@ -10,6 +10,8 @@ import useToastStore from "../../store/toastStore";
 import useAuthStore from "../../store/authStore";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 import OptimizedImage from "./OptimizedImage";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 export default function ProductCard({ product, viewMode = "grid" }) {
   const router = useRouter();
@@ -17,6 +19,7 @@ export default function ProductCard({ product, viewMode = "grid" }) {
   const { addToCart } = useCartStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
+  const { lang } = useLanguage();
   
   const productUrl = `/shop/${product.id}`;
 
@@ -133,7 +136,7 @@ export default function ProductCard({ product, viewMode = "grid" }) {
               onClick={handleOrderClick}
               className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white  text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300"
             >
-              Order
+              {t(lang, "order")}
             </Link>
             <button
               onClick={handleAddToCart}
@@ -204,7 +207,7 @@ export default function ProductCard({ product, viewMode = "grid" }) {
               onClick={handleOrderClick}
               className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white  text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 flex-1"
             >
-              Order
+              {t(lang, "order")}
             </Link>
             <button
               onClick={handleAddToCart}

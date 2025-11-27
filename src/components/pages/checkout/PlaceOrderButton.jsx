@@ -1,8 +1,11 @@
 "use client";
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function PlaceOrderButton({ isProcessing, onClick }) {
+  const { lang } = useLanguage();
   return (
     <motion.button
       type="submit"
@@ -20,12 +23,12 @@ export default function PlaceOrderButton({ isProcessing, onClick }) {
           >
             <Lock className="w-5 h-5" />
           </motion.div>
-          Processing...
+          {t(lang, "processing")}
         </>
       ) : (
         <>
           <Lock className="w-5 h-5" />
-          Place Order
+          {t(lang, "place_order")}
         </>
       )}
     </motion.button>

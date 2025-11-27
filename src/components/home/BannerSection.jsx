@@ -7,17 +7,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 import "swiper/swiper-bundle.css";
 
 export default function BannerSection() {
   const { prefetchRoute } = usePrefetchRoute();
+  const { lang } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
 
   const slides = [
     {
       id: 1,
-      subtitle: "WELCOME FRESHEAT",
+      subtitle: t(lang, "welcome_fresheat"),
       title: "SPICY FRIED CHICKEN",
       image: "/img/banner/bannerThumb1_1.png",
       bgImage: "/img/bg/bannerBG1_1.jpg",
@@ -26,7 +29,7 @@ export default function BannerSection() {
     },
     {
       id: 2,
-      subtitle: "WELCOME FRESHEAT",
+      subtitle: t(lang, "welcome_fresheat"),
       title: "Chicago Deep Pizza King",
       image: "/img/banner/bannerThumb1_2.png",
       bgImage: "/img/bg/bannerBG1_1.jpg",
@@ -35,7 +38,7 @@ export default function BannerSection() {
     },
     {
       id: 3,
-      subtitle: "WELCOME FRESHEAT",
+      subtitle: t(lang, "welcome_fresheat"),
       title: "Chicago Deep Burger King",
       image: "/img/banner/bannerThumb1_3.png",
       bgImage: "/img/bg/bannerBG1_1.jpg",
@@ -208,7 +211,7 @@ export default function BannerSection() {
                               href={currentSlide.link}
                               onMouseEnter={() => prefetchRoute(currentSlide.link)}
                             >
-                              ORDER NOW
+                              {t(lang, "order_now")}
                               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                             </Link>
                           </motion.div>

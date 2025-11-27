@@ -6,10 +6,13 @@ import { useRouter } from "next/navigation";
 import { X, MapPin, Mail, Clock, Phone, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import BranchSelector from "./BranchSelector";
+import LanguageSwitcher from "../LanguageSwitcher";
 import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import { NAV_LINKS } from "../../../data/constants";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 // Helper function to format working hours from array to string
 const formatWorkingHours = (hours) => {
@@ -37,6 +40,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const router = useRouter();
   const { selectedBranch, initialize } = useBranchStore();
   const { prefetchRoute } = usePrefetchRoute();
+  const { lang } = useLanguage();
   const [contactInfo, setContactInfo] = useState({
     address: "Main Street, Melbourne, Australia",
     email: "info@fresheat.com",
@@ -186,8 +190,14 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     <h4 className="text-white  text-lg font-semibold mb-3">
                       Select Branch
                     </h4>
-                    <div className="relative">
+                    <div className="relative mb-4">
                       <BranchSelector isMobile={true} />
+                    </div>
+                    <h4 className="text-white  text-lg font-semibold mb-3">
+                      Select Language
+                    </h4>
+                    <div className="relative">
+                      <LanguageSwitcher isMobile={true} />
                     </div>
                   </motion.div>
 
@@ -398,7 +408,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                         className="theme-btn px-6 py-3 bg-theme3 text-white  text-sm font-normal hover:bg-theme transition-colors duration-300 rounded-md flex items-center justify-center gap-2 shadow-lg"
                       >
                         <ShoppingCart className="w-4 h-4" />
-                        <span>ORDER NOW</span>
+                        <span>{t(lang, "order_now")}</span>
                       </Link>
                     </motion.div>
                   </motion.div>

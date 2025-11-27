@@ -13,12 +13,15 @@ import { transformMenuItemsToProducts } from "../../lib/utils/productTransform";
 import { extractMenuItemsFromResponse } from "../../lib/utils/responseExtractor";
 import useToastStore from "../../store/toastStore";
 import { ITEMS_PER_PAGE_GRID, ITEMS_PER_PAGE_LIST } from "../../data/constants";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 
 export default function ShopSection() {
   const searchParams = useSearchParams();
   const { selectedBranch, initialize } = useBranchStore();
   const { error: toastError } = useToastStore();
+  const { lang } = useLanguage();
   
   // Initialize branch if not loaded
   useEffect(() => {
@@ -187,14 +190,14 @@ export default function ShopSection() {
                       onClick={fetchProducts}
                       className="px-6 py-2 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors"
                     >
-                      Try Again
+                      {t(lang, "try_again")}
                     </button>
                   </div>
                 ) : products.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
-                    <p className="text-text text-lg">No products found</p>
+                    <p className="text-text text-lg">{t(lang, "no_products_found")}</p>
                     {searchQuery && (
-                      <p className="text-text text-sm mt-2">Try adjusting your search or filters</p>
+                      <p className="text-text text-sm mt-2">{t(lang, "try_adjusting_search_filters")}</p>
                     )}
                   </div>
                 ) : viewMode === "grid" ? (
@@ -216,7 +219,7 @@ export default function ShopSection() {
                           onClick={handleShowMore}
                           className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white  text-sm font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
                         >
-                          Show More
+                          {t(lang, "show_more")}
                           <ChevronDown className="w-5 h-5" />
                         </button>
                       </div>
@@ -240,7 +243,7 @@ export default function ShopSection() {
                           onClick={handleShowMore}
                           className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white  text-sm font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
                         >
-                          Show More
+                          {t(lang, "show_more")}
                           <ChevronDown className="w-5 h-5" />
                         </button>
                       </div>

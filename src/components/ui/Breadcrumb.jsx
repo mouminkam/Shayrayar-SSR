@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 /**
  * Reusable Breadcrumb component
@@ -9,6 +11,7 @@ import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
  */
 export default function Breadcrumb({ title, showLinks = true }) {
   const { prefetchRoute } = usePrefetchRoute();
+  const { lang } = useLanguage();
   
   return (
     <section className="relative">
@@ -34,7 +37,7 @@ export default function Breadcrumb({ title, showLinks = true }) {
                     onMouseEnter={() => prefetchRoute("/")}
                     className="text-white/90  text-xl font-medium hover:text-theme hover:scale-105 transition-all duration-300 px-3 py-1 rounded-lg hover:bg-white/10 backdrop-blur-sm"
                   >
-                    Home
+                    {t(lang, "home")}
                   </Link>
                 </li>
                 <li className="text-white/70 text-xl">›</li>

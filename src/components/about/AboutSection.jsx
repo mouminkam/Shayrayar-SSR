@@ -1,18 +1,22 @@
-// Removed "use client" - This component only uses static JSX, Image, and Link components which are SSR-compatible
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 export default function AboutSection() {
+  const { lang } = useLanguage();
+  
   const features = [
     {
       icon: "/img/icon/aboutIcon1_1.svg",
-      title: "super quality food",
-      description: "Served our Testy Food & good food by friendly",
+      title: t(lang, "premium_quality_ingredients"),
+      description: t(lang, "premium_quality_ingredients_description"),
     },
     {
       icon: "/img/icon/aboutIcon1_2.svg",
-      title: "Qualified Chef",
-      description: "Served our Testy Food & good food by friendly",
+      title: t(lang, "expert_master_chefs"),
+      description: t(lang, "expert_master_chefs_description"),
     },
   ];
 
@@ -40,7 +44,7 @@ export default function AboutSection() {
               >
                 <Image
                   src="/img/shape/player.svg"
-                  alt="Play Video"
+                  alt={t(lang, "play_video")}
                   width={80}
                   height={80}
                   className="w-16 h-16 sm:w-40 sm:h-40 animate-rotate"
@@ -59,7 +63,7 @@ export default function AboutSection() {
                 height={20}
               />
               <span className="text-theme2  text-base font-bold uppercase">
-                About US
+                {t(lang, "about_us")}
               </span>
               <Image
                 src="/img/icon/titleIcon.svg"
@@ -69,12 +73,10 @@ export default function AboutSection() {
               />
             </div>
             <h2 className="text-white  text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4 text-center sm:text-left">
-              Variety of flavours from american cuisine
+              {t(lang, "about_us_title")}
             </h2>
             <p className="text-text  text-lg sm:text-xl text-center sm:text-left leading-relaxed mb-12">
-              Every dish is not just prepared it's a crafted with a savor the a
-              utmost <br className="hidden sm:block" /> precision and a deep understanding sdf of flavor harmony. <br className="hidden sm:block" />
-              The experienced hands of our chefs
+              {t(lang, "about_section_description")}
             </p>
 
             {/* Features */}

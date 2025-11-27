@@ -9,6 +9,8 @@ import Breadcrumb from "../../components/ui/Breadcrumb";
 import useAuthStore from "../../store/authStore";
 import api from "../../api";
 import { IMAGE_PATHS } from "../../data/constants";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 // Lazy load profile components
 const ProfileSidebar = dynamic(
@@ -30,6 +32,7 @@ const OrdersHistory = dynamic(
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
+  const { lang } = useLanguage();
   const [orders, setOrders] = useState([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -139,7 +142,7 @@ export default function ProfilePage() {
   return (
     <div className="bg-bg3 min-h-screen">
       <AnimatedSection>
-        <Breadcrumb title="My Profile" />
+        <Breadcrumb title={t(lang, "my_profile")} />
       </AnimatedSection>
       <section className="profile-section section-padding fix bg-bg3 py-12 px-1 sm:px-5 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
@@ -162,14 +165,14 @@ export default function ProfilePage() {
                 <div className="bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 p-2">
                   <div className="flex flex-wrap gap-2">
                     {[
-                      { value: 'all', label: 'All Orders' },
-                      { value: 'pending', label: 'Pending' },
-                      { value: 'confirmed', label: 'Confirmed' },
-                      { value: 'preparing', label: 'Preparing' },
-                      { value: 'ready', label: 'Ready' },
-                      { value: 'out_for_delivery', label: 'Out for Delivery' },
-                      { value: 'delivered', label: 'Delivered' },
-                      { value: 'cancelled', label: 'Cancelled' },
+                      { value: 'all', label: t(lang, "all_orders") },
+                      { value: 'pending', label: t(lang, "pending") },
+                      { value: 'confirmed', label: t(lang, "confirmed") },
+                      { value: 'preparing', label: t(lang, "preparing") },
+                      { value: 'ready', label: t(lang, "ready") },
+                      { value: 'out_for_delivery', label: t(lang, "out_for_delivery") },
+                      { value: 'delivered', label: t(lang, "delivered") },
+                      { value: 'cancelled', label: t(lang, "cancelled") },
                     ].map((tab) => (
                       <button
                         key={tab.value}
@@ -213,7 +216,7 @@ export default function ProfilePage() {
                               disabled={currentPage === 1}
                               className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
-                              Previous
+                              {t(lang, "previous")}
                             </button>
                             
                             <div className="flex items-center gap-2">
@@ -256,7 +259,7 @@ export default function ProfilePage() {
                               disabled={currentPage === pagination.last_page}
                               className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
-                              Next
+                              {t(lang, "next")}
                             </button>
                           </div>
                         )}

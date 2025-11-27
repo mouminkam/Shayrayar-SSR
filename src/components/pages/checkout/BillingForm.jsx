@@ -12,10 +12,13 @@ import PaymentMethodSection from "./PaymentMethodSection";
 import CouponSection from "./CouponSection";
 import PlaceOrderButton from "./PlaceOrderButton";
 import { createStripePaymentIntent } from "../../../lib/utils/paymentProcessor";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 const BillingForm = memo(() => {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
+  const { lang } = useLanguage();
   const {
     items,
     clearCart,
@@ -60,33 +63,33 @@ const BillingForm = memo(() => {
   const validateForm = () => {
     // Validate user data exists (from authStore)
     if (!user) {
-      toastError("Please login to place an order");
+      toastError(t(lang, "please_login_place_order"));
       return false;
     }
     if (!user.name) {
-      toastError("User name is missing. Please update your profile.");
+      toastError(t(lang, "user_name_missing"));
       return false;
     }
     if (!user.email || !/\S+@\S+\.\S+/.test(user.email)) {
-      toastError("User email is invalid. Please update your profile.");
+      toastError(t(lang, "user_email_invalid"));
       return false;
     }
     if (!user.phone) {
-      toastError("User phone is missing. Please update your profile.");
+      toastError(t(lang, "user_phone_missing"));
       return false;
     }
 
     // Validate address based on order type
     if (orderType === "delivery") {
       if (!formData.address || !formData.latitude || !formData.longitude) {
-        toastError("Please select a delivery location on the map");
+        toastError(t(lang, "please_select_delivery_location"));
         return false;
       }
     }
 
     // Validate payment method
     if (formData.paymentMethod !== "stripe" && formData.paymentMethod !== "cash") {
-      toastError("Please select a valid payment method");
+      toastError(t(lang, "please_select_valid_payment_method"));
       return false;
     }
 
@@ -101,14 +104,14 @@ const BillingForm = memo(() => {
     }
 
     if (!isAuthenticated) {
-      toastError("Please login to place an order");
+      toastError(t(lang, "please_login_place_order"));
       router.push("/login");
       return;
     }
 
     const branchId = getSelectedBranchId();
     if (!branchId) {
-      toastError("Please select a branch");
+      toastError(t(lang, "please_select_branch"));
       return;
     }
 
@@ -140,7 +143,7 @@ const BillingForm = memo(() => {
 
       if (itemsNeedingSize.length > 0) {
         const itemNames = itemsNeedingSize.map(item => item.title || item.name).join(", ");
-        toastError(`Please select a size for: ${itemNames}`);
+        toastError(`${t(lang, "please_select_size_for")} ${itemNames}`);
         setIsProcessing(false);
         return;
       }
@@ -238,7 +241,7 @@ const BillingForm = memo(() => {
       } else {
         // Cash payment - existing flow
         clearCart();
-        toastSuccess("Order placed successfully! 🎉");
+        toastSuccess(t(lang, "order_placed_successfully"));
 
         // Redirect to order success page
         setTimeout(() => {
@@ -250,7 +253,7 @@ const BillingForm = memo(() => {
       const errorMessage =
         error?.data?.message ||
         error?.message ||
-        "Failed to place order. Please try again.";
+        t(lang, "failed_to_place_order");
       toastError(errorMessage);
       setIsProcessing(false);
     }
@@ -278,7 +281,7 @@ const BillingForm = memo(() => {
       {/* Notes Section */}
       <div className="mb-6">
         <label className="block text-text  text-sm font-medium mb-2">
-          Order Notes (Optional)
+          {t(lang, "order_notes_optional")}
         </label>
         <textarea
           name="notes"
@@ -286,7 +289,7 @@ const BillingForm = memo(() => {
           onChange={handleInputChange}
           rows={3}
           className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300 resize-none"
-          placeholder="Any special instructions for your order..."
+          placeholder={t(lang, "special_instructions_placeholder")}
         />
       </div>
 

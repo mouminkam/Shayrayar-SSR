@@ -8,6 +8,8 @@ import api from "../../api";
 import { transformMenuItemToProduct } from "../../lib/utils/productTransform";
 import useToastStore from "../../store/toastStore";
 import useBranchStore from "../../store/branchStore";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 // Simplified extractor - API always returns { success: true, data: { item: {...} } }
 const extractProductData = (response) => {
@@ -18,6 +20,7 @@ export default function ShopDetailsContent({ productId }) {
   const router = useRouter();
   const { error: toastError } = useToastStore();
   const { selectedBranch } = useBranchStore();
+  const { lang } = useLanguage();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -62,7 +65,7 @@ export default function ShopDetailsContent({ productId }) {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <Loader2 className="w-8 h-8 text-theme3 animate-spin" />
-            <p className="text-text text-base">Loading product details...</p>
+            <p className="text-text text-base">{t(lang, "loading_product_details")}</p>
           </div>
         </div>
       </section>
@@ -77,24 +80,24 @@ export default function ShopDetailsContent({ productId }) {
             <div className="flex items-center gap-3 text-theme3">
               <AlertCircle className="w-8 h-8" />
               <h3 className="text-white  text-2xl font-bold">
-                Product Not Found
+                {t(lang, "product_not_found")}
               </h3>
             </div>
             <p className="text-text text-lg text-center max-w-md">
-              {error || "The product you're looking for doesn't exist or has been removed."}
+              {error || t(lang, "product_not_found_description")}
             </p>
             <div className="flex gap-4">
               <button
                 onClick={() => router.push("/shop")}
                 className="px-6 py-3 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors  font-semibold"
               >
-                Back to Shop
+                {t(lang, "back_to_shop")}
               </button>
               <button
                 onClick={fetchProduct}
                 className="px-6 py-3 bg-transparent border-2 border-theme3 text-theme3 rounded-lg hover:bg-theme3/10 transition-colors  font-semibold"
               >
-                Try Again
+                {t(lang, "try_again")}
               </button>
             </div>
           </div>

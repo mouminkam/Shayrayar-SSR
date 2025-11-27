@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import ProductSizes from "./ProductSizes";
 import ProductIngredients from "./ProductIngredients";
 import { formatCurrency } from "../../lib/utils/formatters";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 /**
  * ProductCustomization Component
@@ -13,6 +15,7 @@ import { formatCurrency } from "../../lib/utils/formatters";
  * @param {Function} props.onCustomizationChange - Callback when customization changes
  */
 export default function ProductCustomization({ product, onCustomizationChange }) {
+  const { lang } = useLanguage();
   const [selectedSizeId, setSelectedSizeId] = useState(product?.default_size_id || null);
   const [selectedIngredientIds, setSelectedIngredientIds] = useState([]);
   
@@ -114,7 +117,7 @@ export default function ProductCustomization({ product, onCustomizationChange })
         <div className="mt-6 p-4 bg-theme3/10 rounded-xl border border-theme3/30">
           <div className="flex items-center justify-between">
             <span className="text-white  text-base font-semibold">
-              Total Price:
+              {t(lang, "total_price")}
             </span>
             <span className="text-theme3  text-2xl font-black">
               {formatCurrency(finalPrice)}

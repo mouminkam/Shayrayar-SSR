@@ -5,6 +5,8 @@ import AnimatedSection from "../../components/ui/AnimatedSection";
 import ErrorBoundary from "../../components/ui/ErrorBoundary";
 import SectionSkeleton from "../../components/ui/SectionSkeleton";
 import Breadcrumb from "../../components/ui/Breadcrumb";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 // Lazy load all about sections
 const OfferCards = dynamic(
@@ -32,10 +34,12 @@ const ChefeSection = dynamic(
 );
 
 export default function AboutUsPage() {
+  const { lang } = useLanguage();
+  
   return (
     <div className="bg-bg3 min-h-screen">
       <AnimatedSection>
-        <Breadcrumb title="About Us" />
+        <Breadcrumb title={t(lang, "about_us")} />
       </AnimatedSection>
       <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="default" cardCount={3} height="h-80" />}>

@@ -3,10 +3,13 @@ import { motion } from "framer-motion";
 import { User, Mail, Phone, MapPin, Package, LogOut } from "lucide-react";
 import useAuthStore from "../../../store/authStore";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function ProfileSidebar({ user, totalOrders = 0 }) {
   const router = useRouter();
   const { logout } = useAuthStore();
+  const { lang } = useLanguage();
 
   const handleLogout = async () => {
     try {
@@ -44,7 +47,7 @@ export default function ProfileSidebar({ user, totalOrders = 0 }) {
         <div className="flex items-start gap-3">
           <Mail className="w-5 h-5 text-theme3 mt-0.5 shrink-0" />
           <div>
-            <p className="text-text text-xs font-medium mb-1">Email</p>
+            <p className="text-text text-xs font-medium mb-1">{t(lang, "email_label").replace(":", "")}</p>
             <p className="text-white  text-sm">
               {user.email}
             </p>
@@ -55,7 +58,7 @@ export default function ProfileSidebar({ user, totalOrders = 0 }) {
           <div className="flex items-start gap-3">
             <Phone className="w-5 h-5 text-theme3 mt-0.5 shrink-0" />
             <div>
-              <p className="text-text text-xs font-medium mb-1">Phone</p>
+              <p className="text-text text-xs font-medium mb-1">{t(lang, "phone_label").replace(":", "")}</p>
               <p className="text-white  text-sm">
                 {user.phone}
               </p>
@@ -67,7 +70,7 @@ export default function ProfileSidebar({ user, totalOrders = 0 }) {
           <div className="flex items-start gap-3">
             <MapPin className="w-5 h-5 text-theme3 mt-0.5 shrink-0" />
             <div>
-              <p className="text-text text-xs font-medium mb-1">Address</p>
+              <p className="text-text text-xs font-medium mb-1">{t(lang, "address")}</p>
               <p className="text-white  text-sm">
                 {user.address.street}
                 <br />
@@ -85,7 +88,7 @@ export default function ProfileSidebar({ user, totalOrders = 0 }) {
           <p className="text-white  text-xl font-black">
             {totalOrders}
           </p>
-          <p className="text-text text-xs">Orders</p>
+          <p className="text-text text-xs">{t(lang, "orders")}</p>
         </div>
       </div>
 
@@ -97,7 +100,7 @@ export default function ProfileSidebar({ user, totalOrders = 0 }) {
         className="w-full border-2 border-red-500/50 text-red-400 py-3 px-6 hover:bg-red-500/20 transition-all duration-300 text-base  font-medium rounded-xl flex items-center justify-center gap-2"
       >
         <LogOut className="w-5 h-5" />
-        Logout
+        {t(lang, "logout")}
       </motion.button>
     </motion.div>
   );

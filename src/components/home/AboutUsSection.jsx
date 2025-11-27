@@ -1,9 +1,12 @@
-// Removed "use client" - This component only uses static JSX, Image, and Link components which are SSR-compatible
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 export default function AboutUsSection() {
+  const { lang } = useLanguage();
   return (
     <section className="about-us-section  section-padding pb-0 py-0 sm:py-12  relative overflow-hidden">
       <div className="about-wrapper style1 relative h-[450px]">
@@ -64,7 +67,7 @@ export default function AboutUsSection() {
                       unoptimized={true}
 
                     /> */}
-                    About US
+                    {t(lang, "about_us")}
                     {/* <Image
                       className="ms-1"
                       src="/img/icon/titleIcon.svg"
@@ -75,21 +78,17 @@ export default function AboutUsSection() {
                     /> */}
                   </div>
                   <h2 className="title text-white  text-3xl sm:text-4xl lg:text-5xl font-black mb-10 sm:w-1/2 text-center mx-auto">
-                    Authentic Middle Eastern Flavors Crafted with Passion
+                    {t(lang, "about_us_title")}
                   </h2>
                   <div className="text text-text  text-base leading-relaxed mb-8 max-w-3xl mx-auto sm:w-1/3 text-center ">
-                    At Shahryar Restaurant, we bring you the finest Middle Eastern cuisine made with fresh, 
-                    premium ingredients and traditional recipes passed down through generations. From our 
-                    signature shawarma to our mouthwatering grilled specialties, every dish is prepared 
-                    with care and served with genuine hospitality. Experience the rich flavors and 
-                    authentic taste that make us a beloved destination for food lovers.
+                    {t(lang, "about_us_description")}
                   </div>
                   <div className="btn-wrapper flex justify-center">
                     <Link
                       className="theme-btn px-8 py-3 bg-theme3 text-white  text-base font-medium hover:bg-theme transition-all duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
                       href="/shop"
                     >
-                      ORDER NOW
+                      {t(lang, "order_now")}
                       <ArrowRight className="w-5 h-5" />
                     </Link>
                   </div>

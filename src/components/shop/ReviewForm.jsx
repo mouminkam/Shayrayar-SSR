@@ -4,11 +4,14 @@ import { useRouter } from "next/navigation";
 import { User, Mail, MessageSquare, ArrowRight, Loader2 } from "lucide-react";
 import useAuthStore from "../../store/authStore";
 import useToastStore from "../../store/toastStore";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 export default function ReviewForm({ productId }) {
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
+  const { lang } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -31,13 +34,13 @@ export default function ReviewForm({ productId }) {
     e.preventDefault();
     
     if (!isAuthenticated) {
-      toastError("Please login to submit a review");
+      toastError(t(lang, "please_login_submit_review"));
       router.push("/login");
       return;
     }
 
     if (!formData.message.trim()) {
-      toastError("Please write a review message");
+      toastError(t(lang, "please_write_review_message"));
       return;
     }
 
@@ -46,7 +49,7 @@ export default function ReviewForm({ productId }) {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toastSuccess("Review submitted successfully!");
+      toastSuccess(t(lang, "review_submitted_success"));
       
       setFormData({
         name: user?.name || "",
@@ -55,7 +58,7 @@ export default function ReviewForm({ productId }) {
         saveInfo: formData.saveInfo,
       });
     } catch (error) {
-      toastError(error.message || "Failed to submit review. Please try again.");
+      toastError(error.message || t(lang, "failed_submit_review"));
     } finally {
       setIsSubmitting(false);
     }
@@ -67,10 +70,10 @@ export default function ReviewForm({ productId }) {
 
       <div className="form-title mb-8 relative z-10">
         <h3 className="inner-title text-white  text-3xl font-black mb-4 capitalize">
-          Add a Review
+          {t(lang, "add_review")}
         </h3>
         <p className="text-text text-sm sm:text-base mb-6">
-          Your email address will not be published. Required fields are marked *
+          {t(lang, "review_form_note")}
         </p>
       </div>
 
@@ -79,7 +82,7 @@ export default function ReviewForm({ productId }) {
           <div className="form-group style-white2 relative">
             <input
               type="text"
-              placeholder="Your Name"
+              placeholder={t(lang, "your_name")}
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-5 py-4 pr-12 border-2 border-white/20 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder:text-white/50  text-base font-normal outline-none transition-all duration-300 focus:border-theme3 focus:bg-white/20 focus:ring-2 focus:ring-theme3/30"
@@ -90,7 +93,7 @@ export default function ReviewForm({ productId }) {
           <div className="form-group style-white2 relative">
             <input
               type="email"
-              placeholder="Your Email"
+              placeholder={t(lang, "your_email")}
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full px-5 py-4 pr-12 border-2 border-white/20 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder:text-white/50  text-base font-normal outline-none transition-all duration-300 focus:border-theme3 focus:bg-white/20 focus:ring-2 focus:ring-theme3/30"
@@ -101,7 +104,7 @@ export default function ReviewForm({ productId }) {
         </div>
         <div className="form-group style-white2 relative mb-5">
           <textarea
-            placeholder="Write a Message"
+            placeholder={t(lang, "write_message")}
             rows="5"
             value={formData.message}
             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
@@ -124,7 +127,7 @@ export default function ReviewForm({ productId }) {
             htmlFor="reviewcheck"
             className="relative pl-10 cursor-pointer block leading-7 text-white/80  text-sm sm:text-base font-normal hover:text-white transition-colors duration-300"
           >
-            Save my name, email, and website in this browser for the next time I comment.
+            {t(lang, "save_info_checkbox")}
             <span
               className={`absolute left-0 top-0.5 w-6 h-6 border-2 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center transition-all duration-300 ${formData.saveInfo
                 ? "bg-theme3 border-theme3"
@@ -149,11 +152,11 @@ export default function ReviewForm({ productId }) {
             {isSubmitting ? (
               <>
                 <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Submitting...
+                {t(lang, "submitting")}
               </>
             ) : (
               <>
-                Post A Comment
+                {t(lang, "post_comment")}
                 <ArrowRight className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
               </>
             )}

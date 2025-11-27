@@ -1,8 +1,11 @@
 "use client";
 import { motion } from "framer-motion";
 import { Wallet, Zap } from "lucide-react";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function PaymentMethodSelector({ paymentMethod, setPaymentMethod }) {
+  const { lang } = useLanguage();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       <motion.button
@@ -21,7 +24,7 @@ export default function PaymentMethodSelector({ paymentMethod, setPaymentMethod 
           <span className={` font-bold text-sm ${
             paymentMethod === "stripe" ? "text-theme3" : "text-white"
           }`}>
-            Stripe
+            {t(lang, "stripe")}
           </span>
         </div>
       </motion.button>
@@ -42,7 +45,7 @@ export default function PaymentMethodSelector({ paymentMethod, setPaymentMethod 
           <span className={` font-bold text-sm ${
             paymentMethod === "cash" ? "text-theme3" : "text-white"
           }`}>
-            Cash
+            {t(lang, "cash")}
           </span>
         </div>
       </motion.button>

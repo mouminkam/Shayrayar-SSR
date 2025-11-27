@@ -1,8 +1,11 @@
 "use client";
 import { motion } from "framer-motion";
 import { User, Mail, Phone } from "lucide-react";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function BillingInfoSection({ formData, handleInputChange }) {
+  const { lang } = useLanguage();
   return (
     <div className="mb-8">
       <div className="flex items-center gap-3 mb-6">
@@ -13,14 +16,14 @@ export default function BillingInfoSection({ formData, handleInputChange }) {
           <User className="w-6 h-6 text-white fill-white" />
         </motion.div>
         <h3 className="text-white  text-2xl font-black uppercase">
-          Billing Information
+          {t(lang, "billing_information")}
         </h3>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-text  text-sm font-medium mb-2">
-            First Name *
+            {t(lang, "first_name")}
           </label>
           <input
             type="text"
@@ -29,12 +32,12 @@ export default function BillingInfoSection({ formData, handleInputChange }) {
             onChange={handleInputChange}
             required
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300"
-            placeholder="John"
+            placeholder={t(lang, "first_name_placeholder")}
           />
         </div>
         <div>
           <label className="block text-text  text-sm font-medium mb-2">
-            Last Name *
+            {t(lang, "last_name")}
           </label>
           <input
             type="text"
@@ -43,7 +46,7 @@ export default function BillingInfoSection({ formData, handleInputChange }) {
             onChange={handleInputChange}
             required
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300"
-            placeholder="Doe"
+            placeholder={t(lang, "last_name_placeholder")}
           />
         </div>
       </div>
@@ -52,7 +55,7 @@ export default function BillingInfoSection({ formData, handleInputChange }) {
         <div>
           <label className="block text-text  text-sm font-medium mb-2">
             <Mail className="w-4 h-4 inline mr-1" />
-            Email Address *
+            {t(lang, "email_address")} *
           </label>
           <input
             type="email"
@@ -61,13 +64,13 @@ export default function BillingInfoSection({ formData, handleInputChange }) {
             onChange={handleInputChange}
             required
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300"
-            placeholder="john@example.com"
+            placeholder={t(lang, "email_placeholder")}
           />
         </div>
         <div>
           <label className="block text-text  text-sm font-medium mb-2">
             <Phone className="w-4 h-4 inline mr-1" />
-            Phone Number *
+            {t(lang, "phone_number")} *
           </label>
           <input
             type="tel"
@@ -76,7 +79,7 @@ export default function BillingInfoSection({ formData, handleInputChange }) {
             onChange={handleInputChange}
             required
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300"
-            placeholder="+1234567890"
+            placeholder={t(lang, "phone_placeholder")}
           />
         </div>
       </div>

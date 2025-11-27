@@ -1,8 +1,11 @@
 "use client";
 import Image from "next/image";
 import { MessageSquare } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 export default function ProductReviews({ productId }) {
+  const { lang } = useLanguage();
   const reviews = [
     {
       id: 1,
@@ -30,12 +33,12 @@ export default function ProductReviews({ productId }) {
       
       <div className="flex items-center justify-between mb-10 relative z-10">
         <h3 className="text-white  text-3xl font-black capitalize">
-          {reviews.length} {reviews.length === 1 ? 'Review' : 'Reviews'}
+          {reviews.length} {reviews.length === 1 ? t(lang, "review") : t(lang, "reviews")}
         </h3>
         {reviews.length > 0 && (
           <div className="flex items-center gap-2 text-theme3">
             <MessageSquare className="w-5 h-5" />
-            <span className="text-sm font-semibold">{reviews.length} Total</span>
+            <span className="text-sm font-semibold">{reviews.length} {t(lang, "total")}</span>
           </div>
         )}
       </div>
@@ -43,7 +46,7 @@ export default function ProductReviews({ productId }) {
       {reviews.length === 0 ? (
         <div className="text-center py-12 relative z-10">
           <MessageSquare className="w-16 h-16 text-white/20 mx-auto mb-4" />
-          <p className="text-text text-lg">No reviews yet. Be the first to review this product!</p>
+          <p className="text-text text-lg">{t(lang, "no_reviews_yet")}</p>
         </div>
       ) : (
         <ul className="comment-list relative z-10">

@@ -9,6 +9,8 @@ import useToastStore from "../../store/toastStore";
 import useAuthStore from "../../store/authStore";
 import ProductCustomization from "./ProductCustomization";
 import { SOCIAL_LINKS } from "../../data/constants";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 // Map icon names to lucide-react components
 const iconMap = { Facebook, Youtube, Twitter, Instagram };
@@ -18,6 +20,7 @@ export default function ProductAbout({ product }) {
   const { addToCart } = useCartStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
+  const { lang } = useLanguage();
 
   const [quantity, setQuantity] = useState(1);
   const [customization, setCustomization] = useState(() => ({
@@ -34,14 +37,14 @@ export default function ProductAbout({ product }) {
     if (!product) return;
 
     if (!isAuthenticated) {
-      toastError("Please login to add items to cart");
+      toastError(t(lang, "please_login_add_cart"));
       router.push("/login");
       return;
     }
 
     // Validation: Check if size is required but not selected
     if (product?.has_sizes && !customization.sizeId) {
-      toastError("Please select a size");
+      toastError(t(lang, "please_select_size"));
       return;
     }
 
@@ -73,7 +76,7 @@ export default function ProductAbout({ product }) {
 
       const customizationText = [
         selectedSize?.name,
-        selectedIngredients.length > 0 && `${selectedIngredients.length} add-on(s)`,
+        selectedIngredients.length > 0 && `${selectedIngredients.length} ${t(lang, "add_ons")}`,
       ]
         .filter(Boolean)
         .join(", ");
@@ -83,7 +86,7 @@ export default function ProductAbout({ product }) {
       );
       setQuantity(1);
     } catch {
-      toastError("Failed to add product to cart");
+      toastError(t(lang, "failed_add_cart"));
     }
   };
 
@@ -95,7 +98,7 @@ export default function ProductAbout({ product }) {
     <div className="product-about h-full flex flex-col">
       <div className="title-wrapper flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-4">
         <h2 className="product-title text-white  text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">
-          {product?.title || "Product"}
+          {product?.title || t(lang, "product")}
         </h2>
         <div className="price text-theme  text-4xl sm:text-5xl lg:text-6xl font-black">
           {formatCurrency(customization.finalPrice)}
@@ -103,7 +106,7 @@ export default function ProductAbout({ product }) {
       </div>
 
       <p className="text text-white text-base sm:text-lg  font-normal leading-relaxed mb-8">
-        {product?.description || product?.longDescription || "No description available."}
+        {product?.description || product?.longDescription || t(lang, "no_description_available")}
       </p>
 
       {/* Product Customization (Sizes & Ingredients) */}
@@ -115,7 +118,7 @@ export default function ProductAbout({ product }) {
       <div className="actions mb-8">
         <div className="quantity flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 mb-8">
           <p className="text-white text-lg  font-semibold mb-0">
-            Quantity
+            {t(lang, "quantity")}
           </p>
 
           <div className="qty-wrapper flex items-center gap-0 shadow-lg rounded-lg overflow-hidden">
@@ -150,14 +153,14 @@ export default function ProductAbout({ product }) {
             className="theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3  text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30"
           >
             <ShoppingCart className="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform duration-300" />
-            Add to Cart
+            {t(lang, "add_to_cart")}
           </button>
         </div>
       </div>
 
       <div className="share flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mt-auto pt-6 border-t border-white/10">
         <h6 className="text-white  text-base sm:text-lg font-semibold m-0">
-          Share with friends
+          {t(lang, "share_with_friends")}
         </h6>
         <ul className="social-media flex items-center gap-3">
           {SOCIAL_LINKS.map((social) => {

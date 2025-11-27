@@ -13,6 +13,8 @@ import useCartStore from "../../store/cartStore";
 import useToastStore from "../../store/toastStore";
 import useAuthStore from "../../store/authStore";
 import { formatCurrency } from "../../lib/utils/formatters";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 // Helper: Extract categories from API response
 const extractCategories = (response) => {
@@ -32,6 +34,7 @@ export default function ShopSidebar() {
   const { addToCart } = useCartStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
+  const { lang } = useLanguage();
 
   const currentCategory = searchParams.get("category");
   const [categories, setCategories] = useState([]);
@@ -124,20 +127,20 @@ export default function ShopSidebar() {
       {/* Categories */}
       <div className="bg-bgimg p-6 sm:p-8 rounded-2xl shadow-sm">
         <h5 className="text-white text-lg sm:text-xl font-bold relative pb-3 mb-6 capitalize">
-          Categories
+          {t(lang, "categories")}
           <span className="absolute bottom-0 left-0 h-0.5 w-16 sm:w-20 bg-theme3"></span>
         </h5>
         {isLoadingCategories ? (
           <div className="flex items-center justify-center py-4">
-            <p className="text-text text-sm">Loading categories...</p>
+            <p className="text-text text-sm">{t(lang, "loading_categories")}</p>
           </div>
         ) : categories.length === 0 ? (
-          <p className="text-text text-sm">No categories available</p>
+          <p className="text-text text-sm">{t(lang, "no_categories_available")}</p>
         ) : (
           <ul className="flex flex-wrap items-center gap-2 sm:gap-3">
             <li>
               <button onClick={() => handleCategoryClick(null)} className={categoryBtnClass(!currentCategory)}>
-                All
+                {t(lang, "all")}
               </button>
             </li>
             {categories.map((category) => (
@@ -158,17 +161,17 @@ export default function ShopSidebar() {
 
           <h5 className="text-white text-lg lg:text-xl font-black relative pb-3 lg:pb-4 mb-6 lg:mb-8 capitalize text-center">
             <span className="relative z-10 bg-linear-to-r from-theme3 to-theme bg-clip-text text-transparent drop-shadow-lg">
-              Recent Products
+              {t(lang, "recent_products")}
             </span>
             <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-1 w-16 lg:w-20 bg-linear-to-r from-theme to-theme3 rounded-full"></span>
           </h5>
 
           {isLoadingRecent ? (
             <div className="flex items-center justify-center py-4">
-              <p className="text-text text-sm">Loading...</p>
+              <p className="text-text text-sm">{t(lang, "loading")}</p>
             </div>
           ) : recentProducts.length === 0 ? (
-            <p className="text-text text-sm text-center">No recent products</p>
+            <p className="text-text text-sm text-center">{t(lang, "no_recent_products")}</p>
           ) : (
             <div className="grid grid-cols-1 gap-4 lg:gap-6 relative z-10">
               {recentProducts.map((product) => (
@@ -213,7 +216,7 @@ export default function ShopSidebar() {
                           onMouseEnter={() => prefetchRoute(`/shop/${product.id}`)}
                           className="flex-1 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white text-xs lg:text-sm font-semibold py-1.5 lg:py-2 px-3 lg:px-4 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-theme3/30 text-center"
                         >
-                          Order
+                          {t(lang, "order")}
                         </Link>
                         <button
                           onClick={(e) => handleAddToCart(e, product)}

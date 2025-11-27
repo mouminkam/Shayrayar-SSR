@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { MapPin, Mail, Phone, Clock, Loader2 } from "lucide-react";
 import api from "../../api";
 import useBranchStore from "../../store/branchStore";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 // Helper function to format working hours from object to string
 const formatWorkingHours = (hours) => {
@@ -30,6 +32,7 @@ const formatWorkingHours = (hours) => {
 
 export default function ContactBoxes() {
   const { selectedBranch, initialize } = useBranchStore();
+  const { lang } = useLanguage();
   const [contactInfo, setContactInfo] = useState({
     address: "4517 Washington Ave. Manchester, Kentucky 39495",
     email: "info@example.com",
@@ -66,7 +69,7 @@ export default function ContactBoxes() {
             address: "4517 Washington Ave. Manchester, Kentucky 39495",
             email: "info@example.com",
             phone: "+208-666-01112",
-            workingHours: "Sunday-Fri: 9 AM – 6 PM Saturday: 9 AM – 4 PM",
+            workingHours: t(lang, "default_opening_hours"),
           };
 
           // Format working hours if it's an object
@@ -94,12 +97,12 @@ export default function ContactBoxes() {
   const contactBoxes = [
     {
       icon: MapPin,
-      title: "Our Address",
+      title: t(lang, "our_address"),
       description: contactInfo.address,
     },
     {
       icon: Mail,
-      title: "Email Us",
+      title: t(lang, "email_us"),
       description:(
         <>
         <h3 className="text-sm sm:text-base md:text-lg lg:text-xl break-all">{contactInfo.email}</h3>
@@ -108,7 +111,7 @@ export default function ContactBoxes() {
     },
     {
       icon: Phone,
-      title: "Phone",
+      title: t(lang, "phone"),
       description:(
         <>
         <h3 className="text-sm sm:text-base md:text-lg lg:text-xl break-all">{contactInfo.phone}</h3>
@@ -117,8 +120,8 @@ export default function ContactBoxes() {
     },
     {
       icon: Clock,
-      title: "Opening Hour",
-      description: "Mon-Friday, 09am - 05pm",
+      title: t(lang, "opening_hour"),
+      description: contactInfo.workingHours || t(lang, "default_opening_hours"),
     },
   ];
 
@@ -129,7 +132,7 @@ export default function ContactBoxes() {
           <div className="flex items-center justify-center py-20 bg-bgimg rounded-2xl">
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="w-10 h-10 text-theme3 animate-spin" />
-              <p className="text-text  text-sm">Loading contact information...</p>
+              <p className="text-text  text-sm">{t(lang, "loading_contact_information")}</p>
             </div>
           </div>
         ) : (

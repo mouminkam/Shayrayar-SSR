@@ -9,10 +9,13 @@ import useBranchStore from "../../store/branchStore";
 import { transformCategories, transformMenuItemsToProducts } from "../../lib/utils/productTransform";
 import { extractMenuItemsFromResponse } from "../../lib/utils/responseExtractor";
 import { IMAGE_PATHS } from "../../data/constants";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 export default function FoodMenuSection() {
   const { prefetchRoute } = usePrefetchRoute();
   const { selectedBranch, getSelectedBranchId, initialize } = useBranchStore();
+  const { lang } = useLanguage();
   
   // State for categories
   const [categories, setCategories] = useState([]);
@@ -129,7 +132,7 @@ export default function FoodMenuSection() {
                   height={20}
                   unoptimized={true}
                 /> */}
-                FOOD MENU
+                {t(lang, "food_menu")}
                 {/* <Image
                   className="ms-1"
                   src="/img/icon/titleIcon.svg"
@@ -140,7 +143,7 @@ export default function FoodMenuSection() {
                 /> */}
               </div>
               <h2 className="title text-white  text-3xl sm:text-4xl lg:text-5xl font-black">
-                Fresheat Foods Menu
+                {t(lang, "fresheat_foods_menu")}
               </h2>
             </div>
 
@@ -234,7 +237,7 @@ export default function FoodMenuSection() {
                   </div>
                 ) : (
                   <div className="text-center text-text py-12">
-                    <p>No items available in this category</p>
+                    <p>{t(lang, "no_items_available_category")}</p>
                   </div>
                 )}
               </div>

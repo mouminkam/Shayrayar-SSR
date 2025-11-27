@@ -7,6 +7,8 @@ import useCartStore from "../../../store/cartStore";
 import useToastStore from "../../../store/toastStore";
 import OrderTypeSelector from "./OrderTypeSelector";
 import api from "../../../api";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 const SOFIA_CENTER = { lat: 42.6977, lng: 23.3219 };
 const SOFIA_BOUNDS = [
@@ -32,6 +34,7 @@ const isInsideSofia = (lat, lng) =>
 export default function ShippingAddressSection({ formData, setFormData }) {
   const { orderType, setDeliveryCharge } = useCartStore();
   const { error: toastError, success: toastSuccess } = useToastStore();
+  const { lang } = useLanguage();
   const isDelivery = orderType === "delivery";
 
   const initialLocation = useMemo(
@@ -153,9 +156,9 @@ export default function ShippingAddressSection({ formData, setFormData }) {
         }));
 
         fetchDeliveryQuote({ lat, lng, address: detectedAddress });
-      } catch (error) {
+        } catch (error) {
         setShowManualInput(true);
-        toastError(error.message || "Unable to detect address. Please enter it manually.");
+        toastError(error.message || t(lang, "unable_detect_address_manual"));
       } finally {
         setLoading((prev) => ({ ...prev, geocoding: false }));
       }
@@ -166,7 +169,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
   const selectLocation = useCallback(
     (lat, lng, options = {}) => {
       if (!isInsideSofia(lat, lng)) {
-        const message = "Please select a point inside the Sofia delivery zone.";
+        const message = t(lang, "select_inside_sofia_zone");
         setMapError(message);
         toastError(message);
         const fallback = lastValidLocationRef.current || SOFIA_CENTER;
@@ -268,7 +271,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
       })
       .catch(() => {
         if (cancelled) return;
-        setMapError("Failed to load the map. Click to retry.");
+        setMapError(t(lang, "failed_load_map_retry"));
         setLoading((prev) => ({ ...prev, map: false }));
       });
 
@@ -290,7 +293,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
 
   const getCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      toastError("Geolocation is not supported by this browser.");
+      toastError(t(lang, "geolocation_not_supported"));
       selectLocation(SOFIA_CENTER.lat, SOFIA_CENTER.lng);
       return;
     }
@@ -300,21 +303,21 @@ export default function ShippingAddressSection({ formData, setFormData }) {
       (pos) => {
         const { latitude, longitude } = pos.coords;
         if (!isInsideSofia(latitude, longitude)) {
-          toastError("You are outside Sofia. Using the city center instead.");
+          toastError(t(lang, "outside_sofia_using_center"));
           selectLocation(SOFIA_CENTER.lat, SOFIA_CENTER.lng, { focus: true });
         } else {
-          toastSuccess("Location detected!");
+          toastSuccess(t(lang, "location_detected"));
           selectLocation(latitude, longitude, { focus: true });
         }
         setLoading((prev) => ({ ...prev, location: false }));
       },
       (error) => {
         const messages = {
-          [error.PERMISSION_DENIED]: "Please allow location access.",
-          [error.POSITION_UNAVAILABLE]: "Location information is unavailable.",
-          [error.TIMEOUT]: "Location request timed out.",
+          [error.PERMISSION_DENIED]: t(lang, "please_allow_location_access"),
+          [error.POSITION_UNAVAILABLE]: t(lang, "location_unavailable"),
+          [error.TIMEOUT]: t(lang, "location_timeout"),
         };
-        toastError(messages[error.code] || "Unable to get your location.");
+        toastError(messages[error.code] || t(lang, "unable_get_location"));
         setLoading((prev) => ({ ...prev, location: false }));
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
@@ -323,11 +326,11 @@ export default function ShippingAddressSection({ formData, setFormData }) {
 
   const handleManualSubmit = useCallback(() => {
     if (!manualAddress.trim()) {
-      toastError("Please enter an address.");
+      toastError(t(lang, "please_enter_address"));
       return;
     }
     if (!selectedLocation) {
-      toastError("Please select a location on the map first.");
+      toastError(t(lang, "please_select_location_first"));
       return;
     }
 
@@ -338,8 +341,8 @@ export default function ShippingAddressSection({ formData, setFormData }) {
       address: manualAddress.trim(),
     });
     setShowManualInput(false);
-    toastSuccess("Address saved successfully.");
-  }, [fetchDeliveryQuote, manualAddress, selectedLocation, setFormData, toastError, toastSuccess]);
+    toastSuccess(t(lang, "address_saved_successfully"));
+  }, [fetchDeliveryQuote, manualAddress, selectedLocation, setFormData, toastError, toastSuccess, lang]);
 
   if (!isDelivery) {
     return (
@@ -351,12 +354,12 @@ export default function ShippingAddressSection({ formData, setFormData }) {
           >
             <MapPin className="w-6 h-6 text-white fill-white" />
           </motion.div>
-          <h3 className="text-white text-2xl font-black uppercase">Pickup Information</h3>
+          <h3 className="text-white text-2xl font-black uppercase">{t(lang, "pickup_information")}</h3>
         </div>
         <OrderTypeSelector />
         <div className="p-4 bg-theme3/20 border border-theme3/50 rounded-xl">
           <p className="text-white text-sm">
-            You will pick up your order from the selected branch.
+            {t(lang, "pickup_from_branch")}
           </p>
         </div>
       </div>
@@ -372,7 +375,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
         >
           <MapPin className="w-6 h-6 text-white fill-white" />
         </motion.div>
-        <h3 className="text-white text-2xl font-black uppercase">Delivery Address</h3>
+        <h3 className="text-white text-2xl font-black uppercase">{t(lang, "delivery_address")}</h3>
       </div>
 
       <OrderTypeSelector />
@@ -389,12 +392,12 @@ export default function ShippingAddressSection({ formData, setFormData }) {
           {loading.location ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Getting Location...</span>
+              <span>{t(lang, "getting_location")}</span>
             </>
           ) : (
             <>
               <Navigation className="w-4 h-4" />
-              <span>Use My Current Location</span>
+              <span>{t(lang, "use_current_location")}</span>
             </>
           )}
         </motion.button>
@@ -426,12 +429,12 @@ export default function ShippingAddressSection({ formData, setFormData }) {
               .then(() => {
                 initializeMap();
                 setLoading((prev) => ({ ...prev, map: false }));
-                toastSuccess("Map reloaded successfully");
+                toastSuccess(t(lang, "map_reloaded_successfully"));
               })
               .catch(() => {
-                setMapError("Failed to reload the map. Please try again.");
+                setMapError(t(lang, "failed_reload_map"));
                 setLoading((prev) => ({ ...prev, map: false }));
-                toastError("Failed to reload the map. Please try again.");
+                toastError(t(lang, "failed_reload_map"));
               });
           }}
           disabled={loading.map}
@@ -443,7 +446,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
           ) : (
             <RefreshCw className="w-4 h-4" />
           )}
-          <span className="hidden sm:inline">Reload Map</span>
+          <span className="hidden sm:inline">{t(lang, "reload_map")}</span>
         </motion.button>
       </div>
 
@@ -453,7 +456,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
             <div className="absolute inset-0 flex items-center justify-center bg-bgimg z-10">
               <div className="text-center">
                 <Loader2 className="w-8 h-8 text-theme3 animate-spin mx-auto mb-2" />
-                <p className="text-text">Loading map...</p>
+                <p className="text-text">{t(lang, "loading_map")}</p>
               </div>
             </div>
           ) : mapError && !mapInstanceRef.current ? (
@@ -469,9 +472,9 @@ export default function ShippingAddressSection({ formData, setFormData }) {
             >
               <div className="text-center max-w-md">
                 <p className="text-red-400 mb-3 font-semibold">{mapError}</p>
-                <p className="text-text text-sm mb-2">Click here to reload the map.</p>
+                <p className="text-text text-sm mb-2">{t(lang, "click_to_reload_map")}</p>
                 <button className="px-4 py-2 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors">
-                  Reload Map
+                  {t(lang, "reload_map")}
                 </button>
               </div>
             </div>
@@ -498,16 +501,16 @@ export default function ShippingAddressSection({ formData, setFormData }) {
           <div className="flex items-start gap-3 mb-3">
             <Edit className="w-5 h-5 text-yellow-400 mt-0.5 shrink-0" />
             <div className="flex-1">
-              <p className="text-yellow-400 font-semibold mb-2">Enter Address Manually</p>
+              <p className="text-yellow-400 font-semibold mb-2">{t(lang, "enter_address_manually")}</p>
               <p className="text-text text-xs mb-3">
-                Unable to detect the address automatically. Please type it below.
+                {t(lang, "unable_detect_address")}
               </p>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={manualAddress}
                   onChange={(e) => setManualAddress(e.target.value)}
-                  placeholder="Enter your full address..."
+                  placeholder={t(lang, "enter_full_address_placeholder")}
                   className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20"
                   onKeyDown={(e) => e.key === "Enter" && handleManualSubmit()}
                 />
@@ -515,7 +518,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
                   onClick={handleManualSubmit}
                   className="px-4 py-2 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors font-semibold"
                 >
-                  Save
+                  {t(lang, "save")}
                 </button>
                 <button
                   onClick={() => {
@@ -524,7 +527,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
                   }}
                   className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
                 >
-                  Cancel
+                  {t(lang, "cancel")}
                 </button>
               </div>
             </div>
@@ -541,7 +544,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
           <div className="flex items-start gap-3">
             <MapPin className="w-5 h-5 text-theme3 mt-0.5 shrink-0" />
             <div className="flex-1">
-              <p className="text-white text-sm font-semibold mb-1">Selected Address:</p>
+              <p className="text-white text-sm font-semibold mb-1">{t(lang, "selected_address")}</p>
               <p className="text-white text-sm mb-2">{formData.address}</p>
               {(formData.city || formData.state || formData.zipCode || formData.country) && (
                 <div className="flex flex-wrap gap-2 text-xs text-text">
@@ -566,7 +569,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
         <div className="mb-4 p-3 bg-theme3/20 border border-theme3/50 rounded-xl">
           <div className="flex items-center gap-2 text-theme3">
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="text-sm">Calculating delivery fee...</span>
+            <span className="text-sm">{t(lang, "calculating_delivery_fee")}</span>
           </div>
         </div>
       )}
@@ -578,16 +581,16 @@ export default function ShippingAddressSection({ formData, setFormData }) {
           className="mb-4 p-4 bg-theme3/20 border border-theme3/50 rounded-xl"
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-text text-sm font-semibold">Delivery Fee:</span>
+            <span className="text-text text-sm font-semibold">{t(lang, "delivery_fee")}</span>
             <span className="text-theme3 font-bold text-lg">
               {deliveryQuote.fee_bgn} {deliveryQuote.currency || "BGN"}
             </span>
           </div>
           {deliveryQuote.eta_min && (
             <div className="flex items-center justify-between">
-              <span className="text-text text-xs">Estimated Time:</span>
+              <span className="text-text text-xs">{t(lang, "estimated_time")}</span>
               <span className="text-white text-xs font-semibold">
-                {deliveryQuote.eta_min} minutes
+                {deliveryQuote.eta_min} {t(lang, "minutes")}
               </span>
             </div>
           )}
@@ -603,9 +606,9 @@ export default function ShippingAddressSection({ formData, setFormData }) {
           <div className="flex items-start gap-3">
             <MapPin className="w-5 h-5 text-red-400 mt-0.5 shrink-0" />
             <div className="flex-1">
-              <p className="text-red-400 font-semibold mb-1">Outside Delivery Area</p>
+              <p className="text-red-400 font-semibold mb-1">{t(lang, "outside_delivery_area")}</p>
               <p className="text-text text-sm">
-                The selected location is outside our service area. Please choose a place inside Sofia.
+                {t(lang, "outside_service_area_message")}
               </p>
             </div>
           </div>
@@ -614,8 +617,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
 
       <div className="p-3 bg-white/5 border border-white/10 rounded-xl mb-4">
         <p className="text-text text-xs">
-          💡 Click anywhere on the map to update your delivery location. We will keep the marker inside
-          Sofia automatically.
+          💡 {t(lang, "map_instruction")}
         </p>
       </div>
 

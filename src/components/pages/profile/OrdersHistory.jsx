@@ -3,8 +3,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ShoppingBag, Package, ArrowRight } from "lucide-react";
 import OrderCard from "./OrderCard";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function OrdersHistory({ orders, showViewAll = true, maxDisplay = null, totalOrders = null }) {
+  const { lang } = useLanguage();
   // Ensure orders is always an array
   const ordersList = Array.isArray(orders) ? orders : [];
   const DISPLAY_LIMIT = 5;
@@ -46,12 +49,12 @@ export default function OrdersHistory({ orders, showViewAll = true, maxDisplay =
             <ShoppingBag className="w-6 h-6 text-white fill-white" />
           </motion.div>
           <h3 className="text-white  text-2xl font-black uppercase">
-            Order History
+            {t(lang, "order_history")}
           </h3>
         </div>
         {totalOrdersCount > 0 && (
           <span className="text-text text-sm font-medium">
-            {totalOrdersCount} {totalOrdersCount === 1 ? 'order' : 'orders'}
+            {totalOrdersCount} {totalOrdersCount === 1 ? t(lang, "order") : t(lang, "orders")}
           </span>
         )}
       </div>
@@ -59,15 +62,15 @@ export default function OrdersHistory({ orders, showViewAll = true, maxDisplay =
       {ordersList.length === 0 ? (
         <div className="text-center py-12">
           <Package className="w-16 h-16 text-text/30 mx-auto mb-4" />
-          <p className="text-text text-lg mb-2">No orders yet</p>
+          <p className="text-text text-lg mb-2">{t(lang, "no_orders_yet")}</p>
           <p className="text-text/70 text-sm mb-6">
-            Start shopping to see your orders here
+            {t(lang, "start_shopping_to_see_orders")}
           </p>
           <Link
             href="/shop"
             className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white  text-sm font-semibold rounded-xl transition-all duration-300"
           >
-            Start Shopping
+            {t(lang, "start_shopping")}
           </Link>
         </div>
       ) : (
@@ -89,7 +92,7 @@ export default function OrdersHistory({ orders, showViewAll = true, maxDisplay =
                 href="/orders"
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-theme3/50 rounded-xl text-white  text-sm font-semibold transition-all duration-300 group"
               >
-                View All Orders ({totalOrdersCount})
+                {t(lang, "view_all_orders")} ({totalOrdersCount})
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>

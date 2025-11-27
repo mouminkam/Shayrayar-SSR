@@ -4,9 +4,12 @@ import { motion } from "framer-motion";
 import { MapPin, Plus, Check, Loader2 } from "lucide-react";
 import useToastStore from "../../../store/toastStore";
 import api from "../../../api";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function AddressSelector({ selectedAddressId, onSelectAddress, onNewAddress }) {
   const { success: toastSuccess, error: toastError } = useToastStore();
+  const { lang } = useLanguage();
   const [addresses, setAddresses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -27,7 +30,7 @@ export default function AddressSelector({ selectedAddressId, onSelectAddress, on
       }
     } catch (error) {
       console.error("Error fetching addresses:", error);
-      toastError("Failed to load addresses");
+      toastError(t(lang, "failed_to_load_addresses"));
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +52,7 @@ export default function AddressSelector({ selectedAddressId, onSelectAddress, on
     <div className="mb-6">
       <div className="flex items-center justify-between mb-4">
         <label className="block text-text  text-sm font-medium">
-          Saved Addresses
+          {t(lang, "saved_addresses")}
         </label>
         <motion.button
           type="button"
@@ -59,14 +62,14 @@ export default function AddressSelector({ selectedAddressId, onSelectAddress, on
           className="flex items-center gap-2 px-4 py-2 bg-theme3/20 text-theme3 rounded-lg text-sm font-semibold hover:bg-theme3/30 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          New Address
+          {t(lang, "new_address")}
         </motion.button>
       </div>
 
       {addresses.length === 0 ? (
         <div className="p-4 bg-white/5 rounded-xl border border-white/10 text-center">
           <MapPin className="w-8 h-8 text-text mx-auto mb-2 opacity-50" />
-          <p className="text-text text-sm">No saved addresses</p>
+          <p className="text-text text-sm">{t(lang, "no_saved_addresses")}</p>
         </div>
       ) : (
         <div className="space-y-3 max-h-64 overflow-y-auto pr-2">

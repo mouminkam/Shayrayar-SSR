@@ -16,11 +16,14 @@ import CartDropdown from "./header/CartDropdown";
 import UserDropdown from "./header/UserDropdown";
 import Sidebar from "./header/Sidebar";
 import BranchSelector from "./header/BranchSelector";
+import LanguageSwitcher from "./LanguageSwitcher";
 import { useCart } from "../../hooks/useCart";
 import { useScroll } from "../../hooks/useScroll";
 import useAuthStore from "../../store/authStore";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
-import { NAV_LINKS, SOCIAL_LINKS, BUSINESS_HOURS, IMAGE_PATHS } from "../../data/constants";
+import { NAV_LINKS, SOCIAL_LINKS, IMAGE_PATHS } from "../../data/constants";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 const FreshHeatHeader = () => {
   const router = useRouter();
@@ -40,6 +43,9 @@ const FreshHeatHeader = () => {
 
   // Use scroll hook
   const isScrolled = useScroll(150);
+
+  // Use language hook
+  const { lang } = useLanguage();
 
   const handleCartClick = (headerId) => {
     setActiveHeader(headerId);
@@ -170,14 +176,18 @@ const FreshHeatHeader = () => {
             {/* Top Bar */}
             <div className="py-1 pl-26 pr-16 bg-theme3 flex justify-between items-center text-lg text-white">
               <div className="flex items-center">
-                <span className="mr-2">©</span>
-                <span>{BUSINESS_HOURS}</span>
+                <span className="mr-2">{t(lang, "copyright")}</span>
+                <span>{t(lang, "business_hours")}</span>
               </div>
               <div className="flex items-center gap-3">
                 {/* Branch Selector */}
                 <BranchSelector isMobile={false} />
                 
-                <span className="mr-2">FollowUs:</span>
+                {/* Language Switcher */}
+                <LanguageSwitcher isMobile={false} />
+                
+                
+                <span className="mr-2">{t(lang, "follow_us")}</span>
                 {SOCIAL_LINKS.map((social) => {
                   const IconComponent = {
                     Facebook,
@@ -205,17 +215,20 @@ const FreshHeatHeader = () => {
             {/* Navigation */}
             <nav className="w-full flex justify-between items-center md:w-auto py-5 px-10 bg-bgimg text-white">
               <ul className="flex justify-around items-center font-medium w-full">
-                {NAV_LINKS.map((link) => (
-                  <li key={link.href} className="transition-all duration-300 hover:translate-x-1">
-                    <Link
-                      href={link.href}
-                      onMouseEnter={() => prefetchRoute(link.href)}
-                      className="hover:text-theme3 transition-colors duration-300 cursor-pointer"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
+                {NAV_LINKS.map((link) => {
+                  const labelKey = link.label.toLowerCase().replace(/\s+/g, '_');
+                  return (
+                    <li key={link.href} className="transition-all duration-300 hover:translate-x-1">
+                      <Link
+                        href={link.href}
+                        onMouseEnter={() => prefetchRoute(link.href)}
+                        className="hover:text-theme3 transition-colors duration-300 cursor-pointer"
+                      >
+                        {t(lang, labelKey)}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
 
               {/* Cart and User */}
@@ -338,18 +351,22 @@ const FreshHeatHeader = () => {
           {/* Navigation - Desktop only */}
           <nav className="hidden lg:flex flex-1 justify-center">
             <ul className="flex items-center gap-8 xl:gap-12 font-medium text-white">
-              {NAV_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    onMouseEnter={() => prefetchRoute(link.href)}
-                    className="text-sm xl:text-base hover:text-theme3 transition-colors duration-300 cursor-pointer relative group"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {NAV_LINKS.map((link) => {
+                const labelKey = link.label.toLowerCase().replace(' ', '_');
+                return (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      onMouseEnter={() => prefetchRoute(link.href)}
+                      className="text-sm xl:text-base hover:text-theme3 transition-colors duration-300 cursor-pointer relative group"
+                    >
+                      {t(lang, labelKey)}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
+           
           </nav>
 
           {/* Icons */}
@@ -357,6 +374,11 @@ const FreshHeatHeader = () => {
             {/* Branch Selector - Desktop only (hidden on mobile/tablet, shown in sidebar) */}
             <div className="hidden lg:block">
               <BranchSelector isMobile={true} />
+            </div>
+            
+            {/* Language Switcher - Desktop only (hidden on mobile/tablet, shown in sidebar) */}
+            <div className="hidden lg:block">
+              <LanguageSwitcher isMobile={true} />
             </div>
             
             {/* User Icon with Dropdown */}

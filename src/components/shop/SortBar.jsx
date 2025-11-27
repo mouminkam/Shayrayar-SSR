@@ -3,12 +3,15 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Grid, List } from "lucide-react";
 import { ITEMS_PER_PAGE } from "../../data/constants";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage = ITEMS_PER_PAGE, onViewChange, viewMode = "grid" }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentSort = searchParams.get("sort") || "menu_order";
   const [sortBy, setSortBy] = useState(currentSort);
+  const { lang } = useLanguage();
 
   // Update sortBy when URL changes
   useEffect(() => {
@@ -40,7 +43,7 @@ export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage 
         {/* Results Count */}
         <div className="shrink-0">
           <p className="text-white text-sm sm:text-base ">
-            Showing <span className="font-semibold">{startItem}</span> - <span className="font-semibold">{endItem}</span> of <span className="font-semibold">{totalItems}</span> Results
+            {t(lang, "showing")} <span className="font-semibold">{startItem}</span> - <span className="font-semibold">{endItem}</span> {t(lang, "of")} <span className="font-semibold">{totalItems}</span> {t(lang, "results")}
           </p>
         </div>
 
