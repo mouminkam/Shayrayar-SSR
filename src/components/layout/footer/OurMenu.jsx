@@ -6,6 +6,8 @@ import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
 import { transformCategories } from "../../../lib/utils/productTransform";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 // Helper: Extract categories from API response
 const extractCategories = (response) => {
@@ -20,6 +22,7 @@ const extractCategories = (response) => {
 export default function OurMenu() {
   const { prefetchRoute } = usePrefetchRoute();
   const { selectedBranch, initialize } = useBranchStore();
+  const { lang } = useLanguage();
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -59,7 +62,7 @@ export default function OurMenu() {
     <div className="mt-6 sm:mt-8 md:mt-0 lg:pl-6 xl:pl-12">
       <div className="mb-6 sm:mb-8">
         <h3 className="text-white text-xl sm:text-2xl font-bold inline-block relative pb-4 sm:pb-5">
-          Our Menu
+          {t(lang, "our_menu")}
           {/* Orange Line */}
           <span className="absolute bottom-0 left-0 w-6 h-0.5 bg-theme3"></span>
           {/* White Line */}
@@ -68,7 +71,7 @@ export default function OurMenu() {
       </div>
       <ul className="space-y-3 sm:space-y-4 md:space-y-5">
         {isLoading ? (
-          <li className="text-white/70 text-sm">Loading categories...</li>
+          <li className="text-white/70 text-sm">{t(lang, "loading_categories")}</li>
         ) : categories.length > 0 ? (
           categories.map((category) => {
             const href = `/shop?category=${category.id}`;
@@ -86,7 +89,7 @@ export default function OurMenu() {
             );
           })
         ) : (
-          <li className="text-white/70 text-sm">No categories available</li>
+          <li className="text-white/70 text-sm">{t(lang, "no_categories_available")}</li>
         )}
       </ul>
     </div>

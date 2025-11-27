@@ -3,9 +3,12 @@ import { useState, useEffect } from "react";
 import { MapPin, Mail, Phone } from "lucide-react";
 import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function TopBar() {
   const { selectedBranch, initialize } = useBranchStore();
+  const { lang } = useLanguage();
   const [contactInfo, setContactInfo] = useState({
     address: "4648 Rocky Road Philadelphia",
     email: "info@exmple.com",
@@ -63,7 +66,7 @@ export default function TopBar() {
           </div>
           <div className="min-w-0 flex-1">
             <h6 className="text-white text-xs sm:text-sm font-medium mb-1 sm:mb-2 capitalize">
-              address
+              {t(lang, "address")}
             </h6>
             <p className="text-white text-base sm:text-lg md:text-xl font-medium break-words">
               {contactInfo.address}
@@ -78,7 +81,7 @@ export default function TopBar() {
           </div>
           <div className="min-w-0 flex-1">
             <h6 className="text-white text-xs sm:text-sm font-medium mb-1 sm:mb-2 capitalize">
-              send email
+              {t(lang, "send_email")}
             </h6>
             <p className="text-white text-base sm:text-lg md:text-xl font-medium break-all">
               {contactInfo.email}
@@ -93,7 +96,7 @@ export default function TopBar() {
           </div>
           <div className="min-w-0 flex-1">
             <h6 className="text-white text-xs sm:text-sm font-medium mb-1 sm:mb-2 capitalize">
-              call emergency
+              {t(lang, "call_emergency")}
             </h6>
             <p className="text-white text-base sm:text-lg md:text-xl font-medium">
               +88 0123 654 99

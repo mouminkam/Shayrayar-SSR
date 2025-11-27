@@ -3,9 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { Facebook, Twitter, Youtube, Linkedin } from "lucide-react";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function CompanyInfo() {
   const { prefetchRoute } = usePrefetchRoute();
+  const { lang } = useLanguage();
   
   return (
     <div className="mt-6 sm:mt-8 md:mt-0 sm:col-span-2 lg:col-span-1">
@@ -29,8 +32,7 @@ export default function CompanyInfo() {
 
       {/* Description */}
       <p className="text-white/85 text-sm leading-relaxed mb-6 sm:mb-8 lg:mb-10 max-w-md">
-        Phasellus ultricies aliquam volutpat ullamcorper laoreet neque, a
-        lacinia curabitur lacinia mollis
+        {t(lang, "company_description")}
       </p>
 
       {/* Social Media Icons */}

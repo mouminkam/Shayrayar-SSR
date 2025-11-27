@@ -29,7 +29,7 @@ function FreshHeatFooter() {
       </div>
 
       {/* Bottom Red Bar */}
-      <BottomBar />
+      {/* <BottomBar /> */}
 
       {/* Scroll to Top Button */}
       <ScrollToTop />

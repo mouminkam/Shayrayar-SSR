@@ -5,6 +5,8 @@ import { MapPin, ChevronDown } from "lucide-react";
 import useBranchStore from "../../../store/branchStore";
 import useCartStore from "../../../store/cartStore";
 import useToastStore from "../../../store/toastStore";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 const BranchSelector = ({ isMobile = false }) => {
   const router = useRouter();
@@ -19,6 +21,7 @@ const BranchSelector = ({ isMobile = false }) => {
   } = useBranchStore();
   const { clearCart } = useCartStore();
   const { success: toastSuccess } = useToastStore();
+  const { lang } = useLanguage();
   
   const [isOpen, setIsOpen] = useState(false);
 
@@ -55,7 +58,8 @@ const BranchSelector = ({ isMobile = false }) => {
     clearCart();
 
     // Show notification
-    toastSuccess(`Branch changed to ${branch.name || branch.title || 'Selected Branch'}. Cart cleared.`);
+    const branchName = branch.name || branch.title || t(lang, "select_branch");
+    toastSuccess(t(lang, "branch_changed_cart_cleared").replace("{name}", branchName));
 
     // Reload current page data
     // Exclude auth pages from reload
@@ -65,7 +69,7 @@ const BranchSelector = ({ isMobile = false }) => {
     }
   };
 
-  const branchName = selectedBranch?.name || selectedBranch?.title || "Select Branch";
+  const branchName = selectedBranch?.name || selectedBranch?.title || t(lang, "select_branch");
   const displayName = branchName.length > 20 ? `${branchName.substring(0, 20)}...` : branchName;
 
   if (isMobile) {
@@ -89,9 +93,9 @@ const BranchSelector = ({ isMobile = false }) => {
             />
             <div className="absolute top-full left-0 right-0 mt-2 w-full sm:w-64 bg-bgimg border border-white/20 rounded-xl shadow-2xl z-[10001] max-h-64 overflow-y-auto">
               {isLoading ? (
-                <div className="p-4 text-center text-text text-sm">Loading branches...</div>
+                <div className="p-4 text-center text-text text-sm">{t(lang, "loading_branches")}</div>
               ) : branches.length === 0 ? (
-                <div className="p-4 text-center text-text text-sm">No branches available</div>
+                <div className="p-4 text-center text-text text-sm">{t(lang, "no_branches_available")}</div>
               ) : (
                 <ul className="py-2">
                   {branches.map((branch) => {
@@ -142,9 +146,9 @@ const BranchSelector = ({ isMobile = false }) => {
           />
           <div className="absolute top-full right-0 mt-2 w-64 bg-bgimg border border-white/20 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto">
             {isLoading ? (
-              <div className="p-4 text-center text-text text-sm">Loading branches...</div>
+              <div className="p-4 text-center text-text text-sm">{t(lang, "loading_branches")}</div>
             ) : branches.length === 0 ? (
-              <div className="p-4 text-center text-text text-sm">No branches available</div>
+              <div className="p-4 text-center text-text text-sm">{t(lang, "no_branches_available")}</div>
             ) : (
               <ul className="py-2">
                 {branches.map((branch) => {

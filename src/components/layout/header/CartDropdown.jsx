@@ -8,6 +8,8 @@ import { useCart } from "../../../hooks/useCart";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { IMAGE_PATHS } from "../../../data/constants";
 import { getCartItemKey } from "../../../store/cartStore";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function CartDropdown({
   cartOpen,
@@ -15,6 +17,7 @@ export default function CartDropdown({
 }) {
   const cartTimeoutRef = useRef(null);
   const { items: cartItems, subtotal, removeFromCart } = useCart();
+  const { lang } = useLanguage();
 
   const handleMouseEnter = () => {
     if (cartTimeoutRef.current) {
@@ -122,7 +125,7 @@ export default function CartDropdown({
               className="flex justify-between items-center mb-4"
             >
               <h3 className="text-base md:text-lg font-medium text-gray-900">
-                Shopping Cart
+                {t(lang, "shopping_cart")}
               </h3>
               <motion.button
                 onClick={() => setCartOpen(false)}
@@ -144,7 +147,7 @@ export default function CartDropdown({
                   variants={itemVariants}
                   className="text-center py-8 text-gray-500"
                 >
-                  <p>Your cart is empty</p>
+                  <p>{t(lang, "cart_empty")}</p>
                 </motion.div>
               ) : (
                 cartItems.map((item, index) => {
@@ -184,7 +187,7 @@ export default function CartDropdown({
                             <p className="text-xs text-gray-500 truncate">
                               {item.size_name && `${item.size_name}`}
                               {item.size_name && item.ingredients_data?.length > 0 && " • "}
-                              {item.ingredients_data?.length > 0 && `${item.ingredients_data.length} add-on(s)`}
+                              {item.ingredients_data?.length > 0 && `${item.ingredients_data.length} ${t(lang, "add_ons")}`}
                             </p>
                           )}
                           <p className="text-sm text-gray-600">
@@ -217,7 +220,7 @@ export default function CartDropdown({
                   variants={itemVariants}
                   className="flex justify-between items-center mb-4 pt-2 border-t border-gray-200"
                 >
-                  <span className="text-gray-600 font-medium">Total:</span>
+                  <span className="text-gray-600 font-medium">{t(lang, "total")}:</span>
                   <span className="text-lg font-semibold text-theme3">
                     {formatCurrency(subtotal)}
                   </span>
@@ -233,7 +236,7 @@ export default function CartDropdown({
                       className="w-full bg-theme3 hover:bg-theme text-white py-3 px-4 transition-colors duration-300 text-sm font-medium block text-center rounded-md shadow-lg"
                       onClick={() => setCartOpen(false)}
                     >
-                      Checkout
+                      {t(lang, "checkout")}
                     </Link>
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -242,7 +245,7 @@ export default function CartDropdown({
                       className="w-full border border-gray-300 text-gray-700 py-3 px-4 hover:bg-gray-50 transition-colors duration-300 text-sm font-medium block text-center rounded-md"
                       onClick={() => setCartOpen(false)}
                     >
-                      View Cart
+                      {t(lang, "view_cart")}
                     </Link>
                   </motion.div>
                 </motion.div>

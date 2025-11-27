@@ -1,8 +1,11 @@
 "use client";
 import { Search, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function SearchModal({ searchOpen, setSearchOpen }) {
+  const { lang } = useLanguage();
   const overlayVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
@@ -62,13 +65,13 @@ export default function SearchModal({ searchOpen, setSearchOpen }) {
               <div className="flex items-center">
                 <Search className="w-6 h-6 text-theme3 mr-3" />
                 <span className="text-xl font-normal text-gray-900 tracking-wide">
-                  Search
+                  {t(lang, "search")}
                 </span>
               </div>
               <motion.button
                 onClick={() => setSearchOpen(false)}
                 className="text-gray-500 hover:text-theme rounded-full p-1"
-                aria-label="Close search"
+                aria-label={t(lang, "close_search")}
                 whileHover={{ scale: 1.1, rotate: 90 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -80,7 +83,7 @@ export default function SearchModal({ searchOpen, setSearchOpen }) {
             <div className="p-6">
               <motion.input
                 type="text"
-                placeholder="Type to search..."
+                placeholder={t(lang, "type_to_search")}
                 className="w-full px-4 py-4 text-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-theme3 rounded-lg transition-all duration-300 bg-transparent border border-gray-200 focus:border-theme3"
                 autoFocus
                 initial={{ scale: 0.95 }}

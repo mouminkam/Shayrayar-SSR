@@ -188,13 +188,13 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     className="mb-6 lg:hidden"
                   >
                     <h4 className="text-white  text-lg font-semibold mb-3">
-                      Select Branch
+                      {t(lang, "select_branch")}
                     </h4>
                     <div className="relative mb-4">
                       <BranchSelector isMobile={true} />
                     </div>
                     <h4 className="text-white  text-lg font-semibold mb-3">
-                      Select Language
+                      {t(lang, "select_language")}
                     </h4>
                     <div className="relative">
                       <LanguageSwitcher isMobile={true} />
@@ -208,8 +208,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
                     className="text text-white  text-base font-normal leading-relaxed mb-6 hidden lg:block"
                   >
-                    This involves interactions between a business and its customers. It&apos;s about meeting
-                    customers&apos; needs and resolving their problems. Effective customer service is crucial.
+                    {t(lang, "sidebar_description")}
                   </motion.p>
 
                   {/* Gallery Area - Only visible on XL screens */}
@@ -305,7 +304,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     className="offcanvas__contact"
                   >
                     <h4 className="text-white  text-2xl font-bold mb-6">
-                      Contact Info
+                      {t(lang, "contact_info")}
                     </h4>
                     <ul className="space-y-4 mb-12">
                       {/* Location */}

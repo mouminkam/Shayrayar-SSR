@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { User, LogOut, Package } from "lucide-react";
 import useAuthStore from "../../../store/authStore";
 import useToastStore from "../../../store/toastStore";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function UserDropdown({
   userOpen,
@@ -15,6 +17,7 @@ export default function UserDropdown({
   const userTimeoutRef = useRef(null);
   const { user, isAuthenticated, logout } = useAuthStore();
   const { success: toastSuccess } = useToastStore();
+  const { lang } = useLanguage();
 
   const handleMouseEnter = () => {
     if (userTimeoutRef.current) {
@@ -38,7 +41,7 @@ export default function UserDropdown({
     try {
       await logout();
       setUserOpen(false);
-      toastSuccess("Logged out successfully");
+      toastSuccess(t(lang, "logged_out_successfully"));
       router.push("/");
     } catch (error) {
       // Logout will still clear local state even if API call fails
@@ -110,7 +113,7 @@ export default function UserDropdown({
               variants={itemVariants}
               className="text-center py-4 mb-4 border-b border-gray-200"
             >
-              <p className="text-gray-600 text-sm mb-4">Welcome! Please sign in to continue.</p>
+              <p className="text-gray-600 text-sm mb-4">{t(lang, "welcome_sign_in")}</p>
             </motion.div>
 
             <motion.div variants={itemVariants} className="space-y-2">
@@ -124,7 +127,7 @@ export default function UserDropdown({
                   }}
                   className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-3 px-4 transition-all duration-300 text-sm font-semibold block text-center rounded-lg shadow-lg"
                 >
-                  Sign In
+                  {t(lang, "sign_in")}
                 </button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -137,7 +140,7 @@ export default function UserDropdown({
                   }}
                   className="w-full border-2 border-theme text-theme py-2 px-4 hover:bg-theme hover:text-white transition-all duration-300 text-sm font-medium block text-center rounded-lg"
                 >
-                  Create Account
+                  {t(lang, "create_account")}
                 </button>
               </motion.div>
             </motion.div>
@@ -182,7 +185,7 @@ export default function UserDropdown({
                 onClick={() => setUserOpen(false)}
               >
                 <User className="w-5 h-5 text-theme3" />
-                <span className="text-sm font-medium">My Profile</span>
+                <span className="text-sm font-medium">{t(lang, "my_profile")}</span>
               </Link>
             </motion.div>
 
@@ -194,7 +197,7 @@ export default function UserDropdown({
               >
                 <Package className="w-5 h-5 text-theme3" />
                 <span className="text-sm font-medium">
-                  My Orders
+                  {t(lang, "my_orders")}
                   {user?.orders?.length > 0 && (
                     <span className="ml-2 text-xs bg-theme3 text-white px-2 py-0.5 rounded-full">
                       {user.orders.length}
@@ -214,7 +217,7 @@ export default function UserDropdown({
               className="w-full flex items-center gap-3 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 border border-red-200"
             >
               <LogOut className="w-5 h-5" />
-              <span className="text-sm font-medium">Sign Out</span>
+              <span className="text-sm font-medium">{t(lang, "sign_out")}</span>
             </motion.button>
           </motion.div>
         </motion.div>
