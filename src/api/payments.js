@@ -32,7 +32,7 @@ export const confirmStripePayment = async (confirmData) => {
 
 /**
  * Get Stripe configuration (publishable key)
- * @deprecated Use NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY env variable instead
+ * Fetches Stripe publishable key from API endpoint
  * @returns {Promise<Object>} Response with Stripe publishable key and currency
  */
 export const getStripeConfig = async () => {
@@ -115,7 +115,7 @@ const paymentsAPI = {
   createStripePaymentIntent,
   confirmStripePayment,
   // New Stripe Web API functions
-  getStripeConfig, // @deprecated - use NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY env variable instead
+  getStripeConfig,
   createStripePaymentIntentWeb,
   confirmStripePaymentWeb,
   getStripePaymentStatus,

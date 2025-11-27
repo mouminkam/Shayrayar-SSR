@@ -2,11 +2,11 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { motion } from 'framer-motion';
 import { Loader2, X, AlertCircle } from 'lucide-react';
 import api from '../../../../api';
+import getStripe from '../../../../lib/getStripe';
 
 /**
  * Payment Form Component
@@ -290,19 +290,18 @@ function StripePaymentContent() {
       return;
     }
 
-    // Load Stripe publishable key from environment variable only
+    // Load Stripe publishable key from API
     const loadStripeConfig = async () => {
       try {
-        const envKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+        const stripe = await getStripe();
         
-        if (!envKey) {
+        if (!stripe) {
           setError('Payment system not configured');
           const failedUrl = `/checkout/stripe/failed?order_id=${orderId}&error=${encodeURIComponent('Payment system not configured')}`;
           window.location.href = failedUrl;
           return;
         }
 
-        const stripe = await loadStripe(envKey);
         setStripePromise(stripe);
         setIsLoading(false);
       } catch (err) {
