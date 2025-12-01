@@ -137,27 +137,32 @@ const useAuthStore = create(
             console.warn("Failed to clear cart:", error);
           }
 
-          // Clear all localStorage items
+          // Clear all localStorage items except rememberedEmail
           if (typeof window !== "undefined") {
+            // Save rememberedEmail before clearing
+            const rememberedEmail = localStorage.getItem("rememberedEmail");
+            
             // Clear Zustand stores
             localStorage.removeItem("auth-storage");
             localStorage.removeItem("cart-storage");
             localStorage.removeItem("branch-storage");
             
-            // Clear other localStorage items
-            localStorage.removeItem("rememberedEmail");
+            // Clear all other localStorage items (loop through all keys)
+            const keysToKeep = ["rememberedEmail"];
+            const allKeys = Object.keys(localStorage);
+            allKeys.forEach((key) => {
+              if (!keysToKeep.includes(key)) {
+                localStorage.removeItem(key);
+              }
+            });
+            
+            // Restore rememberedEmail if it existed
+            if (rememberedEmail) {
+              localStorage.setItem("rememberedEmail", rememberedEmail);
+            }
             
             // Clear all sessionStorage items
-            sessionStorage.removeItem("resetToken");
-            sessionStorage.removeItem("resetEmail");
-            sessionStorage.removeItem("registrationToken");
-            sessionStorage.removeItem("registrationPhone");
-            sessionStorage.removeItem("registrationPassword");
-            sessionStorage.removeItem("googleOAuthState");
-            sessionStorage.removeItem("googleOAuthRedirectUri");
-            sessionStorage.removeItem("googleUser");
-            sessionStorage.removeItem("googleToken");
-            sessionStorage.removeItem("googleFlow");
+            sessionStorage.clear();
 
             // Clear browser cache (caches API)
             if ("caches" in window) {
