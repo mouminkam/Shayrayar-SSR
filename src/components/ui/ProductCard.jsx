@@ -1,24 +1,17 @@
 "use client";
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShoppingBasket } from "lucide-react";
 import { formatCurrency } from "../../lib/utils/formatters";
-import useCartStore from "../../store/cartStore";
-import useToastStore from "../../store/toastStore";
-import useAuthStore from "../../store/authStore";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 import OptimizedImage from "./OptimizedImage";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../locales/i18n/getTranslation";
 
-export default function ProductCard({ product, viewMode = "grid" }) {
+const ProductCard = memo(function ProductCard({ product, viewMode = "grid" }) {
   const router = useRouter();
   const { prefetchRoute } = usePrefetchRoute();
-  const { addToCart } = useCartStore();
-  const { success: toastSuccess, error: toastError } = useToastStore();
-  const { isAuthenticated } = useAuthStore();
   const { lang } = useLanguage();
   
   const productUrl = `/shop/${product.id}`;
@@ -31,58 +24,8 @@ export default function ProductCard({ product, viewMode = "grid" }) {
   // Handle navigation
   const handleOrderClick = useCallback((e) => {
     e.preventDefault();
-    router.push(productUrl, { scroll: false });
+    router.push(productUrl, { scroll: true });
   }, [router, productUrl]);
-
-  // Handle add to cart
-  const handleAddToCart = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Check authentication first
-    if (!isAuthenticated) {
-      toastError("Please login to add items to cart");
-      router.push("/login", { scroll: false });
-      return;
-    }
-    
-    try {
-      // Calculate default values for sizes and ingredients
-      const defaultSizeId = product?.default_size_id || (product?.sizes?.[0]?.id || null);
-      const defaultSize = product?.sizes?.find(s => s.id === defaultSizeId) || null;
-      
-      // Calculate final price with default size
-      let finalPrice = product.base_price || product.price || 0;
-      if (defaultSize) {
-        finalPrice += parseFloat(defaultSize.price || 0);
-      }
-      
-      // Prepare cart item with default values
-      const cartItem = {
-        id: product.id,
-        name: product.title,
-        price: finalPrice,
-        base_price: product.base_price || product.price,
-        image: product.image,
-        title: product.title,
-        final_price: finalPrice,
-        // Default size (if available)
-        size_id: defaultSizeId,
-        size_name: defaultSize?.name || null,
-        // No ingredients by default
-        ingredients: [],
-        ingredients_data: [],
-      };
-      
-      addToCart(cartItem);
-      
-      // Show success message with customization info if applicable
-      const customizationText = defaultSize?.name ? ` (${defaultSize.name})` : "";
-      toastSuccess(`${product.title}${customizationText} added to cart`);
-    } catch {
-      toastError("Failed to add product to cart");
-    }
-  };
 
   if (viewMode === "list") {
     return (
@@ -129,23 +72,14 @@ export default function ProductCard({ product, viewMode = "grid" }) {
           <h6 className="text-theme  text-lg font-bold">
             {formatCurrency(product.price)}
           </h6>
-          <div className="flex items-center gap-2">
-            <Link
-              href={productUrl}
-              onMouseEnter={handleMouseEnter}
-              onClick={handleOrderClick}
-              className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white  text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300"
-            >
-              {t(lang, "order")}
-            </Link>
-            <button
-              onClick={handleAddToCart}
-              className="w-12 h-12 flex items-center justify-center rounded-full bg-theme3 text-white hover:bg-theme transition-all duration-300"
-              title="Add to Cart"
-            >
-              <ShoppingBasket className="w-5 h-5" />
-            </button>
-          </div>
+          <Link
+            href={productUrl}
+            onMouseEnter={handleMouseEnter}
+            onClick={handleOrderClick}
+            className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white  text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300"
+          >
+            {t(lang, "order")}
+          </Link>
         </div>
         </div>
       </div>
@@ -200,26 +134,21 @@ export default function ProductCard({ product, viewMode = "grid" }) {
           <h6 className="text-theme  text-base sm:text-lg font-bold mb-4">
             {formatCurrency(product.price)}
           </h6>
-          <div className="flex items-center justify-center gap-2">
-            <Link
-              href={productUrl}
-              onMouseEnter={handleMouseEnter}
-              onClick={handleOrderClick}
-              className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white  text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 flex-1"
-            >
-              {t(lang, "order")}
-            </Link>
-            <button
-              onClick={handleAddToCart}
-              className="w-12 h-12 flex items-center justify-center rounded-full bg-theme3 text-white hover:bg-theme transition-all duration-300"
-              title="Add to Cart"
-            >
-              <ShoppingBasket className="w-5 h-5" />
-            </button>
-          </div>
+          <Link
+            href={productUrl}
+            onMouseEnter={handleMouseEnter}
+            onClick={handleOrderClick}
+            className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white  text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 w-full"
+          >
+            {t(lang, "order")}
+          </Link>
         </div>
       </div>
     </div>
   );
-}
+});
+
+ProductCard.displayName = "ProductCard";
+
+export default ProductCard;
 

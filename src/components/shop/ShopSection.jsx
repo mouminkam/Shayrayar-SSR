@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import ShopSidebar from "./ShopSidebar";
 import SortBar from "./SortBar";
@@ -7,147 +7,35 @@ import ProductCardSkeleton from "../ui/ProductCardSkeleton";
 import LazyProductCard from "../ui/LazyProductCard";
 import AnimatedSection from "../ui/AnimatedSection";
 import { ChevronDown } from "lucide-react";
-import api from "../../api";
-import useBranchStore from "../../store/branchStore";
-import { transformMenuItemsToProducts } from "../../lib/utils/productTransform";
-import { extractMenuItemsFromResponse } from "../../lib/utils/responseExtractor";
-import useToastStore from "../../store/toastStore";
+import { useShopProducts } from "../../hooks/useShopProducts";
 import { ITEMS_PER_PAGE_GRID, ITEMS_PER_PAGE_LIST } from "../../data/constants";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../locales/i18n/getTranslation";
 
-
 export default function ShopSection() {
   const searchParams = useSearchParams();
-  const { selectedBranch, initialize } = useBranchStore();
-  const { error: toastError } = useToastStore();
   const { lang } = useLanguage();
-  
-  // Initialize branch if not loaded
-  useEffect(() => {
-    if (!selectedBranch) {
-      initialize();
-    }
-  }, [selectedBranch, initialize]);
-  
-  const categoryId = searchParams.get("category");
-  const searchQuery = searchParams.get("search") || "";
-  const sortBy = searchParams.get("sort") || "menu_order";
-  
   const [viewMode, setViewMode] = useState("grid");
-  const [products, setProducts] = useState([]); // Products to display
-  const [allProducts, setAllProducts] = useState([]); // All products (for client-side pagination)
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [totalItems, setTotalItems] = useState(0);
-  const [useClientPagination, setUseClientPagination] = useState(false); // Flag to determine pagination type
-
+  
   const itemsPerPage = viewMode === "grid" ? ITEMS_PER_PAGE_GRID : ITEMS_PER_PAGE_LIST;
+  
+  // Use custom hook for products management
+  const {
+    products,
+    isLoading,
+    error,
+    totalItems,
+    hasMore,
+    handleViewModeChange: hookHandleViewModeChange,
+    handleShowMore,
+    refetch,
+  } = useShopProducts(viewMode);
 
-  // Handle view mode change
+  // Handle view mode change with hook
   const handleViewModeChange = (newViewMode) => {
     setViewMode(newViewMode);
-    if (useClientPagination) {
-      const newItemsPerPage = newViewMode === "grid" ? ITEMS_PER_PAGE_GRID : ITEMS_PER_PAGE_LIST;
-      setProducts(allProducts.slice(0, newItemsPerPage));
-    }
+    hookHandleViewModeChange(newViewMode);
   };
-
-  // Handle show more button (only for client-side pagination)
-  const handleShowMore = () => {
-    const currentCount = products.length;
-    const nextCount = currentCount + itemsPerPage;
-    setProducts(allProducts.slice(0, nextCount));
-  };
-
-  // Hybrid Pagination: Try server-side first, fallback to client-side
-  const fetchProducts = useCallback(async () => {
-    if (!selectedBranch) {
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // Step 1: Try server-side pagination with requested limit
-      const params = {
-        page: 1,
-        limit: itemsPerPage,
-      };
-
-      // Add filters
-      if (categoryId) {
-        params.category_id = categoryId;
-      }
-      if (searchQuery) {
-        params.search = searchQuery;
-      }
-      if (sortBy && sortBy !== "menu_order") {
-        params.sort_by = sortBy;
-      }
-
-      const response = await api.menu.getMenuItems(params);
-      const { menuItems, totalCount } = extractMenuItemsFromResponse(response);
-      const apiPerPage = response?.data?.items?.per_page;
-
-      // Check if API respects the limit parameter
-      const apiRespectsLimit = apiPerPage && apiPerPage === itemsPerPage;
-
-      if (Array.isArray(menuItems) && menuItems.length > 0) {
-        const transformedProducts = transformMenuItemsToProducts(menuItems);
-
-        if (apiRespectsLimit) {
-          // ✅ Server-side pagination works!
-          setUseClientPagination(false);
-          setProducts(transformedProducts);
-          setAllProducts([]); // Not needed for server-side
-          setTotalItems(totalCount || transformedProducts.length);
-        } else {
-          // ❌ API doesn't respect limit - use client-side pagination
-          setUseClientPagination(true);
-          
-          // Fetch all products for client-side pagination
-          const allParams = { ...params, limit: 1000 };
-          const allResponse = await api.menu.getMenuItems(allParams);
-          const { menuItems: allMenuItems } = extractMenuItemsFromResponse(allResponse);
-          const allTransformed = transformMenuItemsToProducts(allMenuItems);
-          
-          setAllProducts(allTransformed);
-          setProducts(allTransformed.slice(0, itemsPerPage));
-          setTotalItems(allTransformed.length);
-        }
-        setError(null);
-      } else if (totalCount > 0) {
-        setError("No products found");
-        setProducts([]);
-        setAllProducts([]);
-        setTotalItems(totalCount);
-      } else {
-        const errorMsg = response?.message || response?.error || "No products found";
-        setError(errorMsg);
-        setProducts([]);
-        setAllProducts([]);
-        setTotalItems(0);
-      }
-    } catch (err) {
-      const errorMessage = err.message || "An error occurred while loading products";
-      setError(errorMessage);
-      toastError(errorMessage);
-      setProducts([]);
-      setAllProducts([]);
-      setTotalItems(0);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [selectedBranch, itemsPerPage, categoryId, searchQuery, sortBy, toastError]);
-
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
-  const hasMore = useClientPagination && products.length < allProducts.length;
 
   return (
     <AnimatedSection mobileOptimized={true}>
@@ -187,7 +75,7 @@ export default function ShopSection() {
                   <div className="flex flex-col items-center justify-center py-20">
                     <p className="text-text text-lg mb-4">{error}</p>
                     <button
-                      onClick={fetchProducts}
+                      onClick={refetch}
                       className="px-6 py-2 bg-theme3 text-white rounded-lg hover:bg-theme transition-colors"
                     >
                       {t(lang, "try_again")}
@@ -196,7 +84,7 @@ export default function ShopSection() {
                 ) : products.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
                     <p className="text-text text-lg">{t(lang, "no_products_found")}</p>
-                    {searchQuery && (
+                    {searchParams.get("search") && (
                       <p className="text-text text-sm mt-2">{t(lang, "try_adjusting_search_filters")}</p>
                     )}
                   </div>

@@ -2,6 +2,9 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { ArrowRight, Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { contactSchema } from "../../lib/validations/contactSchemas";
 import { branchesAPI } from "../../api";
 import useToastStore from "../../store/toastStore";
 import useBranchStore from "../../store/branchStore";
@@ -13,15 +16,25 @@ export default function ContactForm() {
   const { selectedBranch, initialize } = useBranchStore();
   const { lang } = useLanguage();
   const [branchEmail, setBranchEmail] = useState("info@example.com");
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    subject: "subject",
-    message: "",
-    agree: false,
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(contactSchema),
+    mode: "onChange",
+    defaultValues: {
+      fullName: "",
+      email: "",
+      phone: "",
+      subject: "subject",
+      message: "",
+      agree: false,
+    },
+  });
 
   // Initialize branch if not loaded
   useEffect(() => {
@@ -52,33 +65,7 @@ export default function ContactForm() {
     fetchBranchEmail();
   }, [selectedBranch]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Validation
-    if (!formData.fullName || !formData.email || !formData.phone || !formData.message) {
-      toastError(t(lang, "please_fill_all_required_fields"));
-      return;
-    }
-
-    if (!formData.agree) {
-      toastError(t(lang, "please_agree_to_terms"));
-      return;
-    }
-
-    if (formData.subject === "subject") {
-      toastError(t(lang, "please_select_subject"));
-      return;
-    }
-
+  const onSubmit = async (data) => {
     setIsSubmitting(true);
 
     try {
@@ -90,20 +77,20 @@ export default function ContactForm() {
         price: t(lang, "about_price"),
         order: t(lang, "about_order"),
       };
-      const emailSubject = subjectLabels[formData.subject] || formData.subject;
+      const emailSubject = subjectLabels[data.subject] || data.subject;
 
       // Create email body with all form data
       const emailBody = `${t(lang, "email_greeting")}
 
 ${t(lang, "email_contact_reason")} ${emailSubject}
 
-${t(lang, "name_label")} ${formData.fullName}
-${t(lang, "email_label")} ${formData.email}
-${t(lang, "phone_label")} ${formData.phone}
+${t(lang, "name_label")} ${data.fullName}
+${t(lang, "email_label")} ${data.email}
+${t(lang, "phone_label")} ${data.phone}
 ${t(lang, "subject_label")} ${emailSubject}
 
 ${t(lang, "message_label")}
-${formData.message}
+${data.message}
 
 ---
 ${t(lang, "email_footer")}`;
@@ -118,14 +105,7 @@ ${t(lang, "email_footer")}`;
       
       // Reset form after a short delay
       setTimeout(() => {
-        setFormData({
-          fullName: "",
-          email: "",
-          phone: "",
-          subject: "subject",
-          message: "",
-          agree: false,
-        });
+        reset();
         setIsSubmitting(false);
       }, 1000);
     } catch (error) {
@@ -162,54 +142,60 @@ ${t(lang, "email_footer")}`;
                 <h2 className="text-title  text-2xl sm:text-3xl lg:text-4xl font-black mb-6 capitalize">
                   {t(lang, "get_in_touch")}
                 </h2>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-6">
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 sm:gap-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     {/* Full Name - col-md-6 */}
                     <div className="col-md-6">
                       <input
                         type="text"
-                        name="fullName"
+                        {...register("fullName")}
                         placeholder={t(lang, "full_name")}
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
-                        required
+                        className={`w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border ${
+                          errors.fullName ? "border-red-500" : "border-gray-200"
+                        } text-text  text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300`}
                       />
+                      {errors.fullName && (
+                        <p className="mt-1 text-red-500 text-xs">{errors.fullName.message}</p>
+                      )}
                     </div>
 
                     {/* Email - col-md-6 */}
                     <div className="col-md-6">
                       <input
                         type="email"
-                        name="email"
+                        {...register("email")}
                         placeholder={t(lang, "email_address")}
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
-                        required
+                        className={`w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border ${
+                          errors.email ? "border-red-500" : "border-gray-200"
+                        } text-text  text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300`}
                       />
+                      {errors.email && (
+                        <p className="mt-1 text-red-500 text-xs">{errors.email.message}</p>
+                      )}
                     </div>
 
                     {/* Phone - col-md-6 */}
                     <div className="col-md-6">
                       <input
-                        type="number"
-                        name="phone"
+                        type="tel"
+                        {...register("phone")}
                         placeholder={t(lang, "phone_number")}
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300"
-                        required
+                        className={`w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border ${
+                          errors.phone ? "border-red-500" : "border-gray-200"
+                        } text-text  text-sm sm:text-base focus:outline-none focus:border-theme3 transition-colors duration-300`}
                       />
+                      {errors.phone && (
+                        <p className="mt-1 text-red-500 text-xs">{errors.phone.message}</p>
+                      )}
                     </div>
 
                     {/* Subject - col-md-6 */}
                     <div className="col-md-6">
                       <select
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base bg-white focus:outline-none focus:border-theme3 transition-colors duration-300 cursor-pointer"
+                        {...register("subject")}
+                        className={`w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border ${
+                          errors.subject ? "border-red-500" : "border-gray-200"
+                        } text-text  text-sm sm:text-base bg-white focus:outline-none focus:border-theme3 transition-colors duration-300 cursor-pointer`}
                       >
                         <option value="subject">{t(lang, "subject")}</option>
                         <option value="complain">{t(lang, "complain")}</option>
@@ -218,6 +204,9 @@ ${t(lang, "email_footer")}`;
                         <option value="price">{t(lang, "about_price")}</option>
                         <option value="order">{t(lang, "about_order")}</option>
                       </select>
+                      {errors.subject && (
+                        <p className="mt-1 text-red-500 text-xs">{errors.subject.message}</p>
+                      )}
                     </div>
                   </div>
 
@@ -225,26 +214,25 @@ ${t(lang, "email_footer")}`;
                   <div className="col-12">
                     <textarea
                       id="message"
-                      name="message"
+                      {...register("message")}
                       placeholder={t(lang, "write_your_message_here")}
                       rows="5"
-                      value={formData.message}
-                      onChange={handleChange}
-                      className="w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-gray-200 text-text  text-sm sm:text-base resize-y focus:outline-none focus:border-theme3 transition-colors duration-300"
-                      required
+                      className={`w-full px-4 sm:px-5 py-3 sm:py-4 rounded-lg border ${
+                        errors.message ? "border-red-500" : "border-gray-200"
+                      } text-text  text-sm sm:text-base resize-y focus:outline-none focus:border-theme3 transition-colors duration-300`}
                     ></textarea>
+                    {errors.message && (
+                      <p className="mt-1 text-red-500 text-xs">{errors.message.message}</p>
+                    )}
                   </div>
 
                   {/* Checkbox - col-12 form-group */}
                   <div className="col-12 form-group flex items-start gap-3">
                     <input
                       id="reviewcheck"
-                      name="agree"
                       type="checkbox"
-                      checked={formData.agree}
-                      onChange={handleChange}
+                      {...register("agree")}
                       className="mt-1.5 w-5 h-5 rounded border-gray-300 text-theme3 focus:ring-theme3 cursor-pointer"
-                      required
                     />
                     <label
                       htmlFor="reviewcheck"
@@ -254,6 +242,9 @@ ${t(lang, "email_footer")}`;
                       <span className="checkmark"></span>
                     </label>
                   </div>
+                  {errors.agree && (
+                    <p className="text-red-500 text-xs -mt-2">{errors.agree.message}</p>
+                  )}
 
                   {/* Submit Button - col-12 form-group mb-0 */}
                   <div className="col-12 form-group mb-0">

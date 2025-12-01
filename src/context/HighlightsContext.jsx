@@ -3,11 +3,13 @@ import { createContext, useContext, useEffect, useState } from "react";
 import api from "../api";
 import useBranchStore from "../store/branchStore";
 import { transformMenuItemsToProducts } from "../lib/utils/productTransform";
+import { useApiCache } from "../hooks/useApiCache";
 
 export const HighlightsContext = createContext(null);
 
 export function HighlightsProvider({ children }) {
   const { selectedBranch, getSelectedBranchId } = useBranchStore();
+  const { getCachedOrFetch } = useApiCache("HIGHLIGHTS");
   const [popular, setPopular] = useState([]);
   const [latest, setLatest] = useState([]);
   const [chefSpecial, setChefSpecial] = useState([]);
@@ -26,7 +28,11 @@ export function HighlightsProvider({ children }) {
       setError(null);
       
       try {
-        const response = await api.menu.getHighlights();
+        const response = await getCachedOrFetch(
+          "/menu-items/highlights",
+          {},
+          () => api.menu.getHighlights()
+        );
         
         if (!response?.success || !response.data) {
           setPopular([]);
@@ -55,7 +61,7 @@ export function HighlightsProvider({ children }) {
     };
 
     fetchHighlights();
-  }, [selectedBranch, getSelectedBranchId]);
+  }, [selectedBranch, getSelectedBranchId, getCachedOrFetch]);
 
   const value = {
     popular,

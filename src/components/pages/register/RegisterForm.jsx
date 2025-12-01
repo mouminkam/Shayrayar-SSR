@@ -3,6 +3,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Phone, Lock, UserPlus, Eye, EyeOff } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema } from "../../../lib/validations/authSchemas";
 import useAuthStore from "../../../store/authStore";
 import useToastStore from "../../../store/toastStore";
 
@@ -10,86 +13,51 @@ export default function RegisterForm() {
   const router = useRouter();
   const { registerPhone, isLoading } = useAuthStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
-  const [formData, setFormData] = useState({
-    phone: "",
-    password: "",
-    confirmPassword: "",
-  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
-  const [errors, setErrors] = useState({});
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
-  };
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+    mode: "onChange",
+    defaultValues: {
+      phone: "",
+      password: "",
+      confirmPassword: "",
+      agreeToTerms: false,
+    },
+  });
 
-  const validateForm = () => {
-    const newErrors = {};
+  const agreeToTerms = watch("agreeToTerms");
 
-    if (!formData.phone) {
-      newErrors.phone = "Phone number is required";
-    } else if (!/^\+?[1-9]\d{1,14}$/.test(formData.phone.replace(/\s/g, ""))) {
-      newErrors.phone = "Please enter a valid phone number";
-    }
+  const onSubmit = async (data) => {
+    const result = await registerPhone({
+      phone: data.phone,
+      password: data.password,
+      password_confirmation: data.confirmPassword,
+    });
 
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    if (!agreeToTerms) {
-      newErrors.terms = "You must agree to the terms and conditions";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-      const result = await registerPhone({
-      phone: formData.phone,
-        password: formData.password,
-        password_confirmation: formData.confirmPassword,
-      });
-
-      if (result.success) {
+    if (result.success) {
       // Save phone and password in sessionStorage for OTP verification and resend
-        if (typeof window !== "undefined") {
-        sessionStorage.setItem("registrationPhone", formData.phone);
-          sessionStorage.setItem("registrationPassword", formData.password);
-        }
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("registrationPhone", data.phone);
+        sessionStorage.setItem("registrationPassword", data.password);
+      }
 
       toastSuccess("OTP sent to your phone. Please verify your number.");
-        router.push("/enter-otp");
+      router.push("/enter-otp");
     } else {
       // Handle errors
       if (result.errors) {
-        setErrors(result.errors);
+        // Server-side errors will be shown via toast
+        const errorMessages = Object.values(result.errors).flat();
+        if (errorMessages.length > 0) {
+          toastError(errorMessages.join(", "));
+        }
       } else {
         toastError(result.error || "Registration failed. Please try again.");
       }
@@ -98,7 +66,7 @@ export default function RegisterForm() {
 
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {/* Phone */}
       <div>
         <label className="block text-text  text-sm font-medium mb-2">
@@ -107,16 +75,14 @@ export default function RegisterForm() {
         </label>
         <input
           type="tel"
-          name="phone"
-          value={formData.phone}
-          onChange={handleInputChange}
+          {...register("phone")}
           className={`w-full px-4 py-3 bg-white/10 border ${
             errors.phone ? "border-red-500" : "border-white/20"
           } rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300`}
           placeholder="Enter your phone number"
         />
         {errors.phone && (
-          <p className="mt-1 text-red-400 text-sm">{errors.phone}</p>
+          <p className="mt-1 text-red-400 text-sm">{errors.phone.message}</p>
         )}
       </div>
 
@@ -129,9 +95,7 @@ export default function RegisterForm() {
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
+            {...register("password")}
             className={`w-full px-4 py-3 pr-12 bg-white/10 border ${
               errors.password ? "border-red-500" : "border-white/20"
             } rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300`}
@@ -150,7 +114,7 @@ export default function RegisterForm() {
           </button>
         </div>
         {errors.password && (
-          <p className="mt-1 text-red-400 text-sm">{errors.password}</p>
+          <p className="mt-1 text-red-400 text-sm">{errors.password.message}</p>
         )}
       </div>
 
@@ -163,9 +127,7 @@ export default function RegisterForm() {
         <div className="relative">
           <input
             type={showConfirmPassword ? "text" : "password"}
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
+            {...register("confirmPassword")}
             className={`w-full px-4 py-3 pr-12 bg-white/10 border ${
               errors.confirmPassword ? "border-red-500" : "border-white/20"
             } rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300`}
@@ -184,7 +146,7 @@ export default function RegisterForm() {
           </button>
         </div>
         {errors.confirmPassword && (
-          <p className="mt-1 text-red-400 text-sm">{errors.confirmPassword}</p>
+          <p className="mt-1 text-red-400 text-sm">{errors.confirmPassword.message}</p>
         )}
       </div>
 
@@ -192,21 +154,15 @@ export default function RegisterForm() {
       <div className="flex items-start">
         <input
           type="checkbox"
-          checked={agreeToTerms}
-          onChange={(e) => {
-            setAgreeToTerms(e.target.checked);
-            if (errors.terms) {
-              setErrors((prev) => ({ ...prev, terms: "" }));
-            }
-          }}
+          {...register("agreeToTerms")}
           className="w-4 h-4 rounded border-white/20 bg-white/10 text-theme3 focus:ring-theme3 mt-1"
         />
         <span className="ml-2 text-text text-sm">
           I agree to Terms and condition
         </span>
       </div>
-      {errors.terms && (
-        <p className="text-red-400 text-sm -mt-2">{errors.terms}</p>
+      {errors.agreeToTerms && (
+        <p className="text-red-400 text-sm -mt-2">{errors.agreeToTerms.message}</p>
       )}
 
       {/* Submit Button */}

@@ -1,7 +1,10 @@
 "use client";
-import { useState, memo, useEffect } from "react";
+import { useState, memo, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createCheckoutSchema } from "../../../lib/validations/checkoutSchemas";
 import useAuthStore from "../../../store/authStore";
 import useCartStore from "../../../store/cartStore";
 import useToastStore from "../../../store/toastStore";
@@ -32,36 +35,39 @@ const BillingForm = memo(() => {
   const { getSelectedBranchId } = useBranchStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
 
-  const [formData, setFormData] = useState({
-    // Shipping address fields (only for delivery)
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: "",
-    latitude: null,
-    longitude: null,
-    quote_id: null, // Delivery quote ID
-    // Payment and order fields
-    paymentMethod: "cash", // Default to cash
-    scheduled_at: "",
-    notes: "",
-  });
-
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Create schema based on order type
+  const checkoutSchema = useMemo(() => createCheckoutSchema(orderType), [orderType]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(checkoutSchema),
+    mode: "onChange",
+    defaultValues: {
+      address: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "",
+      latitude: null,
+      longitude: null,
+      quote_id: null,
+      paymentMethod: "cash",
+      scheduled_at: "",
+      notes: "",
+    },
+  });
 
+  const formData = watch();
 
-  const validateForm = () => {
-    // Validate user data exists (from authStore)
+  // Validate user data exists (from authStore)
+  const validateUser = () => {
     if (!user) {
       toastError(t(lang, "please_login_place_order"));
       return false;
@@ -78,28 +84,11 @@ const BillingForm = memo(() => {
       toastError(t(lang, "user_phone_missing"));
       return false;
     }
-
-    // Validate address based on order type
-    if (orderType === "delivery") {
-      if (!formData.address || !formData.latitude || !formData.longitude) {
-        toastError(t(lang, "please_select_delivery_location"));
-        return false;
-      }
-    }
-
-    // Validate payment method
-    if (formData.paymentMethod !== "stripe" && formData.paymentMethod !== "cash") {
-      toastError(t(lang, "please_select_valid_payment_method"));
-      return false;
-    }
-
     return true;
   };
 
-  const handlePlaceOrder = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
+  const onSubmit = async (data) => {
+    if (!validateUser()) {
       return;
     }
 
@@ -167,7 +156,7 @@ const BillingForm = memo(() => {
       // Build delivery address string
       const deliveryAddress =
         orderType === "delivery"
-          ? `${formData.address}, ${formData.city}, ${formData.state} ${formData.zipCode}, ${formData.country}`
+          ? `${data.address}, ${data.city}, ${data.state} ${data.zipCode}, ${data.country}`
           : `Pickup from Main Branch - Branch Location`;
 
       // Prepare order data for API (matching API structure)
@@ -185,22 +174,22 @@ const BillingForm = memo(() => {
         customer_name: user.name || "",
         customer_phone: user.phone || "",
         customer_email: user.email || "",
-        payment_method: formData.paymentMethod, // 'cash' or 'stripe'
+        payment_method: data.paymentMethod, // 'cash' or 'stripe'
         delivery_address: deliveryAddress,
-        latitude: formData.latitude || (orderType === "delivery" ? 0.0 : null),
-        longitude: formData.longitude || (orderType === "delivery" ? 0.0 : null),
-        notes: formData.notes || "",
+        latitude: data.latitude || (orderType === "delivery" ? 0.0 : null),
+        longitude: data.longitude || (orderType === "delivery" ? 0.0 : null),
+        notes: data.notes || "",
       };
 
       // Add quote_id if delivery order
-      if (orderType === "delivery" && formData.quote_id) {
-        orderData.quote_id = formData.quote_id;
+      if (orderType === "delivery" && data.quote_id) {
+        orderData.quote_id = data.quote_id;
       }
 
       // Add scheduled_at if provided
-      if (formData.scheduled_at) {
+      if (data.scheduled_at) {
         // Convert datetime-local to API format (YYYY-MM-DD HH:mm:ss)
-        const scheduledDate = new Date(formData.scheduled_at);
+        const scheduledDate = new Date(data.scheduled_at);
         orderData.scheduled_at = scheduledDate.toISOString().slice(0, 19).replace("T", " ");
       }
 
@@ -215,7 +204,7 @@ const BillingForm = memo(() => {
       const orderId = createdOrder.id;
 
       // Step 2: Handle payment based on payment method
-      if (formData.paymentMethod === "stripe") {
+      if (data.paymentMethod === "stripe") {
         // Create payment intent
         const intentResult = await createStripePaymentIntent(orderId, totalAmount);
 
@@ -230,8 +219,8 @@ const BillingForm = memo(() => {
         // Note: publishable_key will be loaded from NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY env variable
         let paymentUrl = `/checkout/stripe/pay?order_id=${orderId}&client_secret=${encodeURIComponent(intentResult.client_secret)}`;
         // Add quote_id to URL if available (for delivery orders)
-        if (orderType === "delivery" && formData.quote_id) {
-          paymentUrl += `&quote_id=${encodeURIComponent(formData.quote_id)}`;
+        if (orderType === "delivery" && data.quote_id) {
+          paymentUrl += `&quote_id=${encodeURIComponent(data.quote_id)}`;
         }
         router.push(paymentUrl);
         // Don't set isProcessing to false - page will change
@@ -264,18 +253,43 @@ const BillingForm = memo(() => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      onSubmit={handlePlaceOrder}
+      onSubmit={handleSubmit(onSubmit)}
       className="checkout-form bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 p-6 lg:p-8"
     >
       <ShippingAddressSection
         formData={formData}
-        handleInputChange={handleInputChange}
-        setFormData={setFormData}
+        handleInputChange={(e) => {
+          const { name, value } = e.target;
+          setValue(name, value);
+        }}
+        setFormData={(updater) => {
+          if (typeof updater === "function") {
+            const newData = updater(formData);
+            Object.keys(newData).forEach((key) => {
+              setValue(key, newData[key]);
+            });
+          } else {
+            Object.keys(updater).forEach((key) => {
+              setValue(key, updater[key]);
+            });
+          }
+        }}
       />
       <CouponSection />
       <PaymentMethodSection
         formData={formData}
-        setFormData={setFormData}
+        setFormData={(updater) => {
+          if (typeof updater === "function") {
+            const newData = updater(formData);
+            Object.keys(newData).forEach((key) => {
+              setValue(key, newData[key]);
+            });
+          } else {
+            Object.keys(updater).forEach((key) => {
+              setValue(key, updater[key]);
+            });
+          }
+        }}
       />
       
       {/* Notes Section */}
@@ -284,16 +298,23 @@ const BillingForm = memo(() => {
           {t(lang, "order_notes_optional")}
         </label>
         <textarea
-          name="notes"
-          value={formData.notes}
-          onChange={handleInputChange}
+          {...register("notes")}
           rows={3}
-          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300 resize-none"
+          className={`w-full px-4 py-3 bg-white/10 border ${
+            errors.notes ? "border-red-500" : "border-white/20"
+          } rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300 resize-none`}
           placeholder={t(lang, "special_instructions_placeholder")}
         />
+        {errors.notes && (
+          <p className="mt-1 text-red-400 text-sm">{errors.notes.message}</p>
+        )}
       </div>
 
-      <PlaceOrderButton isProcessing={isProcessing} onClick={handlePlaceOrder} />
+      {errors.address && orderType === "delivery" && (
+        <p className="mb-4 text-red-400 text-sm">{errors.address.message}</p>
+      )}
+
+      <PlaceOrderButton isProcessing={isProcessing} onClick={handleSubmit(onSubmit)} />
     </motion.form>
   );
 });

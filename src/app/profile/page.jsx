@@ -6,6 +6,7 @@ import ErrorBoundary from "../../components/ui/ErrorBoundary";
 import SectionSkeleton from "../../components/ui/SectionSkeleton";
 import Breadcrumb from "../../components/ui/Breadcrumb";
 import Protected from "../../components/auth/Protected";
+import PageSEO from "../../components/seo/PageSEO";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../locales/i18n/getTranslation";
 
@@ -23,6 +24,12 @@ export default function ProfilePage() {
   
   return (
     <Protected>
+      <PageSEO
+        title="My Profile - Account Settings"
+        description="Manage your account settings, view order history, and update your information at Shahrayar Restaurant."
+        url="/profile"
+        keywords={["profile", "account", "orders", "settings"]}
+      />
       <div className="bg-bg3 min-h-screen">
         <AnimatedSection>
           <Breadcrumb title={t(lang, "my_profile")} />

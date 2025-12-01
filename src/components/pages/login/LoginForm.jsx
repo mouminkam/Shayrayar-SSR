@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, Lock, LogIn, Eye, EyeOff } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema } from "../../../lib/validations/authSchemas";
 import useAuthStore from "../../../store/authStore";
 import useToastStore from "../../../store/toastStore";
 
@@ -10,73 +13,38 @@ export default function LoginForm() {
   const router = useRouter();
   const { login, isLoading } = useAuthStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [errors, setErrors] = useState({});
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    mode: "onChange",
+  });
 
   // Load saved email from localStorage if Remember Me was checked
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedEmail = localStorage.getItem("rememberedEmail");
       if (savedEmail) {
-        setFormData((prev) => ({ ...prev, email: savedEmail }));
+        setValue("email", savedEmail);
         setRememberMe(true);
       }
     }
-  }, []);
+  }, [setValue]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!validateForm()) {
-      return false;
-    }
-
+  const onSubmit = async (data) => {
     try {
-      const result = await login(formData.email, formData.password);
+      const result = await login(data.email, data.password);
 
       if (result.success) {
         // Save email to localStorage if Remember Me is checked
         if (rememberMe) {
-          localStorage.setItem("rememberedEmail", formData.email);
+          localStorage.setItem("rememberedEmail", data.email);
         } else {
           localStorage.removeItem("rememberedEmail");
         }
@@ -88,7 +56,6 @@ export default function LoginForm() {
       } else {
         // Handle errors - show toast immediately
         if (result.errors) {
-          setErrors(result.errors);
           // Show toast for validation errors
           const errorMessages = Object.values(result.errors).flat();
           if (errorMessages.length > 0) {
@@ -105,14 +72,12 @@ export default function LoginForm() {
       console.error("Login error:", error);
       toastError(error?.message || "An error occurred during login. Please try again.");
     }
-
-    return false;
   };
 
 
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
       {/* Email */}
       <div>
         <label className="block text-text  text-sm font-medium mb-2">
@@ -121,16 +86,14 @@ export default function LoginForm() {
         </label>
         <input
           type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleInputChange}
+          {...register("email")}
           className={`w-full px-4 py-3 bg-white/10 border ${
             errors.email ? "border-red-500" : "border-white/20"
           } rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300`}
           placeholder="your@email.com"
         />
         {errors.email && (
-          <p className="mt-1 text-red-400 text-sm">{errors.email}</p>
+          <p className="mt-1 text-red-400 text-sm">{errors.email.message}</p>
         )}
       </div>
 
@@ -143,9 +106,7 @@ export default function LoginForm() {
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
+            {...register("password")}
             className={`w-full px-4 py-3 pr-12 bg-white/10 border ${
               errors.password ? "border-red-500" : "border-white/20"
             } rounded-xl text-white placeholder-text/50 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 transition-all duration-300`}
@@ -164,7 +125,7 @@ export default function LoginForm() {
           </button>
         </div>
         {errors.password && (
-          <p className="mt-1 text-red-400 text-sm">{errors.password}</p>
+          <p className="mt-1 text-red-400 text-sm">{errors.password.message}</p>
         )}
       </div>
 

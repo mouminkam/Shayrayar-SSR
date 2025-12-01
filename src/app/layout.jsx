@@ -17,8 +17,52 @@ const oswald = Oswald({
 
 
 export const metadata = {
-  title: "shahrayar",
-  description: "shahrayar website",
+  title: {
+    default: "Shahrayar Restaurant - Authentic Middle Eastern Cuisine",
+    template: "%s | Shahrayar Restaurant",
+  },
+  description: "Experience authentic Middle Eastern flavors at Shahrayar Restaurant. Fresh ingredients, traditional recipes, and genuine hospitality. Order online for delivery or pickup.",
+  keywords: ["Middle Eastern food", "restaurant", "delivery", "pickup", "authentic cuisine", "Shahrayar"],
+  authors: [{ name: "Shahrayar Restaurant" }],
+  creator: "Shahrayar Restaurant",
+  publisher: "Shahrayar Restaurant",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://shahrayar.peaklink.pro"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: "Shahrayar Restaurant",
+    title: "Shahrayar Restaurant - Authentic Middle Eastern Cuisine",
+    description: "Experience authentic Middle Eastern flavors at Shahrayar Restaurant. Fresh ingredients, traditional recipes, and genuine hospitality.",
+    images: [
+      {
+        url: "/img/logo/mainlogo.png",
+        width: 1200,
+        height: 630,
+        alt: "Shahrayar Restaurant",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Shahrayar Restaurant - Authentic Middle Eastern Cuisine",
+    description: "Experience authentic Middle Eastern flavors at Shahrayar Restaurant.",
+    images: ["/img/logo/mainlogo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 

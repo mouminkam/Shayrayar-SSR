@@ -5,6 +5,7 @@ import AnimatedSection from "../../components/ui/AnimatedSection";
 import ErrorBoundary from "../../components/ui/ErrorBoundary";
 import SectionSkeleton from "../../components/ui/SectionSkeleton";
 import Breadcrumb from "../../components/ui/Breadcrumb";
+import PageSEO from "../../components/seo/PageSEO";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../locales/i18n/getTranslation";
 
@@ -22,6 +23,12 @@ export default function ShopPage() {
   
   return (
     <div className="bg-bg3 min-h-screen">
+      <PageSEO
+        title="Shop - Browse Our Menu"
+        description="Browse our delicious menu of authentic Middle Eastern dishes. Order your favorite meals online for delivery or pickup."
+        url="/shop"
+        keywords={["menu", "food", "order online", "delivery", "pickup", "Middle Eastern cuisine"]}
+      />
       <AnimatedSection>
         <Breadcrumb title={t(lang, "shop")} />
       </AnimatedSection>

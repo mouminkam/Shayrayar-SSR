@@ -1,9 +1,10 @@
 "use client";
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { memo } from "react";
 import { motion } from "framer-motion";
 import ProductSizes from "./ProductSizes";
 import ProductIngredients from "./ProductIngredients";
 import { formatCurrency } from "../../lib/utils/formatters";
+import { useProductCustomization } from "../../hooks/useProductCustomization";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../locales/i18n/getTranslation";
 
@@ -14,73 +15,17 @@ import { t } from "../../locales/i18n/getTranslation";
  * @param {Object} product - Product object with sizes and ingredients
  * @param {Function} props.onCustomizationChange - Callback when customization changes
  */
-export default function ProductCustomization({ product, onCustomizationChange }) {
+const ProductCustomization = memo(function ProductCustomization({ product, onCustomizationChange }) {
   const { lang } = useLanguage();
-  const [selectedSizeId, setSelectedSizeId] = useState(product?.default_size_id || null);
-  const [selectedIngredientIds, setSelectedIngredientIds] = useState([]);
   
-  // Use ref to store the latest callback to avoid including it in useEffect dependencies
-  const onCustomizationChangeRef = useRef(onCustomizationChange);
-  
-  // Update ref when callback changes
-  useEffect(() => {
-    onCustomizationChangeRef.current = onCustomizationChange;
-  }, [onCustomizationChange]);
-
-  // Calculate final price
-  // Note: size.price from API is the FULL price for that size, not an addition
-  // So we use size.price directly instead of adding it to base_price
-  const finalPrice = useMemo(() => {
-    let price = 0;
-
-    // If a size is selected, use its price directly (it's the full price for that size)
-    if (selectedSizeId && product?.sizes) {
-      const selectedSize = product.sizes.find((s) => s.id === selectedSizeId);
-      if (selectedSize) {
-        price = parseFloat(selectedSize.price || 0);
-      }
-    } else {
-      // If no size selected, use base_price (fallback for products without sizes)
-      price = product?.base_price || product?.price || 0;
-    }
-
-    // Add ingredients prices (these are additions, not full prices)
-    if (selectedIngredientIds.length > 0 && product?.ingredients) {
-      selectedIngredientIds.forEach((ingredientId) => {
-        const ingredient = product.ingredients.find((ing) => ing.id === ingredientId);
-        if (ingredient) {
-          price += parseFloat(ingredient.price || 0);
-        }
-      });
-    }
-
-    return price;
-  }, [product, selectedSizeId, selectedIngredientIds]);
-
-  const handleSizeChange = useCallback((sizeId) => {
-    setSelectedSizeId(sizeId);
-  }, []);
-
-  const handleIngredientToggle = useCallback((ingredientId) => {
-    setSelectedIngredientIds((prev) =>
-      prev.includes(ingredientId)
-        ? prev.filter((id) => id !== ingredientId)
-        : [...prev, ingredientId]
-    );
-  }, []);
-
-  // Update parent when customization changes
-  // Use ref to access the latest callback without including it in dependencies
-  // This prevents the error of updating parent state during child render
-  useEffect(() => {
-    if (onCustomizationChangeRef.current) {
-      onCustomizationChangeRef.current({
-        sizeId: selectedSizeId,
-        ingredientIds: selectedIngredientIds,
-        finalPrice,
-      });
-    }
-  }, [finalPrice, selectedSizeId, selectedIngredientIds]);
+  // Use custom hook for customization management
+  const {
+    selectedSizeId,
+    selectedIngredientIds,
+    finalPrice,
+    handleSizeChange,
+    handleIngredientToggle,
+  } = useProductCustomization(product, onCustomizationChange);
 
   // Don't render if product has no sizes or ingredients
   if (!product?.has_sizes && !product?.has_ingredients) {
@@ -127,5 +72,9 @@ export default function ProductCustomization({ product, onCustomizationChange })
       )}
     </motion.div>
   );
-}
+});
+
+ProductCustomization.displayName = "ProductCustomization";
+
+export default ProductCustomization;
 

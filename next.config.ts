@@ -23,6 +23,14 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60,
     qualities: [75, 80, 85, 90],
   },
+  // Experimental features for better performance
+  // Note: Turbopack (Next.js 16 default) handles bundle optimization automatically
+  experimental: {
+    optimizePackageImports: ["lucide-react", "framer-motion"],
+  },
+  // Turbopack configuration (empty config to silence the warning)
+  // Turbopack handles bundle splitting and optimization automatically
+  turbopack: {},
 };
 
 export default nextConfig;

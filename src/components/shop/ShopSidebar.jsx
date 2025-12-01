@@ -1,111 +1,30 @@
 "use client";
-import { useState, useCallback, useEffect } from "react";
+import { memo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, ShoppingBasket } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import OptimizedImage from "../ui/OptimizedImage";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
-import api from "../../api";
-import useBranchStore from "../../store/branchStore";
-import { transformCategories, transformMenuItemsToProducts } from "../../lib/utils/productTransform";
-import { extractMenuItemsFromResponse } from "../../lib/utils/responseExtractor";
-import useCartStore from "../../store/cartStore";
-import useToastStore from "../../store/toastStore";
-import useAuthStore from "../../store/authStore";
+import { useShopSidebar } from "../../hooks/useShopSidebar";
 import { formatCurrency } from "../../lib/utils/formatters";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../locales/i18n/getTranslation";
 
-// Helper: Extract categories from API response
-const extractCategories = (response) => {
-  if (!response) return [];
-  if (Array.isArray(response)) return response;
-  if (response?.success && response?.data) {
-    return Array.isArray(response.data) ? response.data : response.data.categories || response.data.data || [];
-  }
-  return response?.data?.categories || response?.categories || response?.data || [];
-};
-
-export default function ShopSidebar() {
+const ShopSidebar = memo(function ShopSidebar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { prefetchRoute } = usePrefetchRoute();
-  const { selectedBranch } = useBranchStore();
-  const { addToCart } = useCartStore();
-  const { success: toastSuccess, error: toastError } = useToastStore();
-  const { isAuthenticated } = useAuthStore();
   const { lang } = useLanguage();
 
   const currentCategory = searchParams.get("category");
-  const [categories, setCategories] = useState([]);
-  const [recentProducts, setRecentProducts] = useState([]);
-  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
-  const [isLoadingRecent, setIsLoadingRecent] = useState(false);
-
-  // Fetch categories
-  useEffect(() => {
-    const fetchCategories = async () => {
-      if (!selectedBranch) {
-        setIsLoadingCategories(false);
-        return;
-      }
-
-      setIsLoadingCategories(true);
-      try {
-        const response = await api.menu.getMenuCategories();
-        const categoriesData = extractCategories(response);
-        setCategories(transformCategories(categoriesData));
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        setCategories([]);
-      } finally {
-        setIsLoadingCategories(false);
-      }
-    };
-
-    fetchCategories();
-  }, [selectedBranch]);
-
-  // Fetch recent products
-  useEffect(() => {
-    const fetchRecentProducts = async () => {
-      if (!selectedBranch) return;
-
-      setIsLoadingRecent(true);
-      try {
-        const response = await api.menu.getMenuItems({ featured: true, limit: 4 });
-        const { menuItems } = extractMenuItemsFromResponse(response);
-        setRecentProducts(Array.isArray(menuItems) && menuItems.length > 0 
-          ? transformMenuItemsToProducts(menuItems) 
-          : []);
-      } catch {
-        setRecentProducts([]);
-      } finally {
-        setIsLoadingRecent(false);
-      }
-    };
-
-    fetchRecentProducts();
-  }, [selectedBranch]);
-
-  // Handlers
-  const handleAddToCart = useCallback((e, product) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (!isAuthenticated) {
-      toastError("Please login to add items to cart");
-      router.push("/login", { scroll: false });
-      return;
-    }
-
-    try {
-      addToCart({ id: product.id, name: product.title, price: product.price, image: product.image, title: product.title });
-      toastSuccess(`${product.title} added to cart`);
-    } catch {
-      toastError("Failed to add product to cart");
-    }
-  }, [addToCart, toastSuccess, toastError, isAuthenticated, router]);
+  
+  // Use custom hook for sidebar data
+  const {
+    categories,
+    recentProducts,
+    isLoadingCategories,
+    isLoadingRecent,
+  } = useShopSidebar();
 
   const handleCategoryClick = useCallback((categoryId) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -210,22 +129,13 @@ export default function ShopSidebar() {
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-center gap-2">
-                        <Link
-                          href={`/shop/${product.id}`}
-                          onMouseEnter={() => prefetchRoute(`/shop/${product.id}`)}
-                          className="flex-1 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white text-xs lg:text-sm font-semibold py-1.5 lg:py-2 px-3 lg:px-4 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-theme3/30 text-center"
-                        >
-                          {t(lang, "order")}
-                        </Link>
-                        <button
-                          onClick={(e) => handleAddToCart(e, product)}
-                          className="w-9 h-9 flex items-center justify-center rounded-full bg-theme3 text-white hover:bg-theme transition-all duration-300"
-                          title="Add to Cart"
-                        >
-                          <ShoppingBasket className="w-4 h-4" />
-                        </button>
-                      </div>
+                      <Link
+                        href={`/shop/${product.id}`}
+                        onMouseEnter={() => prefetchRoute(`/shop/${product.id}`)}
+                        className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white text-xs lg:text-sm font-semibold py-1.5 lg:py-2 px-3 lg:px-4 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-theme3/30 text-center"
+                      >
+                        {t(lang, "order")}
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -243,4 +153,8 @@ export default function ShopSidebar() {
       </div>
     </aside>
   );
-}
+});
+
+ShopSidebar.displayName = "ShopSidebar";
+
+export default ShopSidebar;

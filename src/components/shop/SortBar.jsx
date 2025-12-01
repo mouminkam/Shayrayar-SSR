@@ -1,38 +1,21 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Grid, List } from "lucide-react";
 import { ITEMS_PER_PAGE } from "../../data/constants";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../locales/i18n/getTranslation";
 
+/**
+ * SortBar Component
+ * Displays product count and view mode toggle
+ * @param {Object} props
+ * @param {number} props.totalItems - Total number of items
+ * @param {number} props.currentPage - Current page number
+ * @param {number} props.itemsPerPage - Items per page
+ * @param {Function} props.onViewChange - Callback when view mode changes
+ * @param {string} props.viewMode - Current view mode ("grid" or "list")
+ */
 export default function SortBar({ totalItems = 0, currentPage = 1, itemsPerPage = ITEMS_PER_PAGE, onViewChange, viewMode = "grid" }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentSort = searchParams.get("sort") || "menu_order";
-  const [sortBy, setSortBy] = useState(currentSort);
   const { lang } = useLanguage();
-
-  // Update sortBy when URL changes
-  useEffect(() => {
-    setSortBy(currentSort);
-  }, [currentSort]);
-
-  // Handle sort change
-  const handleSortChange = (e) => {
-    const newSort = e.target.value;
-    setSortBy(newSort);
-    
-    const params = new URLSearchParams(searchParams.toString());
-    if (newSort && newSort !== "menu_order") {
-      params.set("sort", newSort);
-    } else {
-      params.delete("sort");
-    }
-    params.delete("page"); // Reset to first page
-    
-    router.push(`/shop?${params.toString()}`);
-  };
 
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);

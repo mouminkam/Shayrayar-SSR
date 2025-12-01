@@ -7,6 +7,7 @@ import { HighlightsProvider } from "../context/HighlightsContext";
 import AnimatedSection from "../components/ui/AnimatedSection";
 import ErrorBoundary from "../components/ui/ErrorBoundary";
 import SectionSkeleton from "../components/ui/SectionSkeleton";
+import PageSEO from "../components/seo/PageSEO";
 
 // Above the fold - Load immediately (no lazy loading)
 import BannerSection from "../components/home/BannerSection";
@@ -88,6 +89,12 @@ export default function HomePage() {
 
   return (
     <HighlightsProvider>
+      <PageSEO
+        title="Shahrayar Restaurant - Authentic Middle Eastern Cuisine"
+        description="Experience authentic Middle Eastern flavors at Shahrayar Restaurant. Fresh ingredients, traditional recipes, and genuine hospitality. Order online for delivery or pickup."
+        url="/"
+        keywords={["Middle Eastern food", "restaurant", "delivery", "pickup", "authentic cuisine", "Shahrayar"]}
+      />
       <div className="bg-bg3 min-h-screen">
         {/* Banner Section - Above the fold, load immediately */}
         <AnimatedSection>
