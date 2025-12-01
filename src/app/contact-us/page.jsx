@@ -8,27 +8,11 @@ import Breadcrumb from "../../components/ui/Breadcrumb";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../locales/i18n/getTranslation";
 
-// Lazy load contact components
-const ContactBoxes = dynamic(
-  () => import("../../components/contact/ContactBoxes"),
+// Lazy load ContactSection - Heavy component with multiple sub-components
+const ContactSection = dynamic(
+  () => import("../../components/pages/contact-us/ContactSection"),
   {
-    loading: () => <SectionSkeleton variant="grid" cardCount={3} height="h-64" />,
-    ssr: true,
-  }
-);
-
-const ContactForm = dynamic(
-  () => import("../../components/contact/ContactForm"),
-  {
-    loading: () => <SectionSkeleton variant="default" height="h-96" />,
-    ssr: false,
-  }
-);
-
-const Map = dynamic(
-  () => import("../../components/contact/Map"),
-  {
-    loading: () => <SectionSkeleton variant="default" showCards={false} height="h-96" />,
+    loading: () => <SectionSkeleton variant="grid" cardCount={3} height="h-screen" />,
     ssr: false,
   }
 );
@@ -42,24 +26,8 @@ export default function ContactPage() {
         <Breadcrumb title={t(lang, "contact_us")} />
       </AnimatedSection>
       <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="grid" cardCount={3} height="h-64" />}>
-          <AnimatedSection>
-            <ContactBoxes />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary>
-      <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="default" height="h-96" />}>
-          <AnimatedSection>
-            <ContactForm />
-          </AnimatedSection>
-        </Suspense>
-      </ErrorBoundary>
-      <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-96" />}>
-          <AnimatedSection>
-            <Map />
-          </AnimatedSection>
+        <Suspense fallback={<SectionSkeleton variant="grid" cardCount={3} height="h-screen" />}>
+          <ContactSection />
         </Suspense>
       </ErrorBoundary>
     </div>

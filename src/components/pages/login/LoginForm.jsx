@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, Lock, LogIn, Eye, EyeOff } from "lucide-react";
 import useAuthStore from "../../../store/authStore";
@@ -8,7 +8,6 @@ import useToastStore from "../../../store/toastStore";
 
 export default function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { login, isLoading } = useAuthStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
 
@@ -30,20 +29,6 @@ export default function LoginForm() {
       }
     }
   }, []);
-
-  // Handle error from query params (e.g., from redirects)
-  useEffect(() => {
-    const error = searchParams?.get("error");
-    if (error) {
-      toastError(error);
-      // Clear error from URL
-      if (typeof window !== "undefined") {
-        const url = new URL(window.location.href);
-        url.searchParams.delete("error");
-        window.history.replaceState({}, "", url);
-      }
-    }
-  }, [searchParams, toastError]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -98,9 +83,8 @@ export default function LoginForm() {
 
         toastSuccess("Login successful! Welcome back!");
 
-        // Redirect to returnUrl or home
-        const returnUrl = searchParams?.get("returnUrl") || "/";
-        router.push(returnUrl);
+        // Redirect to home
+        router.push("/");
       } else {
         // Handle errors - show toast immediately
         if (result.errors) {

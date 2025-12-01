@@ -96,13 +96,12 @@ export default function OfferCards() {
                     alt={offer.title}
                     width={200}
                     height={200}
-                    className="object-contain w-auto h-auto"
+                    className="object-contain w-auto h-auto sm:w-40 md:w-48 lg:w-42 xl:w-52 2xl:w-55"
                     quality={85}
                     loading="lazy"
-                    sizes="200px"
                   />
                   <div className="absolute inset-0 -top-15 right-0 animate-float-bob-x">
-                    <Image
+                    {/* <Image
                       key={`${offer.shape}-${index}`}
                       src={offer.shape}
                       alt="shape"
@@ -110,7 +109,7 @@ export default function OfferCards() {
                       height={100}
                       className="object-contain w-auto h-auto"
                       unoptimized={true}
-                    />
+                    /> */}
                   </div>
                 </div>
               </div>
