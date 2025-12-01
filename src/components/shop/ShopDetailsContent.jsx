@@ -66,6 +66,7 @@ export default function ShopDetailsContent({ productId }) {
           </div>
         </div>
       </section>
+      </>
     );
   }
 
