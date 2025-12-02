@@ -18,8 +18,7 @@ const nextConfig: NextConfig = {
     ],
     // Image optimization settings - Improved for better performance
     formats: ["image/avif", "image/webp"],
-    // Optimized deviceSizes for mobile-first approach
-    deviceSizes: [320, 375, 414, 640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60,
     // Configure allowed quality values used in Image components

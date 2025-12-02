@@ -135,7 +135,7 @@ function LazyChefCard({ dish, index, prefetchRoute, handleAddToCart }) {
       className="chef-special-card style2 p-6 sm:p-7 mt-38 rounded-2xl bg-gradient-to-br from-bgimg to-bgimg/80 border-2 border-theme3/30 shadow-lg hover:shadow-2xl hover:border-theme3/60 text-center transition-all duration-300 hover:-translate-y-2 relative min-h-[280px] flex flex-col group"
     >
       {/* Special Badge */}
-      <div className="absolute top-4 right-4 z-20 bg-theme3 text-gray-900 px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1">
+      <div className="absolute top-4 right-4 z-20 bg-theme3 text-white px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1">
         <ChefHat className="w-3 h-3" />
         Special
       </div>
