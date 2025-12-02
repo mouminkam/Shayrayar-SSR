@@ -159,7 +159,7 @@ function LazyChefCard({ dish, index, prefetchRoute, handleAddToCart }) {
           width={192}
           height={192}
           className="w-48 h-48 object-cover rounded-full -top-10 relative z-10 group-hover:scale-110 transition-transform duration-300"
-          quality={85}
+          quality={75}
           loading="lazy"
           sizes="192px"
         />
@@ -172,9 +172,9 @@ function LazyChefCard({ dish, index, prefetchRoute, handleAddToCart }) {
             href={`/shop/${dish.id}`}
             onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
           >
-            <h3 className="text-white text-lg sm:text-xl font-bold mb-2 hover:text-theme3 transition-colors duration-300 line-clamp-2">
+            <h2 className="text-white text-lg sm:text-xl font-bold mb-2 hover:text-theme3 transition-colors duration-300 line-clamp-2">
               {dish.title}
-            </h3>
+            </h2>
           </Link>
           <p className="text-text text-sm sm:text-base mb-4 line-clamp-2">
             {dish.description || t(lang, "chef_special_recommendation")}

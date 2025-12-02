@@ -89,7 +89,7 @@ export default function AboutUsSection() {
                   </div>
                   <div className="btn-wrapper flex justify-center">
                     <Link
-                      className="theme-btn px-8 py-3 bg-theme3 text-white  text-base font-medium hover:bg-theme transition-all duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
+                      className="theme-btn px-8 py-3 bg-theme3 text-gray-900 text-base font-medium hover:bg-theme hover:text-white transition-all duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
                       href="/shop"
                     >
                       {t(lang, "order_now")}

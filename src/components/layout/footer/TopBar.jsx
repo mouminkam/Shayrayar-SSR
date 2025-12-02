@@ -65,10 +65,10 @@ export default function TopBar() {
             <MapPin className="w-5 h-5 text-theme3" />
           </div>
           <div className="min-w-0 flex-1">
-            <h6 className="text-white text-xs sm:text-sm font-medium mb-1 sm:mb-2 capitalize">
+            <p className="text-gray-900 text-xs sm:text-sm font-medium mb-1 sm:mb-2 capitalize">
               {t(lang, "address")}
-            </h6>
-            <p className="text-white text-base sm:text-lg md:text-xl font-medium break-words">
+            </p>
+            <p className="text-gray-900 text-base sm:text-lg md:text-xl font-medium break-words">
               {contactInfo.address}
             </p>
           </div>
@@ -80,10 +80,10 @@ export default function TopBar() {
             <Mail className="w-5 h-5 text-theme3" />
           </div>
           <div className="min-w-0 flex-1">
-            <h6 className="text-white text-xs sm:text-sm font-medium mb-1 sm:mb-2 capitalize">
+            <p className="text-gray-900 text-xs sm:text-sm font-medium mb-1 sm:mb-2 capitalize">
               {t(lang, "send_email")}
-            </h6>
-            <p className="text-white text-base sm:text-lg md:text-xl font-medium break-all">
+            </p>
+            <p className="text-gray-900 text-base sm:text-lg md:text-xl font-medium break-all">
               {contactInfo.email}
             </p>
           </div>
@@ -95,10 +95,10 @@ export default function TopBar() {
             <Phone className="w-5 h-5 text-theme3" />
           </div>
           <div className="min-w-0 flex-1">
-            <h6 className="text-white text-xs sm:text-sm font-medium mb-1 sm:mb-2 capitalize">
+            <p className="text-gray-900 text-xs sm:text-sm font-medium mb-1 sm:mb-2 capitalize">
               {t(lang, "call_emergency")}
-            </h6>
-            <p className="text-white text-base sm:text-lg md:text-xl font-medium">
+            </p>
+            <p className="text-gray-900 text-base sm:text-lg md:text-xl font-medium">
               +88 0123 654 99
             </p>
           </div>

@@ -404,7 +404,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                           setIsOpen(false);
                           router.push("/shop", { scroll: false });
                         }}
-                        className="theme-btn px-6 py-3 bg-theme3 text-white  text-sm font-normal hover:bg-theme transition-colors duration-300 rounded-md flex items-center justify-center gap-2 shadow-lg"
+                        className="theme-btn px-6 py-3 bg-theme3 text-gray-900 text-sm font-normal hover:bg-theme hover:text-white transition-colors duration-300 rounded-md flex items-center justify-center gap-2 shadow-lg"
                       >
                         <ShoppingCart className="w-4 h-4" />
                         <span>{t(lang, "order_now")}</span>

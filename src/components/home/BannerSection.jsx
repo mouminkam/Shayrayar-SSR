@@ -159,7 +159,7 @@ export default function BannerSection() {
                       width={1200}
                       height={1200}
                       className="w-full h-auto object-contain"
-                      quality={85}
+                      quality={75}
                       priority={activeIndex === 0}
                       fetchPriority={activeIndex === 0 ? "high" : "auto"}
                       loading={activeIndex === 0 ? "eager" : "lazy"}
@@ -209,7 +209,7 @@ export default function BannerSection() {
                             whileTap={{ scale: 0.95 }}
                           >
                             <Link
-                              className="theme-btn px-6 py-2.5 sm:px-8 sm:py-3 bg-theme3 text-white  text-sm sm:text-base font-medium hover:bg-theme transition-colors duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
+                              className="theme-btn px-6 py-2.5 sm:px-8 sm:py-3 bg-theme3 text-gray-900 text-sm sm:text-base font-medium hover:bg-theme hover:text-white transition-colors duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
                               href={currentSlide.link}
                               onMouseEnter={() => prefetchRoute(currentSlide.link)}
                             >

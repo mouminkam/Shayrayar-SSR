@@ -76,6 +76,7 @@ export default function RootLayout({ children }) {
         {/* Preconnect to external domains for faster resource loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://shahrayar.peaklink.pro" crossOrigin="anonymous" />
       </head>
 
       <body suppressHydrationWarning className={oswald.className}>

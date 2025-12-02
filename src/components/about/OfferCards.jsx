@@ -81,7 +81,7 @@ export default function OfferCards() {
                 <p className="text-theme3 font-extrabold mb-5">{offer.description}</p>
                 <Link
                   href="/shop"
-                  className={`inline-block px-4 py-3 text-xs sm:text-sm font-normal rounded-md transition-all duration-300 bg-theme3 text-white hover:bg-theme`}
+                  className={`inline-block px-4 py-3 text-xs sm:text-sm font-normal rounded-md transition-all duration-300 bg-theme3 text-gray-900 hover:bg-theme hover:text-white`}
                 >
                   {t(lang, "order_now")} <ArrowRight className="inline-block w-4 h-4 ml-2" />
                 </Link>

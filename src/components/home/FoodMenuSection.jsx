@@ -216,15 +216,15 @@ export default function FoodMenuSection() {
                             width={96}
                             height={96}
                             className="w-24 h-24 object-cover rounded-full"
-                            quality={85}
+                            quality={75}
                             loading="lazy"
                             sizes="96px"
                           />
                         </div>
                         <div className="menu-content flex-1">
-                          <h3 className="text-white  text-lg font-bold mb-2 hover:text-theme transition-colors duration-300">
+                          <h2 className="text-white  text-lg font-bold mb-2 hover:text-theme transition-colors duration-300">
                             {item.title}
-                          </h3>
+                          </h2>
                           <p className="text-text  text-sm line-clamp-2">
                             {item.description || "Delicious food item"}
                           </p>

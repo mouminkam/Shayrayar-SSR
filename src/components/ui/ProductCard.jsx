@@ -40,7 +40,7 @@ const ProductCard = memo(function ProductCard({ product, viewMode = "grid" }) {
             width={192}
             height={192}
             className="w-32 h-32 sm:w-48 sm:h-48 object-cover rounded-full relative z-10"
-            quality={85}
+            quality={75}
             loading="lazy"
             sizes="(max-width: 640px) 128px, 192px"
           />
@@ -61,9 +61,9 @@ const ProductCard = memo(function ProductCard({ product, viewMode = "grid" }) {
             onMouseEnter={handleMouseEnter}
             onClick={handleOrderClick}
           >
-            <h3 className="text-white  text-2xl font-bold mb-3 hover:text-theme transition-colors duration-300">
+            <h2 className="text-white  text-2xl font-bold mb-3 hover:text-theme transition-colors duration-300">
               {product.title}
-            </h3>
+            </h2>
           </Link>
           <div className="text text-text  text-base font-normal leading-relaxed mb-5">
             {product.longDescription || "Neque porro est qui dolorem ipsum quia quaed inventor veritatis et quasi architecto beatae vitae dicta sunt explicabo. Aelltes port lacus quis enim var sed efficitur turpis gilla sed sit amet finibus eros. Lorem Ipsum is simply dummy text of the printing and typesetting industry.When an unknown printer took a galley of type"}
@@ -122,9 +122,9 @@ const ProductCard = memo(function ProductCard({ product, viewMode = "grid" }) {
             onMouseEnter={handleMouseEnter}
             onClick={handleOrderClick}
           >
-            <h3 className="text-white  text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
+            <h2 className="text-white  text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
               {product.title}
-            </h3>
+            </h2>
           </Link>
           <p className="text-text  text-sm sm:text-base mb-4 line-clamp-2">
             {product.description}
