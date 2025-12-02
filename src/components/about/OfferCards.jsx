@@ -72,9 +72,9 @@ export default function OfferCards() {
             >
               {/* Content */}
               <div className="relative z-10 w-1/2">
-                <h6 className="text-theme text-sm font-extrabold uppercase mb-2">
+                <p className="text-theme text-sm font-extrabold uppercase mb-2">
                   {offer.subtitle}
-                </h6>
+                </p>
                 <h3 className="text-white text-2xl sm:text-3xl font-black mb-2">
                   {offer.title}
                 </h3>
@@ -97,8 +97,9 @@ export default function OfferCards() {
                     width={200}
                     height={200}
                     className="object-contain w-auto h-auto sm:w-40 md:w-48 lg:w-42 xl:w-52 2xl:w-55"
-                    quality={85}
+                    quality={75}
                     loading="lazy"
+                    sizes="(max-width: 640px) 160px, (max-width: 1024px) 192px, (max-width: 1280px) 168px, (max-width: 1536px) 208px, 220px"
                   />
                   <div className="absolute inset-0 -top-15 right-0 animate-float-bob-x">
                     {/* <Image

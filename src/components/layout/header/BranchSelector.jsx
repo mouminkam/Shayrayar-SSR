@@ -78,7 +78,7 @@ const BranchSelector = ({ isMobile = false }) => {
         <button
           onClick={() => setIsOpen(!isOpen)}
           disabled={isLoading || branches.length === 0}
-          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 bg-gray-900/80 hover:bg-gray-900 rounded-lg text-white text-sm font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
         >
           <MapPin className="w-4 h-4 sm:w-5 sm:h-5" />
           <span className="flex-1 text-left truncate">{displayName}</span>
@@ -131,7 +131,7 @@ const BranchSelector = ({ isMobile = false }) => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={isLoading || branches.length === 0}
-        className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-900/80 hover:bg-gray-900 rounded-lg text-white text-sm font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <MapPin className="w-4 h-4" />
         <span>{displayName}</span>

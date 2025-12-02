@@ -181,9 +181,9 @@ function LazyChefCard({ dish, index, prefetchRoute, handleAddToCart }) {
           </p>
         </div>
         <div className="mt-auto">
-          <h6 className="text-theme3 text-base sm:text-lg font-bold mb-4">
+          <p className="text-theme3 text-base sm:text-lg font-bold mb-4">
             {formatCurrency(dish.price)}
-          </h6>
+          </p>
           <div className="flex items-center justify-center gap-2">
             <Link
               href={`/shop/${dish.id}`}

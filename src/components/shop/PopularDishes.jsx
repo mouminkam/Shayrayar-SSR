@@ -187,9 +187,9 @@ function LazyPopularCard({ dish, index, prefetchRoute }) {
           </p>
         </div>
         <div className="mt-auto">
-          <h6 className="text-theme  text-base sm:text-lg font-bold mb-4">
+          <p className="text-theme  text-base sm:text-lg font-bold mb-4">
             {formatCurrency(dish.price)}
-          </h6>
+          </p>
           <Link
             href={`/shop/${dish.id}`}
             onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}

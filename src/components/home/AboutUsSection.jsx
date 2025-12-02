@@ -27,8 +27,10 @@ export default function AboutUsSection() {
             alt="shape"
             width={80}
             height={80}
-            unoptimized={true}
+            quality={75}
             className="w-full h-130 object-contain"
+            sizes="80px"
+            loading="lazy"
           />
         </div>
         <div className="shape5 hidden xl:block absolute bottom-25 left-100 z-0">
@@ -47,8 +49,10 @@ export default function AboutUsSection() {
             alt="shape"
             width={100}
             height={100}
-            unoptimized={true}
+            quality={75}
             className="w-full h-130 object-contain"
+            sizes="100px"
+            loading="lazy"
           />
         </div>
 

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade } from "swiper/modules";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,6 +10,7 @@ import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 import { useLanguage } from "../../context/LanguageContext";
 import { t } from "../../locales/i18n/getTranslation";
 
+// Import Swiper CSS - Next.js will handle optimization
 import "swiper/swiper-bundle.css";
 
 export default function BannerSection() {
@@ -158,8 +159,9 @@ export default function BannerSection() {
                       width={1200}
                       height={1200}
                       className="w-full h-auto object-contain"
-                      quality={90}
+                      quality={85}
                       priority={activeIndex === 0}
+                      fetchPriority={activeIndex === 0 ? "high" : "auto"}
                       loading={activeIndex === 0 ? "eager" : "lazy"}
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px"
                     />

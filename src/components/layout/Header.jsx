@@ -174,10 +174,10 @@ const FreshHeatHeader = () => {
           {/* Right Section */}
           <div className="flex-1 flex flex-col">
             {/* Top Bar */}
-            <div className="py-1 pl-26 pr-16 bg-theme3 flex justify-between items-center text-lg text-white">
+            <div className="py-1 pl-26 pr-16 bg-theme3 flex justify-between items-center text-lg">
               <div className="flex items-center">
-                <span className="mr-2">{t(lang, "copyright")}</span>
-                <span>{t(lang, "business_hours")}</span>
+                <span className="mr-2 text-gray-900 font-medium">{t(lang, "copyright")}</span>
+                <span className="text-gray-900 font-medium">{t(lang, "business_hours")}</span>
               </div>
               <div className="flex items-center gap-3">
                 {/* Branch Selector */}
@@ -187,7 +187,7 @@ const FreshHeatHeader = () => {
                 <LanguageSwitcher isMobile={false} />
                 
                 
-                <span className="mr-2">{t(lang, "follow_us")}</span>
+                <span className="mr-2 text-gray-900 font-medium">{t(lang, "follow_us")}</span>
                 {SOCIAL_LINKS.map((social) => {
                   const IconComponent = {
                     Facebook,
@@ -392,7 +392,7 @@ const FreshHeatHeader = () => {
                   href="/profile"
                   onMouseEnter={() => prefetchRoute("/profile")}
                   aria-label={`Go to profile for ${user?.name}`}
-                  className="flex items-center justify-center p-2 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-theme3 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer relative hover:bg-white/10 transition-all duration-300"
+                  className="flex items-center justify-center p-2 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-theme3 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer relative hover:bg-white/15 transition-all duration-300"
                 >
                   <User
                     className="h-5 w-5 sm:h-6 sm:w-6 transition-colors duration-300 text-theme3 hover:text-theme"
@@ -405,7 +405,7 @@ const FreshHeatHeader = () => {
                   <button
                     onClick={(e) => handleUserClick("header2", e)}
                     aria-label="User menu"
-                    className="flex items-center justify-center p-2 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-theme3 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer relative hover:bg-white/10 transition-all duration-300"
+                    className="flex items-center justify-center p-2 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-theme3 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer relative hover:bg-white/15 transition-all duration-300"
                   >
                     <User
                       className="h-5 w-5 sm:h-6 sm:w-6 transition-colors duration-300 text-white hover:text-theme3"
@@ -431,7 +431,7 @@ const FreshHeatHeader = () => {
               <button
                 onClick={() => handleCartClick("header2")}
                 aria-label={`Open cart with ${cartCount} items`}
-                className="flex items-center justify-center p-2 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-theme3 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer relative hover:bg-white/10 transition-all duration-300"
+                    className="flex items-center justify-center p-2 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-theme3 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer relative hover:bg-white/15 transition-all duration-300"
               >
                 <ShoppingCart
                   className="h-5 w-5 sm:h-6 sm:w-6 text-white hover:text-theme3 transition-colors duration-300"
@@ -456,7 +456,7 @@ const FreshHeatHeader = () => {
             <button
               onClick={handleMenuClick}
               aria-label="Open sidebar menu"
-              className="flex items-center justify-center p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-theme2 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer hover:bg-white/10 transition-all duration-300"
+                className="flex items-center justify-center p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-theme2 focus:ring-offset-2 focus:ring-offset-bgimg cursor-pointer hover:bg-white/15 transition-all duration-300"
             >
               <Menu
                 className="h-5 w-5 sm:h-6 sm:w-6 text-white hover:text-theme3 transition-colors duration-300"
