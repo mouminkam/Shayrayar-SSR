@@ -229,7 +229,7 @@ export default function FoodMenuSection() {
                             {item.description || "Delicious food item"}
                           </p>
                         </div>
-                        <p className="text-theme  text-xl font-bold shrink-0">
+                        <p className="text-theme3  text-xl font-bold shrink-0">
                           {formatCurrency(item.price)}
                         </p>
                       </Link>

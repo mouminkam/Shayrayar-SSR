@@ -163,7 +163,8 @@ export default function BannerSection() {
                       priority={activeIndex === 0}
                       fetchPriority={activeIndex === 0 ? "high" : "auto"}
                       loading={activeIndex === 0 ? "eager" : "lazy"}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px"
+                      sizes="(max-width: 640px) 90vw, (max-width: 1024px) 80vw, 1200px"
+                      style={{ aspectRatio: '1/1' }}
                     />
                   </motion.div>
                 </AnimatePresence>

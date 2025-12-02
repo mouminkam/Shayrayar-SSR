@@ -187,7 +187,7 @@ function LazyPopularCard({ dish, index, prefetchRoute }) {
           </p>
         </div>
         <div className="mt-auto">
-          <p className="text-theme  text-base sm:text-lg font-bold mb-4">
+          <p className="text-theme3  text-base sm:text-lg font-bold mb-4">
             {formatCurrency(dish.price)}
           </p>
           <Link
