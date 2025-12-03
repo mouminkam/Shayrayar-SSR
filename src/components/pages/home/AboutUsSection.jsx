@@ -25,11 +25,11 @@ export default function AboutUsSection() {
           <Image
             src="/img/shape/shawerma.png"
             alt="shape"
-            width={80}
-            height={80}
-            quality={75}
+            width={300}
+            height={300}
+            quality={100}
             className="w-full h-130 object-contain"
-            sizes="80px"
+            sizes="300px"
             loading="lazy"
           />
         </div>
@@ -47,11 +47,11 @@ export default function AboutUsSection() {
           <Image
             src="/img/shape/shawerma.png"
             alt="shape"
-            width={100}
-            height={100}
-            quality={75}
+            width={400}
+            height={400}
+            quality={100}
             className="w-full h-130 object-contain"
-            sizes="100px"
+            sizes="400px"
             loading="lazy"
           />
         </div>
