@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import ProductSizes from "../pages/shop/ProductSizes";
 import ProductIngredients from "../pages/shop/ProductIngredients";
+import OptionGroup from "../pages/shop/OptionGroup";
 import { formatCurrency } from "../../lib/utils/formatters";
 import api from "../../api";
 import { transformMenuItemToProduct } from "../../lib/utils/productTransform";
@@ -20,6 +21,13 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
   const [selectedIngredientIds, setSelectedIngredientIds] = useState(
     cartItem?.ingredients || []
   );
+  const [selectedOptions, setSelectedOptions] = useState(() => {
+    // Initialize from cartItem.selected_options or empty object
+    if (cartItem?.selected_options && typeof cartItem.selected_options === 'object') {
+      return cartItem.selected_options;
+    }
+    return {};
+  });
 
   // Fetch product data if not available
   useEffect(() => {
@@ -28,12 +36,16 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
       api.menu
         .getMenuItemById(cartItem.id)
         .then((response) => {
-          // Extract product data from response
+          // Extract product data and option_groups from response
           let productData = null;
+          let optionGroups = [];
+          
           if (response?.success && response?.data) {
             productData = response.data.item || response.data;
+            optionGroups = response.data.option_groups || [];
           } else if (response?.data) {
             productData = response.data.item || response.data;
+            optionGroups = response.data.option_groups || [];
           } else if (typeof response === "object" && !Array.isArray(response)) {
             if (response.id || response.name || response.menu_item_id) {
               productData = response;
@@ -41,11 +53,22 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
           }
 
           if (productData) {
-            const transformed = transformMenuItemToProduct(productData);
+            const transformed = transformMenuItemToProduct(productData, optionGroups);
             setProduct(transformed);
             // Initialize selections from cart item
-            setSelectedSizeId(cartItem.size_id || transformed.default_size_id || null);
+            setSelectedSizeId(cartItem.size_id || null); // No default
             setSelectedIngredientIds(cartItem.ingredients || []);
+            // Initialize option groups from cart item
+            if (cartItem?.selected_options && typeof cartItem.selected_options === 'object') {
+              setSelectedOptions(cartItem.selected_options);
+            } else if (transformed.option_groups) {
+              // Initialize empty selections for each group
+              const initialState = {};
+              transformed.option_groups.forEach(group => {
+                initialState[group.id] = [];
+              });
+              setSelectedOptions(initialState);
+            }
           }
         })
         .catch((error) => {
@@ -63,30 +86,33 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
       setProduct(null);
       setSelectedSizeId(cartItem?.size_id || null);
       setSelectedIngredientIds(cartItem?.ingredients || []);
+      if (cartItem?.selected_options && typeof cartItem.selected_options === 'object') {
+        setSelectedOptions(cartItem.selected_options);
+      } else {
+        setSelectedOptions({});
+      }
     }
   }, [isOpen, cartItem]);
 
   // Calculate final price
-  // Note: size.price from API is the FULL price for that size, not an addition
-  // So we use size.price directly instead of adding it to base_price
   const finalPrice = useMemo(() => {
     if (!product) return cartItem?.final_price || cartItem?.price || 0;
 
     let price = 0;
 
-    // If a size is selected, use its price directly (it's the full price for that size)
-    if (selectedSizeId && product.sizes) {
+    // Legacy: If a size is selected, use its price directly
+    if (selectedSizeId && product.sizes && !product.has_option_groups) {
       const selectedSize = product.sizes.find((s) => s.id === selectedSizeId);
       if (selectedSize) {
         price = parseFloat(selectedSize.price || 0);
       }
     } else {
-      // If no size selected, use base_price (fallback for products without sizes)
+      // If no size selected or using option groups, use base_price
       price = product.base_price || product.price || 0;
     }
 
-    // Add ingredients prices (these are additions, not full prices)
-    if (selectedIngredientIds.length > 0 && product.ingredients) {
+    // Legacy: Add ingredients prices
+    if (selectedIngredientIds.length > 0 && product.ingredients && !product.has_option_groups) {
       selectedIngredientIds.forEach((ingredientId) => {
         const ingredient = product.ingredients.find((ing) => ing.id === ingredientId);
         if (ingredient) {
@@ -95,8 +121,21 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
       });
     }
 
+    // New: Add option groups price deltas
+    if (product.option_groups && Array.isArray(product.option_groups)) {
+      product.option_groups.forEach(group => {
+        const selectedItemIds = selectedOptions[group.id] || [];
+        selectedItemIds.forEach(itemId => {
+          const item = group.items.find(i => i.id === itemId);
+          if (item) {
+            price += parseFloat(item.price_delta || 0);
+          }
+        });
+      });
+    }
+
     return price;
-  }, [product, selectedSizeId, selectedIngredientIds, cartItem]);
+  }, [product, selectedSizeId, selectedIngredientIds, selectedOptions, cartItem]);
 
   // Handle size change
   const handleSizeChange = useCallback((sizeId) => {
@@ -112,16 +151,44 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
     );
   }, []);
 
-  // Handle save
-  const handleSave = useCallback(() => {
-    if (!product) return;
+  // Validate selections
+  const isValid = useMemo(() => {
+    if (!product) return false;
 
-    // Validation: Check if size is required but not selected
-    if (product.has_sizes && !selectedSizeId) {
-      return; // Don't save if size is required but not selected
+    // Legacy: Check if size is required but not selected
+    if (product.has_sizes && !product.has_option_groups && !selectedSizeId) {
+      return false;
     }
 
-    // Get selected size and ingredients data
+    // Check option groups requirements
+    if (product.option_groups && Array.isArray(product.option_groups)) {
+      for (const group of product.option_groups) {
+        if (group.is_required) {
+          const selectedItemIds = selectedOptions[group.id] || [];
+          const minSelection = parseInt(group.min_selection || 0, 10);
+          if (selectedItemIds.length < minSelection) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }, [product, selectedSizeId, selectedOptions]);
+
+  // Handle option group change
+  const handleOptionGroupChange = useCallback((groupId, selectedItemIds) => {
+    setSelectedOptions(prev => ({
+      ...prev,
+      [groupId]: selectedItemIds,
+    }));
+  }, []);
+
+  // Handle save
+  const handleSave = useCallback(() => {
+    if (!product || !isValid) return;
+
+    // Get selected size and ingredients data (legacy)
     const selectedSize = product.sizes?.find((s) => s.id === selectedSizeId) || null;
     const selectedIngredients =
       product.ingredients?.filter((ing) => selectedIngredientIds.includes(ing.id)) || [];
@@ -132,6 +199,7 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
       size_name: selectedSize?.name || null,
       ingredients: selectedIngredientIds,
       ingredients_data: selectedIngredients,
+      selected_options: selectedOptions, // New: option groups selections
       final_price: finalPrice,
       price: finalPrice, // Update price as well
       image: product.image || cartItem?.image || null, // Preserve image from product or cart item
@@ -142,7 +210,7 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
     }
 
     onClose();
-  }, [product, selectedSizeId, selectedIngredientIds, finalPrice, cartItem, onSave, onClose]);
+  }, [product, selectedSizeId, selectedIngredientIds, selectedOptions, finalPrice, isValid, cartItem, onSave, onClose]);
 
   // Use portal to render modal at document body level
   if (typeof window === 'undefined') return null;
@@ -206,8 +274,24 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
               </div>
             ) : product ? (
               <div className="space-y-6">
-                {/* Sizes Section */}
-                {product.has_sizes && (
+                {/* New Option Groups System */}
+                {product.has_option_groups && product.option_groups && (
+                  <div className="option-groups">
+                    {product.option_groups
+                      .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+                      .map((group) => (
+                        <OptionGroup
+                          key={group.id}
+                          group={group}
+                          selectedItemIds={selectedOptions[group.id] || []}
+                          onSelectionChange={(itemIds) => handleOptionGroupChange(group.id, itemIds)}
+                        />
+                      ))}
+                  </div>
+                )}
+
+                {/* Legacy Sizes Section (for backward compatibility) */}
+                {product.has_sizes && !product.has_option_groups && (
                   <ProductSizes
                     sizes={product.sizes || []}
                     selectedSizeId={selectedSizeId}
@@ -215,13 +299,22 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
                   />
                 )}
 
-                {/* Ingredients Section */}
-                {product.has_ingredients && (
+                {/* Legacy Ingredients Section (for backward compatibility) */}
+                {product.has_ingredients && !product.has_option_groups && (
                   <ProductIngredients
                     ingredients={product.ingredients || []}
                     selectedIngredientIds={selectedIngredientIds}
                     onIngredientToggle={handleIngredientToggle}
                   />
+                )}
+
+                {/* Validation Message */}
+                {!isValid && (
+                  <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
+                    <p className="text-red-300 text-sm font-medium">
+                      Please select all required options
+                    </p>
+                  </div>
                 )}
 
                 {/* Price Summary */}
@@ -258,7 +351,7 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
             </button>
             <button
               onClick={handleSave}
-              disabled={isLoading || !product || (product.has_sizes && !selectedSizeId)}
+              disabled={isLoading || !product || !isValid}
               className="w-full sm:w-auto px-6 py-3 bg-theme3 text-white rounded-xl hover:bg-theme transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               Save Changes

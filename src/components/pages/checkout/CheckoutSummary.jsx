@@ -143,7 +143,7 @@ const CheckoutSummary = memo(() => {
           </div>
         )}
 
-        {/* Delivery Charge */}
+        {/* Delivery Charge - Only show when delivery is selected */}
         {orderType === 'delivery' && (
           <div className="flex justify-between items-center py-2 border-b border-white/10">
             <div className="flex items-center gap-2">
@@ -153,11 +153,7 @@ const CheckoutSummary = memo(() => {
               </span>
             </div>
             <span className="text-white  text-lg font-bold">
-              {delivery === 0 ? (
-                <span className="text-theme3">{t(lang, "free")}</span>
-              ) : (
-                formatCurrency(delivery)
-              )}
+              {formatCurrency(delivery)}
             </span>
           </div>
         )}

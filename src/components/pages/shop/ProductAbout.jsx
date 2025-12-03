@@ -18,9 +18,12 @@ export default function ProductAbout({ product }) {
 
   const [quantity, setQuantity] = useState(1);
   const [customization, setCustomization] = useState(() => ({
-    sizeId: product?.default_size_id || null,
+    sizeId: null, // No default selection - user must choose
     ingredientIds: [],
+    selectedOptions: {}, // New: option groups selections
     finalPrice: product?.price || product?.base_price || 0,
+    isValid: false, // Will be updated by ProductCustomization
+    missingRequiredGroups: [], // Groups that need to be selected
   }));
 
   const handleCustomizationChange = useCallback((data) => {
@@ -29,6 +32,28 @@ export default function ProductAbout({ product }) {
 
   const onAddToCart = () => {
     if (!product) return;
+    if (!customization.isValid) {
+      // Scroll to first missing required group
+      if (customization.missingRequiredGroups && customization.missingRequiredGroups.length > 0) {
+        const firstMissingGroup = customization.missingRequiredGroups[0];
+        const groupElement = document.getElementById(`option-group-${firstMissingGroup.id}`);
+        if (groupElement) {
+          groupElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Add highlight effect
+          groupElement.classList.add('ring-2', 'ring-red-500', 'ring-opacity-75');
+          setTimeout(() => {
+            groupElement.classList.remove('ring-2', 'ring-red-500', 'ring-opacity-75');
+          }, 2000);
+        } else {
+          // Fallback: scroll to customization section
+          const customizationSection = document.querySelector('.product-customization');
+          if (customizationSection) {
+            customizationSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      }
+      return;
+    }
     handleAddToCart(product, customization, quantity);
     setQuantity(1);
   };
@@ -93,38 +118,24 @@ export default function ProductAbout({ product }) {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
           <button
             onClick={onAddToCart}
-            className="theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent text-white border-2 border-theme3  text-base font-semibold hover:bg-theme3 hover:border-theme3 transition-all duration-300 rounded-xl backdrop-blur-sm hover:shadow-lg hover:shadow-theme3/30"
+            disabled={!customization.isValid}
+            className={`
+              theme-btn group inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 
+              text-base font-semibold transition-all duration-300 rounded-xl backdrop-blur-sm
+              ${
+                customization.isValid
+                  ? "bg-transparent text-white border-2 border-theme3 hover:bg-theme3 hover:border-theme3 hover:shadow-lg hover:shadow-theme3/30"
+                  : "bg-white/10 text-white/50 border-2 border-white/20 cursor-not-allowed opacity-60"
+              }
+            `}
           >
-            <ShoppingCart className="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform duration-300" />
+            <ShoppingCart className={`w-5 h-5 mr-2 ${customization.isValid ? 'transform group-hover:scale-110 transition-transform duration-300' : ''}`} />
             {t(lang, "add_to_cart")}
           </button>
         </div>
       </div>
 
-      <div className="share flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mt-auto pt-6 border-t border-white/10">
-        <h6 className="text-white  text-base sm:text-lg font-semibold m-0">
-          {t(lang, "share_with_friends")}
-        </h6>
-        <ul className="social-media flex items-center gap-3">
-          {SOCIAL_LINKS.map((social) => {
-            const Icon = iconMap[social.icon];
-            if (!Icon) return null;
-            return (
-              <li key={social.label}>
-                <Link
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 flex items-center justify-center bg-white/10 text-white border border-white/20 rounded-full hover:bg-white hover:text-theme3 hover:border-theme3 transition-colors"
-                  aria-label={social.label}
-                >
-                  <Icon className="w-4 h-4" />
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+     
     </div>
   );
 }

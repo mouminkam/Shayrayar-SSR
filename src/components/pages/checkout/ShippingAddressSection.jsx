@@ -88,9 +88,15 @@ export default function ShippingAddressSection({ formData, setFormData }) {
 
   const fetchDeliveryQuote = useCallback(
     async ({ lat, lng, address }) => {
-      if (!lat || !lng || !address) return;
+      if (!lat || !lng || !address) {
+        // Reset delivery charge if invalid location
+        setDeliveryCharge(0);
+        return;
+      }
       setLoading((prev) => ({ ...prev, quote: true }));
       setDeliveryQuote(null);
+      // Reset delivery charge before fetching new quote
+      setDeliveryCharge(0);
 
       try {
         const response = await api.delivery.getDeliveryQuote({ lat, lng, address });
@@ -109,6 +115,8 @@ export default function ShippingAddressSection({ formData, setFormData }) {
           error?.message ||
           "Unable to get delivery quote";
         toastError(reason);
+        // Reset delivery charge on error
+        setDeliveryCharge(0);
       } finally {
         setLoading((prev) => ({ ...prev, quote: false }));
       }

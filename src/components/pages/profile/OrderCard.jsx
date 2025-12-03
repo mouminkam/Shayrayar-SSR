@@ -1,21 +1,55 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { memo } from "react";
+import { memo, useState } from "react";
+import { RotateCcw, Loader2 } from "lucide-react";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import OptimizedImage from "../../ui/OptimizedImage";
 import { IMAGE_PATHS } from "../../../data/constants";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import api from "../../../api";
+import useToastStore from "../../../store/toastStore";
+import ReorderModal from "./ReorderModal";
 
 const OrderCard = memo(function OrderCard({ order }) {
   const router = useRouter();
   const { prefetchRoute } = usePrefetchRoute();
   const { lang } = useLanguage();
+  const { success: toastSuccess, error: toastError } = useToastStore();
+  const [isReorderLoading, setIsReorderLoading] = useState(false);
+  const [reorderData, setReorderData] = useState(null);
+  const [isReorderModalOpen, setIsReorderModalOpen] = useState(false);
 
   const handleCardClick = () => {
     router.push(`/orders/${order.id}`, { scroll: false });
+  };
+
+  const handleReorder = async (e) => {
+    e.stopPropagation(); // Prevent card click
+    
+    if (!order?.id) {
+      toastError(t(lang, "invalid_order"));
+      return;
+    }
+
+    setIsReorderLoading(true);
+    try {
+      const response = await api.orders.reorderOrder(order.id);
+      
+      if (response?.success && response?.data) {
+        setReorderData(response.data);
+        setIsReorderModalOpen(true);
+      } else {
+        toastError(response?.message || t(lang, "failed_to_reorder"));
+      }
+    } catch (error) {
+      console.error("Reorder error:", error);
+      toastError(error?.message || t(lang, "failed_to_reorder"));
+    } finally {
+      setIsReorderLoading(false);
+    }
   };
 
   const getStatusColor = (status) => {
@@ -105,21 +139,50 @@ const OrderCard = memo(function OrderCard({ order }) {
         </div>
       )}
 
-      {/* Payment Method */}
-      <div className="flex items-center justify-between pt-4 border-t border-white/10">
+      {/* Payment Method and Actions */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-white/10">
         <p className="text-text text-sm">
           {t(lang, "payment")}{" "}
           <span className="text-white font-medium capitalize">
             {order.paymentMethod}
           </span>
         </p>
-        <div className="flex items-center gap-2 text-theme3 group-hover:text-theme text-sm font-medium transition-colors">
+        <div className="flex items-center gap-3">
+          {/* Reorder Button */}
+          <button
+            onClick={handleReorder}
+            disabled={isReorderLoading}
+            className="flex items-center gap-2 px-4 py-2 bg-theme3/20 hover:bg-theme3/30 border border-theme3/50 rounded-lg text-theme3 text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            title={t(lang, "reorder")}
+          >
+            {isReorderLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <RotateCcw className="w-4 h-4" />
+            )}
+            <span>{t(lang, "reorder")}</span>
+          </button>
+          
+          {/* View Details Link */}
+          <div className="flex items-center gap-2 text-theme3 group-hover:text-theme text-sm font-medium transition-colors cursor-pointer" onClick={handleCardClick}>
           <span>{t(lang, "view_details")}</span>
           <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </div>
       </div>
+      </div>
+
+      {/* Reorder Modal */}
+      <ReorderModal
+        isOpen={isReorderModalOpen}
+        onClose={() => {
+          setIsReorderModalOpen(false);
+          setReorderData(null);
+        }}
+        reorderData={reorderData}
+        isLoading={isReorderLoading}
+      />
     </div>
   );
 });

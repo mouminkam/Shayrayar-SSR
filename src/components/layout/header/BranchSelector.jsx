@@ -19,7 +19,7 @@ const BranchSelector = ({ isMobile = false }) => {
     setSelectedBranch,
     initialize 
   } = useBranchStore();
-  const { clearCart } = useCartStore();
+  const { clearCart, resetDeliveryCharge } = useCartStore();
   const { success: toastSuccess } = useToastStore();
   const { lang } = useLanguage();
   
@@ -56,6 +56,8 @@ const BranchSelector = ({ isMobile = false }) => {
 
     // Clear cart (products may differ between branches)
     clearCart();
+    // Reset delivery charge (delivery fee may differ between branches)
+    resetDeliveryCharge();
 
     // Show notification
     const branchName = branch.name || branch.title || t(lang, "select_branch");

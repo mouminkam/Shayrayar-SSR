@@ -3,6 +3,7 @@ import { useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import useBranchStore from "../store/branchStore";
+import { HighlightsProvider } from "../context/HighlightsContext";
 import AnimatedSection from "../components/ui/AnimatedSection";
 import ErrorBoundary from "../components/ui/ErrorBoundary";
 import SectionSkeleton from "../components/ui/SectionSkeleton";
@@ -87,7 +88,7 @@ export default function HomePage() {
   }, [selectedBranch, router]);
 
   return (
-    <>
+    <HighlightsProvider>
       <PageSEO
         title="Shahrayar Restaurant - Authentic Middle Eastern Cuisine"
         description="Experience authentic Middle Eastern flavors at Shahrayar Restaurant. Fresh ingredients, traditional recipes, and genuine hospitality. Order online for delivery or pickup."
@@ -175,6 +176,6 @@ export default function HomePage() {
       </ErrorBoundary> */}
 
       </div>
-    </>
+    </HighlightsProvider>
   );
 }

@@ -145,14 +145,32 @@ const BillingForm = memo(() => {
       const taxAmount = getTax();
       const totalAmount = getTotal();
 
-      // Prepare order items with size_id and ingredients
-      const orderItems = items.map((item) => ({
+      // Prepare order items with size_id, ingredients, and selected_options
+      const orderItems = items.map((item) => {
+        const orderItem = {
         menu_item_id: item.id,
         size_id: item.size_id || null,
         quantity: item.quantity,
         ingredients: item.ingredients || [],
         special_instructions: item.special_instructions || "",
-      }));
+        };
+
+        // Add selected_options if available (convert from frontend format to API format)
+        if (item.selected_options && typeof item.selected_options === 'object') {
+          const selectedOptionsArray = Object.entries(item.selected_options)
+            .filter(([groupId, itemIds]) => Array.isArray(itemIds) && itemIds.length > 0)
+            .map(([groupId, itemIds]) => ({
+              option_group_id: parseInt(groupId, 10),
+              option_item_ids: itemIds.map(id => parseInt(id, 10)),
+            }));
+          
+          if (selectedOptionsArray.length > 0) {
+            orderItem.selected_options = selectedOptionsArray;
+          }
+        }
+
+        return orderItem;
+      });
 
       // Build delivery address string
       const deliveryAddress =

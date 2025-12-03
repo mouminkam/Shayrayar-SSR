@@ -24,10 +24,11 @@ const getImageUrl = (menuItem) => {
   return IMAGE_PATHS.placeholder;
 };
 
-export const transformMenuItemToProduct = (menuItem) => {
+export const transformMenuItemToProduct = (menuItem, optionGroups = []) => {
   if (!menuItem) return null;
 
   // Extract sizes and ingredients (API provides them directly)
+  // These are kept for backward compatibility with old products
   const sizesArray = Array.isArray(menuItem.sizes) ? menuItem.sizes : [];
   const ingredientsArray = Array.isArray(menuItem.ingredients) ? menuItem.ingredients : [];
 
@@ -35,12 +36,33 @@ export const transformMenuItemToProduct = (menuItem) => {
   const basePrice = parseFloat(menuItem.default_price || menuItem.price || 0);
 
   // Get default size (size with is_default flag, or first size)
+  // Note: We keep default_size_id for backward compatibility but won't use it as default selection
   const defaultSize = sizesArray.find(s => s.is_default) || sizesArray[0] || null;
   const defaultSizeId = defaultSize?.id || null;
   const defaultSizePrice = defaultSize?.price ? parseFloat(defaultSize.price) : basePrice;
 
   // Display price: default size price if available, otherwise base price
   const displayPrice = defaultSizePrice || basePrice;
+
+  // Transform option_groups from API format to frontend format
+  const transformedOptionGroups = Array.isArray(optionGroups) ? optionGroups.map(group => ({
+    id: group.id,
+    name: group.name || "",
+    description: group.description || null,
+    type: group.type || null,
+    is_required: group.is_required === true || group.is_required === 1,
+    min_selection: parseInt(group.min_selection || 0, 10),
+    max_selection: parseInt(group.max_selection || 0, 10),
+    sort_order: parseInt(group.sort_order || 0, 10),
+    items: Array.isArray(group.items) ? group.items.map(item => ({
+      id: item.id,
+      name: item.name || "",
+      price_delta: parseFloat(item.price_delta || 0),
+      sort_order: parseInt(item.sort_order || 0, 10),
+      original: item,
+    })) : [],
+    original: group,
+  })) : [];
 
   return {
     id: menuItem.id,
@@ -55,7 +77,7 @@ export const transformMenuItemToProduct = (menuItem) => {
     category_id: menuItem.category_id || menuItem.category?.id || null,
     rating: menuItem.rating || 0,
     featured: menuItem.is_featured || false,
-    // Sizes data (API provides: id, name, price, is_default)
+    // Sizes data (API provides: id, name, price, is_default) - kept for backward compatibility
     sizes: sizesArray.map(size => ({
       id: size.id,
       name: size.name || "",
@@ -63,7 +85,7 @@ export const transformMenuItemToProduct = (menuItem) => {
       is_default: size.is_default || false,
       original: size,
     })),
-    // Ingredients data (API provides: id, name, price, pivot.is_required)
+    // Ingredients data (API provides: id, name, price, pivot.is_required) - kept for backward compatibility
     ingredients: ingredientsArray.map(ingredient => ({
       id: ingredient.id,
       name: ingredient.name || "",
@@ -72,7 +94,11 @@ export const transformMenuItemToProduct = (menuItem) => {
       is_required: ingredient.pivot?.is_required === 1 || false,
       original: ingredient,
     })),
-    default_size_id: defaultSizeId,
+    // New option_groups system
+    option_groups: transformedOptionGroups,
+    has_option_groups: transformedOptionGroups.length > 0,
+    // Backward compatibility fields
+    default_size_id: defaultSizeId, // Kept but not used as default selection
     has_sizes: sizesArray.length > 0,
     has_ingredients: ingredientsArray.length > 0,
     // Keep original data for reference

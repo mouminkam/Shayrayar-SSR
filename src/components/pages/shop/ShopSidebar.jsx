@@ -125,19 +125,19 @@ const ShopSidebar = memo(function ShopSidebar() {
                       </Link>
 
 
-                      <div className="flex items-center justify-center gap-2 lg:gap-3">
+                      <div className="flex flex-col items-center justify-center gap-2 lg:gap-3">
                         <span className="text-theme text-sm lg:text-base font-black bg-linear-to-r from-theme/10 to-theme3/10 px-2 lg:px-3 py-1 rounded-full">
                           {formatCurrency(product.price)}
                         </span>
-                      </div>
 
                       <Link
                         href={`/shop/${product.id}`}
                         onMouseEnter={() => prefetchRoute(`/shop/${product.id}`)}
                         className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white text-xs lg:text-sm font-semibold py-1.5 lg:py-2 px-3 lg:px-4 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-theme3/30 text-center"
-                      >
+                        >
                         {t(lang, "order")}
                       </Link>
+                        </div>
                     </div>
                   </div>
                 </div>

@@ -39,6 +39,9 @@ export const getUserOrders = async (params = {}) => {
  * @param {number} orderData.items[].quantity - Item quantity
  * @param {Array} orderData.items[].ingredients - Item ingredients (optional)
  * @param {number} orderData.items[].size_id - Size ID (optional)
+ * @param {Array} orderData.items[].selected_options - Selected option groups (optional)
+ * @param {number} orderData.items[].selected_options[].option_group_id - Option group ID
+ * @param {Array<number>} orderData.items[].selected_options[].option_item_ids - Selected option item IDs
  * @param {string} orderData.payment_method - Payment method (cash, card, etc.)
  * @param {string} orderData.notes - Order notes (optional)
  * @returns {Promise<Object>} Response with created order
@@ -95,6 +98,16 @@ export const getAvailableCoupons = async (orderData) => {
   return response;
 };
 
+/**
+ * Reorder a previous order
+ * @param {number} orderId - Order ID to reorder
+ * @returns {Promise<Object>} Response with items to add to cart and missing items
+ */
+export const reorderOrder = async (orderId) => {
+  const response = await axiosInstance.post(`/orders/${orderId}/reorder`);
+  return response;
+};
+
 // Default export with all order functions
 const ordersAPI = {
   getUserOrders,
@@ -103,6 +116,7 @@ const ordersAPI = {
   cancelOrder,
   trackOrder,
   getAvailableCoupons,
+  reorderOrder,
 };
 
 export default ordersAPI;

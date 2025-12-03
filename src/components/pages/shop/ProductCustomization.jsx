@@ -3,6 +3,7 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import ProductSizes from "./ProductSizes";
 import ProductIngredients from "./ProductIngredients";
+import OptionGroup from "./OptionGroup";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { useProductCustomization } from "../../../hooks/useProductCustomization";
 import { useLanguage } from "../../../context/LanguageContext";
@@ -10,9 +11,9 @@ import { t } from "../../../locales/i18n/getTranslation";
 
 /**
  * ProductCustomization Component
- * Container component that manages size and ingredient selection
+ * Container component that manages size, ingredient, and option group selection
  * @param {Object} props
- * @param {Object} product - Product object with sizes and ingredients
+ * @param {Object} product - Product object with sizes, ingredients, and option_groups
  * @param {Function} props.onCustomizationChange - Callback when customization changes
  */
 const ProductCustomization = memo(function ProductCustomization({ product, onCustomizationChange }) {
@@ -22,13 +23,23 @@ const ProductCustomization = memo(function ProductCustomization({ product, onCus
   const {
     selectedSizeId,
     selectedIngredientIds,
+    selectedOptions,
     finalPrice,
+    isValid,
+    missingRequiredGroups,
     handleSizeChange,
     handleIngredientToggle,
+    handleOptionGroupChange,
   } = useProductCustomization(product, onCustomizationChange);
 
-  // Don't render if product has no sizes or ingredients
-  if (!product?.has_sizes && !product?.has_ingredients) {
+  // Check if product has any customization options
+  const hasOptionGroups = product?.has_option_groups && Array.isArray(product.option_groups) && product.option_groups.length > 0;
+  const hasLegacySizes = product?.has_sizes && !hasOptionGroups; // Only show legacy sizes if no option_groups
+  const hasLegacyIngredients = product?.has_ingredients && !hasOptionGroups; // Only show legacy ingredients if no option_groups
+  const hasAnyCustomization = hasOptionGroups || hasLegacySizes || hasLegacyIngredients;
+
+  // Don't render if product has no customization options
+  if (!hasAnyCustomization) {
     return null;
   }
 
@@ -39,8 +50,32 @@ const ProductCustomization = memo(function ProductCustomization({ product, onCus
       transition={{ duration: 0.3 }}
       className="product-customization mb-8 pb-8 border-b border-white/10"
     >
-      {/* Sizes Section */}
-      {product?.has_sizes && (
+      {/* New Option Groups System */}
+      {hasOptionGroups && (
+        <div className="option-groups mb-6">
+          {product.option_groups
+            .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+            .map((group) => {
+              const isMissing = missingRequiredGroups?.some(mg => mg.id === group.id);
+              return (
+                <div
+                  key={group.id}
+                  id={`option-group-${group.id}`}
+                  className={isMissing ? 'scroll-mt-4' : ''}
+                >
+                  <OptionGroup
+                    group={group}
+                    selectedItemIds={selectedOptions[group.id] || []}
+                    onSelectionChange={(itemIds) => handleOptionGroupChange(group.id, itemIds)}
+                  />
+                </div>
+              );
+            })}
+        </div>
+      )}
+
+      {/* Legacy Sizes Section (for backward compatibility) */}
+      {hasLegacySizes && !hasOptionGroups && (
         <ProductSizes
           sizes={product.sizes || []}
           selectedSizeId={selectedSizeId}
@@ -48,8 +83,8 @@ const ProductCustomization = memo(function ProductCustomization({ product, onCus
         />
       )}
 
-      {/* Ingredients Section */}
-      {product?.has_ingredients && (
+      {/* Legacy Ingredients Section (for backward compatibility) */}
+      {hasLegacyIngredients && !hasOptionGroups && (
         <ProductIngredients
           ingredients={product.ingredients || []}
           selectedIngredientIds={selectedIngredientIds}
@@ -57,8 +92,24 @@ const ProductCustomization = memo(function ProductCustomization({ product, onCus
         />
       )}
 
+      {/* Validation Message */}
+      {!isValid && missingRequiredGroups && missingRequiredGroups.length > 0 && (
+        <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
+          <p className="text-red-300 text-sm font-medium mb-2">
+            {t(lang, "please_select_required_options")}
+          </p>
+          <ul className="list-disc list-inside space-y-1">
+            {missingRequiredGroups.map((group) => (
+              <li key={group.id} className="text-red-200 text-xs">
+                {group.name}: {t(lang, "required_choose_minimum", { min: group.minSelection })}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Price Summary */}
-      {(product?.has_sizes || product?.has_ingredients) && (
+      {hasAnyCustomization && (
         <div className="mt-6 p-4 bg-theme3/10 rounded-xl border border-theme3/30">
           <div className="flex items-center justify-between">
             <span className="text-white  text-base font-semibold">

@@ -6,9 +6,12 @@ import useToastStore from "../store/toastStore";
 import useBranchStore from "../store/branchStore";
 import { useApiCache } from "./useApiCache";
 
-// Simplified extractor - API always returns { success: true, data: { item: {...} } }
+// Simplified extractor - API always returns { success: true, data: { item: {...}, option_groups: [...] } }
 const extractProductData = (response) => {
-  return response?.data?.item || response?.data || null;
+  return {
+    item: response?.data?.item || response?.data || null,
+    option_groups: response?.data?.option_groups || [],
+  };
 };
 
 /**
@@ -40,10 +43,10 @@ export function useProductDetails(productId) {
         {},
         () => api.menu.getMenuItemById(productId)
       );
-      const productData = extractProductData(response);
+      const { item: productData, option_groups } = extractProductData(response);
 
       if (productData) {
-        setProduct(transformMenuItemToProduct(productData));
+        setProduct(transformMenuItemToProduct(productData, option_groups));
       } else {
         const errorMsg = "Product not found";
         setError(errorMsg);

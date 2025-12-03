@@ -56,12 +56,25 @@ export const checkDeliveryAvailability = async (branchId, params) => {
   return response;
 };
 
+/**
+ * Get upsell items for a branch
+ * @param {number} branchId - Branch ID
+ * @param {Object} params - Query parameters
+ * @param {string} params.type - Filter by item type (optional: drink, dessert, sauce, addon, etc.)
+ * @returns {Promise<Object>} Response with upsell items list
+ */
+export const getUpsellItems = async (branchId, params = {}) => {
+  const response = await axiosInstance.get(`/branches/${branchId}/upsell-items`, { params });
+  return response;
+};
+
 // Default export with all branch functions
 const branchesAPI = {
   getAllBranches,
   getBranchById,
   getNearestBranches,
   checkDeliveryAvailability,
+  getUpsellItems,
 };
 
 export default branchesAPI;

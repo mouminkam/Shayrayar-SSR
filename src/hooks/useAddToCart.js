@@ -28,10 +28,14 @@ export function useAddToCart() {
         return;
       }
 
-      // Validate product
-      const validation = validateProductForCart(product, customization);
-      if (!validation.isValid) {
-        toastError(t(lang, validation.error) || validation.error);
+      // Validate product (use isValid from customization if available, otherwise validate)
+      const isValid = customization.isValid !== undefined 
+        ? customization.isValid 
+        : validateProductForCart(product, customization).isValid;
+      
+      if (!isValid) {
+        const validation = validateProductForCart(product, customization);
+        toastError(t(lang, validation.error) || validation.error || t(lang, "please_select_required_options"));
         return;
       }
 

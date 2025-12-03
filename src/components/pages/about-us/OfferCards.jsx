@@ -96,7 +96,7 @@ export default function OfferCards() {
                     alt={offer.title}
                     width={200}
                     height={200}
-                    className="object-contain w-auto h-auto sm:w-40 md:w-48 lg:w-42 xl:w-52 2xl:w-55"
+                    className="object-contain w-50 h-40 sm:w-40 md:w-48 lg:w-42 xl:w-52 2xl:w-55"
                     quality={75}
                     loading="lazy"
                     sizes="(max-width: 640px) 160px, (max-width: 1024px) 192px, (max-width: 1280px) 168px, (max-width: 1536px) 208px, 220px"

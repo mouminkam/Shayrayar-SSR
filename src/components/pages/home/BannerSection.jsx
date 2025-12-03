@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade } from "swiper/modules";
 import { motion, AnimatePresence } from "framer-motion";
@@ -70,7 +70,7 @@ export default function BannerSection() {
           {slides.map((slide) => (
             <SwiperSlide key={slide.id}>
               <div
-                className="banner-wrapper style1 bg-img relative bg-cover bg-center min-h-[600px] lg:min-h-[800px]"
+                className="relative bg-cover bg-center min-h-[800px]"
                 style={{
                   backgroundImage: `url(${slide.bgImage})`,
                 }}
@@ -139,11 +139,11 @@ export default function BannerSection() {
         </Swiper>
 
         {/* Fixed Content Container */}
-        <div className="banner-container absolute inset-0 z-50 py-12 sm:py-16 md:py-20 lg:py-32 xl:py-40 mt-18 sm:mt-20 md:mt-0 lg:mt-0 pointer-events-none">
+        <div className="banner-container absolute inset-0 z-50 py-12 sm:py-16 md:py-20 lg:py-32 xl:py-40 mt-18 sm:mt-20 md:mt-24 lg:mt-0 pointer-events-none">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 h-full">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center h-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-12 items-center h-full">
               {/* Image - Right Side */}
-              <div className="col-span-1 lg:col-span-1 order-1 lg:order-2 flex justify-center lg:justify-end items-center overflow-hidden">
+              <div className="col-span-1 lg:col-span-1 order-1 lg:order-2 flex justify-center lg:justify-end items-center overflow-hidden mt-0 lg:mt-0">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentSlide.id}
@@ -170,8 +170,8 @@ export default function BannerSection() {
               </div>
 
               {/* Text Content - Left Side - Fixed Container */}
-              <div className="col-span-1 lg:col-span-1 order-2 lg:order-1 mt-15 sm:mt-0 w-full lg:w-auto">
-                <div className="banner-title-area w-full lg:w-auto relative min-h-[200px] sm:min-h-[250px] lg:min-h-[300px]">
+              <div className="col-span-1 lg:col-span-1 order-2 lg:order-1 mt-4 sm:mt-0 md:mt-0 w-full lg:w-auto">
+                <div className="banner-title-area w-full lg:w-auto relative min-h-[200px] sm:min-h-[250px] md:min-h-[280px] lg:min-h-[300px] mt-0 lg:mt-0">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={currentSlide.id}
