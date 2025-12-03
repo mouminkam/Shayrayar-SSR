@@ -163,7 +163,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
         setLoading((prev) => ({ ...prev, geocoding: false }));
       }
     },
-    [fetchDeliveryQuote, setFormData, toastError]
+    [fetchDeliveryQuote, setFormData, toastError, lang]
   );
 
   const selectLocation = useCallback(
@@ -194,7 +194,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
         reverseGeocodeAndQuote(normalized.lat, normalized.lng);
       }
     },
-    [setFormData, toastError, updateMarker, reverseGeocodeAndQuote]
+    [setFormData, toastError, updateMarker, reverseGeocodeAndQuote, lang]
   );
 
   const loadLeafletAssets = useCallback(() => {
@@ -278,7 +278,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
     return () => {
       cancelled = true;
     };
-  }, [isDelivery, loadLeafletAssets, initializeMap]);
+  }, [isDelivery, loadLeafletAssets, initializeMap, lang]);
 
   useEffect(() => {
     return () => {
@@ -322,7 +322,7 @@ export default function ShippingAddressSection({ formData, setFormData }) {
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
-  }, [selectLocation, toastError, toastSuccess]);
+  }, [selectLocation, toastError, toastSuccess, lang]);
 
   const handleManualSubmit = useCallback(() => {
     if (!manualAddress.trim()) {

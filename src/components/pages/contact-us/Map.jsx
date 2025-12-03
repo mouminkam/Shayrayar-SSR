@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import api from "../../api";
-import useBranchStore from "../../store/branchStore";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
 
 export default function Map() {
   const { selectedBranch, initialize } = useBranchStore();

@@ -6,6 +6,7 @@ import BranchInitializer from "../components/layout/BranchInitializer";
 import LenisScrollProvider from "../components/layout/LenisScrollProvider";
 import HtmlLangUpdater from "../components/layout/HtmlLangUpdater";
 import { LanguageProvider } from "../context/LanguageContext";
+import { HighlightsProvider } from "../context/HighlightsContext";
 import "./globals.css";
 
 const oswald = Oswald({
@@ -81,16 +82,18 @@ export default function RootLayout({ children }) {
 
       <body suppressHydrationWarning className={oswald.className}>
         <LanguageProvider>
-          <HtmlLangUpdater />
-          <LenisScrollProvider>
-            <BranchInitializer />
-            <FreshHeatHeader />
-            <main id="main" role="main" className="pt-15 md:pt-15 lg:pt-0">
-              {children}
-            </main>
-            <FreshHeatFooter />
-            <Toast />
-          </LenisScrollProvider>
+          <HighlightsProvider>
+            <HtmlLangUpdater />
+            <LenisScrollProvider>
+              <BranchInitializer />
+              <FreshHeatHeader />
+              <main id="main" role="main" className="pt-15 md:pt-15 lg:pt-0">
+                {children}
+              </main>
+              <FreshHeatFooter />
+              <Toast />
+            </LenisScrollProvider>
+          </HighlightsProvider>
         </LanguageProvider>
       </body>
     </html>

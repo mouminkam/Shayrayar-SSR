@@ -3,10 +3,10 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import ProductSizes from "./ProductSizes";
 import ProductIngredients from "./ProductIngredients";
-import { formatCurrency } from "../../lib/utils/formatters";
-import { useProductCustomization } from "../../hooks/useProductCustomization";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
+import { formatCurrency } from "../../../lib/utils/formatters";
+import { useProductCustomization } from "../../../hooks/useProductCustomization";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 /**
  * ProductCustomization Component

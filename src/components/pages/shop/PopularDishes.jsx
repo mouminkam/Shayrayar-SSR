@@ -2,17 +2,17 @@
 import { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import OptimizedImage from "../ui/OptimizedImage";
-import ProductCardSkeleton from "../ui/ProductCardSkeleton";
-import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
-import { HighlightsContext } from "../../context/HighlightsContext";
-import api from "../../api";
-import useBranchStore from "../../store/branchStore";
-import { transformMenuItemsToProducts } from "../../lib/utils/productTransform";
-import { formatCurrency } from "../../lib/utils/formatters";
+import OptimizedImage from "../../ui/OptimizedImage";
+import ProductCardSkeleton from "../../ui/ProductCardSkeleton";
+import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
+import { HighlightsContext } from "../../../context/HighlightsContext";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
+import { transformMenuItemsToProducts } from "../../../lib/utils/productTransform";
+import { formatCurrency } from "../../../lib/utils/formatters";
 import { useInView } from "react-intersection-observer";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function PopularDishes() {
   // Always call useContext first (before any other hooks) to maintain hook order

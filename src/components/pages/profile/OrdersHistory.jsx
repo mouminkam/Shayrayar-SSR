@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ShoppingBag, Package, ArrowRight } from "lucide-react";
+import { useInView } from "react-intersection-observer";
 import OrderCard from "./OrderCard";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
@@ -42,12 +43,9 @@ export default function OrdersHistory({ orders, showViewAll = true, maxDisplay =
     >
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <motion.div
-            whileHover={{ scale: 1.1, rotate: 5 }}
-            className="w-12 h-12 shadow-2xl rounded-xl bg-theme flex items-center justify-center"
-          >
+          <div className="w-12 h-12 shadow-2xl rounded-xl bg-theme flex items-center justify-center">
             <ShoppingBag className="w-6 h-6 text-white fill-white" />
-          </motion.div>
+          </div>
           <h3 className="text-white  text-2xl font-black uppercase">
             {t(lang, "order_history")}
           </h3>
@@ -76,18 +74,13 @@ export default function OrdersHistory({ orders, showViewAll = true, maxDisplay =
       ) : (
         <>
           <div className="space-y-4">
-            {displayedOrders.map((order, index) => (
-              <OrderCard key={order.id} order={order} index={index} />
+            {displayedOrders.map((order) => (
+              <LazyOrderCard key={order.id} order={order} />
             ))}
           </div>
           
           {hasMoreOrders && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="mt-6 pt-6 border-t border-white/10"
-            >
+            <div className="mt-6 pt-6 border-t border-white/10">
               <Link
                 href="/orders"
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-theme3/50 rounded-xl text-white  text-sm font-semibold transition-all duration-300 group"
@@ -95,11 +88,42 @@ export default function OrdersHistory({ orders, showViewAll = true, maxDisplay =
                 {t(lang, "view_all_orders")} ({totalOrdersCount})
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-            </motion.div>
+            </div>
           )}
         </>
       )}
     </motion.div>
+  );
+}
+
+// Lazy Order Card Component - Loads only when in viewport
+function LazyOrderCard({ order }) {
+  const shouldLoadImmediately = false; // Don't load immediately, wait for viewport
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    rootMargin: "100px", // Start loading 100px before it comes into view
+    triggerOnce: true, // Only trigger once
+  });
+
+  const shouldLoad = shouldLoadImmediately || inView;
+
+  if (!shouldLoad) {
+    return (
+      <div 
+        ref={ref} 
+        className="p-4 bg-white/5 rounded-xl border border-white/10 min-h-[200px] animate-pulse"
+      >
+        <div className="h-6 bg-white/10 rounded mb-4 w-1/3"></div>
+        <div className="h-4 bg-white/10 rounded mb-2 w-1/2"></div>
+        <div className="h-4 bg-white/10 rounded w-2/3"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={ref}>
+      <OrderCard order={order} />
+    </div>
   );
 }
 

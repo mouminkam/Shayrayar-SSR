@@ -15,8 +15,6 @@ import {
 import CartDropdown from "./header/CartDropdown";
 import UserDropdown from "./header/UserDropdown";
 import Sidebar from "./header/Sidebar";
-import BranchSelector from "./header/BranchSelector";
-import LanguageSwitcher from "./LanguageSwitcher";
 import { useCart } from "../../hooks/useCart";
 import { useScroll } from "../../hooks/useScroll";
 import useAuthStore from "../../store/authStore";
@@ -180,13 +178,6 @@ const FreshHeatHeader = () => {
                 <span className="text-gray-900 font-medium">{t(lang, "business_hours")}</span>
               </div>
               <div className="flex items-center gap-3">
-                {/* Branch Selector */}
-                <BranchSelector isMobile={false} />
-                
-                {/* Language Switcher */}
-                <LanguageSwitcher isMobile={false} />
-                
-                
                 <span className="mr-2 text-gray-900 font-medium">{t(lang, "follow_us")}</span>
                 {SOCIAL_LINKS.map((social) => {
                   const IconComponent = {
@@ -371,16 +362,6 @@ const FreshHeatHeader = () => {
 
           {/* Icons */}
           <div className="flex items-center gap-2 sm:gap-3 lg:gap-5 xl:gap-6 shrink-0">
-            {/* Branch Selector - Desktop only (hidden on mobile/tablet, shown in sidebar) */}
-            <div className="hidden lg:block">
-              <BranchSelector isMobile={true} />
-            </div>
-            
-            {/* Language Switcher - Desktop only (hidden on mobile/tablet, shown in sidebar) */}
-            <div className="hidden lg:block">
-              <LanguageSwitcher isMobile={true} />
-            </div>
-            
             {/* User Icon with Dropdown */}
             <div
               className="relative flex items-center"

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { memo } from "react";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import OptimizedImage from "../../ui/OptimizedImage";
@@ -9,7 +9,7 @@ import { IMAGE_PATHS } from "../../../data/constants";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
 
-export default function OrderCard({ order, index }) {
+const OrderCard = memo(function OrderCard({ order }) {
   const router = useRouter();
   const { prefetchRoute } = usePrefetchRoute();
   const { lang } = useLanguage();
@@ -36,10 +36,7 @@ export default function OrderCard({ order, index }) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.1 }}
+    <div
       onClick={handleCardClick}
       className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-theme3/50 transition-all duration-300 cursor-pointer group"
     >
@@ -123,7 +120,11 @@ export default function OrderCard({ order, index }) {
           </svg>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
-}
+});
+
+OrderCard.displayName = "OrderCard";
+
+export default OrderCard;
 

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { X, MapPin, Mail, Clock, Phone, ShoppingCart } from "lucide-react";
+import { X, MapPin, Mail, Clock, Phone, ShoppingCart, Languages } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import BranchSelector from "./BranchSelector";
 import LanguageSwitcher from "../LanguageSwitcher";
@@ -180,24 +180,36 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     </div>
                   </motion.div>
 
-                  {/* Branch Selector - Mobile & Tablet */}
+                  {/* Branch Selector & Language Switcher - Always Visible */}
                   <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
-                    className="mb-6 lg:hidden"
+                    className="mb-6 p-4 bg-white/5 backdrop-blur-sm rounded-xl"
                   >
-                    <h4 className="text-white  text-lg font-semibold mb-3">
-                      {t(lang, "select_branch")}
-                    </h4>
-                    <div className="relative mb-4">
-                      <BranchSelector isMobile={true} />
+                    {/* Branch Selector */}
+                    <div className="mb-4">
+                      <h4 className="text-white text-base font-semibold mb-3 flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-theme3" />
+                        {t(lang, "select_branch")}
+                      </h4>
+                      <div className="relative">
+                        <BranchSelector isMobile={true} />
+                      </div>
                     </div>
-                    <h4 className="text-white  text-lg font-semibold mb-3">
-                      {t(lang, "select_language")}
-                    </h4>
-                    <div className="relative">
-                      <LanguageSwitcher isMobile={true} />
+                    
+                    {/* Divider */}
+                    <div className="h-px bg-white/10 my-4"></div>
+                    
+                    {/* Language Switcher */}
+                    <div>
+                      <h4 className="text-white text-base font-semibold mb-3 flex items-center gap-2">
+                        <Languages className="w-4 h-4 text-theme3" />
+                        {t(lang, "select_language")}
+                      </h4>
+                      <div className="relative">
+                        <LanguageSwitcher isMobile={true} />
+                      </div>
                     </div>
                   </motion.div>
 

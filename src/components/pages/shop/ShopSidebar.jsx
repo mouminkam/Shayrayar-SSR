@@ -2,13 +2,13 @@
 import { memo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import OptimizedImage from "../ui/OptimizedImage";
-import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
-import { useShopSidebar } from "../../hooks/useShopSidebar";
-import { formatCurrency } from "../../lib/utils/formatters";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
+import OptimizedImage from "../../ui/OptimizedImage";
+import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
+import { useShopSidebar } from "../../../hooks/useShopSidebar";
+import { useHighlights } from "../../../context/HighlightsContext";
+import { formatCurrency } from "../../../lib/utils/formatters";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 const ShopSidebar = memo(function ShopSidebar() {
   const router = useRouter();
@@ -21,10 +21,12 @@ const ShopSidebar = memo(function ShopSidebar() {
   // Use custom hook for sidebar data
   const {
     categories,
-    recentProducts,
     isLoadingCategories,
-    isLoadingRecent,
   } = useShopSidebar();
+
+  // Use highlights API for recent products (latest)
+  const { latest, isLoading: isLoadingRecent } = useHighlights();
+  const recentProducts = latest || [];
 
   const handleCategoryClick = useCallback((categoryId) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -142,13 +144,6 @@ const ShopSidebar = memo(function ShopSidebar() {
               ))}
             </div>
           )}
-
-          <div className="text-center mt-6 lg:mt-8 pt-4 lg:pt-6 border-t border-white/10">
-            <Link href="/shop" className="inline-flex items-center text-theme3 text-xs lg:text-sm font-semibold hover:text-theme transition-all duration-300 group">
-              View All Products
-              <ArrowRight className="w-3 h-3 lg:w-4 lg:h-4 ml-1 lg:ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
-            </Link>
-          </div>
         </div>
       </div>
     </aside>

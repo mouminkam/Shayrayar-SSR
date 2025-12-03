@@ -3,11 +3,11 @@ import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle } from "lucide-react";
 import ProductImage from "./ProductImage";
 import ProductAbout from "./ProductAbout";
-import PageSEO from "../seo/PageSEO";
-import { useProductDetails } from "../../hooks/useProductDetails";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
-import { formatCurrency } from "../../lib/utils/formatters";
+import PageSEO from "../../seo/PageSEO";
+import { useProductDetails } from "../../../hooks/useProductDetails";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
+import { formatCurrency } from "../../../lib/utils/formatters";
 
 export default function ShopDetailsContent({ productId }) {
   const router = useRouter();

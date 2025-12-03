@@ -1,5 +1,5 @@
 "use client";
-import { useState, memo, useEffect, useMemo } from "react";
+import { useState, memo, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -45,6 +45,7 @@ const BillingForm = memo(() => {
     handleSubmit,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(checkoutSchema),
@@ -264,13 +265,15 @@ const BillingForm = memo(() => {
         }}
         setFormData={(updater) => {
           if (typeof updater === "function") {
-            const newData = updater(formData);
+            // Use getValues() to get current form values instead of watch() which may be stale
+            const currentValues = getValues();
+            const newData = updater(currentValues);
             Object.keys(newData).forEach((key) => {
-              setValue(key, newData[key]);
+              setValue(key, newData[key], { shouldValidate: false, shouldDirty: true });
             });
           } else {
             Object.keys(updater).forEach((key) => {
-              setValue(key, updater[key]);
+              setValue(key, updater[key], { shouldValidate: false, shouldDirty: true });
             });
           }
         }}
@@ -280,13 +283,15 @@ const BillingForm = memo(() => {
         formData={formData}
         setFormData={(updater) => {
           if (typeof updater === "function") {
-            const newData = updater(formData);
+            // Use getValues() to get current form values instead of watch() which may be stale
+            const currentValues = getValues();
+            const newData = updater(currentValues);
             Object.keys(newData).forEach((key) => {
-              setValue(key, newData[key]);
+              setValue(key, newData[key], { shouldValidate: false, shouldDirty: true });
             });
           } else {
             Object.keys(updater).forEach((key) => {
-              setValue(key, updater[key]);
+              setValue(key, updater[key], { shouldValidate: false, shouldDirty: true });
             });
           }
         }}

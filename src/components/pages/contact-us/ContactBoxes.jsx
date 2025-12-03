@@ -1,10 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { MapPin, Mail, Phone, Clock, Loader2 } from "lucide-react";
-import api from "../../api";
-import useBranchStore from "../../store/branchStore";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 // Helper function to format working hours from object to string
 const formatWorkingHours = (hours) => {

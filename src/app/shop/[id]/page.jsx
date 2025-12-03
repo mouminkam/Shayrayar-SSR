@@ -10,7 +10,7 @@ import { t } from "../../../locales/i18n/getTranslation";
 
 // Lazy load heavy components
 const ShopDetailsContent = dynamic(
-  () => import("../../../components/shop/ShopDetailsContent"),
+  () => import("../../../components/pages/shop/ShopDetailsContent"),
   {
     loading: () => <SectionSkeleton variant="default" height="h-96" />,
     ssr: false,
@@ -18,7 +18,7 @@ const ShopDetailsContent = dynamic(
 );
 
 const PopularDishes = dynamic(
-  () => import("../../../components/shop/PopularDishes"),
+  () => import("../../../components/pages/shop/PopularDishes"),
   {
     loading: () => <SectionSkeleton variant="grid" cardCount={5} height="h-96" />,
     ssr: false,

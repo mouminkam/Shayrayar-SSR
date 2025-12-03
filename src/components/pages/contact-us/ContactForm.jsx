@@ -4,12 +4,12 @@ import Image from "next/image";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { contactSchema } from "../../lib/validations/contactSchemas";
-import { branchesAPI } from "../../api";
-import useToastStore from "../../store/toastStore";
-import useBranchStore from "../../store/branchStore";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
+import { contactSchema } from "../../../lib/validations/contactSchemas";
+import { branchesAPI } from "../../../api";
+import useToastStore from "../../../store/toastStore";
+import useBranchStore from "../../../store/branchStore";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function ContactForm() {
   const { success: toastSuccess, error: toastError } = useToastStore();

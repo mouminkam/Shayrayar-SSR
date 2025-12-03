@@ -6,7 +6,7 @@ import SectionSkeleton from "../../ui/SectionSkeleton";
 
 // Lazy load contact components
 const ContactBoxes = dynamic(
-  () => import("../../contact/ContactBoxes"),
+  () => import("./ContactBoxes"),
   {
     loading: () => <SectionSkeleton variant="grid" cardCount={3} height="h-64" />,
     ssr: true,
@@ -14,7 +14,7 @@ const ContactBoxes = dynamic(
 );
 
 const ContactForm = dynamic(
-  () => import("../../contact/ContactForm"),
+  () => import("./ContactForm"),
   {
     loading: () => <SectionSkeleton variant="default" height="h-96" />,
     ssr: false,
@@ -22,7 +22,7 @@ const ContactForm = dynamic(
 );
 
 const Map = dynamic(
-  () => import("../../contact/Map"),
+  () => import("./Map"),
   {
     loading: () => <SectionSkeleton variant="default" showCards={false} height="h-96" />,
     ssr: false,

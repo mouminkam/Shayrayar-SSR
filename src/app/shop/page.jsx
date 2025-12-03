@@ -11,7 +11,7 @@ import { t } from "../../locales/i18n/getTranslation";
 
 // Lazy load ShopSection - Heavy component with API calls
 const ShopSection = dynamic(
-  () => import("../../components/shop/ShopSection"),
+  () => import("../../components/pages/shop/ShopSection"),
   {
     loading: () => <SectionSkeleton variant="grid" cardCount={12} height="h-screen" />,
     ssr: false,

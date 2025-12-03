@@ -1,8 +1,8 @@
 "use client";
 import { Grid, List } from "lucide-react";
-import { ITEMS_PER_PAGE } from "../../data/constants";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
+import { ITEMS_PER_PAGE } from "../../../data/constants";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 /**
  * SortBar Component

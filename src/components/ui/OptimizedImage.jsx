@@ -149,6 +149,64 @@ export default function OptimizedImage({
   }
 
   const imageSrc = src;
+  const isFill = rest.fill === true;
+
+  // If using fill prop, the parent container should handle positioning
+  // We still need a wrapper for absolute positioned elements (skeleton, retry indicator)
+  if (isFill) {
+    return (
+      <div className="absolute inset-0">
+        {/* Skeleton/Placeholder while loading */}
+        {!imageLoaded && (
+          <div 
+            className={`absolute inset-0 bg-gray-800/50 animate-pulse z-0`}
+          />
+        )}
+        
+        <NextImage
+          key={`${imageSrc}-${imageKey}`} // Force re-render when URL or key changes (for retry)
+          src={imageSrc}
+          alt={alt || "Image"}
+          blurDataURL={blurPlaceholder}
+          fill
+          className={`${className} ${!imageLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+          onLoad={() => {
+            setImageLoaded(true);
+            setImageError(false);
+            // Clear timeout if image loads successfully
+            if (loadTimeoutRef.current) {
+              clearTimeout(loadTimeoutRef.current);
+            }
+          }}
+          onError={() => {
+            setImageError(true);
+            setImageLoaded(false);
+            // Clear load timeout
+            if (loadTimeoutRef.current) {
+              clearTimeout(loadTimeoutRef.current);
+            }
+          }}
+          onLoadingComplete={() => {
+            setImageLoaded(true);
+            setImageError(false);
+            // Clear timeout if image loads successfully
+            if (loadTimeoutRef.current) {
+              clearTimeout(loadTimeoutRef.current);
+            }
+          }}
+          placeholder={blurPlaceholder ? "blur" : "empty"}
+          {...rest}
+        />
+        
+        {/* Show retry indicator if retrying */}
+        {imageError && retryCount < maxRetries && (
+          <div className="absolute inset-0 bg-gray-800/30 flex items-center justify-center z-10">
+            <span className="text-gray-400 text-xs">Retrying... ({retryCount + 1}/{maxRetries})</span>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="relative">

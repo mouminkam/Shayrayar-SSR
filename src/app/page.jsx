@@ -3,18 +3,17 @@ import { useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import useBranchStore from "../store/branchStore";
-import { HighlightsProvider } from "../context/HighlightsContext";
 import AnimatedSection from "../components/ui/AnimatedSection";
 import ErrorBoundary from "../components/ui/ErrorBoundary";
 import SectionSkeleton from "../components/ui/SectionSkeleton";
 import PageSEO from "../components/seo/PageSEO";
 
 // Above the fold - Load immediately (no lazy loading)
-import BannerSection from "../components/home/BannerSection";
+import BannerSection from "../components/pages/home/BannerSection";
 
 // Priority 1: High Priority - Lazy load with SSR disabled (client-only)
 const PopularDishes = dynamic(
-  () => import("../components/shop/PopularDishes"),
+  () => import("../components/pages/shop/PopularDishes"),
   {
     loading: () => <SectionSkeleton variant="grid" cardCount={5} height="h-96" />,
     ssr: false,
@@ -22,7 +21,7 @@ const PopularDishes = dynamic(
 );
 
 const FoodMenuSection = dynamic(
-  () => import("../components/home/FoodMenuSection"),
+  () => import("../components/pages/home/FoodMenuSection"),
   {
     loading: () => <SectionSkeleton variant="default" cardCount={10} height="h-96" />,
     ssr: false,
@@ -31,7 +30,7 @@ const FoodMenuSection = dynamic(
 
 // Priority 3: Medium Priority - Lazy load
 const LatestItemsSection = dynamic(
-  () => import("../components/home/LatestItemsSection"),
+  () => import("../components/pages/home/LatestItemsSection"),
   {
     loading: () => <SectionSkeleton variant="slider" cardCount={4} height="h-80" />,
     ssr: false,
@@ -39,7 +38,7 @@ const LatestItemsSection = dynamic(
 );
 
 const ChefSpecialSection = dynamic(
-  () => import("../components/home/ChefSpecialSection"),
+  () => import("../components/pages/home/ChefSpecialSection"),
   {
     loading: () => <SectionSkeleton variant="grid" cardCount={3} height="h-96" />,
     ssr: false,
@@ -47,7 +46,7 @@ const ChefSpecialSection = dynamic(
 );
 
 const ChefeSection = dynamic(
-  () => import("../components/about/ChefeSection"),
+  () => import("../components/pages/about-us/ChefeSection"),
   {
     loading: () => <SectionSkeleton variant="grid" cardCount={3} height="h-96" />,
     ssr: false,
@@ -55,7 +54,7 @@ const ChefeSection = dynamic(
 );
 
 const OfferCards = dynamic(
-  () => import("../components/about/OfferCards"),
+  () => import("../components/pages/about-us/OfferCards"),
   {
     loading: () => <SectionSkeleton variant="default" cardCount={3} height="h-80" />,
     ssr: false,
@@ -64,7 +63,7 @@ const OfferCards = dynamic(
 
 // Lightweight sections - Can be lazy loaded but low impact
 const AboutUsSection = dynamic(
-  () => import("../components/home/AboutUsSection"),
+  () => import("../components/pages/home/AboutUsSection"),
   {
     loading: () => <SectionSkeleton variant="default" showCards={false} height="h-64" />,
     ssr: true, // Can be SSR as it's lightweight
@@ -88,7 +87,7 @@ export default function HomePage() {
   }, [selectedBranch, router]);
 
   return (
-    <HighlightsProvider>
+    <>
       <PageSEO
         title="Shahrayar Restaurant - Authentic Middle Eastern Cuisine"
         description="Experience authentic Middle Eastern flavors at Shahrayar Restaurant. Fresh ingredients, traditional recipes, and genuine hospitality. Order online for delivery or pickup."
@@ -176,6 +175,6 @@ export default function HomePage() {
       </ErrorBoundary> */}
 
       </div>
-    </HighlightsProvider>
+    </>
   );
 }

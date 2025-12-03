@@ -2,12 +2,12 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { ShoppingCart, Facebook, Youtube, Twitter, Instagram, Plus, Minus } from "lucide-react";
-import { formatCurrency } from "../../lib/utils/formatters";
+import { formatCurrency } from "../../../lib/utils/formatters";
 import ProductCustomization from "./ProductCustomization";
-import { useAddToCart } from "../../hooks/useAddToCart";
-import { SOCIAL_LINKS } from "../../data/constants";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
+import { useAddToCart } from "../../../hooks/useAddToCart";
+import { SOCIAL_LINKS } from "../../../data/constants";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 // Map icon names to lucide-react components
 const iconMap = { Facebook, Youtube, Twitter, Instagram };

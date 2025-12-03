@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import ProductSizes from "../shop/ProductSizes";
-import ProductIngredients from "../shop/ProductIngredients";
+import ProductSizes from "../pages/shop/ProductSizes";
+import ProductIngredients from "../pages/shop/ProductIngredients";
 import { formatCurrency } from "../../lib/utils/formatters";
 import api from "../../api";
 import { transformMenuItemToProduct } from "../../lib/utils/productTransform";
@@ -133,6 +134,7 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
       ingredients_data: selectedIngredients,
       final_price: finalPrice,
       price: finalPrice, // Update price as well
+      image: product.image || cartItem?.image || null, // Preserve image from product or cart item
     };
 
     if (onSave) {
@@ -140,43 +142,64 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
     }
 
     onClose();
-  }, [product, selectedSizeId, selectedIngredientIds, finalPrice, onSave, onClose]);
+  }, [product, selectedSizeId, selectedIngredientIds, finalPrice, cartItem, onSave, onClose]);
 
+  // Use portal to render modal at document body level
+  if (typeof window === 'undefined') return null;
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      >
+      {isOpen && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="relative w-full max-w-2xl max-h-[90vh] bg-linear-to-br from-bgimg/95 via-bgimg to-bgimg/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/10 overflow-hidden"
-          onClick={(e) => e.stopPropagation()}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 flex items-center justify-center bg-black/75 backdrop-blur-md"
+          onClick={onClose}
+          style={{ 
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 999999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem'
+          }}
         >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="relative w-full max-w-4xl xl:max-w-5xl bg-linear-to-br from-bgimg/98 via-bgimg/95 to-bgimg/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-2xl border border-white/20 overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+            style={{ 
+              maxHeight: '90vh',
+              maxWidth: '90vw',
+              margin: 'auto',
+              position: 'relative'
+            }}
+          >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-white/10">
-            <h2 className="text-white  text-2xl font-bold">
-              Edit Item: {cartItem?.name || "Product"}
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/20 shrink-0 bg-linear-to-r from-bgimg/95 via-bgimg/90 to-bgimg/95 backdrop-blur-sm relative z-10">
+            <h2 className="text-white text-lg sm:text-xl md:text-2xl font-black truncate pr-4 drop-shadow-lg">
+              Edit Item: <span className="text-theme3">{cartItem?.name || "Product"}</span>
             </h2>
             <button
               onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 text-white transition-all duration-300 shrink-0 shadow-lg hover:shadow-xl hover:scale-110"
               aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Content */}
-          <div className="overflow-y-auto max-h-[calc(90vh-180px)] p-6">
+          {/* Content - Scrollable */}
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-theme3"></div>
@@ -226,24 +249,27 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-4 p-6 border-t border-white/10">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 p-4 sm:p-6 border-t border-white/10 shrink-0">
             <button
               onClick={onClose}
-              className="px-6 py-3 bg-transparent border-2 border-white/20 text-white rounded-xl hover:border-white/40 transition-colors  font-semibold"
+              className="w-full sm:w-auto px-6 py-3 bg-transparent border-2 border-white/20 text-white rounded-xl hover:border-white/40 transition-colors font-semibold text-sm sm:text-base"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={isLoading || !product || (product.has_sizes && !selectedSizeId)}
-              className="px-6 py-3 bg-theme3 text-white rounded-xl hover:bg-theme transition-colors  font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 py-3 bg-theme3 text-white rounded-xl hover:bg-theme transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               Save Changes
             </button>
           </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
+      )}
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }
 

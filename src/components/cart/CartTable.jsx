@@ -7,12 +7,13 @@ import useCartStore, { getCartItemKey } from "../../store/cartStore";
 import { formatCurrency } from "../../lib/utils/formatters";
 import { IMAGE_PATHS } from "../../data/constants";
 import CartEditModal from "./CartEditModal";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 import useToastStore from "../../store/toastStore";
 import OptimizedImage from "../ui/OptimizedImage";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
 
 // Desktop Table View Component
-const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, onEditItem }) => {
+const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, onEditItem, onDeleteItem }) => {
   const { prefetchRoute } = usePrefetchRoute();
   
   return (
@@ -151,10 +152,10 @@ const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, on
                     </motion.button>
                   )}
                   <motion.button
-                    onClick={() => removeFromCart(itemKey)}
+                    onClick={() => onDeleteItem(itemKey, item.name)}
                     whileHover={{ scale: 1.1, rotate: 5 }}
                     whileTap={{ scale: 0.9 }}
-                    className="w-10 h-10 flex items-center justify-center text-white/60 hover:text-theme hover:bg-theme/10 rounded-lg transition-all duration-300"
+                    className="w-10 h-10 flex items-center justify-center text-white/60 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-300"
                     aria-label={`Remove ${item.name} from cart`}
                   >
                     <Trash2 className="w-5 h-5" />
@@ -173,7 +174,7 @@ const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, on
 DesktopTable.displayName = "DesktopTable";
 
 // Mobile Card View Component
-const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, onEditItem }) => {
+const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, onEditItem, onDeleteItem }) => {
   const { prefetchRoute } = usePrefetchRoute();
   
   return (
@@ -198,7 +199,7 @@ const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, 
               className="shrink-0 group"
               onMouseEnter={() => prefetchRoute(`/shop/${item.id}`)}
             >
-              <div className="relative w-full sm:w-24 h-50 rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-shadow duration-300">
+              <div className="relative w-full sm:w-24 h-24 sm:h-24 rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-shadow duration-300">
                 <OptimizedImage
                   src={item.image || IMAGE_PATHS.placeholder}
                   alt={item.name}
@@ -289,10 +290,10 @@ const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, 
                   </motion.button>
                 )}
                 <motion.button
-                  onClick={() => removeFromCart(itemKey)}
+                  onClick={() => onDeleteItem(itemKey, item.name)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-transparent border-2 border-theme text-theme text-sm font-semibold rounded-xl hover:bg-theme hover:text-white transition-all duration-300"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-transparent border-2 border-red-500/50 text-red-400 text-sm font-semibold rounded-xl hover:bg-red-500/20 hover:border-red-500 hover:text-red-300 transition-all duration-300"
                   aria-label={`Remove ${item.name} from cart`}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -315,6 +316,8 @@ const CartTable = memo(() => {
   const { success: toastSuccess, error: toastError } = useToastStore();
   const [editingItem, setEditingItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deletingItem, setDeletingItem] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleEditItem = (item) => {
     setEditingItem(item);
@@ -337,6 +340,24 @@ const CartTable = memo(() => {
       handleCloseModal();
     } else {
       toastError("Failed to update item");
+    }
+  };
+
+  const handleDeleteClick = (itemKey, itemName) => {
+    setDeletingItem({ key: itemKey, name: itemName });
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingItem(null);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingItem) {
+      removeFromCart(deletingItem.key);
+      toastSuccess("Item removed from cart");
+      handleCloseDeleteModal();
     }
   };
 
@@ -381,6 +402,7 @@ const CartTable = memo(() => {
           increaseQty={increaseQty}
           decreaseQty={decreaseQty}
           onEditItem={handleEditItem}
+          onDeleteItem={handleDeleteClick}
         />
         <MobileCardView 
           items={items}
@@ -388,6 +410,7 @@ const CartTable = memo(() => {
           increaseQty={increaseQty}
           decreaseQty={decreaseQty}
           onEditItem={handleEditItem}
+          onDeleteItem={handleDeleteClick}
         />
       </div>
       
@@ -399,6 +422,13 @@ const CartTable = memo(() => {
           onSave={handleSaveEdit}
         />
       )}
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        itemName={deletingItem?.name}
+      />
     </>
   );
 });

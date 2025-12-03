@@ -60,7 +60,12 @@ const useCartStore = create(
                 ingredients: item.ingredients || [],
               });
               return itemKey === productKey
-                ? { ...item, quantity: item.quantity + 1 }
+                ? { 
+                    ...item, 
+                    quantity: item.quantity + 1,
+                    // Ensure image is preserved or updated from product
+                    image: item.image || product.image || product.image_url || null
+                  }
                 : item;
             }),
           });
@@ -71,6 +76,7 @@ const useCartStore = create(
               ...product, 
               quantity: 1,
               // Ensure all fields are set
+              image: product.image || product.image_url || null, // Preserve image from product
               size_id: product.size_id || null,
               size_name: product.size_name || null,
               ingredients: product.ingredients || [],
@@ -230,8 +236,9 @@ const useCartStore = create(
         const updatedItem = {
           ...itemToUpdate,
           ...updates,
-          // Preserve quantity
+          // Preserve quantity and image
           quantity: itemToUpdate.quantity,
+          image: itemToUpdate.image || updates.image || null, // Preserve image from original item
         };
 
         // Generate new key for updated item
@@ -398,6 +405,21 @@ const useCartStore = create(
     {
       name: "cart-storage", // localStorage key
       storage: createJSONStorage(() => localStorage),
+      // Migration: Ensure all items have image property
+      migrate: (persistedState, version) => {
+        if (persistedState?.items) {
+          persistedState.items = persistedState.items.map((item) => {
+            // If item doesn't have image, try to fetch it from API or set placeholder
+            if (!item.image) {
+              // Try to get image from various possible sources
+              item.image = item.image_url || item.imageUrl || null;
+            }
+            return item;
+          });
+        }
+        return persistedState;
+      },
+      version: 1,
     }
   )
 );

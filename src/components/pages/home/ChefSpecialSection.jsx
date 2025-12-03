@@ -1,54 +1,20 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingBasket, ChefHat } from "lucide-react";
-import { formatCurrency } from "../../lib/utils/formatters";
-import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
-import { useHighlights } from "../../context/HighlightsContext";
-import OptimizedImage from "../ui/OptimizedImage";
-import ProductCardSkeleton from "../ui/ProductCardSkeleton";
-import { useRouter } from "next/navigation";
-import useCartStore from "../../store/cartStore";
-import useToastStore from "../../store/toastStore";
-import useAuthStore from "../../store/authStore";
-import { useCallback } from "react";
+import { ChefHat } from "lucide-react";
+import { formatCurrency } from "../../../lib/utils/formatters";
+import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
+import { useHighlights } from "../../../context/HighlightsContext";
+import OptimizedImage from "../../ui/OptimizedImage";
+import ProductCardSkeleton from "../../ui/ProductCardSkeleton";
 import { useInView } from "react-intersection-observer";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function ChefSpecialSection() {
-  const router = useRouter();
   const { prefetchRoute } = usePrefetchRoute();
   const { chefSpecial, isLoading } = useHighlights();
-  const { addToCart } = useCartStore();
-  const { success: toastSuccess, error: toastError } = useToastStore();
-  const { isAuthenticated } = useAuthStore();
   const { lang } = useLanguage();
-
-  const handleAddToCart = useCallback((e, dish) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Check authentication first
-    if (!isAuthenticated) {
-      toastError("Please login to add items to cart");
-      router.push("/login", { scroll: false });
-      return;
-    }
-    
-    try {
-      addToCart({
-        id: dish.id,
-        name: dish.title,
-        price: dish.price,
-        image: dish.image,
-        title: dish.title,
-      });
-      toastSuccess(`${dish.title} added to cart`);
-    } catch {
-      toastError("Failed to add product to cart");
-    }
-  }, [addToCart, toastSuccess, toastError, isAuthenticated, router]);
 
   if (isLoading) {
     return (
@@ -99,7 +65,6 @@ export default function ChefSpecialSection() {
                   dish={dish}
                   index={index}
                   prefetchRoute={prefetchRoute}
-                  handleAddToCart={handleAddToCart}
                 />
               );
             })}
@@ -111,7 +76,7 @@ export default function ChefSpecialSection() {
 }
 
 // Lazy Chef Card Component - Loads only when in viewport
-function LazyChefCard({ dish, index, prefetchRoute, handleAddToCart }) {
+function LazyChefCard({ dish, index, prefetchRoute }) {
   const { lang } = useLanguage();
   const shouldLoadImmediately = index < 3; // Load first 3 immediately
   const { ref, inView } = useInView({
@@ -184,22 +149,13 @@ function LazyChefCard({ dish, index, prefetchRoute, handleAddToCart }) {
           <p className="text-theme3 text-base sm:text-lg font-bold mb-4">
             {formatCurrency(dish.price)}
           </p>
-          <div className="flex items-center justify-center gap-2">
-            <Link
-              href={`/shop/${dish.id}`}
-              onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
-              className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 flex-1"
-            >
-              {t(lang, "order")}
-            </Link>
-            <button
-              onClick={(e) => handleAddToCart(e, dish)}
-              className="w-12 h-12 flex items-center justify-center rounded-full bg-theme3 text-white hover:bg-theme transition-all duration-300"
-              title="Add to Cart"
-            >
-              <ShoppingBasket className="w-5 h-5" />
-            </button>
-          </div>
+          <Link
+            href={`/shop/${dish.id}`}
+            onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
+            className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 w-full"
+          >
+            {t(lang, "order")}
+          </Link>
         </div>
       </div>
     </div>

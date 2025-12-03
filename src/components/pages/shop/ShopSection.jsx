@@ -3,14 +3,14 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import ShopSidebar from "./ShopSidebar";
 import SortBar from "./SortBar";
-import ProductCardSkeleton from "../ui/ProductCardSkeleton";
-import LazyProductCard from "../ui/LazyProductCard";
-import AnimatedSection from "../ui/AnimatedSection";
+import ProductCardSkeleton from "../../ui/ProductCardSkeleton";
+import LazyProductCard from "../../ui/LazyProductCard";
+import AnimatedSection from "../../ui/AnimatedSection";
 import { ChevronDown } from "lucide-react";
-import { useShopProducts } from "../../hooks/useShopProducts";
-import { ITEMS_PER_PAGE_GRID, ITEMS_PER_PAGE_LIST } from "../../data/constants";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
+import { useShopProducts } from "../../../hooks/useShopProducts";
+import { ITEMS_PER_PAGE_GRID, ITEMS_PER_PAGE_LIST } from "../../../data/constants";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function ShopSection() {
   const searchParams = useSearchParams();

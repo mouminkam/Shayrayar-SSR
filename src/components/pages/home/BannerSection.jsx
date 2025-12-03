@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
+import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 // Import Swiper CSS - Next.js will handle optimization
 import "swiper/swiper-bundle.css";

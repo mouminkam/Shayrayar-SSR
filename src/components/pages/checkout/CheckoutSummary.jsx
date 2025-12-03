@@ -28,8 +28,10 @@ const CheckoutSummary = memo(() => {
   const subtotal = useMemo(() => getSubtotal(), [items, getSubtotal]);
   const tax = useMemo(() => getTax(), [subtotal, getTax]);
   const discount = useMemo(() => getDiscount(), [coupon, subtotal, getDiscount]);
-  const delivery = useMemo(() => getDeliveryCharge(), [orderType, deliveryCharge, coupon, getDeliveryCharge]);
-  const total = useMemo(() => getTotal(), [subtotal, discount, tax, delivery, getTotal]);
+  // إزالة getDeliveryCharge من dependencies لأنه function ثابتة - يعتمد فقط على deliveryCharge state
+  const delivery = useMemo(() => getDeliveryCharge(), [orderType, deliveryCharge, coupon]);
+  // إزالة getTotal من dependencies لأنه function ثابتة - يعتمد على القيم المحسوبة
+  const total = useMemo(() => getTotal(), [subtotal, discount, tax, delivery]);
   const itemCount = useMemo(() => getItemCount(), [items, getItemCount]);
 
   if (items.length === 0) {

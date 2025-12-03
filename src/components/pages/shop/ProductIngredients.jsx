@@ -1,9 +1,9 @@
 "use client";
 import { memo, useMemo } from "react";
 import { Check, Plus } from "lucide-react";
-import { formatCurrency } from "../../lib/utils/formatters";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
+import { formatCurrency } from "../../../lib/utils/formatters";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 /**
  * ProductIngredients Component

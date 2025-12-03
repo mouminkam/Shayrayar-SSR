@@ -6,7 +6,7 @@ import SectionSkeleton from "../../ui/SectionSkeleton";
 
 // Lazy load all about sections
 const OfferCards = dynamic(
-  () => import("../../about/OfferCards"),
+  () => import("./OfferCards"),
   {
     loading: () => <SectionSkeleton variant="default" cardCount={3} height="h-80" />,
     ssr: false,
@@ -14,7 +14,7 @@ const OfferCards = dynamic(
 );
 
 const AboutSection = dynamic(
-  () => import("../../about/AboutSection"),
+  () => import("./AboutSection"),
   {
     loading: () => <SectionSkeleton variant="default" showCards={false} height="h-64" />,
     ssr: true,
@@ -22,7 +22,7 @@ const AboutSection = dynamic(
 );
 
 const ChefeSection = dynamic(
-  () => import("../../about/ChefeSection"),
+  () => import("./ChefeSection"),
   {
     loading: () => <SectionSkeleton variant="grid" cardCount={3} height="h-96" />,
     ssr: false,

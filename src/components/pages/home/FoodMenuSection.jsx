@@ -2,15 +2,15 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { formatCurrency } from "../../lib/utils/formatters";
-import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
-import api from "../../api";
-import useBranchStore from "../../store/branchStore";
-import { transformCategories, transformMenuItemsToProducts } from "../../lib/utils/productTransform";
-import { extractMenuItemsFromResponse } from "../../lib/utils/responseExtractor";
-import { IMAGE_PATHS } from "../../data/constants";
-import { useLanguage } from "../../context/LanguageContext";
-import { t } from "../../locales/i18n/getTranslation";
+import { formatCurrency } from "../../../lib/utils/formatters";
+import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
+import { transformCategories, transformMenuItemsToProducts } from "../../../lib/utils/productTransform";
+import { extractMenuItemsFromResponse } from "../../../lib/utils/responseExtractor";
+import { IMAGE_PATHS } from "../../../data/constants";
+import { useLanguage } from "../../../context/LanguageContext";
+import { t } from "../../../locales/i18n/getTranslation";
 
 export default function FoodMenuSection() {
   const { prefetchRoute } = usePrefetchRoute();
