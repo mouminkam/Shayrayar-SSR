@@ -38,14 +38,17 @@ const OptionGroup = memo(({ group, selectedItemIds = [], onSelectionChange }) =>
       if (minSelection === 1 && maxSelection === 1) {
         return t(lang, "required_choose_one");
       } else if (minSelection > 0 && maxSelection > minSelection) {
-        return t(lang, "required_choose_min", { min: minSelection, max: maxSelection });
+        let message = t(lang, "required_choose_min");
+        message = message.replace("{min}", minSelection);
+        message = message.replace("{max}", maxSelection);
+        return message;
       } else if (minSelection > 0) {
-        return t(lang, "required_choose_minimum", { min: minSelection });
+        return t(lang, "required_choose_minimum").replace("{min}", minSelection);
       }
       return t(lang, "required");
     } else {
       if (maxSelection > 0) {
-        return t(lang, "choose_up_to", { max: maxSelection });
+        return t(lang, "choose_up_to").replace("{max}", maxSelection);
       }
       return t(lang, "optional");
     }

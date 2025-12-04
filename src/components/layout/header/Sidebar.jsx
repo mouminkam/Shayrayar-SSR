@@ -13,6 +13,8 @@ import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import { NAV_LINKS } from "../../../data/constants";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import { useHighlights } from "../../../context/HighlightsContext";
+import OptimizedImage from "../../ui/OptimizedImage";
 
 // Helper function to format working hours from array to string
 const formatWorkingHours = (hours) => {
@@ -41,6 +43,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const { selectedBranch, initialize } = useBranchStore();
   const { prefetchRoute } = usePrefetchRoute();
   const { lang } = useLanguage();
+  const { popular, latest, chefSpecial, isLoading: highlightsLoading } = useHighlights();
   const [contactInfo, setContactInfo] = useState({
     address: "Main Street, Melbourne, Australia",
     email: "info@fresheat.com",
@@ -48,14 +51,15 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     workingHours: "Mon-Friday, 09am - 05pm",
   });
 
-  const galleryImages = [
-    "/img/header/01.jpg",
-    "/img/header/02.jpg",
-    "/img/header/03.jpg",
-    "/img/header/04.jpg",
-    "/img/header/05.jpg",
-    "/img/header/06.jpg",
-  ];
+  // Get gallery images from highlights API
+  // First 3 from popular, next 3 from latest or chefSpecial
+  const getGalleryImages = () => {
+    const popularImages = (popular || []).slice(0, 3);
+    const otherImages = (latest && latest.length > 0 ? latest : chefSpecial || []).slice(0, 3);
+    return [...popularImages, ...otherImages];
+  };
+
+  const galleryImages = getGalleryImages();
 
   // Initialize branch if not loaded
   useEffect(() => {
@@ -230,54 +234,84 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     transition={{ delay: 0.3, duration: 0.4, ease: "easeOut" }}
                     className="offcanvas-gallery-area hidden xl:block mb-6"
                   >
-                    <div className="offcanvas-gallery-items grid grid-cols-3 gap-2 mb-2">
-                      {galleryImages.slice(0, 3).map((image, index) => (
-                        <Link
-                          key={index}
-                          href={image}
-                          className="offcanvas-image block aspect-square overflow-hidden rounded-lg group"
-                        >
-                          <motion.div
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ duration: 0.3 }}
+                    {highlightsLoading ? (
+                      <div className="grid grid-cols-3 gap-2">
+                        {[...Array(6)].map((_, index) => (
+                          <div
+                            key={index}
+                            className="aspect-square bg-white/10 rounded-lg animate-pulse"
+                          />
+                        ))}
+                      </div>
+                    ) : galleryImages.length > 0 ? (
+                      <>
+                        <div className="offcanvas-gallery-items grid grid-cols-3 gap-2 mb-2">
+                          {galleryImages.slice(0, 3).map((dish, index) => (
+                            <Link
+                              key={dish?.id || index}
+                              href={dish?.id ? `/shop/${dish.id}` : "#"}
+                              onMouseEnter={() => dish?.id && prefetchRoute(`/shop/${dish.id}`)}
+                              onClick={() => setIsOpen(false)}
+                              className="offcanvas-image block aspect-square overflow-hidden rounded-lg group"
+                            >
+                              <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                transition={{ duration: 0.3 }}
+                              >
+                                <OptimizedImage
+                                  src={dish?.image || "/img/header/01.jpg"}
+                                  alt={dish?.title || `gallery-img-${index + 1}`}
+                                  width={120}
+                                  height={120}
+                                  className="w-full h-full object-cover"
+                                  quality={80}
+                                  loading="lazy"
+                                  sizes="120px"
+                                />
+                              </motion.div>
+                            </Link>
+                          ))}
+                        </div>
+                        <div className="offcanvas-gallery-items grid grid-cols-3 gap-2">
+                          {galleryImages.slice(3, 6).map((dish, index) => (
+                            <Link
+                              key={dish?.id || index + 3}
+                              href={dish?.id ? `/shop/${dish.id}` : "#"}
+                              onMouseEnter={() => dish?.id && prefetchRoute(`/shop/${dish.id}`)}
+                              onClick={() => setIsOpen(false)}
+                              className="offcanvas-image block aspect-square overflow-hidden rounded-lg group"
+                            >
+                              <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                transition={{ duration: 0.3 }}
+                              >
+                                <OptimizedImage
+                                  src={dish?.image || "/img/header/04.jpg"}
+                                  alt={dish?.title || `gallery-img-${index + 4}`}
+                                  width={120}
+                                  height={120}
+                                  className="w-full h-full object-cover"
+                                  quality={80}
+                                  loading="lazy"
+                                  sizes="120px"
+                                />
+                              </motion.div>
+                            </Link>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="grid grid-cols-3 gap-2">
+                        {[...Array(6)].map((_, index) => (
+                          <div
+                            key={index}
+                            className="aspect-square bg-white/10 rounded-lg flex items-center justify-center"
                           >
-                            <Image
-                              src={image}
-                              alt={`gallery-img-${index + 1}`}
-                              width={120}
-                              height={120}
-                              className="w-full h-full object-cover"
-                              quality={80}
-                              loading="lazy"
-                              sizes="120px"
-                            />
-                          </motion.div>
-                        </Link>
-                      ))}
-                    </div>
-                    <div className="offcanvas-gallery-items grid grid-cols-3 gap-2">
-                      {galleryImages.slice(3, 6).map((image, index) => (
-                        <Link
-                          key={index + 3}
-                          href={image}
-                          className="offcanvas-image block aspect-square overflow-hidden rounded-lg group"
-                        >
-                          <motion.div
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            <Image
-                              src={image}
-                              alt={`gallery-img-${index + 4}`}
-                              width={120}
-                              height={120}
-                              className="w-full h-full object-cover"
-                              unoptimized={true}
-                            />
-                          </motion.div>
-                        </Link>
-                      ))}
-                    </div>
+                            <span className="text-white/50 text-xs">No image</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </motion.div>
 
                   {/* Mobile Menu - Navigation for small devices */}

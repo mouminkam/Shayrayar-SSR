@@ -1,9 +1,8 @@
 "use client";
-import { useEffect, useState, Suspense } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useEffect, useState, useCallback, use } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import dynamic from "next/dynamic";
-import { ArrowLeft, Package, Calendar, CreditCard, MapPin, CheckCircle, Clock, XCircle, X, Navigation } from "lucide-react";
+import { ArrowLeft, Package, Calendar, CreditCard, MapPin, CheckCircle, Clock, XCircle, X, Navigation, RotateCcw, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import api from "../../../api";
@@ -13,33 +12,28 @@ import { formatCurrency } from "../../../lib/utils/formatters";
 import AnimatedSection from "../../../components/ui/AnimatedSection";
 import ErrorBoundary from "../../../components/ui/ErrorBoundary";
 import Breadcrumb from "../../../components/ui/Breadcrumb";
-import SectionSkeleton from "../../../components/ui/SectionSkeleton";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import { useAddToCart } from "../../../hooks/useAddToCart";
+import { transformMenuItemToProduct } from "../../../lib/utils/productTransform";
 
-export default function OrderDetailsPage() {
+export default function OrderDetailsPage({ params }) {
   const router = useRouter();
-  const params = useParams();
+  const resolvedParams = use(params);
   const { prefetchRoute } = usePrefetchRoute();
-  const orderId = params?.id;
+  const orderId = resolvedParams?.id ? String(resolvedParams.id) : null;
   const { error: toastError, success: toastSuccess } = useToastStore();
   const { lang } = useLanguage();
   const [order, setOrder] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCancelling, setIsCancelling] = useState(false);
-  const [isTracking, setIsTracking] = useState(false);
-  const [trackingData, setTrackingData] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  const [isReorderLoading, setIsReorderLoading] = useState(false);
+  const addToCartHook = useAddToCart();
 
-  useEffect(() => {
-    if (orderId) {
-      fetchOrderDetails();
-    }
-  }, [orderId]);
-
-  const fetchOrderDetails = async () => {
+  const fetchOrderDetails = useCallback(async () => {
     if (!orderId) return;
 
     setIsLoading(true);
@@ -59,7 +53,13 @@ export default function OrderDetailsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [orderId, toastError, lang]);
+
+  useEffect(() => {
+    if (orderId) {
+      fetchOrderDetails();
+    }
+  }, [orderId, fetchOrderDetails]);
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -118,28 +118,125 @@ export default function OrderDetailsPage() {
     }
   };
 
-  const handleTrackOrder = async () => {
-    setIsTracking(true);
-    try {
-      const response = await api.orders.trackOrder(orderId);
-      
-      if (response.success && response.data) {
-        setTrackingData(response.data);
-        toastSuccess(t(lang, "tracking_information_loaded"));
-      } else {
-        toastError(response.message || t(lang, "failed_to_load_tracking_information"));
-      }
-    } catch (error) {
-      console.error("Error tracking order:", error);
-      toastError(error?.message || t(lang, "failed_to_load_tracking_information"));
-    } finally {
-      setIsTracking(false);
+  const handleTrackOrder = () => {
+    // Check if tracking_url is available
+    if (!order.tracking_url) {
+      toastError(t(lang, "tracking_not_available"));
+      return;
     }
+
+    // Open tracking URL in a new window
+    window.open(order.tracking_url, '_blank', 'noopener,noreferrer');
   };
 
   const canCancelOrder = () => {
     const status = order?.status?.toLowerCase();
     return status === 'pending' || status === 'processing' || status === 'confirmed';
+  };
+
+  const handleReorder = async () => {
+    if (!order?.id) {
+      toastError(t(lang, "invalid_order"));
+      return;
+    }
+
+    setIsReorderLoading(true);
+    try {
+      // Get full order data from API
+      const response = await api.orders.getOrderById(order.id);
+      
+      if (!response?.success || !response?.data) {
+        toastError(response?.message || t(lang, "failed_to_reorder"));
+        setIsReorderLoading(false);
+        return;
+      }
+
+      // Extract order from response
+      const orderData = response.data.order || response.data;
+      const orderItems = orderData.order_items || [];
+
+      if (!orderItems || orderItems.length === 0) {
+        toastError(t(lang, "no_items_to_add"));
+        setIsReorderLoading(false);
+        return;
+      }
+
+      // Add each order item to cart
+      let addedCount = 0;
+      let failedCount = 0;
+
+      for (const orderItem of orderItems) {
+        try {
+          // Get menu_item from order_item
+          const menuItem = orderItem.menu_item;
+          
+          if (!menuItem) {
+            console.error(`Menu item not found for order item ${orderItem.id}`);
+            failedCount++;
+            continue;
+          }
+
+          // Extract option_groups from menu_item if available, otherwise empty array
+          const optionGroups = menuItem.option_groups || [];
+
+          // Transform menu_item to product object
+          const product = transformMenuItemToProduct(menuItem, optionGroups);
+          
+          if (!product) {
+            console.error(`Failed to transform product ${menuItem.id}`);
+            failedCount++;
+            continue;
+          }
+
+          // Convert selected_options from API format to frontend format
+          // API format: [{ option_group_id: 4, option_item_ids: [3] }]
+          // Frontend format: { 4: [3] }
+          let selectedOptions = null;
+          if (orderItem.selected_options && Array.isArray(orderItem.selected_options) && orderItem.selected_options.length > 0) {
+            selectedOptions = {};
+            orderItem.selected_options.forEach(option => {
+              if (option.option_group_id && Array.isArray(option.option_item_ids)) {
+                selectedOptions[option.option_group_id] = option.option_item_ids;
+              }
+            });
+          }
+
+          // Build customization object from order_item data
+          const customization = {
+            sizeId: orderItem.size_id || null,
+            ingredientIds: orderItem.selected_ingredients || [],
+            selectedOptions: selectedOptions,
+            finalPrice: parseFloat(orderItem.item_price || 0),
+            isValid: true, // Assume valid since it was in a previous order
+          };
+
+          // Add to cart using the hook (which handles quantity internally)
+          addToCartHook(product, customization, orderItem.quantity || 1);
+          addedCount++;
+        } catch (error) {
+          console.error(`Error adding item ${orderItem.item_name} to cart:`, error);
+          failedCount++;
+        }
+      }
+
+      // Show success/error messages
+      if (addedCount > 0) {
+        const itemText = addedCount === 1 ? t(lang, "item") : t(lang, "items");
+        toastSuccess(`${addedCount} ${itemText} ${t(lang, "added_to_cart")}`);
+      }
+      if (failedCount > 0) {
+        const itemText = failedCount === 1 ? t(lang, "item") : t(lang, "items");
+        toastError(`${failedCount} ${itemText} ${t(lang, "failed_add_cart")}`);
+      }
+      if (addedCount === 0 && failedCount === 0) {
+        toastError(t(lang, "no_items_to_add"));
+      }
+    } catch (error) {
+      console.error("Reorder error:", error);
+      toastError(error?.message || t(lang, "failed_to_reorder"));
+    } finally {
+      setIsReorderLoading(false);
+    }
   };
 
   if (isLoading) {
@@ -313,6 +410,18 @@ export default function OrderDetailsPage() {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 mt-6 pt-6 border-t border-white/10">
+                  <button
+                    onClick={handleReorder}
+                    disabled={isReorderLoading}
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-theme3/20 hover:bg-theme3/30 border border-theme3/30 rounded-xl text-theme3 font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isReorderLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <RotateCcw className="w-5 h-5" />
+                    )}
+                    {t(lang, "reorder")}
+                  </button>
                   {canCancelOrder() && (
                     <button
                       onClick={() => setShowCancelModal(true)}
@@ -324,58 +433,15 @@ export default function OrderDetailsPage() {
                   )}
                   <button
                     onClick={handleTrackOrder}
-                    disabled={isTracking}
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-theme3/20 hover:bg-theme3/30 border border-theme3/30 rounded-xl text-theme3 font-semibold transition-all duration-300 disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-theme3/20 hover:bg-theme3/30 border border-theme3/30 rounded-xl text-theme3 font-semibold transition-all duration-300"
                   >
                     <Navigation className="w-5 h-5" />
-                    {isTracking ? t(lang, "tracking") : t(lang, "track_order")}
+                    {t(lang, "track_order")}
                     </button>
                   </div>
                 </motion.div>
               </AnimatedSection>
 
-              {/* Tracking Information */}
-              {trackingData && (
-                <AnimatedSection>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-theme3/10 border border-white/10 p-6 lg:p-8"
-                >
-                  <h2 className="text-white  text-xl font-bold mb-4">
-                    {t(lang, "order_tracking")}
-                  </h2>
-                  <div className="space-y-3">
-                    {trackingData.status && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-text">{t(lang, "current_status")}</span>
-                        <span className={`font-semibold capitalize px-3 py-1 rounded-xl ${getStatusColor(trackingData.status)}`}>
-                          {trackingData.status}
-                        </span>
-                      </div>
-                    )}
-                    {trackingData.estimated_delivery_time && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-text">{t(lang, "estimated_delivery")}</span>
-                        <span className="text-white font-semibold">
-                          {new Date(trackingData.estimated_delivery_time).toLocaleString()}
-                        </span>
-                      </div>
-                    )}
-                    {trackingData.tracking_url && (
-                      <a
-                        href={trackingData.tracking_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block text-center px-4 py-2 bg-theme3/20 hover:bg-theme3/30 border border-theme3/30 rounded-xl text-theme3 font-semibold transition-all"
-                      >
-                        {t(lang, "view_tracking_link")}
-                      </a>
-                    )}
-                  </div>
-                </motion.div>
-                </AnimatedSection>
-              )}
             </div>
 
             {/* Sidebar - Order Summary */}
@@ -520,6 +586,8 @@ export default function OrderDetailsPage() {
           </motion.div>
         </div>
       )}
+
+      {/* Track Order Map Modal */}
     </div>
   );
 }

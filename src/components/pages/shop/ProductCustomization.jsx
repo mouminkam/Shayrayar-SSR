@@ -34,8 +34,8 @@ const ProductCustomization = memo(function ProductCustomization({ product, onCus
 
   // Check if product has any customization options
   const hasOptionGroups = product?.has_option_groups && Array.isArray(product.option_groups) && product.option_groups.length > 0;
-  const hasLegacySizes = product?.has_sizes && !hasOptionGroups; // Only show legacy sizes if no option_groups
-  const hasLegacyIngredients = product?.has_ingredients && !hasOptionGroups; // Only show legacy ingredients if no option_groups
+  const hasLegacySizes = product?.has_sizes; // Show sizes even if option_groups exist
+  const hasLegacyIngredients = product?.has_ingredients; // Show ingredients even if option_groups exist
   const hasAnyCustomization = hasOptionGroups || hasLegacySizes || hasLegacyIngredients;
 
   // Don't render if product has no customization options
@@ -75,7 +75,7 @@ const ProductCustomization = memo(function ProductCustomization({ product, onCus
       )}
 
       {/* Legacy Sizes Section (for backward compatibility) */}
-      {hasLegacySizes && !hasOptionGroups && (
+      {hasLegacySizes && (
         <ProductSizes
           sizes={product.sizes || []}
           selectedSizeId={selectedSizeId}
@@ -84,7 +84,7 @@ const ProductCustomization = memo(function ProductCustomization({ product, onCus
       )}
 
       {/* Legacy Ingredients Section (for backward compatibility) */}
-      {hasLegacyIngredients && !hasOptionGroups && (
+      {hasLegacyIngredients && (
         <ProductIngredients
           ingredients={product.ingredients || []}
           selectedIngredientIds={selectedIngredientIds}
@@ -99,11 +99,15 @@ const ProductCustomization = memo(function ProductCustomization({ product, onCus
             {t(lang, "please_select_required_options")}
           </p>
           <ul className="list-disc list-inside space-y-1">
-            {missingRequiredGroups.map((group) => (
-              <li key={group.id} className="text-red-200 text-xs">
-                {group.name}: {t(lang, "required_choose_minimum", { min: group.minSelection })}
-              </li>
-            ))}
+            {missingRequiredGroups.map((group) => {
+              const minValue = group.minSelection || 1;
+              const message = t(lang, "required_choose_minimum").replace("{min}", minValue);
+              return (
+                <li key={group.id} className="text-red-200 text-xs">
+                  {group.name}: {message}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

@@ -69,7 +69,7 @@ export function useProductCustomization(product, onCustomizationChange) {
   const isValid = useMemo(() => {
     if (!product) return false;
 
-    // If product has option_groups, use new system
+    // Check required option groups (if any)
     if (product.option_groups && Array.isArray(product.option_groups) && product.option_groups.length > 0) {
       // Check each required option group
       for (const group of product.option_groups) {
@@ -85,10 +85,9 @@ export function useProductCustomization(product, onCustomizationChange) {
           }
         }
       }
-      return true;
     }
 
-    // Legacy products: check if size is required
+    // Check if size is required (works with or without option_groups)
     if (product.has_sizes && !selectedSizeId) {
       return false;
     }
@@ -102,7 +101,7 @@ export function useProductCustomization(product, onCustomizationChange) {
     
     const missing = [];
     
-    // If product has option_groups, check them
+    // Check required option groups (if any)
     if (product.option_groups && Array.isArray(product.option_groups) && product.option_groups.length > 0) {
       product.option_groups.forEach(group => {
         if (group.is_required) {
@@ -120,8 +119,10 @@ export function useProductCustomization(product, onCustomizationChange) {
           }
         }
       });
-    } else if (product.has_sizes && !selectedSizeId) {
-      // Legacy: size is required but not selected
+    }
+    
+    // Check if size is required (works with or without option_groups)
+    if (product.has_sizes && !selectedSizeId) {
       missing.push({
         id: 'size',
         name: 'Size',

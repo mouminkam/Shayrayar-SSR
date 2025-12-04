@@ -68,6 +68,18 @@ export const getUpsellItems = async (branchId, params = {}) => {
   return response;
 };
 
+/**
+ * Get chefs for a branch
+ * @param {number} branchId - Branch ID
+ * @returns {Promise<Object>} Response with chefs list
+ */
+export const getChefs = async (branchId) => {
+  const response = await axiosInstance.get('/chefs', { 
+    params: { branch_id: branchId } 
+  });
+  return response;
+};
+
 // Default export with all branch functions
 const branchesAPI = {
   getAllBranches,
@@ -75,6 +87,7 @@ const branchesAPI = {
   getNearestBranches,
   checkDeliveryAvailability,
   getUpsellItems,
+  getChefs,
 };
 
 export default branchesAPI;
