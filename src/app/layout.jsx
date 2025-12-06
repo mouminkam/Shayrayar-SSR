@@ -1,4 +1,5 @@
 import { Oswald } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import FreshHeatHeader from "../components/layout/Header";
 import FreshHeatFooter from "../components/layout/Footer";
 import Toast from "../components/ui/Toast";
@@ -95,6 +96,7 @@ export default function RootLayout({ children }) {
             </LenisScrollProvider>
           </HighlightsProvider>
         </LanguageProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
