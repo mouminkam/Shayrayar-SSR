@@ -72,6 +72,23 @@ const getBranchId = () => {
 };
 
 /**
+ * Get selected language from localStorage
+ * Language is stored in localStorage under 'language'
+ * Default value: 'bg' (Bulgarian)
+ */
+const getLanguage = () => {
+  if (typeof window === 'undefined') return 'bg';
+  
+  try {
+    const language = localStorage.getItem('language');
+    return language || 'bg';
+  } catch (error) {
+    console.error('Error reading language from storage:', error);
+    return 'bg';
+  }
+};
+
+/**
  * Check if URL should exclude branch_id
  * URLs that don't need branch_id:
  * - /branches (getting all branches - exact match or query params only)
@@ -105,7 +122,7 @@ const shouldExcludeBranchId = (url) => {
 
 /**
  * Request Interceptor
- * Adds Bearer token and branch_id to all requests if available
+ * Adds Bearer token, branch_id, and Accept-Language header to all requests if available
  */
 axiosInstance.interceptors.request.use(
   (config) => {
@@ -121,6 +138,10 @@ axiosInstance.interceptors.request.use(
         console.log('sessionStorage registrationToken:', sessionStorage.getItem('registrationToken'));
       }
     }
+    
+    // Add Accept-Language header based on selected language
+    const language = getLanguage();
+    config.headers['Accept-Language'] = language;
     
     // Add branch_id if available and URL doesn't exclude it
     const branchId = getBranchId();

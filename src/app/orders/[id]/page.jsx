@@ -92,8 +92,30 @@ export default function OrderDetailsPage({ params }) {
   };
 
   const handleCancelOrder = async () => {
+    // Validate cancellation reason
     if (!cancelReason.trim()) {
       toastError(t(lang, "please_provide_cancellation_reason"));
+      return;
+    }
+
+    // Double check if order can still be cancelled (status might have changed)
+    if (!canCancelOrder()) {
+      const paymentMethod = order?.payment_method?.toLowerCase();
+      const paymentIntentId = order?.payment_intent_id;
+      const status = order?.status?.toLowerCase();
+      
+      // Stripe orders cannot be cancelled at all
+      if (paymentMethod === 'stripe' || paymentIntentId) {
+        toastError(t(lang, "cannot_cancel_paid_order"));
+      } else if (paymentMethod === 'cash' && status === 'confirmed') {
+        toastError(t(lang, "cannot_cancel_paid_order"));
+      } else if (status === 'completed' || status === 'delivered') {
+        toastError(t(lang, "cannot_cancel_completed_order"));
+      } else {
+        toastError(t(lang, "cannot_cancel_order"));
+      }
+      setShowCancelModal(false);
+      setCancelReason("");
       return;
     }
 
@@ -108,11 +130,14 @@ export default function OrderDetailsPage({ params }) {
         // Refresh order data
         fetchOrderDetails();
       } else {
-        toastError(response.message || t(lang, "failed_to_cancel_order"));
+        // Backend might reject cancellation - show appropriate message
+        const errorMessage = response.message || t(lang, "failed_to_cancel_order");
+        toastError(errorMessage);
       }
     } catch (error) {
       console.error("Error cancelling order:", error);
-      toastError(error?.message || t(lang, "failed_to_cancel_order"));
+      const errorMessage = error?.response?.data?.message || error?.message || t(lang, "failed_to_cancel_order");
+      toastError(errorMessage);
     } finally {
       setIsCancelling(false);
     }
@@ -130,8 +155,49 @@ export default function OrderDetailsPage({ params }) {
   };
 
   const canCancelOrder = () => {
+    // إذا لم يتم تحميل البيانات بعد، لا نسمح بالإلغاء
+    if (!order) {
+      return false;
+    }
+
     const status = order?.status?.toLowerCase();
-    return status === 'pending' || status === 'processing' || status === 'confirmed';
+    const paymentMethod = order?.payment_method?.toLowerCase();
+    const paymentIntentId = order?.payment_intent_id;
+    const paymentStatus = order?.payment_status?.toLowerCase();
+    
+    // لا يمكن الإلغاء إذا كان الطلب مكتمل أو ملغي أو تم تسليمه
+    if (status === 'completed' || status === 'cancelled' || status === 'delivered') {
+      return false;
+    }
+    
+    // Stripe orders: لا يمكن الإلغاء أبداً (بغض النظر عن الحالة)
+    // التحقق من payment_method === 'stripe' أو وجود payment_intent_id
+    if (paymentMethod === 'stripe' || paymentIntentId) {
+      return false;
+    }
+    
+    // أيضاً: إذا كان payment_status === 'paid' و payment_method === 'stripe'
+    if (paymentStatus === 'paid' && paymentMethod === 'stripe') {
+      return false;
+    }
+    
+    // Cash orders: لا يمكن الإلغاء إذا كان confirmed (تم الدفع فعلياً)
+    if (paymentMethod === 'cash' && status === 'confirmed') {
+      return false;
+    }
+    
+    // Cash orders: يمكن الإلغاء إذا كان pending (لم يتم الدفع بعد)
+    if (paymentMethod === 'cash' && status === 'pending') {
+      return true;
+    }
+    
+    // Cash orders: يمكن الإلغاء إذا كان processing (قبل البدء بالتحضير الفعلي)
+    if (paymentMethod === 'cash' && status === 'processing') {
+      return true;
+    }
+    
+    // Default: لا يمكن الإلغاء
+    return false;
   };
 
   const handleReorder = async () => {
@@ -422,15 +488,65 @@ export default function OrderDetailsPage({ params }) {
                     )}
                     {t(lang, "reorder")}
                   </button>
-                  {canCancelOrder() && (
-                    <button
-                      onClick={() => setShowCancelModal(true)}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-xl text-red-300 font-semibold transition-all duration-300"
-                    >
-                      <X className="w-5 h-5" />
-                      {t(lang, "cancel_order")}
-                    </button>
-                  )}
+                  {(() => {
+                    // Direct check: لا نعرض الزر إذا كان Stripe أو Cash confirmed
+                    if (!order) return null;
+                    
+                    const paymentMethod = order?.payment_method?.toLowerCase();
+                    const paymentIntentId = order?.payment_intent_id;
+                    const status = order?.status?.toLowerCase();
+                    const paymentStatus = order?.payment_status?.toLowerCase();
+                    
+                    // لا نعرض الزر إذا كان Stripe (بغض النظر عن الحالة)
+                    if (paymentMethod === 'stripe' || paymentIntentId) {
+                      return null;
+                    }
+                    
+                    // لا نعرض الزر إذا كان Cash + confirmed
+                    if (paymentMethod === 'cash' && status === 'confirmed') {
+                      return null;
+                    }
+                    
+                    // لا نعرض الزر إذا كان الطلب مكتمل أو ملغي أو تم تسليمه
+                    if (status === 'completed' || status === 'cancelled' || status === 'delivered') {
+                      return null;
+                    }
+                    
+                    // فقط إذا كان canCancelOrder() يعيد true
+                    if (!canCancelOrder()) {
+                      return null;
+                    }
+                    
+                    return (
+                      <button
+                        onClick={() => {
+                          // Double check before showing modal
+                          if (!canCancelOrder()) {
+                            const paymentMethod = order?.payment_method?.toLowerCase();
+                            const paymentIntentId = order?.payment_intent_id;
+                            const status = order?.status?.toLowerCase();
+                            
+                            // Stripe orders cannot be cancelled at all
+                            if (paymentMethod === 'stripe' || paymentIntentId) {
+                              toastError(t(lang, "cannot_cancel_paid_order"));
+                            } else if (paymentMethod === 'cash' && status === 'confirmed') {
+                              toastError(t(lang, "cannot_cancel_paid_order"));
+                            } else if (status === 'completed' || status === 'delivered') {
+                              toastError(t(lang, "cannot_cancel_completed_order"));
+                            } else {
+                              toastError(t(lang, "cannot_cancel_order"));
+                            }
+                            return;
+                          }
+                          setShowCancelModal(true);
+                        }}
+                        className="flex items-center justify-center gap-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-xl text-red-300 font-semibold transition-all duration-300"
+                      >
+                        <X className="w-5 h-5" />
+                        {t(lang, "cancel_order")}
+                      </button>
+                    );
+                  })()}
                   <button
                     onClick={handleTrackOrder}
                     className="flex items-center justify-center gap-2 px-6 py-3 bg-theme3/20 hover:bg-theme3/30 border border-theme3/30 rounded-xl text-theme3 font-semibold transition-all duration-300"

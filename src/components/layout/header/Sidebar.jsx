@@ -239,7 +239,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                         {[...Array(6)].map((_, index) => (
                           <div
                             key={index}
-                            className="aspect-square bg-white/10 rounded-lg animate-pulse"
+                            className="w-[120px] h-[120px] bg-white/10 rounded-lg animate-pulse"
                           />
                         ))}
                       </div>
@@ -252,11 +252,12 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                               href={dish?.id ? `/shop/${dish.id}` : "#"}
                               onMouseEnter={() => dish?.id && prefetchRoute(`/shop/${dish.id}`)}
                               onClick={() => setIsOpen(false)}
-                          className="offcanvas-image block aspect-square overflow-hidden rounded-lg group"
+                          className="offcanvas-image block overflow-hidden rounded-lg group"
                         >
                           <motion.div
                             whileHover={{ scale: 1.1 }}
                             transition={{ duration: 0.3 }}
+                            className="w-[120px] h-[120px]"
                           >
                                 <OptimizedImage
                                   src={dish?.image || "/img/header/01.jpg"}
@@ -279,11 +280,12 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                               href={dish?.id ? `/shop/${dish.id}` : "#"}
                               onMouseEnter={() => dish?.id && prefetchRoute(`/shop/${dish.id}`)}
                               onClick={() => setIsOpen(false)}
-                          className="offcanvas-image block aspect-square overflow-hidden rounded-lg group"
+                          className="offcanvas-image block overflow-hidden rounded-lg group"
                         >
                           <motion.div
                             whileHover={{ scale: 1.1 }}
                             transition={{ duration: 0.3 }}
+                            className="w-[120px] h-[120px]"
                           >
                                 <OptimizedImage
                                   src={dish?.image || "/img/header/04.jpg"}
@@ -305,7 +307,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                         {[...Array(6)].map((_, index) => (
                           <div
                             key={index}
-                            className="aspect-square bg-white/10 rounded-lg flex items-center justify-center"
+                            className="w-[120px] h-[120px] bg-white/10 rounded-lg flex items-center justify-center"
                           >
                             <span className="text-white/50 text-xs">No image</span>
                           </div>
