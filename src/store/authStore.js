@@ -245,6 +245,40 @@ const useAuthStore = create(
         }
       },
 
+      uploadProfileImage: async (imageFile) => {
+        set({ isLoading: true });
+        try {
+          const response = await api.auth.uploadProfileImage(imageFile);
+          
+          if (response.success && response.data) {
+            const currentUser = get().user;
+            const updatedUser = {
+              ...currentUser,
+              ...response.data.user,
+            };
+
+            set({
+              user: updatedUser,
+              isLoading: false,
+            });
+
+            return { success: true, user: updatedUser };
+          } else {
+            set({ isLoading: false });
+            return { 
+              success: false, 
+              error: response.message || "Failed to upload image" 
+            };
+          }
+        } catch (error) {
+          set({ isLoading: false });
+          return { 
+            success: false, 
+            error: error.message || "An error occurred while uploading image" 
+          };
+        }
+      },
+
       fetchProfile: async () => {
         set({ isLoading: true });
         try {
@@ -675,6 +709,11 @@ const useAuthStore = create(
     {
       name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
+      version: 1,
+      migrate: (persistedState, version) => {
+        // Handle migration if needed in the future
+        return persistedState || { user: null, isAuthenticated: false, isLoading: false };
+      },
     }
   )
 );

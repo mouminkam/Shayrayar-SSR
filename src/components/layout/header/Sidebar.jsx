@@ -245,60 +245,60 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                       </div>
                     ) : galleryImages.length > 0 ? (
                       <>
-                        <div className="offcanvas-gallery-items grid grid-cols-3 gap-2 mb-2">
+                    <div className="offcanvas-gallery-items grid grid-cols-3 gap-2 mb-2">
                           {galleryImages.slice(0, 3).map((dish, index) => (
-                            <Link
+                        <Link
                               key={dish?.id || index}
                               href={dish?.id ? `/shop/${dish.id}` : "#"}
                               onMouseEnter={() => dish?.id && prefetchRoute(`/shop/${dish.id}`)}
                               onClick={() => setIsOpen(false)}
-                              className="offcanvas-image block aspect-square overflow-hidden rounded-lg group"
-                            >
-                              <motion.div
-                                whileHover={{ scale: 1.1 }}
-                                transition={{ duration: 0.3 }}
-                              >
+                          className="offcanvas-image block aspect-square overflow-hidden rounded-lg group"
+                        >
+                          <motion.div
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ duration: 0.3 }}
+                          >
                                 <OptimizedImage
                                   src={dish?.image || "/img/header/01.jpg"}
                                   alt={dish?.title || `gallery-img-${index + 1}`}
-                                  width={120}
-                                  height={120}
-                                  className="w-full h-full object-cover"
-                                  quality={80}
-                                  loading="lazy"
-                                  sizes="120px"
-                                />
-                              </motion.div>
-                            </Link>
-                          ))}
-                        </div>
-                        <div className="offcanvas-gallery-items grid grid-cols-3 gap-2">
+                              width={120}
+                              height={120}
+                              className="w-full h-full object-cover"
+                              quality={80}
+                              loading="lazy"
+                              sizes="120px"
+                            />
+                          </motion.div>
+                        </Link>
+                      ))}
+                    </div>
+                    <div className="offcanvas-gallery-items grid grid-cols-3 gap-2">
                           {galleryImages.slice(3, 6).map((dish, index) => (
-                            <Link
+                        <Link
                               key={dish?.id || index + 3}
                               href={dish?.id ? `/shop/${dish.id}` : "#"}
                               onMouseEnter={() => dish?.id && prefetchRoute(`/shop/${dish.id}`)}
                               onClick={() => setIsOpen(false)}
-                              className="offcanvas-image block aspect-square overflow-hidden rounded-lg group"
-                            >
-                              <motion.div
-                                whileHover={{ scale: 1.1 }}
-                                transition={{ duration: 0.3 }}
-                              >
+                          className="offcanvas-image block aspect-square overflow-hidden rounded-lg group"
+                        >
+                          <motion.div
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ duration: 0.3 }}
+                          >
                                 <OptimizedImage
                                   src={dish?.image || "/img/header/04.jpg"}
                                   alt={dish?.title || `gallery-img-${index + 4}`}
-                                  width={120}
-                                  height={120}
-                                  className="w-full h-full object-cover"
+                              width={120}
+                              height={120}
+                              className="w-full h-full object-cover"
                                   quality={80}
                                   loading="lazy"
                                   sizes="120px"
-                                />
-                              </motion.div>
-                            </Link>
-                          ))}
-                        </div>
+                            />
+                          </motion.div>
+                        </Link>
+                      ))}
+                    </div>
                       </>
                     ) : (
                       <div className="grid grid-cols-3 gap-2">

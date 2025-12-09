@@ -333,6 +333,22 @@
   "special_instructions": "Special Instructions",
   "unavailable": "Unavailable",
   "required": "Required",
-  "optional": "Optional"
+  "optional": "Optional",
+  "edit_profile": "Edit Profile",
+  "update_profile": "Update Profile",
+  "profile_updated_successfully": "Profile updated successfully",
+  "upload_profile_image": "Upload Profile Image",
+  "change_image": "Change Image",
+  "remove_image": "Remove Image",
+  "name_updated_successfully": "Name updated successfully",
+  "updating_profile": "Updating profile...",
+  "uploading_image": "Uploading image...",
+  "image_uploaded_successfully": "Image uploaded successfully",
+  "failed_to_upload_image": "Failed to upload image",
+  "invalid_image_format": "Invalid image format. Please use JPG, PNG, or WEBP",
+  "image_too_large": "Image is too large. Maximum size is 5MB",
+  "please_select_image": "Please select an image",
+  "name_required": "Name is required",
+  "cannot_be_changed": "cannot be changed"
 }
 

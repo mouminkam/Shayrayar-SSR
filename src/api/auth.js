@@ -64,6 +64,23 @@ export const updateProfile = async (updates) => {
 };
 
 /**
+ * Upload user profile image
+ * @param {File} imageFile - Image file to upload
+ * @returns {Promise<Object>} Response with updated user data including image URL
+ */
+export const uploadProfileImage = async (imageFile) => {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+  
+  const response = await axiosInstance.post('/auth/profile/upload-image', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response;
+};
+
+/**
  * Change user password
  * @param {Object} passwordData - Password change data
  * @param {string} passwordData.current_password - Current password
@@ -185,6 +202,7 @@ const authAPI = {
   logout,
   getProfile,
   updateProfile,
+  uploadProfileImage,
   changePassword,
   forgotPassword,
   resetPassword,

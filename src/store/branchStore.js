@@ -79,6 +79,11 @@ const useBranchStore = create(
         selectedBranch: state.selectedBranch,
         branches: state.branches,
       }),
+      version: 1,
+      migrate: (persistedState, version) => {
+        // Handle migration if needed in the future
+        return persistedState || { selectedBranch: null, branches: [] };
+      },
     }
   )
 );
