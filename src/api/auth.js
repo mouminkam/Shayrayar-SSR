@@ -70,13 +70,11 @@ export const updateProfile = async (updates) => {
  */
 export const uploadProfileImage = async (imageFile) => {
   const formData = new FormData();
-  formData.append('image', imageFile);
+  formData.append('photo', imageFile);
   
-  const response = await axiosInstance.post('/auth/profile/upload-image', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  // Axios will automatically set Content-Type: multipart/form-data with boundary
+  // The interceptor will handle removing the default Content-Type header for FormData
+  const response = await axiosInstance.post('/app/auth/profile/photo', formData);
   return response;
 };
 

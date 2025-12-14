@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, Phone, MapPin, Package, LogOut, Edit } from "lucide-react";
 import Image from "next/image";
@@ -8,6 +8,7 @@ import useAuthStore from "../../../store/authStore";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import { getFullImageUrl } from "../../../lib/utils/imageUtils";
 
 // Lazy load ProfileEditModal
 const ProfileEditModal = dynamic(
@@ -22,6 +23,12 @@ export default function ProfileSidebar({ user, totalOrders = 0 }) {
   const { logout } = useAuthStore();
   const { lang } = useLanguage();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Convert relative image path to full URL for Next.js Image component
+  const userImageUrl = useMemo(() => {
+    const imagePath = user?.image || user?.image_url || user?.avatar;
+    return imagePath ? getFullImageUrl(imagePath) : null;
+  }, [user?.image, user?.image_url, user?.avatar]);
 
   const handleLogout = async () => {
     try {
@@ -47,9 +54,9 @@ export default function ProfileSidebar({ user, totalOrders = 0 }) {
           whileHover={{ scale: 1.1, rotate: 5 }}
             className="w-24 h-24 rounded-full bg-theme3 flex items-center justify-center mx-auto mb-4 shadow-xl overflow-hidden relative"
         >
-            {user.image || user.image_url || user.avatar ? (
+            {userImageUrl ? (
               <Image
-                src={user.image || user.image_url || user.avatar}
+                src={userImageUrl}
                 alt={user.name || "Profile"}
                 width={96}
                 height={96}

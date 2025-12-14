@@ -7,6 +7,7 @@ import useToastStore from "../../../store/toastStore";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
 import Image from "next/image";
+import { getFullImageUrl } from "../../../lib/utils/imageUtils";
 
 export default function ProfileEditForm({ onClose }) {
   const { user, updateProfile, uploadProfileImage, isLoading } = useAuthStore();
@@ -33,8 +34,10 @@ export default function ProfileEditForm({ onClose }) {
         phone: user.phone || "",
       });
       // Set image preview if user has an image
-      if (user.image || user.image_url || user.avatar) {
-        setImagePreview(user.image || user.image_url || user.avatar);
+      const imagePath = user.image || user.image_url || user.avatar;
+      if (imagePath) {
+        // Convert relative path to full URL for Next.js Image component
+        setImagePreview(getFullImageUrl(imagePath));
       }
     }
   }, [user]);
@@ -84,7 +87,8 @@ export default function ProfileEditForm({ onClose }) {
 
   const handleRemoveImage = () => {
     setSelectedImage(null);
-    setImagePreview(user?.image || user?.image_url || user?.avatar || null);
+    const imagePath = user?.image || user?.image_url || user?.avatar;
+    setImagePreview(imagePath ? getFullImageUrl(imagePath) : null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }

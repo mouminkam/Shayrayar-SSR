@@ -153,3 +153,39 @@ export async function isImageLoaded(imageUrl) {
   }
 }
 
+/**
+ * Converts a relative image path from API to a full URL
+ * Handles both relative paths (e.g., "avatars/...") and full URLs
+ * 
+ * @param {string} imagePath - Image path from API (can be relative, full URL, or data URL)
+ * @returns {string|null} - Full URL for Next.js Image component, or null if no path
+ */
+export function getFullImageUrl(imagePath) {
+  if (!imagePath) {
+    return null;
+  }
+
+  // If already a full URL (http:// or https://), return as is
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    return imagePath;
+  }
+
+  // If data URL (from FileReader), return as is
+  if (imagePath.startsWith("data:")) {
+    return imagePath;
+  }
+
+  // If starts with /storage/, add base URL
+  if (imagePath.startsWith("/storage/")) {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://shahrayar.peaklink.pro/api/v1";
+    const storageBaseUrl = API_BASE_URL.replace("/api/v1", "");
+    return `${storageBaseUrl}${imagePath}`;
+  }
+
+  // If relative path (e.g., "avatars/..."), construct full URL
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://shahrayar.peaklink.pro/api/v1";
+  const storageBaseUrl = API_BASE_URL.replace("/api/v1", "");
+  const cleanPath = imagePath.startsWith("/") ? imagePath.slice(1) : imagePath;
+  return `${storageBaseUrl}/storage/${cleanPath}`;
+}
+

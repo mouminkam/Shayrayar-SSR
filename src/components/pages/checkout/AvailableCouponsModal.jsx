@@ -216,3 +216,4 @@ export default function AvailableCouponsModal({ isOpen, onClose, onApplyCoupon }
 
   return createPortal(modalContent, document.body);
 }
+

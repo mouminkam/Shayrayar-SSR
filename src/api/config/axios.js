@@ -143,6 +143,11 @@ axiosInstance.interceptors.request.use(
     const language = getLanguage();
     config.headers['Accept-Language'] = language;
     
+    // Remove Content-Type header for FormData to let axios set it automatically with boundary
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
+    
     // Add branch_id if available and URL doesn't exclude it
     const branchId = getBranchId();
     // Build full URL for checking (baseURL + url)
@@ -162,7 +167,12 @@ axiosInstance.interceptors.request.use(
         }
       } else if (method === 'post' || method === 'put' || method === 'patch') {
         // Add branch_id to request body
-        if (config.data && typeof config.data === 'object') {
+        if (config.data instanceof FormData) {
+          // If data is FormData, append branch_id
+          if (!config.data.has('branch_id')) {
+            config.data.append('branch_id', branchId);
+          }
+        } else if (config.data && typeof config.data === 'object') {
           // If data is already an object, merge branch_id
           if (!config.data.branch_id) {
             config.data = { ...config.data, branch_id: branchId };
