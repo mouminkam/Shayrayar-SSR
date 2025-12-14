@@ -1,5 +1,5 @@
-"uipse client";
-import { useState, useEffect, useCallback } from "react";
+"use client"; 
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import api from "../api";
 import useBranchStore from "../store/branchStore";
 import { useApiCache } from "./useApiCache";
@@ -16,6 +16,15 @@ export function useUpsellItems(params = {}) {
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Start with true to show loading state
   const [error, setError] = useState(null);
+  
+  // Use ref to store params and prevent infinite loop
+  const paramsRef = useRef(params);
+  const paramsString = useMemo(() => JSON.stringify(params), [params]);
+  
+  // Update ref when params actually change
+  useEffect(() => {
+    paramsRef.current = params;
+  }, [paramsString]);
 
   const fetchUpsellItems = useCallback(async () => {
     const branchId = selectedBranch?.id;
@@ -29,10 +38,11 @@ export function useUpsellItems(params = {}) {
     setError(null);
 
     try {
+      // Use paramsRef.current to avoid stale closure
       const response = await getCachedOrFetch(
         `/branches/${branchId}/upsell-items`,
-        params,
-        () => api.branches.getUpsellItems(branchId, params)
+        paramsRef.current,
+        () => api.branches.getUpsellItems(branchId, paramsRef.current)
       );
 
       if (response?.success && response?.data?.items) {
@@ -48,7 +58,7 @@ export function useUpsellItems(params = {}) {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedBranch?.id, params, getCachedOrFetch]);
+  }, [selectedBranch?.id, paramsString, getCachedOrFetch]);
 
   useEffect(() => {
     fetchUpsellItems();

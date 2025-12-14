@@ -248,7 +248,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     <div className="offcanvas-gallery-items grid grid-cols-3 gap-2 mb-2">
                           {galleryImages.slice(0, 3).map((dish, index) => (
                         <Link
-                              key={dish?.id || index}
+                              key={`gallery-${index}`}
                               href={dish?.id ? `/shop/${dish.id}` : "#"}
                               onMouseEnter={() => dish?.id && prefetchRoute(`/shop/${dish.id}`)}
                               onClick={() => setIsOpen(false)}
@@ -276,7 +276,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     <div className="offcanvas-gallery-items grid grid-cols-3 gap-2">
                           {galleryImages.slice(3, 6).map((dish, index) => (
                         <Link
-                              key={dish?.id || index + 3}
+                              key={`gallery-${index + 3}`}
                               href={dish?.id ? `/shop/${dish.id}` : "#"}
                               onMouseEnter={() => dish?.id && prefetchRoute(`/shop/${dish.id}`)}
                               onClick={() => setIsOpen(false)}

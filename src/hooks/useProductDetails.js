@@ -5,12 +5,14 @@ import { transformMenuItemToProduct } from "../lib/utils/productTransform";
 import useToastStore from "../store/toastStore";
 import useBranchStore from "../store/branchStore";
 import { useApiCache } from "./useApiCache";
+import { useLanguage } from "../context/LanguageContext";
 
-// Simplified extractor - API always returns { success: true, data: { item: {...}, option_groups: [...] } }
+// Simplified extractor - API always returns { success: true, data: { item: {...}, option_groups: [...], customizations: {...} } }
 const extractProductData = (response) => {
   return {
     item: response?.data?.item || response?.data || null,
     option_groups: response?.data?.option_groups || [],
+    customizations: response?.data?.customizations || null,
   };
 };
 
@@ -23,6 +25,7 @@ export function useProductDetails(productId) {
   const { error: toastError } = useToastStore();
   const { selectedBranch } = useBranchStore();
   const { getCachedOrFetch } = useApiCache("PRODUCT_DETAIL");
+  const { lang } = useLanguage();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,10 +46,10 @@ export function useProductDetails(productId) {
         {},
         () => api.menu.getMenuItemById(productId)
       );
-      const { item: productData, option_groups } = extractProductData(response);
+      const { item: productData, option_groups, customizations } = extractProductData(response);
 
       if (productData) {
-        setProduct(transformMenuItemToProduct(productData, option_groups));
+        setProduct(transformMenuItemToProduct(productData, option_groups, lang, customizations));
       } else {
         const errorMsg = "Product not found";
         setError(errorMsg);
@@ -59,7 +62,7 @@ export function useProductDetails(productId) {
     } finally {
       setIsLoading(false);
     }
-  }, [productId, toastError, getCachedOrFetch]);
+  }, [productId, toastError, getCachedOrFetch, lang]);
 
   useEffect(() => {
     fetchProduct();

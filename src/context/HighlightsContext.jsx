@@ -4,12 +4,14 @@ import api from "../api";
 import useBranchStore from "../store/branchStore";
 import { transformMenuItemsToProducts } from "../lib/utils/productTransform";
 import { useApiCache } from "../hooks/useApiCache";
+import { useLanguage } from "./LanguageContext";
 
 export const HighlightsContext = createContext(null);
 
 export function HighlightsProvider({ children }) {
   const { selectedBranch, getSelectedBranchId } = useBranchStore();
   const { getCachedOrFetch } = useApiCache("HIGHLIGHTS");
+  const { lang } = useLanguage();
   const [popular, setPopular] = useState([]);
   const [latest, setLatest] = useState([]);
   const [chefSpecial, setChefSpecial] = useState([]);
@@ -42,9 +44,9 @@ export function HighlightsProvider({ children }) {
         }
 
         // Transform each section separately
-        const popularItems = transformMenuItemsToProducts(response.data.popular || []);
-        const latestItems = transformMenuItemsToProducts(response.data.latest || []);
-        const chefSpecialItems = transformMenuItemsToProducts(response.data.chef_special || []);
+        const popularItems = transformMenuItemsToProducts(response.data.popular || [], lang);
+        const latestItems = transformMenuItemsToProducts(response.data.latest || [], lang);
+        const chefSpecialItems = transformMenuItemsToProducts(response.data.chef_special || [], lang);
 
         setPopular(popularItems);
         setLatest(latestItems);
@@ -61,7 +63,7 @@ export function HighlightsProvider({ children }) {
     };
 
     fetchHighlights();
-  }, [selectedBranch, getSelectedBranchId, getCachedOrFetch]);
+  }, [selectedBranch, getSelectedBranchId, getCachedOrFetch, lang]);
 
   const value = {
     popular,

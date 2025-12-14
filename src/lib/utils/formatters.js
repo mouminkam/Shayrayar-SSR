@@ -13,7 +13,7 @@ export const formatPrice = (price) => {
  * @param {string} symbol - Currency symbol (default: 'BGN')
  * @returns {string} Formatted currency string
  */
-export const formatCurrency = (price, symbol = 'BGN') => {
+export const formatCurrency = (price, symbol = 'EUR') => {
   return `${symbol} ${formatPrice(price)}`;
 };
 

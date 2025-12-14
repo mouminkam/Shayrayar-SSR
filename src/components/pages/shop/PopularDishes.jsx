@@ -52,7 +52,7 @@ export default function PopularDishes() {
         }
 
         const popularItems = response.data.popular || [];
-        const transformed = transformMenuItemsToProducts(popularItems);
+        const transformed = transformMenuItemsToProducts(popularItems, lang);
         setDishes(transformed);
       } catch (error) {
         console.error("Error fetching popular dishes:", error);
@@ -63,7 +63,7 @@ export default function PopularDishes() {
     };
 
     fetchDishes();
-  }, [contextData, selectedBranch, getSelectedBranchId]);
+  }, [contextData, selectedBranch, getSelectedBranchId, lang]);
 
   return (
     <section className="popular-dishes-section py-10 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">

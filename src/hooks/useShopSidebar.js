@@ -3,18 +3,9 @@ import { useState, useEffect } from "react";
 import api from "../api";
 import useBranchStore from "../store/branchStore";
 import { transformCategories, transformMenuItemsToProducts } from "../lib/utils/productTransform";
-import { extractMenuItemsFromResponse } from "../lib/utils/responseExtractor";
+import { extractMenuItemsFromResponse, extractCategoriesFromResponse } from "../lib/utils/responseExtractor";
 import { useApiCache } from "./useApiCache";
-
-// Helper: Extract categories from API response
-const extractCategories = (response) => {
-  if (!response) return [];
-  if (Array.isArray(response)) return response;
-  if (response?.success && response?.data) {
-    return Array.isArray(response.data) ? response.data : response.data.categories || response.data.data || [];
-  }
-  return response?.data?.categories || response?.categories || response?.data || [];
-};
+import { useLanguage } from "../context/LanguageContext";
 
 /**
  * Hook to manage shop sidebar data (categories and recent products)
@@ -24,6 +15,7 @@ export function useShopSidebar() {
   const { selectedBranch } = useBranchStore();
   const { getCachedOrFetch } = useApiCache("CATEGORIES");
   const { getCachedOrFetch: getCachedProducts } = useApiCache("PRODUCTS");
+  const { lang } = useLanguage();
   const [categories, setCategories] = useState([]);
   const [recentProducts, setRecentProducts] = useState([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
@@ -46,8 +38,8 @@ export function useShopSidebar() {
           // 10 minutes TTL for categories
           10 * 60 * 1000
         );
-        const categoriesData = extractCategories(response);
-        setCategories(transformCategories(categoriesData));
+        const categoriesData = extractCategoriesFromResponse(response);
+        setCategories(transformCategories(categoriesData, lang));
       } catch (error) {
         console.error("Error fetching categories:", error);
         setCategories([]);
@@ -57,7 +49,7 @@ export function useShopSidebar() {
     };
 
     fetchCategories();
-  }, [selectedBranch, getCachedOrFetch]);
+  }, [selectedBranch, getCachedOrFetch, lang]);
 
   // Fetch recent products with caching
   useEffect(() => {
@@ -75,7 +67,7 @@ export function useShopSidebar() {
         const { menuItems } = extractMenuItemsFromResponse(response);
         setRecentProducts(
           Array.isArray(menuItems) && menuItems.length > 0
-            ? transformMenuItemsToProducts(menuItems)
+            ? transformMenuItemsToProducts(menuItems, lang)
             : []
         );
       } catch (error) {
@@ -87,7 +79,7 @@ export function useShopSidebar() {
     };
 
     fetchRecentProducts();
-  }, [selectedBranch, getCachedProducts]);
+  }, [selectedBranch, getCachedProducts, lang]);
 
   return {
     categories,

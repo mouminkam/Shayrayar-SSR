@@ -85,8 +85,10 @@ export default function ShopDetailsContent({ productId }) {
       />
       <section className="bg-bg3 py-12 relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 rounded-3xl p-6 sm:p-8 lg:p-12 border border-white/10 shadow-xl">
+          <div className="flex flex-col gap-8 bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 rounded-3xl p-6 sm:p-8 lg:p-12 border border-white/10 shadow-xl max-w-6xl mx-auto">
+            {/* Product Image - Top */}
             <ProductImage product={product} />
+            {/* Product Content - Below Image */}
             <ProductAbout product={product} />
           </div>
         </div>

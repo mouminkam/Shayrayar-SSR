@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import ProductSizes from "./ProductSizes";
 import ProductIngredients from "./ProductIngredients";
 import OptionGroup from "./OptionGroup";
+import CustomizationGroup from "./CustomizationGroup";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { useProductCustomization } from "../../../hooks/useProductCustomization";
 import { useLanguage } from "../../../context/LanguageContext";
@@ -24,19 +25,23 @@ const ProductCustomization = memo(function ProductCustomization({ product, onCus
     selectedSizeId,
     selectedIngredientIds,
     selectedOptions,
+    selectedCustomizations,
     finalPrice,
     isValid,
     missingRequiredGroups,
     handleSizeChange,
     handleIngredientToggle,
     handleOptionGroupChange,
+    handleCustomizationChange,
   } = useProductCustomization(product, onCustomizationChange);
 
   // Check if product has any customization options
   const hasOptionGroups = product?.has_option_groups && Array.isArray(product.option_groups) && product.option_groups.length > 0;
   const hasLegacySizes = product?.has_sizes; // Show sizes even if option_groups exist
   const hasLegacyIngredients = product?.has_ingredients; // Show ingredients even if option_groups exist
-  const hasAnyCustomization = hasOptionGroups || hasLegacySizes || hasLegacyIngredients;
+  const hasCustomizations = product?.has_customizations;
+  const customizations = product?.customizations;
+  const hasAnyCustomization = hasOptionGroups || hasLegacySizes || hasLegacyIngredients || hasCustomizations;
 
   // Don't render if product has no customization options
   if (!hasAnyCustomization) {
@@ -90,6 +95,44 @@ const ProductCustomization = memo(function ProductCustomization({ product, onCus
           selectedIngredientIds={selectedIngredientIds}
           onIngredientToggle={handleIngredientToggle}
         />
+      )}
+
+      {/* Customizations Section (allergens, drinks, toppings, sauces) */}
+      {hasCustomizations && customizations && (
+        <div className="customizations mb-6">
+          {customizations.allergens && (
+            <CustomizationGroup
+              group={customizations.allergens}
+              groupName="allergens"
+              selectedItemIds={selectedCustomizations?.allergens || []}
+              onSelectionChange={(itemIds) => handleCustomizationChange('allergens', itemIds)}
+            />
+          )}
+          {customizations.drinks && (
+            <CustomizationGroup
+              group={customizations.drinks}
+              groupName="drinks"
+              selectedItemIds={selectedCustomizations?.drinks || []}
+              onSelectionChange={(itemIds) => handleCustomizationChange('drinks', itemIds)}
+            />
+          )}
+          {customizations.toppings && (
+            <CustomizationGroup
+              group={customizations.toppings}
+              groupName="toppings"
+              selectedItemIds={selectedCustomizations?.toppings || []}
+              onSelectionChange={(itemIds) => handleCustomizationChange('toppings', itemIds)}
+            />
+          )}
+          {customizations.sauces && (
+            <CustomizationGroup
+              group={customizations.sauces}
+              groupName="sauces"
+              selectedItemIds={selectedCustomizations?.sauces || []}
+              onSelectionChange={(itemIds) => handleCustomizationChange('sauces', itemIds)}
+            />
+          )}
+        </div>
       )}
 
       {/* Validation Message */}

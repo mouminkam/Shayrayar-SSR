@@ -70,11 +70,12 @@ const OrderCard = memo(function OrderCard({ order }) {
             continue;
           }
 
-          // Extract option_groups from menu_item if available, otherwise empty array
+          // Extract option_groups and customizations from menu_item if available
           const optionGroups = menuItem.option_groups || [];
+          const customizations = menuItem.customizations || null;
 
           // Transform menu_item to product object
-          const product = transformMenuItemToProduct(menuItem, optionGroups);
+          const product = transformMenuItemToProduct(menuItem, optionGroups, lang, customizations);
           
           if (!product) {
             console.error(`Failed to transform product ${menuItem.id}`);
@@ -95,11 +96,33 @@ const OrderCard = memo(function OrderCard({ order }) {
             });
           }
 
+          // Convert selected_customizations from API format to frontend format
+          // API format: selected_drinks: [1, 2] أو null, selected_toppings: [3] أو null
+          // Frontend format: { drinks: [1, 2], toppings: [3] } (دائماً arrays، لا null)
+          const selectedCustomizations = {
+            allergens: Array.isArray(orderItem.selected_allergens) 
+              ? orderItem.selected_allergens 
+              : (orderItem.selected_allergens ? [orderItem.selected_allergens] : []),
+            drinks: Array.isArray(orderItem.selected_drinks) 
+              ? orderItem.selected_drinks 
+              : (orderItem.selected_drinks ? [orderItem.selected_drinks] : []),
+            toppings: Array.isArray(orderItem.selected_toppings) 
+              ? orderItem.selected_toppings 
+              : (orderItem.selected_toppings ? [orderItem.selected_toppings] : []),
+            sauces: Array.isArray(orderItem.selected_sauces) 
+              ? orderItem.selected_sauces 
+              : (orderItem.selected_sauces ? [orderItem.selected_sauces] : [])
+          };
+
           // Build customization object from order_item data
           const customization = {
             sizeId: orderItem.size_id || null,
-            ingredientIds: orderItem.selected_ingredients || [],
+            // Handle selected_ingredients (can be array or null)
+            ingredientIds: Array.isArray(orderItem.selected_ingredients) 
+              ? orderItem.selected_ingredients 
+              : (orderItem.selected_ingredients ? [orderItem.selected_ingredients] : (orderItem.ingredients || [])),
             selectedOptions: selectedOptions,
+            selectedCustomizations: selectedCustomizations, // Add customizations
             finalPrice: parseFloat(orderItem.item_price || 0),
             isValid: true, // Assume valid since it was in a previous order
           };

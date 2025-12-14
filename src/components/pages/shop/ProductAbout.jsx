@@ -73,7 +73,7 @@ export default function ProductAbout({ product }) {
         </div>
       </div>
 
-      <p className="text text-white text-base sm:text-lg  font-normal leading-relaxed mb-8">
+      <p className="text text-white text-base sm:text-lg max-w-2xl font-normal leading-relaxed mb-8">
         {product?.description || product?.longDescription || t(lang, "no_description_available")}
       </p>
 

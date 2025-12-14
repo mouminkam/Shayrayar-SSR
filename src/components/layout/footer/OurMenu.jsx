@@ -6,18 +6,9 @@ import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
 import { transformCategories } from "../../../lib/utils/productTransform";
+import { extractCategoriesFromResponse } from "../../../lib/utils/responseExtractor";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
-
-// Helper: Extract categories from API response
-const extractCategories = (response) => {
-  if (!response) return [];
-  if (Array.isArray(response)) return response;
-  if (response?.success && response?.data) {
-    return Array.isArray(response.data) ? response.data : response.data.categories || response.data.data || [];
-  }
-  return response?.data?.categories || response?.categories || response?.data || [];
-};
 
 export default function OurMenu() {
   const { prefetchRoute } = usePrefetchRoute();
@@ -44,8 +35,8 @@ export default function OurMenu() {
       setIsLoading(true);
       try {
         const response = await api.menu.getMenuCategories();
-        const categoriesData = extractCategories(response);
-        const transformed = transformCategories(categoriesData);
+        const categoriesData = extractCategoriesFromResponse(response);
+        const transformed = transformCategories(categoriesData, lang);
         setCategories(transformed);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -56,7 +47,7 @@ export default function OurMenu() {
     };
 
     fetchCategories();
-  }, [selectedBranch]);
+  }, [selectedBranch, lang]);
 
   return (
     <div className="mt-6 sm:mt-8 md:mt-0 lg:pl-6 xl:pl-12">

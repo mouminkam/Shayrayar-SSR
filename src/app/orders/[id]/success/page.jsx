@@ -30,14 +30,34 @@ export default function OrderSuccessPage() {
     try {
       const response = await api.orders.getOrderById(orderId);
       
+      // Log response for debugging
+      console.log('Order API Response (Success Page):', response);
+      
       if (response.success && response.data) {
-        setOrder(response.data.order || response.data);
+        // Handle different response structures
+        const orderData = response.data.order || response.data;
+        
+        if (!orderData || !orderData.id) {
+          console.error('Invalid order data structure:', response);
+          toastError("Failed to load order details");
+          return;
+        }
+        
+        setOrder(orderData);
       } else {
-        toastError("Failed to load order details");
+        console.error('Order API error:', response);
+        toastError(response?.message || "Failed to load order details");
       }
     } catch (error) {
       console.error("Error fetching order:", error);
-      toastError("Failed to load order details");
+      // Log full error details
+      console.error("Error details:", {
+        message: error.message,
+        status: error.status,
+        data: error.data,
+        response: error.response
+      });
+      toastError(error?.message || "Failed to load order details");
     } finally {
       setIsLoading(false);
     }

@@ -51,9 +51,9 @@ export default function ProductQuickAddModal({ isOpen, onClose, productItem }) {
           }
 
           if (productData) {
-            // Combine product data with option_groups
-            const combinedData = { ...productData, option_groups: optionGroups };
-            const transformed = transformMenuItemToProduct(combinedData);
+            // Extract customizations if available
+            const customizations = response?.data?.customizations || null;
+            const transformed = transformMenuItemToProduct(productData, optionGroups, lang, customizations);
             setProduct(transformed);
             // Initialize final price
             setCustomization(prev => ({

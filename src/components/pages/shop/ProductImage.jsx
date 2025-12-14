@@ -7,18 +7,18 @@ export default function ProductImage({ product }) {
   const imageUrl = product?.image || PLACEHOLDER_IMAGE;
   
   return (
-    <div className="flex items-center justify-center p-8">
-      <div className="relative">
+    <div className="flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="relative w-full max-w-md">
         <Image
           src={imageUrl}
           alt={product?.title || "Product"}
-          width={384}
-          height={384}
-          className="w-60 h-60 sm:w-80 sm:h-80 lg:w-96 lg:h-96 object-cover rounded-full shadow-xl"
-          quality={85}
+          width={500}
+          height={500}
+          className="w-full h-80 aspect-square shadow-2xl"
+          quality={90}
           loading="eager"
           priority
-          sizes="(max-width: 640px) 240px, (max-width: 1024px) 320px, 384px"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 500px"
         />
       </div>
     </div>

@@ -9,6 +9,7 @@ import useToastStore from "../store/toastStore";
 import { ITEMS_PER_PAGE_GRID, ITEMS_PER_PAGE_LIST } from "../data/constants";
 import { useApiCache } from "./useApiCache";
 import { debounce } from "../lib/utils/debounce";
+import { useLanguage } from "../context/LanguageContext";
 
 /**
  * Hook to manage shop products fetching, pagination, and filtering
@@ -20,6 +21,7 @@ export function useShopProducts(viewMode = "grid") {
   const { selectedBranch, initialize } = useBranchStore();
   const { error: toastError } = useToastStore();
   const { getCachedOrFetch } = useApiCache("PRODUCTS");
+  const { lang } = useLanguage();
 
   // Initialize branch if not loaded
   useEffect(() => {
@@ -96,7 +98,7 @@ export function useShopProducts(viewMode = "grid") {
       const apiRespectsLimit = apiPerPage && apiPerPage === itemsPerPage;
 
       if (Array.isArray(menuItems) && menuItems.length > 0) {
-        const transformedProducts = transformMenuItemsToProducts(menuItems);
+        const transformedProducts = transformMenuItemsToProducts(menuItems, lang);
 
         if (apiRespectsLimit) {
           // ✅ Server-side pagination works!
@@ -116,7 +118,7 @@ export function useShopProducts(viewMode = "grid") {
             () => api.menu.getMenuItems(allParams)
           );
           const { menuItems: allMenuItems } = extractMenuItemsFromResponse(allResponse);
-          const allTransformed = transformMenuItemsToProducts(allMenuItems);
+          const allTransformed = transformMenuItemsToProducts(allMenuItems, lang);
 
           setAllProducts(allTransformed);
           setProducts(allTransformed.slice(0, itemsPerPage));
@@ -145,7 +147,7 @@ export function useShopProducts(viewMode = "grid") {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedBranch, itemsPerPage, categoryId, debouncedSearchQuery, sortBy, toastError, getCachedOrFetch]);
+  }, [selectedBranch, itemsPerPage, categoryId, debouncedSearchQuery, sortBy, toastError, getCachedOrFetch, lang]);
 
   // Fetch products when filters change
   useEffect(() => {

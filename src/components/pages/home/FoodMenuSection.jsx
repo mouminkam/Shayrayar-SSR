@@ -7,7 +7,7 @@ import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
 import { transformCategories, transformMenuItemsToProducts } from "../../../lib/utils/productTransform";
-import { extractMenuItemsFromResponse } from "../../../lib/utils/responseExtractor";
+import { extractMenuItemsFromResponse, extractCategoriesFromResponse } from "../../../lib/utils/responseExtractor";
 import { IMAGE_PATHS } from "../../../data/constants";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
@@ -46,25 +46,8 @@ export default function FoodMenuSection() {
       setIsLoadingCategories(true);
       try {
         const response = await api.menu.getMenuCategories();
-        
-        // Handle different response structures
-        let categoriesData = [];
-        
-        if (response && response.success && response.data) {
-          categoriesData = Array.isArray(response.data)
-            ? response.data
-            : response.data.categories || response.data.data || [];
-        } else if (Array.isArray(response)) {
-          categoriesData = response;
-        } else if (response && response.data && Array.isArray(response.data)) {
-          categoriesData = response.data;
-        } else if (response && response.data) {
-          categoriesData = response.data.categories || response.data.data || [];
-        } else if (response && typeof response === 'object') {
-          categoriesData = response.categories || response.data || [];
-        }
-        
-        const transformed = transformCategories(categoriesData);
+        const categoriesData = extractCategoriesFromResponse(response);
+        const transformed = transformCategories(categoriesData, lang);
         setCategories(transformed);
         
         // Set first category as active tab if no active tab is set
@@ -80,7 +63,7 @@ export default function FoodMenuSection() {
     };
 
     fetchCategories();
-  }, [selectedBranch]);
+  }, [selectedBranch, lang]);
 
   // Fetch menu items when activeTab (category) changes
   const fetchMenuItems = useCallback(async (categoryId) => {
@@ -99,7 +82,7 @@ export default function FoodMenuSection() {
       });
       
       const { menuItems: items } = extractMenuItemsFromResponse(response);
-      const transformed = transformMenuItemsToProducts(items);
+      const transformed = transformMenuItemsToProducts(items, lang);
       setMenuItems(transformed);
     } catch (error) {
       console.error("Error fetching menu items:", error);
@@ -107,7 +90,7 @@ export default function FoodMenuSection() {
     } finally {
       setIsLoadingItems(false);
     }
-  }, [getSelectedBranchId]);
+  }, [getSelectedBranchId, lang]);
 
   // Fetch menu items when activeTab changes
   useEffect(() => {

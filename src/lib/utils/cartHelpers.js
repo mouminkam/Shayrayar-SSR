@@ -43,7 +43,7 @@ export function validateProductForCart(product, customization = {}) {
 /**
  * Build cart item object from product and customization
  * @param {Object} product - Product object
- * @param {Object} customization - Customization object { sizeId, ingredientIds, selectedOptions, finalPrice }
+ * @param {Object} customization - Customization object { sizeId, ingredientIds, selectedOptions, selectedCustomizations, finalPrice }
  * @param {number} quantity - Quantity to add
  * @returns {Object} Cart item object
  */
@@ -71,6 +71,13 @@ export function buildProductCartItem(product, customization = {}, quantity = 1) 
     ingredients_data: selectedIngredients,
     // New: Option groups selections
     selected_options: customization.selectedOptions || null,
+    // New: Customizations selections (allergens, drinks, toppings, sauces)
+    selected_customizations: customization.selectedCustomizations || {
+      allergens: [],
+      drinks: [],
+      toppings: [],
+      sauces: []
+    },
     // Final calculated price
     final_price: customization.finalPrice || product.price || product.base_price || 0,
   };

@@ -25,6 +25,15 @@ export function useProductCustomization(product, onCustomizationChange) {
     return initialState;
   });
 
+  // Customizations system (allergens, drinks, toppings, sauces)
+  // State: { allergens: [id1, id2], drinks: [id3], toppings: [], sauces: [id4] }
+  const [selectedCustomizations, setSelectedCustomizations] = useState({
+    allergens: [],
+    drinks: [],
+    toppings: [],
+    sauces: [],
+  });
+
   // Calculate final price
   const finalPrice = useMemo(() => {
     if (!product) return 0;
@@ -62,8 +71,25 @@ export function useProductCustomization(product, onCustomizationChange) {
       });
     }
 
+    // Customizations: Add prices for selected customizations
+    if (product.customizations) {
+      const customizationTypes = ['allergens', 'drinks', 'toppings', 'sauces'];
+      customizationTypes.forEach(type => {
+        const group = product.customizations[type];
+        if (group && Array.isArray(group.available)) {
+          const selectedIds = selectedCustomizations[type] || [];
+          selectedIds.forEach(itemId => {
+            const item = group.available.find(i => i.id === itemId);
+            if (item && !item.is_free) {
+              price += parseFloat(item.final_price || item.price || 0);
+            }
+          });
+        }
+      });
+    }
+
     return price;
-  }, [product, selectedSizeId, selectedIngredientIds, selectedOptions]);
+  }, [product, selectedSizeId, selectedIngredientIds, selectedOptions, selectedCustomizations]);
 
   // Validate that all required option groups are satisfied
   const isValid = useMemo(() => {
@@ -92,8 +118,22 @@ export function useProductCustomization(product, onCustomizationChange) {
       return false;
     }
 
+    // Check customizations min_selection requirements
+    if (product.customizations) {
+      const customizationTypes = ['allergens', 'drinks', 'toppings', 'sauces'];
+      for (const type of customizationTypes) {
+        const group = product.customizations[type];
+        if (group && group.min_selection > 0) {
+          const selectedIds = selectedCustomizations[type] || [];
+          if (selectedIds.length < group.min_selection) {
+            return false;
+          }
+        }
+      }
+    }
+
     return true;
-  }, [product, selectedSizeId, selectedOptions]);
+  }, [product, selectedSizeId, selectedOptions, selectedCustomizations]);
 
   // Get list of missing required groups (for error messages)
   const missingRequiredGroups = useMemo(() => {
@@ -130,9 +170,39 @@ export function useProductCustomization(product, onCustomizationChange) {
         currentSelection: 0,
       });
     }
+
+    // Check customizations min_selection requirements
+    if (product.customizations) {
+      const customizationTypes = ['allergens', 'drinks', 'toppings', 'sauces'];
+      const typeNames = {
+        allergens: 'Allergens',
+        drinks: 'Drinks',
+        toppings: 'Toppings',
+        sauces: 'Sauces',
+      };
+      
+      customizationTypes.forEach(type => {
+        const group = product.customizations[type];
+        // Check if group exists and has min_selection > 0 (required)
+        if (group && group.min_selection > 0) {
+          const selectedIds = selectedCustomizations[type] || [];
+          const minSelection = parseInt(group.min_selection || 0, 10);
+          
+          // If min_selection > 0, it's required and must have at least min_selection items
+          if (selectedIds.length < minSelection) {
+            missing.push({
+              id: type,
+              name: typeNames[type] || type,
+              minSelection: minSelection,
+              currentSelection: selectedIds.length,
+            });
+          }
+        }
+      });
+    }
     
     return missing;
-  }, [product, selectedSizeId, selectedOptions]);
+  }, [product, selectedSizeId, selectedOptions, selectedCustomizations]);
 
   // Update parent when customization changes
   useEffect(() => {
@@ -141,12 +211,13 @@ export function useProductCustomization(product, onCustomizationChange) {
         sizeId: selectedSizeId,
         ingredientIds: selectedIngredientIds,
         selectedOptions, // New option groups selections
+        selectedCustomizations, // Customizations selections
         finalPrice,
         isValid,
         missingRequiredGroups, // Add missing groups info for error messages
       });
     }
-  }, [selectedSizeId, selectedIngredientIds, selectedOptions, finalPrice, isValid, missingRequiredGroups, onCustomizationChange]);
+  }, [selectedSizeId, selectedIngredientIds, selectedOptions, selectedCustomizations, finalPrice, isValid, missingRequiredGroups, onCustomizationChange]);
 
   // Legacy handlers
   const handleSizeChange = useCallback((sizeId) => {
@@ -169,6 +240,14 @@ export function useProductCustomization(product, onCustomizationChange) {
     }));
   }, []);
 
+  // Customizations handlers
+  const handleCustomizationChange = useCallback((type, selectedItemIds) => {
+    setSelectedCustomizations(prev => ({
+      ...prev,
+      [type]: selectedItemIds,
+    }));
+  }, []);
+
   return {
     // Legacy
     selectedSizeId,
@@ -178,6 +257,9 @@ export function useProductCustomization(product, onCustomizationChange) {
     // New
     selectedOptions,
     handleOptionGroupChange,
+    // Customizations
+    selectedCustomizations,
+    handleCustomizationChange,
     // Common
     finalPrice,
     isValid,

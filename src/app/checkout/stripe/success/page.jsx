@@ -121,8 +121,18 @@ function StripeSuccessContent() {
     try {
       const response = await api.orders.getOrderById(orderId);
 
+      // Log response for debugging
+      console.log('Order API Response (Stripe Success):', response);
+
       if (response.success && response.data) {
+        // Handle different response structures
         const orderData = response.data.order || response.data;
+        
+        if (!orderData || !orderData.id) {
+          console.error('Invalid order data structure:', response);
+          return false;
+        }
+        
         setOrder(orderData);
         
         // Check if payment is confirmed
@@ -145,10 +155,19 @@ function StripeSuccessContent() {
         });
         
         return false; // Payment not confirmed yet
+      } else {
+        console.error('Order API error:', response);
+        return false;
       }
-      return false;
     } catch (error) {
       console.error('Error fetching order:', error);
+      // Log full error details
+      console.error('Error details:', {
+        message: error.message,
+        status: error.status,
+        data: error.data,
+        response: error.response
+      });
       return false;
     }
   };

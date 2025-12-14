@@ -6,15 +6,18 @@ import { X } from "lucide-react";
 import ProductSizes from "../pages/shop/ProductSizes";
 import ProductIngredients from "../pages/shop/ProductIngredients";
 import OptionGroup from "../pages/shop/OptionGroup";
+import CustomizationGroup from "../pages/shop/CustomizationGroup";
 import { formatCurrency } from "../../lib/utils/formatters";
 import api from "../../api";
 import { transformMenuItemToProduct } from "../../lib/utils/productTransform";
+import { useLanguage } from "../../context/LanguageContext";
 
 /**
  * CartEditModal Component
  * Modal for editing cart item customization (sizes and ingredients)
  */
 export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
+  const { lang } = useLanguage();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedSizeId, setSelectedSizeId] = useState(cartItem?.size_id || null);
@@ -28,6 +31,18 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
     }
     return {};
   });
+  const [selectedCustomizations, setSelectedCustomizations] = useState(() => {
+    // Initialize from cartItem.selected_customizations or empty object
+    if (cartItem?.selected_customizations && typeof cartItem.selected_customizations === 'object') {
+      return cartItem.selected_customizations;
+    }
+    return {
+      allergens: [],
+      drinks: [],
+      toppings: [],
+      sauces: [],
+    };
+  });
 
   // Fetch product data if not available
   useEffect(() => {
@@ -36,16 +51,19 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
       api.menu
         .getMenuItemById(cartItem.id)
         .then((response) => {
-          // Extract product data and option_groups from response
+          // Extract product data, option_groups, and customizations from response
           let productData = null;
           let optionGroups = [];
+          let customizations = null;
           
           if (response?.success && response?.data) {
             productData = response.data.item || response.data;
             optionGroups = response.data.option_groups || [];
+            customizations = response.data.customizations || null;
           } else if (response?.data) {
             productData = response.data.item || response.data;
             optionGroups = response.data.option_groups || [];
+            customizations = response.data.customizations || null;
           } else if (typeof response === "object" && !Array.isArray(response)) {
             if (response.id || response.name || response.menu_item_id) {
               productData = response;
@@ -53,7 +71,7 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
           }
 
           if (productData) {
-            const transformed = transformMenuItemToProduct(productData, optionGroups);
+            const transformed = transformMenuItemToProduct(productData, optionGroups, lang, customizations);
             setProduct(transformed);
             // Initialize selections from cart item
             setSelectedSizeId(cartItem.size_id || null); // No default
@@ -68,6 +86,18 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
                 initialState[group.id] = [];
               });
               setSelectedOptions(initialState);
+            }
+            // Initialize customizations from cart item
+            if (cartItem?.selected_customizations && typeof cartItem.selected_customizations === 'object') {
+              setSelectedCustomizations(cartItem.selected_customizations);
+            } else if (transformed.customizations) {
+              // Initialize empty selections for each customization type
+              setSelectedCustomizations({
+                allergens: [],
+                drinks: [],
+                toppings: [],
+                sauces: [],
+              });
             }
           }
         })
@@ -90,6 +120,16 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
         setSelectedOptions(cartItem.selected_options);
       } else {
         setSelectedOptions({});
+      }
+      if (cartItem?.selected_customizations && typeof cartItem.selected_customizations === 'object') {
+        setSelectedCustomizations(cartItem.selected_customizations);
+      } else {
+        setSelectedCustomizations({
+          allergens: [],
+          drinks: [],
+          toppings: [],
+          sauces: [],
+        });
       }
     }
   }, [isOpen, cartItem]);
@@ -134,8 +174,25 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
       });
     }
 
+    // Customizations: Add prices for selected customizations
+    if (product.customizations) {
+      const customizationTypes = ['allergens', 'drinks', 'toppings', 'sauces'];
+      customizationTypes.forEach(type => {
+        const group = product.customizations[type];
+        if (group && Array.isArray(group.available)) {
+          const selectedIds = selectedCustomizations[type] || [];
+          selectedIds.forEach(itemId => {
+            const item = group.available.find(i => i.id === itemId);
+            if (item && !item.is_free) {
+              price += parseFloat(item.final_price || item.price || 0);
+            }
+          });
+        }
+      });
+    }
+
     return price;
-  }, [product, selectedSizeId, selectedIngredientIds, selectedOptions, cartItem]);
+  }, [product, selectedSizeId, selectedIngredientIds, selectedOptions, selectedCustomizations, cartItem]);
 
   // Handle size change
   const handleSizeChange = useCallback((sizeId) => {
@@ -173,14 +230,36 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
       }
     }
 
+    // Check customizations min_selection requirements
+    if (product.customizations) {
+      const customizationTypes = ['allergens', 'drinks', 'toppings', 'sauces'];
+      for (const type of customizationTypes) {
+        const group = product.customizations[type];
+        if (group && group.min_selection > 0) {
+          const selectedIds = selectedCustomizations[type] || [];
+          if (selectedIds.length < group.min_selection) {
+            return false;
+          }
+        }
+      }
+    }
+
     return true;
-  }, [product, selectedSizeId, selectedOptions]);
+  }, [product, selectedSizeId, selectedOptions, selectedCustomizations]);
 
   // Handle option group change
   const handleOptionGroupChange = useCallback((groupId, selectedItemIds) => {
     setSelectedOptions(prev => ({
       ...prev,
       [groupId]: selectedItemIds,
+    }));
+  }, []);
+
+  // Handle customization change
+  const handleCustomizationChange = useCallback((type, selectedItemIds) => {
+    setSelectedCustomizations(prev => ({
+      ...prev,
+      [type]: selectedItemIds,
     }));
   }, []);
 
@@ -200,6 +279,7 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
       ingredients: selectedIngredientIds,
       ingredients_data: selectedIngredients,
       selected_options: selectedOptions, // New: option groups selections
+      selected_customizations: selectedCustomizations, // New: customizations selections
       final_price: finalPrice,
       price: finalPrice, // Update price as well
       image: product.image || cartItem?.image || null, // Preserve image from product or cart item
@@ -210,7 +290,7 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
     }
 
     onClose();
-  }, [product, selectedSizeId, selectedIngredientIds, selectedOptions, finalPrice, isValid, cartItem, onSave, onClose]);
+  }, [product, selectedSizeId, selectedIngredientIds, selectedOptions, selectedCustomizations, finalPrice, isValid, cartItem, onSave, onClose]);
 
   // Use portal to render modal at document body level
   if (typeof window === 'undefined') return null;
@@ -306,6 +386,44 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
                     selectedIngredientIds={selectedIngredientIds}
                     onIngredientToggle={handleIngredientToggle}
                   />
+                )}
+
+                {/* Customizations Section (allergens, drinks, toppings, sauces) */}
+                {product.has_customizations && product.customizations && (
+                  <div className="customizations">
+                    {product.customizations.allergens && (
+                      <CustomizationGroup
+                        group={product.customizations.allergens}
+                        groupName="allergens"
+                        selectedItemIds={selectedCustomizations?.allergens || []}
+                        onSelectionChange={(itemIds) => handleCustomizationChange('allergens', itemIds)}
+                      />
+                    )}
+                    {product.customizations.drinks && (
+                      <CustomizationGroup
+                        group={product.customizations.drinks}
+                        groupName="drinks"
+                        selectedItemIds={selectedCustomizations?.drinks || []}
+                        onSelectionChange={(itemIds) => handleCustomizationChange('drinks', itemIds)}
+                      />
+                    )}
+                    {product.customizations.toppings && (
+                      <CustomizationGroup
+                        group={product.customizations.toppings}
+                        groupName="toppings"
+                        selectedItemIds={selectedCustomizations?.toppings || []}
+                        onSelectionChange={(itemIds) => handleCustomizationChange('toppings', itemIds)}
+                      />
+                    )}
+                    {product.customizations.sauces && (
+                      <CustomizationGroup
+                        group={product.customizations.sauces}
+                        groupName="sauces"
+                        selectedItemIds={selectedCustomizations?.sauces || []}
+                        onSelectionChange={(itemIds) => handleCustomizationChange('sauces', itemIds)}
+                      />
+                    )}
+                  </div>
                 )}
 
                 {/* Validation Message */}

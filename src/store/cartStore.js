@@ -8,6 +8,7 @@ import { TAX_RATE } from "../data/constants";
 //   id, name, price, quantity, image,
 //   size_id, size_name, ingredients, ingredients_data,
 //   selected_options, // New: { [groupId]: [itemId1, itemId2, ...] }
+//   selected_customizations, // New: { allergens: [], drinks: [], toppings: [], sauces: [] }
 //   base_price, final_price
 // }
 
@@ -28,7 +29,17 @@ export const getCartItemKey = (item) => {
     optionsKey = optionsArray.join('|') || 'no-options';
   }
   
-  return `${item.id}-${sizeKey}-${ingredientsKey}-${optionsKey}`;
+  // Include selected_customizations in key for customizations system
+  let customizationsKey = 'no-customizations';
+  if (item.selected_customizations && typeof item.selected_customizations === 'object') {
+    // Convert selected_customizations object to sorted string
+    const customizationsArray = Object.entries(item.selected_customizations)
+      .map(([type, itemIds]) => `${type}:${Array.isArray(itemIds) ? itemIds.sort().join(',') : ''}`)
+      .sort();
+    customizationsKey = customizationsArray.join('|') || 'no-customizations';
+  }
+  
+  return `${item.id}-${sizeKey}-${ingredientsKey}-${optionsKey}-${customizationsKey}`;
 };
 
 const useCartStore = create(
@@ -51,6 +62,7 @@ const useCartStore = create(
           size_id: product.size_id || null,
           ingredients: product.ingredients || [],
           selected_options: product.selected_options || null,
+          selected_customizations: product.selected_customizations || null,
         });
 
         // Find existing item with same configuration
@@ -60,6 +72,7 @@ const useCartStore = create(
             size_id: item.size_id || null,
             ingredients: item.ingredients || [],
             selected_options: item.selected_options || null,
+            selected_customizations: item.selected_customizations || null,
           });
           return itemKey === productKey;
         });
@@ -73,6 +86,7 @@ const useCartStore = create(
                 size_id: item.size_id || null,
                 ingredients: item.ingredients || [],
                 selected_options: item.selected_options || null,
+                selected_customizations: item.selected_customizations || null,
               });
               return itemKey === productKey
                 ? { 
@@ -97,6 +111,12 @@ const useCartStore = create(
               ingredients: product.ingredients || [],
               ingredients_data: product.ingredients_data || [],
               selected_options: product.selected_options || null, // New: option groups selections
+              selected_customizations: product.selected_customizations || {
+                allergens: [],
+                drinks: [],
+                toppings: [],
+                sauces: []
+              }, // New: customizations selections
               base_price: product.base_price || product.price,
               final_price: product.final_price || product.price,
             }],
@@ -117,6 +137,7 @@ const useCartStore = create(
             size_id: item.size_id || null,
             ingredients: item.ingredients || [],
             selected_options: item.selected_options || null,
+            selected_customizations: item.selected_customizations || null,
           });
           return itemKey === cartItemKey || item.id === cartItemKey;
         });
@@ -127,6 +148,7 @@ const useCartStore = create(
             size_id: itemToRemove.size_id || null,
             ingredients: itemToRemove.ingredients || [],
             selected_options: itemToRemove.selected_options || null,
+            selected_customizations: itemToRemove.selected_customizations || null,
           });
           
           set({
@@ -136,6 +158,7 @@ const useCartStore = create(
                 size_id: item.size_id || null,
                 ingredients: item.ingredients || [],
                 selected_options: item.selected_options || null,
+                selected_customizations: item.selected_customizations || null,
               });
               return currentKey !== itemKey && item.id !== cartItemKey;
             }),
@@ -157,6 +180,7 @@ const useCartStore = create(
               size_id: item.size_id || null,
               ingredients: item.ingredients || [],
               selected_options: item.selected_options || null,
+              selected_customizations: item.selected_customizations || null,
             });
             if (itemKey === cartItemKey || item.id === cartItemKey) {
               return { ...item, quantity: item.quantity + 1 };
@@ -174,6 +198,7 @@ const useCartStore = create(
             size_id: item.size_id || null,
             ingredients: item.ingredients || [],
             selected_options: item.selected_options || null,
+            selected_customizations: item.selected_customizations || null,
           });
           return itemKey === cartItemKey || item.id === cartItemKey;
         });
@@ -186,6 +211,7 @@ const useCartStore = create(
                 size_id: item.size_id || null,
                 ingredients: item.ingredients || [],
                 selected_options: item.selected_options || null,
+                selected_customizations: item.selected_customizations || null,
               });
               if (itemKey === cartItemKey || item.id === cartItemKey) {
                 return { ...item, quantity: item.quantity - 1 };
@@ -255,6 +281,7 @@ const useCartStore = create(
             size_id: item.size_id || null,
             ingredients: item.ingredients || [],
             selected_options: item.selected_options || null,
+            selected_customizations: item.selected_customizations || null,
           });
           return itemKey === cartItemKey || item.id === cartItemKey;
         });
@@ -278,6 +305,7 @@ const useCartStore = create(
           size_id: updatedItem.size_id || null,
           ingredients: updatedItem.ingredients || [],
           selected_options: updatedItem.selected_options || null,
+          selected_customizations: updatedItem.selected_customizations || null,
         });
 
         // Get old key
@@ -286,6 +314,7 @@ const useCartStore = create(
           size_id: itemToUpdate.size_id || null,
           ingredients: itemToUpdate.ingredients || [],
           selected_options: itemToUpdate.selected_options || null,
+          selected_customizations: itemToUpdate.selected_customizations || null,
         });
 
         // If key changed, we need to replace the item (remove old, add new)
@@ -297,6 +326,7 @@ const useCartStore = create(
               size_id: item.size_id || null,
               ingredients: item.ingredients || [],
               selected_options: item.selected_options || null,
+              selected_customizations: item.selected_customizations || null,
             });
             return itemKey === newKey && itemKey !== oldKey;
           });
@@ -311,6 +341,7 @@ const useCartStore = create(
                     size_id: item.size_id || null,
                     ingredients: item.ingredients || [],
                     selected_options: item.selected_options || null,
+                    selected_customizations: item.selected_customizations || null,
                   });
                   return itemKey !== oldKey;
                 })
@@ -320,6 +351,7 @@ const useCartStore = create(
                     size_id: item.size_id || null,
                     ingredients: item.ingredients || [],
                     selected_options: item.selected_options || null,
+                    selected_customizations: item.selected_customizations || null,
                   });
                   if (itemKey === newKey) {
                     return { ...item, quantity: item.quantity + updatedItem.quantity };
@@ -337,6 +369,7 @@ const useCartStore = create(
                     size_id: item.size_id || null,
                     ingredients: item.ingredients || [],
                     selected_options: item.selected_options || null,
+                    selected_customizations: item.selected_customizations || null,
                   });
                   return itemKey !== oldKey;
                 })
@@ -352,6 +385,7 @@ const useCartStore = create(
                 size_id: item.size_id || null,
                 ingredients: item.ingredients || [],
                 selected_options: item.selected_options || null,
+                selected_customizations: item.selected_customizations || null,
               });
               return itemKey === oldKey ? updatedItem : item;
             }),

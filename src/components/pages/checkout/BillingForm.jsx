@@ -145,13 +145,15 @@ const BillingForm = memo(() => {
       const taxAmount = getTax();
       const totalAmount = getTotal();
 
-      // Prepare order items with size_id, ingredients, and selected_options
+      // Prepare order items with size_id, selected_ingredients, selected_options, and customizations
       const orderItems = items.map((item) => {
         const orderItem = {
         menu_item_id: item.id,
         size_id: item.size_id || null,
         quantity: item.quantity,
-        ingredients: item.ingredients || [],
+        selected_ingredients: Array.isArray(item.ingredients) 
+          ? item.ingredients.map(id => parseInt(id, 10)) 
+          : [],
         special_instructions: item.special_instructions || "",
         };
 
@@ -167,6 +169,32 @@ const BillingForm = memo(() => {
           if (selectedOptionsArray.length > 0) {
             orderItem.selected_options = selectedOptionsArray;
           }
+        }
+
+        // Add selected_customizations if available (convert from frontend format to API format)
+        if (item.selected_customizations && typeof item.selected_customizations === 'object') {
+          // Extract each customization type and convert to array of IDs
+          const customizations = item.selected_customizations;
+          
+          // Ensure arrays are properly formatted (convert to numbers and filter empty)
+          orderItem.selected_drinks = Array.isArray(customizations.drinks) 
+            ? customizations.drinks.map(id => parseInt(id, 10)).filter(id => !isNaN(id))
+            : [];
+          orderItem.selected_toppings = Array.isArray(customizations.toppings) 
+            ? customizations.toppings.map(id => parseInt(id, 10)).filter(id => !isNaN(id))
+            : [];
+          orderItem.selected_sauces = Array.isArray(customizations.sauces) 
+            ? customizations.sauces.map(id => parseInt(id, 10)).filter(id => !isNaN(id))
+            : [];
+          orderItem.selected_allergens = Array.isArray(customizations.allergens) 
+            ? customizations.allergens.map(id => parseInt(id, 10)).filter(id => !isNaN(id))
+            : [];
+        } else {
+          // Default empty arrays if no customizations
+          orderItem.selected_drinks = [];
+          orderItem.selected_toppings = [];
+          orderItem.selected_sauces = [];
+          orderItem.selected_allergens = [];
         }
 
         return orderItem;
