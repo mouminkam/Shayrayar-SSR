@@ -1,0 +1,73 @@
+"use client"; 
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import api from "../api";
+import useBranchStore from "../store/branchStore";
+import { useApiCache } from "./useApiCache";
+
+/**
+ * Hook to fetch and manage website slides
+ * @param {Object} params - Query parameters
+ * @returns {Object} Website slides, loading state, and error
+ */
+export function useWebsiteSlides(params = {}) {
+  const { selectedBranch } = useBranchStore();
+  const { getCachedOrFetch } = useApiCache("WEBSITE_SLIDES");
+  const [slides, setSlides] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Start with true to show loading state
+  const [error, setError] = useState(null);
+  
+  // Use ref to store params and prevent infinite loop
+  const paramsRef = useRef(params);
+  const paramsString = useMemo(() => JSON.stringify(params), [params]);
+  
+  // Update ref when params actually change
+  useEffect(() => {
+    paramsRef.current = params;
+  }, [paramsString]);
+
+  const fetchWebsiteSlides = useCallback(async () => {
+    const branchId = selectedBranch?.id;
+    if (!branchId) {
+      setSlides([]);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Use paramsRef.current to avoid stale closure
+      const response = await getCachedOrFetch(
+        '/website-slides',
+        paramsRef.current,
+        () => api.slides.getWebsiteSlides(paramsRef.current)
+      );
+
+      if (response?.success && response?.data?.slides) {
+        setSlides(response.data.slides);
+      } else {
+        setSlides([]);
+      }
+    } catch (err) {
+      const errorMessage = err?.message || err?.data?.message || "Failed to load website slides";
+      setError(errorMessage);
+      // Don't show toast for slides - it's not critical
+      console.error("Website slides error:", errorMessage);
+      setSlides([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedBranch?.id, paramsString, getCachedOrFetch]);
+
+  useEffect(() => {
+    fetchWebsiteSlides();
+  }, [fetchWebsiteSlides]);
+
+  return {
+    slides,
+    isLoading,
+    error,
+    refetch: fetchWebsiteSlides,
+  };
+}

@@ -1,49 +1,86 @@
 "use client";
+import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import { useWebsiteSlides } from "../../../hooks/useWebsiteSlides";
+import SectionSkeleton from "../../ui/SectionSkeleton";
 
 export default function OfferCards() {
   const { lang } = useLanguage();
-  
-  const offers = [
-    {
-      title: "SPICY FRIED CHICKEN",
+  const { slides: apiSlides, isLoading, error } = useWebsiteSlides();
+
+  // Take first 3 slides and map to offer format
+  const offers = useMemo(() => {
+    if (!apiSlides || apiSlides.length === 0) {
+      // Fallback offers if no data
+      return [
+        {
+          title: "SPICY FRIED CHICKEN",
+          subtitle: t(lang, "on_this_week"),
+          description: t(lang, "limited_time_offer"),
+          image: "/img/offer/offerThumb1_1.png",
+          bgImage: "/img/bg/offerBG1_1.jpg",
+          link: "/shop",
+        },
+        {
+          title: "TODAY SPACIAL FOOD",
+          subtitle: t(lang, "welcome_fresheat"),
+          description: t(lang, "limited_time_offer"),
+          image: "/img/offer/offerThumb1_2.png",
+          bgImage: "/img/bg/offerBG1_1.jpg",
+          link: "/shop",
+        },
+        {
+          title: "SPECIAL CHICKEN ROLL",
+          subtitle: t(lang, "on_this_week"),
+          description: t(lang, "limited_time_offer"),
+          image: "/img/offer/offerThumb1_3.png",
+          bgImage: "/img/bg/offerBG1_1.jpg",
+          link: "/shop",
+        },
+      ];
+    }
+
+    // Take first 3 slides only
+    return apiSlides.slice(0, 3).map((slide) => ({
+      title: slide.title || "",
       subtitle: t(lang, "on_this_week"),
-      description: t(lang, "limited_time_offer"),
-      image: "/img/offer/offerThumb1_1.png",
-      shape: "/img/shape/offerShape1_4.png",
+      description: slide.description || t(lang, "limited_time_offer"),
+      image: slide.desktop_image || "/img/offer/offerThumb1_1.png",
       bgImage: "/img/bg/offerBG1_1.jpg",
-      buttonStyle: "style4", // orange
-    },
-    {
-      title: "TODAY SPACIAL FOOD",
-      subtitle: t(lang, "welcome_fresheat"),
-      description: t(lang, "limited_time_offer"),
-      image: "/img/offer/offerThumb1_2.png",
-      shape: "/img/shape/offerShape1_4.png",
-      bgImage: "/img/bg/offerBG1_1.jpg",
-      buttonStyle: "style5", // white
-    },
-    {
-      title: "SPECIAL CHICKEN ROLL",
-      subtitle: t(lang, "on_this_week"),
-      description: t(lang, "limited_time_offer"),
-      image: "/img/offer/offerThumb1_3.png",
-      shape: "/img/shape/offerShape1_4.png",
-      bgImage: "/img/bg/offerBG1_1.jpg",
-      buttonStyle: "style4", // orange
-    },
-  ];
+      link: slide.menu_item_id ? `/shop/${slide.menu_item_id}` : "/shop",
+    }));
+  }, [apiSlides, lang]);
+
+  // Show loading skeleton
+  if (isLoading) {
+    return (
+      <section className="py-12 mb-12 sm:mb-0 sm:py-16 bg-bg3">
+        <SectionSkeleton variant="default" cardCount={3} height="h-80" />
+      </section>
+    );
+  }
+
+  // Show error state or fallback
+  if (error && offers.length === 0) {
+    return (
+      <section className="py-12 mb-12 sm:mb-0 sm:py-16 bg-bg3">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-text">Failed to load offer cards</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-12 mb-12 sm:mb-0 sm:py-16 bg-bg3 ">
       <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {offers.map((offer, index) => (
+          {offers.length > 0 && offers.map((offer, index) => (
             <motion.div
               key={index}
               className="relative rounded-3xl overflow-hidden min-h-[300px] flex items-center p-8 sm:p-10 border-2 border-bgimg hover:translate-y-2 transition-all duration-300 bg-cover bg-center"
@@ -80,7 +117,7 @@ export default function OfferCards() {
                 </h3>
                 <p className="text-theme3 font-extrabold mb-5">{offer.description}</p>
                 <Link
-                  href="/shop"
+                  href={offer.link || "/shop"}
                   className={`inline-block px-4 py-3 text-xs sm:text-sm font-normal rounded-md transition-all duration-300 bg-theme3 text-gray-900 hover:bg-theme hover:text-white`}
                 >
                   {t(lang, "order_now")} <ArrowRight className="inline-block w-4 h-4 ml-2" />
@@ -92,8 +129,8 @@ export default function OfferCards() {
                 <div className="relative">
                   <Image
                     key={`${offer.image}-${index}`}
-                    src={offer.image}
-                    alt={offer.title}
+                    src={offer.image || "/img/offer/offerThumb1_1.png"}
+                    alt={offer.title || "offer"}
                     width={200}
                     height={200}
                     className="object-contain w-50 h-40 sm:w-40 md:w-48 lg:w-42 xl:w-52 2xl:w-55"

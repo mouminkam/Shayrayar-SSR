@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade } from "swiper/modules";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +9,8 @@ import { ArrowRight } from "lucide-react";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import { useWebsiteSlides } from "../../../hooks/useWebsiteSlides";
+import SectionSkeleton from "../../ui/SectionSkeleton";
 
 // Import Swiper CSS - Next.js will handle optimization
 import "swiper/swiper-bundle.css";
@@ -17,38 +19,57 @@ export default function BannerSection() {
   const { prefetchRoute } = usePrefetchRoute();
   const { lang } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
+  const { slides: apiSlides, isLoading, error } = useWebsiteSlides();
 
-  const slides = [
-    {
-      id: 1,
-      subtitle: t(lang, "welcome_fresheat"),
-      title: "SPICY FRIED CHICKEN",
-      image: "/img/banner/bannerThumb1_1.png",
-      bgImage: "/img/bg/bannerBG1_1.jpg",
-      link: "/shop",
-      shape4Float: false,
-    },
-    {
-      id: 2,
-      subtitle: t(lang, "welcome_fresheat"),
-      title: "Chicago Deep Pizza King",
-      image: "/img/banner/bannerThumb1_2.png",
-      bgImage: "/img/bg/bannerBG1_1.jpg",
-      link: "/shop",
-      shape4Float: true,
-    },
-    {
-      id: 3,
-      subtitle: t(lang, "welcome_fresheat"),
-      title: "Chicago Deep Burger King",
-      image: "/img/banner/bannerThumb1_3.png",
-      bgImage: "/img/bg/bannerBG1_1.jpg",
-      link: "/shop",
-      shape4Float: false,
-    },
-  ];
+  // Map API slides to component format
+  const slides = useMemo(() => {
+    if (!apiSlides || apiSlides.length === 0) {
+      // Fallback slides if no data
+      return [
+        {
+          id: 1,
+          subtitle: t(lang, "welcome_fresheat"),
+          title: "SPICY FRIED CHICKEN",
+          image: "/img/banner/bannerThumb1_1.png",
+          bgImage: "/img/bg/bannerBG1_1.jpg",
+          link: "/shop",
+          shape4Float: false,
+        },
+      ];
+    }
 
-  const currentSlide = slides[activeIndex];
+    return apiSlides.map((slide, index) => ({
+      id: slide.id,
+      subtitle: slide.description || t(lang, "welcome_fresheat"),
+      title: slide.title || "",
+      image: slide.desktop_image || "/img/banner/bannerThumb1_1.png",
+      bgImage: "/img/bg/bannerBG1_1.jpg", // Keep default background
+      link: slide.menu_item_id ? `/shop/${slide.menu_item_id}` : "/shop",
+      shape4Float: index % 2 === 0, // Alternate float animation
+    }));
+  }, [apiSlides, lang]);
+
+  const currentSlide = slides[activeIndex] || slides[0];
+
+  // Show loading skeleton
+  if (isLoading) {
+    return (
+      <section className="banner-section fix mb-8">
+        <SectionSkeleton variant="default" height="h-[800px]" showCards={false} />
+      </section>
+    );
+  }
+
+  // Show error state or fallback
+  if (error && slides.length === 0) {
+    return (
+      <section className="banner-section fix mb-8">
+        <div className="container mx-auto px-4 py-12 text-center">
+          <p className="text-text">Failed to load banner slides</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="banner-section fix mb-8">
@@ -57,17 +78,21 @@ export default function BannerSection() {
           modules={[Autoplay, EffectFade]}
           spaceBetween={0}
           slidesPerView={1}
-          loop={true}
+          loop={slides.length > 1}
           effect="fade"
           speed={800}
-          autoplay={{
-            delay: 3000,
-            disableOnInteraction: false,
-          }}
+          autoplay={
+            slides.length > 1
+              ? {
+                  delay: 3000,
+                  disableOnInteraction: false,
+                }
+              : false
+          }
           onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
           className="banner-slider"
         >
-          {slides.map((slide) => (
+          {slides.length > 0 && slides.map((slide) => (
             <SwiperSlide key={slide.id}>
               <div
                 className="relative bg-cover bg-center min-h-[800px]"
@@ -154,8 +179,8 @@ export default function BannerSection() {
                     className="banner-thumb-area relative z-50 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl pointer-events-auto"
                   >
                     <Image
-                      src={currentSlide.image}
-                      alt="banner"
+                      src={currentSlide?.image || "/img/banner/bannerThumb1_1.png"}
+                      alt={currentSlide?.title || "banner"}
                       width={1200}
                       height={1200}
                       className="w-full h-auto object-contain"
@@ -188,7 +213,7 @@ export default function BannerSection() {
                           transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
                           className="sub-title text-theme  text-sm sm:text-2xl font-extrabold uppercase mb-3 sm:mb-1"
                         >
-                          {currentSlide.subtitle}
+                          {currentSlide?.subtitle || t(lang, "welcome_fresheat")}
                         </motion.h6>
                         <motion.h1
                           initial={{ y: -20, opacity: 0 }}
@@ -196,7 +221,7 @@ export default function BannerSection() {
                           transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
                           className="title text-white  text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-black leading-tight mb-4 sm:mb-6"
                         >
-                          {currentSlide.title}
+                          {currentSlide?.title || ""}
                         </motion.h1>
                         <motion.div
                           initial={{ y: 20, opacity: 0 }}
@@ -210,8 +235,8 @@ export default function BannerSection() {
                           >
                             <Link
                               className="theme-btn px-6 py-2.5 sm:px-8 sm:py-3 bg-theme3 text-gray-900 text-sm sm:text-base font-medium hover:bg-theme hover:text-white transition-colors duration-300 rounded-xl shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2"
-                              href={currentSlide.link}
-                              onMouseEnter={() => prefetchRoute(currentSlide.link)}
+                              href={currentSlide?.link || "/shop"}
+                              onMouseEnter={() => prefetchRoute(currentSlide?.link || "/shop")}
                             >
                               {t(lang, "order_now")}
                               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
