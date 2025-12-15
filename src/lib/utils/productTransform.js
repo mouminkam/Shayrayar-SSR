@@ -104,16 +104,16 @@ export const transformMenuItemToProduct = (menuItem, optionGroups = [], lang = '
   const ingredientsArray = Array.isArray(menuItem.ingredients) ? menuItem.ingredients : [];
 
   // Get base price - API provides default_price
-  const basePrice = parseFloat(menuItem.default_price || menuItem.price || 0);
+  const basePrice = parseFloat( menuItem.price ||menuItem.default_price || 0);
 
   // Get default size (size with is_default flag, or first size)
   // Note: We keep default_size_id for backward compatibility but won't use it as default selection
   const defaultSize = sizesArray.find(s => s.is_default) || sizesArray[0] || null;
   const defaultSizeId = defaultSize?.id || null;
-  const defaultSizePrice = defaultSize?.price ? parseFloat(defaultSize.price) : basePrice;
 
-  // Display price: default size price if available, otherwise base price
-  const displayPrice = defaultSizePrice || basePrice;
+  // Display price: always use basePrice (which represents price from API)
+  // basePrice is the actual price from API response (menuItem.price)
+  const displayPrice = basePrice;
 
   // Get localized name and description for menu item
   const itemName = getLocalizedField(menuItem, 'name', lang);

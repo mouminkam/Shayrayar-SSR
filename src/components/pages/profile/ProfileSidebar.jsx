@@ -1,7 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, Phone, MapPin, Package, LogOut, Edit } from "lucide-react";
+import { User, Mail, Phone, MapPin, Package, LogOut, Edit, Camera } from "lucide-react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import useAuthStore from "../../../store/authStore";
@@ -50,10 +50,10 @@ export default function ProfileSidebar({ user, totalOrders = 0 }) {
       {/* User Avatar & Name */}
       <div className="text-center mb-6">
         <div className="relative inline-block">
-        <motion.div
-          whileHover={{ scale: 1.1, rotate: 5 }}
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 5 }}
             className="w-24 h-24 rounded-full bg-theme3 flex items-center justify-center mx-auto mb-4 shadow-xl overflow-hidden relative"
-        >
+          >
             {userImageUrl ? (
               <Image
                 src={userImageUrl}
@@ -63,31 +63,31 @@ export default function ProfileSidebar({ user, totalOrders = 0 }) {
                 className="w-full h-full object-cover rounded-full"
               />
             ) : (
-          <User className="w-12 h-12 text-white" />
+              <User className="w-12 h-12 text-white" />
             )}
-        </motion.div>
+          </motion.div>
           <motion.button
             onClick={() => setIsEditModalOpen(true)}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="absolute bottom-0 right-0 w-8 h-8 bg-theme3 rounded-full flex items-center justify-center shadow-lg hover:bg-theme3/90 transition-colors border-2 border-bgimg"
+            className="absolute bottom-0 right-0 w-8 h-8 cursor-pointer bg-theme3 rounded-full flex items-center justify-center shadow-lg hover:bg-theme3/90 transition-colors border-2 border-bgimg"
             aria-label={t(lang, "edit_profile")}
           >
-            <Edit className="w-4 h-4 text-white" />
+            <Camera className="w-4 h-4 text-white" />
           </motion.button>
         </div>
         <div className="flex items-center justify-center gap-2">
           <h3 className="text-white text-2xl font-black uppercase">
-          {user.name}
-        </h3>
+            {user.name}
+          </h3>
           <motion.button
             onClick={() => setIsEditModalOpen(true)}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="w-6 h-6 flex items-center justify-center text-theme3 hover:text-theme3/80 transition-colors"
+            className=" w-8 h-8 bg-theme3 cursor-pointer rounded-full flex items-center justify-center shadow-lg hover:bg-theme3/90 transition-colors border-2 border-bgimg"
             aria-label={t(lang, "edit_profile")}
           >
-            <Edit className="w-4 h-4" />
+            <Edit className="w-4 h-4 text-white " />
           </motion.button>
         </div>
         <p className="text-text text-sm mt-1">{user.email}</p>

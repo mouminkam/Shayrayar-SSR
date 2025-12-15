@@ -24,9 +24,7 @@ export default function AllOrdersPage() {
   return (
     <Protected>
       <div className="bg-bg3 min-h-screen">
-        <AnimatedSection>
-          <Breadcrumb title={t(lang, "all_orders")} />
-        </AnimatedSection>
+   
         <ErrorBoundary>
           <Suspense fallback={<SectionSkeleton variant="default" cardCount={5} height="h-screen" />}>
             <OrdersSection />

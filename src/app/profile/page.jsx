@@ -31,9 +31,6 @@ export default function ProfilePage() {
         keywords={["profile", "account", "orders", "settings"]}
       />
       <div className="bg-bg3 min-h-screen">
-        <AnimatedSection>
-          <Breadcrumb title={t(lang, "my_profile")} />
-        </AnimatedSection>
         <ErrorBoundary>
           <Suspense fallback={<SectionSkeleton variant="default" cardCount={2} height="h-screen" />}>
             <ProfileSection />

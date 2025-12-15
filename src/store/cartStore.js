@@ -1,7 +1,7 @@
 "use client";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { TAX_RATE } from "../data/constants";
+import { TAX_AMOUNT } from "../data/constants";
 
 // Cart item structure
 // { 
@@ -408,10 +408,8 @@ const useCartStore = create(
       },
 
       getTax: () => {
-        const subtotal = get().getSubtotal();
-        const discount = get().getDiscount();
-        const taxableAmount = subtotal - discount;
-        return taxableAmount * TAX_RATE;
+        // Tax is a fixed amount, not a percentage
+        return TAX_AMOUNT;
       },
 
       getDiscount: () => {

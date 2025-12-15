@@ -161,7 +161,7 @@ const CheckoutSummary = memo(() => {
         {/* Tax */}
         <div className="flex justify-between items-center py-2 border-b border-white/10">
           <span className="text-text  text-base font-medium">
-            {t(lang, "tax_percentage")}
+            {t(lang, "tax")}
           </span>
           <span className="text-white  text-lg font-bold">
             {formatCurrency(tax)}
