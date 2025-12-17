@@ -26,9 +26,11 @@ const useBranchStore = create(
 
             // If no branch is selected, set the first one as default
             if (!get().selectedBranch && branches.length > 0) {
-              // Try to find main branch (is_main: true) or use first branch
+              // TEMPORARY: For testing, prefer branch ID = 1 (Shahrayar Premium)
+              // Try to find branch with ID = 1, then main branch (is_main: true), or use first branch
+              const testBranch = branches.find(b => b.id === 1 || b.branch_id === 1);
               const mainBranch = branches.find(b => b.is_main === true) || branches[0];
-              set({ selectedBranch: mainBranch });
+              set({ selectedBranch: testBranch || mainBranch });
             }
 
             return { success: true, branches };
@@ -66,8 +68,11 @@ const useBranchStore = create(
         }
         // Ensure a branch is selected
         if (!get().selectedBranch && get().branches.length > 0) {
+          // TEMPORARY: For testing, prefer branch ID = 1 (Shahrayar Premium)
+          // Try to find branch with ID = 1, then main branch (is_main: true), or use first branch
+          const testBranch = get().branches.find(b => b.id === 1 || b.branch_id === 1);
           const mainBranch = get().branches.find(b => b.is_main === true) || get().branches[0];
-          set({ selectedBranch: mainBranch });
+          set({ selectedBranch: testBranch || mainBranch });
         }
       },
     }),
