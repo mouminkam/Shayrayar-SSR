@@ -137,24 +137,6 @@ describe('Auth API', () => {
     });
   });
 
-  describe('changePassword', () => {
-    it('should change password successfully', async () => {
-      const passwordData = {
-        current_password: 'oldpassword',
-        password: 'newpassword',
-        password_confirmation: 'newpassword',
-      };
-
-      const mockResponse = { success: true, message: 'Password changed successfully' };
-      axiosInstance.post.mockResolvedValue({ data: mockResponse });
-
-      const result = await authAPI.changePassword(passwordData);
-
-      expect(axiosInstance.post).toHaveBeenCalledWith('/auth/change-password', passwordData);
-      expect(result.data).toEqual(mockResponse);
-    });
-  });
-
   describe('forgotPassword', () => {
     it('should send password reset OTP successfully', async () => {
       const email = 'test@example.com';

@@ -5,6 +5,8 @@ import AnimatedSection from "../../components/ui/AnimatedSection";
 import ErrorBoundary from "../../components/ui/ErrorBoundary";
 import SectionSkeleton from "../../components/ui/SectionSkeleton";
 import Breadcrumb from "../../components/ui/Breadcrumb";
+import { useLanguage } from "../../context/LanguageContext";
+import { t } from "../../locales/i18n/getTranslation";
 
 // Lazy load cart components
 const CartTable = dynamic(
@@ -24,8 +26,13 @@ const CartSummary = dynamic(
 );
 
 export default function CartPage() {
+  const { lang } = useLanguage();
+  
   return (
     <div className="bg-bg3 min-h-screen">
+      <AnimatedSection>
+        <Breadcrumb title={t(lang, "cart")} />
+      </AnimatedSection>
       <section className="shop-details-section section-padding fix bg-bg3 py-12 px-1 sm:px-5 sm:py-16 md:py-20 lg:py-24 relative">
         <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">

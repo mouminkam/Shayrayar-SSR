@@ -10,6 +10,7 @@ import { IMAGE_PATHS } from "../../../data/constants";
 import { getCartItemKey } from "../../../store/cartStore";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import { hasAnyCustomization, getCustomizationDisplayText } from "../../../lib/utils/cartHelpers";
 
 export default function CartDropdown({
   cartOpen,
@@ -153,7 +154,14 @@ export default function CartDropdown({
                 cartItems.map((item, index) => {
                   const itemKey = getCartItemKey(item);
                   const itemPrice = item.final_price || item.price;
-                  const hasCustomization = item.size_name || (item.ingredients_data && item.ingredients_data.length > 0);
+                  const hasCustomization = hasAnyCustomization(item);
+                  const customizationParts = getCustomizationDisplayText(item);
+                  const customizationText = [
+                    customizationParts.size,
+                    customizationParts.ingredients && `${customizationParts.ingredients.split(", ").length} ${t(lang, "add_ons")}`,
+                    customizationParts.options,
+                    customizationParts.customizations
+                  ].filter(Boolean).join(" • ");
 
                   return (
                     <motion.div
@@ -183,11 +191,9 @@ export default function CartDropdown({
                           <p className="text-sm font-medium text-gray-900 truncate">
                             {item.name}
                           </p>
-                          {hasCustomization && (
+                          {hasCustomization && customizationText && (
                             <p className="text-xs text-gray-500 truncate">
-                              {item.size_name && `${item.size_name}`}
-                              {item.size_name && item.ingredients_data?.length > 0 && " • "}
-                              {item.ingredients_data?.length > 0 && `${item.ingredients_data.length} ${t(lang, "add_ons")}`}
+                              {customizationText}
                             </p>
                           )}
                           <p className="text-sm text-gray-600">

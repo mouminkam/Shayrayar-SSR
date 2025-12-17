@@ -11,6 +11,7 @@ import DeleteConfirmModal from "./DeleteConfirmModal";
 import useToastStore from "../../store/toastStore";
 import OptimizedImage from "../ui/OptimizedImage";
 import { usePrefetchRoute } from "../../hooks/usePrefetchRoute";
+import { hasAnyCustomization, getCustomizationDisplayText } from "../../lib/utils/cartHelpers";
 
 // Desktop Table View Component
 const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, onEditItem, onDeleteItem }) => {
@@ -42,7 +43,8 @@ const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, on
         {items.map((item, index) => {
           const itemKey = getCartItemKey(item);
           const itemPrice = item.final_price || item.price;
-          const hasCustomization = item.size_name || (item.ingredients_data && item.ingredients_data.length > 0);
+          const hasCustomization = hasAnyCustomization(item);
+          const customizationParts = getCustomizationDisplayText(item);
 
           return (
             <motion.tr
@@ -84,18 +86,28 @@ const DesktopTable = memo(({ items, removeFromCart, increaseQty, decreaseQty, on
                     </Link>
                     {hasCustomization && (
                       <div className="text-text/70 text-xs space-y-1">
-                        {item.size_name && (
+                        {customizationParts.size && (
                           <div className="flex items-center gap-1">
                             <span className="text-theme3">Size:</span>
-                            <span>{item.size_name}</span>
+                            <span>{customizationParts.size}</span>
                           </div>
                         )}
-                        {item.ingredients_data && item.ingredients_data.length > 0 && (
+                        {customizationParts.ingredients && (
                           <div className="flex items-center gap-1 flex-wrap">
                             <span className="text-theme3">Add-ons:</span>
-                            <span>
-                              {item.ingredients_data.map((ing) => ing.name).join(", ")}
-                            </span>
+                            <span>{customizationParts.ingredients}</span>
+                          </div>
+                        )}
+                        {customizationParts.options && (
+                          <div className="flex items-center gap-1 flex-wrap">
+                            <span className="text-theme3">Options:</span>
+                            <span>{customizationParts.options}</span>
+                          </div>
+                        )}
+                        {customizationParts.customizations && (
+                          <div className="flex items-center gap-1 flex-wrap">
+                            <span className="text-theme3">Customizations:</span>
+                            <span>{customizationParts.customizations}</span>
                           </div>
                         )}
                       </div>
@@ -182,7 +194,8 @@ const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, 
     {items.map((item, index) => {
       const itemKey = getCartItemKey(item);
       const itemPrice = item.final_price || item.price;
-      const hasCustomization = item.size_name || (item.ingredients_data && item.ingredients_data.length > 0);
+      const hasCustomization = hasAnyCustomization(item);
+      const customizationParts = getCustomizationDisplayText(item);
 
       return (
         <motion.div
@@ -223,18 +236,28 @@ const MobileCardView = memo(({ items, removeFromCart, increaseQty, decreaseQty, 
               </Link>
               {hasCustomization && (
                 <div className="text-text/70 text-xs space-y-1 mb-2">
-                  {item.size_name && (
+                  {customizationParts.size && (
                     <div className="flex items-center gap-1">
                       <span className="text-theme3">Size:</span>
-                      <span>{item.size_name}</span>
+                      <span>{customizationParts.size}</span>
                     </div>
                   )}
-                  {item.ingredients_data && item.ingredients_data.length > 0 && (
+                  {customizationParts.ingredients && (
                     <div className="flex items-center gap-1 flex-wrap">
                       <span className="text-theme3">Add-ons:</span>
-                      <span>
-                        {item.ingredients_data.map((ing) => ing.name).join(", ")}
-                      </span>
+                      <span>{customizationParts.ingredients}</span>
+                    </div>
+                  )}
+                  {customizationParts.options && (
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <span className="text-theme3">Options:</span>
+                      <span>{customizationParts.options}</span>
+                    </div>
+                  )}
+                  {customizationParts.customizations && (
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <span className="text-theme3">Customizations:</span>
+                      <span>{customizationParts.customizations}</span>
                     </div>
                   )}
                 </div>

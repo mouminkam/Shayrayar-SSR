@@ -8,6 +8,7 @@ import { formatCurrency } from "../../../lib/utils/formatters";
 import { IMAGE_PATHS } from "../../../data/constants";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import { getCustomizationDisplayText } from "../../../lib/utils/cartHelpers";
 
 const CheckoutSummary = memo(() => {
   const { lang } = useLanguage();
@@ -66,6 +67,13 @@ const CheckoutSummary = memo(() => {
             size_id: item.size_id || null,
             ingredients: item.ingredients || [],
           });
+          const customizationParts = getCustomizationDisplayText(item);
+          const customizationText = [
+            customizationParts.size,
+            customizationParts.ingredients && `+${customizationParts.ingredients.split(", ").length} ${t(lang, "add_ons")}`,
+            customizationParts.options,
+            customizationParts.customizations
+          ].filter(Boolean).join(" • ");
           
           return (
           <motion.div
@@ -91,8 +99,7 @@ const CheckoutSummary = memo(() => {
               </h4>
               <p className="text-text text-xs">
                 {t(lang, "quantity")}: {item.quantity} × {formatCurrency(item.final_price || item.price)}
-                {item.size_name && ` • ${item.size_name}`}
-                {item.ingredients_data?.length > 0 && ` • +${item.ingredients_data.length} ${t(lang, "add_ons")}`}
+                {customizationText && ` • ${customizationText}`}
               </p>
             </div>
             <div className="text-theme3  text-sm font-bold">

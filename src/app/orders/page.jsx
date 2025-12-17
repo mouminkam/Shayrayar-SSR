@@ -24,7 +24,6 @@ export default function AllOrdersPage() {
   return (
     <Protected>
       <div className="bg-bg3 min-h-screen">
-   
         <ErrorBoundary>
           <Suspense fallback={<SectionSkeleton variant="default" cardCount={5} height="h-screen" />}>
             <OrdersSection />

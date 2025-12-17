@@ -11,7 +11,7 @@ import { useInView } from "react-intersection-observer";
 
 export default function ChefeSection() {
   const { lang } = useLanguage();
-  const { getSelectedBranchId } = useBranchStore();
+  const { selectedBranch, getSelectedBranchId, initialize } = useBranchStore();
   const [chefs, setChefs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,11 +29,21 @@ export default function ChefeSection() {
     return imageUrl;
   };
 
+  // Initialize branch if not loaded
+  useEffect(() => {
+    if (!selectedBranch) {
+      initialize();
+    }
+  }, [selectedBranch, initialize]);
+
+  // Fetch chefs when branch is available
   useEffect(() => {
     const fetchChefs = async () => {
       const branchId = getSelectedBranchId();
+      
+      // If no branch, keep loading state true to wait for branch initialization
       if (!branchId) {
-        setIsLoading(false);
+        // Don't set loading to false - wait for branch to be initialized
         return;
       }
 
@@ -56,31 +66,7 @@ export default function ChefeSection() {
     };
 
     fetchChefs();
-  }, [getSelectedBranchId]);
-
-  if (isLoading) {
-    return (
-      <section className="chef-section py-10 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-          <div className="title-area mb-12 sm:mb-14">
-            <div className="sub-title text-center text-theme3 text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
-              {t(lang, "our_chefe")}
-            </div>
-            <div className="title text-center text-white text-3xl sm:text-5xl font-black capitalize">
-              {t(lang, "meet_our_expert_chefe")}
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            <ProductCardSkeleton viewMode="grid" count={3} />
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (!chefs || chefs.length === 0) {
-    return null;
-  }
+  }, [selectedBranch, getSelectedBranchId]);
 
   return (
     <section className="chef-section py-10 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
@@ -95,18 +81,28 @@ export default function ChefeSection() {
             </div>
           </div>
 
-          <div className="chef-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 ">
-            {chefs.map((chef, index) => {
-              return (
-                <LazyChefCard
-                  key={chef.id}
-                  chef={chef}
-                  index={index}
-                  getImageUrl={getImageUrl}
-                />
-              );
-            })}
-          </div>
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              <ProductCardSkeleton viewMode="grid" count={3} />
+            </div>
+          ) : !chefs || chefs.length === 0 ? (
+            <div className="flex items-center justify-center py-20">
+              <p className="text-text text-lg">{t(lang, "no_chefs_available") || "No chefs available"}</p>
+            </div>
+          ) : (
+            <div className="chef-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 ">
+              {chefs.map((chef, index) => {
+                return (
+                  <LazyChefCard
+                    key={chef.id}
+                    chef={chef}
+                    index={index}
+                    getImageUrl={getImageUrl}
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </section>

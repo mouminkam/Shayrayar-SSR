@@ -74,16 +74,6 @@ export const cancelOrder = async (orderId, cancelData) => {
 };
 
 /**
- * Track order status
- * @param {number} orderId - Order ID
- * @returns {Promise<Object>} Response with order tracking information
- */
-export const trackOrder = async (orderId) => {
-  const response = await axiosInstance.get(`/orders/${orderId}/track`);
-  return response;
-};
-
-/**
  * Get available coupons for an order
  * @param {Object} orderData - Order data to check available coupons
  * @param {number} orderData.order_amount - Order total amount
@@ -102,6 +92,26 @@ export const getAvailableCoupons = async (orderData) => {
  * Reorder a previous order
  * @param {number} orderId - Order ID to reorder
  * @returns {Promise<Object>} Response with items to add to cart and missing items
+ * @returns {Promise<Object>} Response structure:
+ * @returns {boolean} success - Whether the request was successful
+ * @returns {Object} data - Response data
+ * @returns {Array} data.items - Array of items to add to cart
+ * @returns {number} data.items[].menu_item_id - Menu item ID
+ * @returns {number} data.items[].size_id - Size ID (optional, nullable)
+ * @returns {number} data.items[].quantity - Item quantity
+ * @returns {string|null} data.items[].special_instructions - Special instructions (optional)
+ * @returns {Array<number>|null} data.items[].selected_ingredients - Selected ingredient IDs (optional)
+ * @returns {Array|null} data.items[].selected_options - Selected option groups (optional) - Format: [{ option_group_id: number, option_item_ids: number[] }]
+ * @returns {Array<number>|null} data.items[].selected_drinks - Selected drink IDs from customizations (optional)
+ * @returns {Array<number>|null} data.items[].selected_toppings - Selected topping IDs from customizations (optional)
+ * @returns {Array<number>|null} data.items[].selected_sauces - Selected sauce IDs from customizations (optional)
+ * @returns {Array<number>|null} data.items[].selected_allergens - Selected allergen IDs from customizations (optional)
+ * @returns {Array} data.missing_items - Array of items that are no longer available
+ * @returns {string} message - Success message
+ * 
+ * @note BACKEND REQUIREMENT: The backend MUST return all customization fields (selected_options, selected_drinks, 
+ * selected_toppings, selected_sauces, selected_allergens) that were in the original order.
+ * See REORDER_API_SPECIFICATION.md for complete backend requirements.
  */
 export const reorderOrder = async (orderId) => {
   const response = await axiosInstance.post(`/orders/${orderId}/reorder`);
@@ -114,7 +124,6 @@ const ordersAPI = {
   createOrder,
   getOrderById,
   cancelOrder,
-  trackOrder,
   getAvailableCoupons,
   reorderOrder,
 };

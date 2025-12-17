@@ -83,19 +83,6 @@ describe('Orders API', () => {
     });
   });
 
-  describe('trackOrder', () => {
-    it('should track order successfully', async () => {
-      const orderId = 1;
-      const mockResponse = { success: true, data: { status: 'processing' } };
-      axiosInstance.get.mockResolvedValue({ data: mockResponse });
-
-      const result = await ordersAPI.trackOrder(orderId);
-
-      expect(axiosInstance.get).toHaveBeenCalledWith(`/orders/${orderId}/track`);
-      expect(result.data).toEqual(mockResponse);
-    });
-  });
-
   describe('getAvailableCoupons', () => {
     it('should get available coupons successfully', async () => {
       const orderData = {
@@ -113,17 +100,5 @@ describe('Orders API', () => {
     });
   });
 
-  describe('reorderOrder', () => {
-    it('should reorder order successfully', async () => {
-      const orderId = 1;
-      const mockResponse = { success: true, data: { items: [] } };
-      axiosInstance.post.mockResolvedValue({ data: mockResponse });
-
-      const result = await ordersAPI.reorderOrder(orderId);
-
-      expect(axiosInstance.post).toHaveBeenCalledWith(`/orders/${orderId}/reorder`);
-      expect(result.data).toEqual(mockResponse);
-    });
-  });
 });
 

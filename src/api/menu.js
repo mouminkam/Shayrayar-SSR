@@ -43,19 +43,6 @@ export const getMenuItemById = async (itemId) => {
 };
 
 /**
- * Search menu items
- * @param {Object} params - Search parameters
- * @param {string} params.query - Search query
- * @param {number} params.branch_id - Branch ID (required)
- * @param {number} params.category_id - Filter by category ID (optional)
- * @returns {Promise<Object>} Response with search results
- */
-export const searchMenuItems = async (params) => {
-  const response = await axiosInstance.get('/menu-items/search', { params });
-  return response;
-};
-
-/**
  * Get highlighted menu items (for home page)
  * @param {Object} params - Query parameters
  * @param {number} params.branch_id - Branch ID (required)
@@ -71,7 +58,6 @@ const menuAPI = {
   getMenuCategories,
   getMenuItems,
   getMenuItemById,
-  searchMenuItems,
   getHighlights,
 };
 

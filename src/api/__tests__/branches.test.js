@@ -51,39 +51,6 @@ describe('Branches API', () => {
     });
   });
 
-  describe('getNearestBranches', () => {
-    it('should get nearest branches successfully', async () => {
-      const params = {
-        latitude: 40.7128,
-        longitude: -74.0060,
-        radius: 50,
-      };
-      axiosInstance.get.mockResolvedValue({ data: mockBranchesResponse });
-
-      const result = await branchesAPI.getNearestBranches(params);
-
-      expect(axiosInstance.get).toHaveBeenCalledWith('/branches/nearest', { params });
-      expect(result.data).toEqual(mockBranchesResponse);
-    });
-  });
-
-  describe('checkDeliveryAvailability', () => {
-    it('should check delivery availability successfully', async () => {
-      const branchId = 1;
-      const params = {
-        latitude: 40.7128,
-        longitude: -74.0060,
-      };
-      const mockResponse = { success: true, data: { available: true, charge: 5.0 } };
-      axiosInstance.get.mockResolvedValue({ data: mockResponse });
-
-      const result = await branchesAPI.checkDeliveryAvailability(branchId, params);
-
-      expect(axiosInstance.get).toHaveBeenCalledWith(`/branches/${branchId}/check-delivery`, { params });
-      expect(result.data).toEqual(mockResponse);
-    });
-  });
-
   describe('getUpsellItems', () => {
     it('should get upsell items successfully', async () => {
       const branchId = 1;

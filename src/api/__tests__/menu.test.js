@@ -75,21 +75,6 @@ describe('Menu API', () => {
     });
   });
 
-  describe('searchMenuItems', () => {
-    it('should search menu items successfully', async () => {
-      const params = {
-        query: 'pizza',
-        branch_id: 1,
-      };
-      axiosInstance.get.mockResolvedValue({ data: mockMenuResponse });
-
-      const result = await menuAPI.searchMenuItems(params);
-
-      expect(axiosInstance.get).toHaveBeenCalledWith('/menu-items/search', { params });
-      expect(result.data).toEqual(mockMenuResponse);
-    });
-  });
-
   describe('getHighlights', () => {
     it('should get highlights successfully', async () => {
       const params = { branch_id: 1 };

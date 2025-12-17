@@ -252,15 +252,35 @@ const useAuthStore = create(
           
           if (response.success && response.data) {
             const currentUser = get().user;
+            const responseUser = response.data.user || response.data;
+            
+            // Check if image is in response (check all possible field names)
+            const hasImage = responseUser?.image || responseUser?.image_url || responseUser?.avatar || responseUser?.photo;
+            
             const updatedUser = {
               ...currentUser,
-              ...response.data.user,
+              ...responseUser,
             };
 
             set({
               user: updatedUser,
               isLoading: false,
             });
+
+            // If image is not in response, fetch fresh profile to get updated image
+            // This ensures the image URL is correct and up-to-date
+            if (!hasImage) {
+              try {
+                const freshProfile = await get().fetchProfile();
+                if (freshProfile?.user) {
+                  set({ user: freshProfile.user });
+                  return { success: true, user: freshProfile.user };
+                }
+              } catch (fetchError) {
+                // If fetch fails, continue with the updated user from response
+                console.warn('Failed to fetch fresh profile after image upload:', fetchError);
+              }
+            }
 
             return { success: true, user: updatedUser };
           } else {

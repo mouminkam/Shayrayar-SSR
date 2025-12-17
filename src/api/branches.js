@@ -31,32 +31,6 @@ export const getBranchById = async (branchId) => {
 };
 
 /**
- * Get nearest branches to a location
- * @param {Object} params - Location parameters
- * @param {number} params.latitude - Latitude
- * @param {number} params.longitude - Longitude
- * @param {number} params.radius - Search radius in km (optional, default: 50)
- * @returns {Promise<Object>} Response with nearest branches
- */
-export const getNearestBranches = async (params) => {
-  const response = await axiosInstance.get('/branches/nearest', { params });
-  return response;
-};
-
-/**
- * Check delivery availability for a branch
- * @param {number} branchId - Branch ID
- * @param {Object} params - Location parameters
- * @param {number} params.latitude - Delivery location latitude
- * @param {number} params.longitude - Delivery location longitude
- * @returns {Promise<Object>} Response with delivery availability status
- */
-export const checkDeliveryAvailability = async (branchId, params) => {
-  const response = await axiosInstance.get(`/branches/${branchId}/check-delivery`, { params });
-  return response;
-};
-
-/**
  * Get upsell items for a branch
  * @param {number} branchId - Branch ID
  * @param {Object} params - Query parameters
@@ -84,8 +58,6 @@ export const getChefs = async (branchId) => {
 const branchesAPI = {
   getAllBranches,
   getBranchById,
-  getNearestBranches,
-  checkDeliveryAvailability,
   getUpsellItems,
   getChefs,
 };

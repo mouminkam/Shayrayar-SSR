@@ -1,35 +1,157 @@
 "use client";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { memo, useState } from "react";
-import { RotateCcw, Loader2 } from "lucide-react";
-import { formatCurrency } from "../../../lib/utils/formatters";
-import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
-import OptimizedImage from "../../ui/OptimizedImage";
-import { IMAGE_PATHS } from "../../../data/constants";
-import { useLanguage } from "../../../context/LanguageContext";
-import { t } from "../../../locales/i18n/getTranslation";
-import api from "../../../api";
-import useToastStore from "../../../store/toastStore";
-import { useAddToCart } from "../../../hooks/useAddToCart";
-import { transformMenuItemToProduct } from "../../../lib/utils/productTransform";
-import { calculateProductPriceWithCustomizations } from "../../../lib/utils/productPrice";
+import { useState } from "react";
+import api from "../api";
+import useToastStore from "../store/toastStore";
+import { useLanguage } from "../context/LanguageContext";
+import { t } from "../locales/i18n/getTranslation";
+import { useAddToCart } from "./useAddToCart";
+import { transformMenuItemToProduct } from "../lib/utils/productTransform";
+import { calculateProductPriceWithCustomizations } from "../lib/utils/productPrice";
 
-const OrderCard = memo(function OrderCard({ order }) {
-  const router = useRouter();
-  const { prefetchRoute } = usePrefetchRoute();
+/**
+ * Hook to manage order actions (cancel, reorder, track)
+ * @param {Object} order - Order object
+ * @param {string} orderId - Order ID
+ * @param {Function} refetchOrder - Function to refetch order data
+ * @returns {Object} Actions and states
+ */
+export function useOrderActions(order, orderId, refetchOrder) {
+  const { error: toastError, success: toastSuccess } = useToastStore();
   const { lang } = useLanguage();
-  const { success: toastSuccess, error: toastError } = useToastStore();
-  const addToCartHook = useAddToCart();
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
   const [isReorderLoading, setIsReorderLoading] = useState(false);
+  const addToCartHook = useAddToCart();
 
-  const handleCardClick = () => {
-    router.push(`/orders/${order.id}`, { scroll: false });
+  /**
+   * Check if order can be cancelled
+   * @returns {boolean} True if order can be cancelled
+   */
+  const canCancelOrder = () => {
+    // إذا لم يتم تحميل البيانات بعد، لا نسمح بالإلغاء
+    if (!order) {
+      return false;
+    }
+
+    const status = order?.status?.toLowerCase();
+    const paymentMethod = order?.payment_method?.toLowerCase();
+    const paymentIntentId = order?.payment_intent_id;
+    const paymentStatus = order?.payment_status?.toLowerCase();
+    
+    // لا يمكن الإلغاء إذا كان الطلب مكتمل أو ملغي أو تم تسليمه
+    if (status === 'completed' || status === 'cancelled' || status === 'delivered') {
+      return false;
+    }
+    
+    // Stripe orders: لا يمكن الإلغاء أبداً (بغض النظر عن الحالة)
+    // التحقق من payment_method === 'stripe' أو وجود payment_intent_id
+    if (paymentMethod === 'stripe' || paymentIntentId) {
+      return false;
+    }
+    
+    // أيضاً: إذا كان payment_status === 'paid' و payment_method === 'stripe'
+    if (paymentStatus === 'paid' && paymentMethod === 'stripe') {
+      return false;
+    }
+    
+    // Cash orders: لا يمكن الإلغاء إذا كان confirmed (تم الدفع فعلياً)
+    if (paymentMethod === 'cash' && status === 'confirmed') {
+      return false;
+    }
+    
+    // Cash orders: يمكن الإلغاء إذا كان pending (لم يتم الدفع بعد)
+    if (paymentMethod === 'cash' && status === 'pending') {
+      return true;
+    }
+    
+    // Cash orders: يمكن الإلغاء إذا كان processing (قبل البدء بالتحضير الفعلي)
+    if (paymentMethod === 'cash' && status === 'processing') {
+      return true;
+    }
+    
+    // Default: لا يمكن الإلغاء
+    return false;
   };
 
-  const handleReorder = async (e) => {
-    e.stopPropagation(); // Prevent card click
+  /**
+   * Handle cancel order action
+   * @param {string} reason - Cancellation reason (optional, uses state if not provided)
+   */
+  const handleCancelOrder = async (reason = null) => {
+    const reasonToUse = reason || cancelReason;
     
+    // Validate cancellation reason
+    if (!reasonToUse || !reasonToUse.trim()) {
+      toastError(t(lang, "please_provide_cancellation_reason"));
+      return;
+    }
+
+    // Double check if order can still be cancelled (status might have changed)
+    if (!canCancelOrder()) {
+      const paymentMethod = order?.payment_method?.toLowerCase();
+      const paymentIntentId = order?.payment_intent_id;
+      const status = order?.status?.toLowerCase();
+      
+      // Stripe orders cannot be cancelled at all
+      if (paymentMethod === 'stripe' || paymentIntentId) {
+        toastError(t(lang, "cannot_cancel_paid_order"));
+      } else if (paymentMethod === 'cash' && status === 'confirmed') {
+        toastError(t(lang, "cannot_cancel_paid_order"));
+      } else if (status === 'completed' || status === 'delivered') {
+        toastError(t(lang, "cannot_cancel_completed_order"));
+      } else {
+        toastError(t(lang, "cannot_cancel_order"));
+      }
+      setShowCancelModal(false);
+      setCancelReason("");
+      return;
+    }
+
+    setIsCancelling(true);
+    try {
+      const response = await api.orders.cancelOrder(orderId, { reason: reasonToUse });
+      
+      if (response.success) {
+        toastSuccess(t(lang, "order_cancelled_successfully"));
+        setShowCancelModal(false);
+        setCancelReason("");
+        // Refresh order data
+        if (refetchOrder) {
+          refetchOrder();
+        }
+      } else {
+        // Backend might reject cancellation - show appropriate message
+        const errorMessage = response.message || t(lang, "failed_to_cancel_order");
+        toastError(errorMessage);
+      }
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      const errorMessage = error?.response?.data?.message || error?.message || t(lang, "failed_to_cancel_order");
+      toastError(errorMessage);
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  /**
+   * Handle track order action
+   */
+  const handleTrackOrder = () => {
+    // Check if tracking_url is available
+    if (!order?.tracking_url) {
+      toastError(t(lang, "tracking_not_available"));
+      return;
+    }
+
+    // Open tracking URL in a new window
+    window.open(order.tracking_url, '_blank', 'noopener,noreferrer');
+  };
+
+  /**
+   * Handle reorder action
+   */
+  const handleReorder = async () => {
     if (!order?.id) {
       toastError(t(lang, "invalid_order"));
       return;
@@ -50,7 +172,6 @@ const OrderCard = memo(function OrderCard({ order }) {
       const { items = [], missing_items = [] } = response.data;
 
       // Get order items for fallback data (if reorder API doesn't include all customization data)
-      // Note: OrderCard may not have full order_items, so we'll try to get them from order if available
       const orderItemsMap = new Map();
       if (order?.order_items && Array.isArray(order.order_items)) {
         order.order_items.forEach((orderItem) => {
@@ -222,152 +343,16 @@ const OrderCard = memo(function OrderCard({ order }) {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'delivered':
-        return 'bg-green-500/20 text-green-300';
-      case 'confirmed':
-      case 'preparing':
-      case 'ready':
-      case 'out_for_delivery':
-        return 'bg-blue-500/20 text-blue-300';
-      case 'cancelled':
-        return 'bg-red-500/20 text-red-300';
-      case 'pending':
-      default:
-        return 'bg-yellow-500/20 text-yellow-300';
-    }
+  return {
+    canCancelOrder,
+    handleCancelOrder,
+    handleReorder,
+    handleTrackOrder,
+    isCancelling,
+    isReorderLoading,
+    showCancelModal,
+    setShowCancelModal,
+    cancelReason,
+    setCancelReason,
   };
-
-  return (
-    <div
-      onClick={handleCardClick}
-      className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-theme3/50 transition-all duration-300 cursor-pointer group"
-    >
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-        <div>
-          <p className="text-white  font-bold text-lg mb-1">
-            {order.orderNumber || `${t(lang, "order_number")}${String(order.id || '').slice(-8).toUpperCase()}`}
-          </p>
-          <p className="text-text text-sm">
-            {order.date ? new Date(order.date).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            }) : t(lang, "date_not_available")}
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="text-theme3  font-black text-xl mb-1">
-            {formatCurrency(order.total)}
-          </p>
-          <span
-            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusColor(order.status)}`}
-          >
-            {order.status?.replace('_', ' ') || 'pending'}
-          </span>
-        </div>
-      </div>
-
-      {/* Order Items */}
-      {order.items && order.items.length > 0 && (
-        <div className="space-y-2 mb-4 pt-4 border-t border-white/10">
-          {order.items.slice(0, 3).map((item, idx) => (
-            <div key={item.id || idx} className="flex items-center gap-3 text-sm">
-              <div 
-                className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0"
-                onMouseEnter={() => item.id && prefetchRoute(`/shop/${item.id}`)}
-              >
-                <OptimizedImage
-                  src={item.image || IMAGE_PATHS.placeholder}
-                  alt={item.name || 'Item'}
-                  fill
-                  className="object-cover"
-                  quality={85}
-                  loading="lazy"
-                  sizes="48px"
-                />
-              </div>
-              <div className="flex-1">
-                <p className="text-white font-medium">{item.name || 'Unknown Item'}</p>
-                <div className="text-text text-xs space-y-0.5">
-                  {(item.size || item.size_name) && (
-                    <p>{t(lang, "size")}: {item.size?.name || item.size_name || item.size}</p>
-                  )}
-                  {item.selected_ingredients && Array.isArray(item.selected_ingredients) && item.selected_ingredients.length > 0 && (
-                    <p>{t(lang, "add_ons")}: {item.selected_ingredients.length} {t(lang, "items")}</p>
-                  )}
-                  {item.selected_options && Array.isArray(item.selected_options) && item.selected_options.length > 0 && (
-                    <p>{t(lang, "options")}: {item.selected_options.reduce((sum, opt) => sum + (Array.isArray(opt.option_item_ids) ? opt.option_item_ids.length : 0), 0)} {t(lang, "items")}</p>
-                  )}
-                  {(item.selected_drinks || item.selected_toppings || item.selected_sauces || item.selected_allergens) && (
-                    <p>
-                      {[
-                        item.selected_drinks && Array.isArray(item.selected_drinks) && item.selected_drinks.length > 0 && `${t(lang, "drinks")}: ${item.selected_drinks.length}`,
-                        item.selected_toppings && Array.isArray(item.selected_toppings) && item.selected_toppings.length > 0 && `${t(lang, "toppings")}: ${item.selected_toppings.length}`,
-                        item.selected_sauces && Array.isArray(item.selected_sauces) && item.selected_sauces.length > 0 && `${t(lang, "sauces")}: ${item.selected_sauces.length}`,
-                        item.selected_allergens && Array.isArray(item.selected_allergens) && item.selected_allergens.length > 0 && `${t(lang, "allergens")}: ${item.selected_allergens.length}`
-                      ].filter(Boolean).join(" • ")}
-                    </p>
-                  )}
-                  <p>
-                    {t(lang, "quantity")}: {item.quantity || 1} × {formatCurrency(item.price || 0)}
-                  </p>
-                </div>
-              </div>
-              <p className="text-theme3 font-bold">
-                {formatCurrency((item.price || 0) * (item.quantity || 1))}
-              </p>
-            </div>
-          ))}
-          {order.items.length > 3 && (
-            <p className="text-text text-xs text-center pt-2">
-              +{order.items.length - 3} {t(lang, "more_items")}
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Payment Method and Actions */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-white/10">
-        <p className="text-text text-sm">
-          {t(lang, "payment")}{" "}
-          <span className="text-white font-medium capitalize">
-            {order.paymentMethod}
-          </span>
-        </p>
-        <div className="flex items-center gap-3">
-          {/* Reorder Button */}
-          <button
-            onClick={handleReorder}
-            disabled={isReorderLoading}
-            className="flex items-center gap-2 px-4 py-2 bg-theme3/20 hover:bg-theme3/30 border border-theme3/50 rounded-lg text-theme3 text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            title={t(lang, "reorder")}
-          >
-            {isReorderLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <RotateCcw className="w-4 h-4" />
-            )}
-            <span>{t(lang, "reorder")}</span>
-          </button>
-          
-          {/* View Details Link */}
-          <div className="flex items-center gap-2 text-theme3 group-hover:text-theme text-sm font-medium transition-colors cursor-pointer" onClick={handleCardClick}>
-          <span>{t(lang, "view_details")}</span>
-          <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </div>
-      </div>
-    </div>
-  );
-});
-
-OrderCard.displayName = "OrderCard";
-
-export default OrderCard;
-
+}
