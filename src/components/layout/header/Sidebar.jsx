@@ -13,7 +13,8 @@ import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import { NAV_LINKS } from "../../../data/constants";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
-import { useHighlights } from "../../../context/HighlightsContext";
+import { transformMenuItemsToProducts } from "../../../lib/utils/productTransform";
+import { useApiCache } from "../../../hooks/useApiCache";
 import OptimizedImage from "../../ui/OptimizedImage";
 
 // Helper function to format working hours from array to string
@@ -40,10 +41,19 @@ const formatWorkingHours = (hours) => {
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const router = useRouter();
-  const { selectedBranch, initialize } = useBranchStore();
+  const { selectedBranch, initialize, getSelectedBranchId } = useBranchStore();
   const { prefetchRoute } = usePrefetchRoute();
   const { lang } = useLanguage();
-  const { popular, latest, chefSpecial, isLoading: highlightsLoading } = useHighlights();
+  const { getCachedOrFetch } = useApiCache("HIGHLIGHTS");
+  
+  // Lazy load highlights - only fetch when sidebar is opened
+  const [highlightsData, setHighlightsData] = useState({
+    popular: [],
+    latest: [],
+    chefSpecial: [],
+  });
+  const [isLoadingHighlights, setIsLoadingHighlights] = useState(false);
+  
   const [contactInfo, setContactInfo] = useState({
     address: "Main Street, Melbourne, Australia",
     email: "info@fresheat.com",
@@ -51,11 +61,55 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     workingHours: "Mon-Friday, 09am - 05pm",
   });
 
+  // Fetch highlights only when sidebar is opened
+  useEffect(() => {
+    const fetchHighlights = async () => {
+      if (!isOpen || highlightsData.popular.length > 0 || isLoadingHighlights) {
+        return; // Don't fetch if sidebar is closed, already has data, or is loading
+      }
+
+      const branchId = getSelectedBranchId();
+      if (!branchId) {
+        return;
+      }
+
+      setIsLoadingHighlights(true);
+      try {
+        const response = await getCachedOrFetch(
+          "/menu-items/highlights",
+          {},
+          () => api.menu.getHighlights()
+        );
+
+        if (response?.success && response.data) {
+          const popularItems = transformMenuItemsToProducts(response.data.popular || [], lang);
+          const latestItems = transformMenuItemsToProducts(response.data.latest || [], lang);
+          const chefSpecialItems = transformMenuItemsToProducts(response.data.chef_special || [], lang);
+
+          setHighlightsData({
+            popular: popularItems,
+            latest: latestItems,
+            chefSpecial: chefSpecialItems,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching highlights:", error);
+        // Keep empty arrays on error
+      } finally {
+        setIsLoadingHighlights(false);
+      }
+    };
+
+    fetchHighlights();
+  }, [isOpen, getSelectedBranchId, getCachedOrFetch, lang, highlightsData.popular.length, isLoadingHighlights]);
+
   // Get gallery images from highlights API
   // First 3 from popular, next 3 from latest or chefSpecial
   const getGalleryImages = () => {
-    const popularImages = (popular || []).slice(0, 3);
-    const otherImages = (latest && latest.length > 0 ? latest : chefSpecial || []).slice(0, 3);
+    const popularImages = (highlightsData.popular || []).slice(0, 3);
+    const otherImages = (highlightsData.latest && highlightsData.latest.length > 0 
+      ? highlightsData.latest 
+      : highlightsData.chefSpecial || []).slice(0, 3);
     return [...popularImages, ...otherImages];
   };
 
@@ -234,7 +288,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     transition={{ delay: 0.3, duration: 0.4, ease: "easeOut" }}
                     className="offcanvas-gallery-area hidden xl:block mb-6"
                   >
-                    {highlightsLoading ? (
+                    {isLoadingHighlights ? (
                       <div className="grid grid-cols-3 gap-2">
                         {[...Array(6)].map((_, index) => (
                           <div

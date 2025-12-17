@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useInView } from "react-intersection-observer";
 import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
 import { useLanguage } from "../../../context/LanguageContext";
@@ -40,6 +41,12 @@ export default function ContactSection() {
       saturday: "8am – 12am",
     },
   });
+  
+  // Intersection Observer - defer API call until footer is visible
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    triggerOnce: true, // Only trigger once when it becomes visible
+  });
 
   // Initialize branch if not loaded
   useEffect(() => {
@@ -48,8 +55,12 @@ export default function ContactSection() {
     }
   }, [selectedBranch, initialize]);
 
-  // Fetch branch contact information
+  // Fetch branch contact information - only when footer is visible
   useEffect(() => {
+    if (!inView) {
+      return; // Don't fetch until footer is visible
+    }
+
     const fetchContactInfo = async () => {
       if (!selectedBranch) {
         return;
@@ -104,9 +115,9 @@ export default function ContactSection() {
     };
 
     fetchContactInfo();
-  }, [selectedBranch]);
+  }, [inView, selectedBranch]);
   return (
-    <div className="mt-6 sm:mt-8 md:mt-0 lg:pl-6 xl:pl-12 sm:col-span-2 lg:col-span-1">
+    <div ref={ref} className="mt-6 sm:mt-8 md:mt-0 lg:pl-6 xl:pl-12 sm:col-span-2 lg:col-span-1">
       <div className="mb-6 sm:mb-8">
         <h3 className="text-white text-xl sm:text-2xl font-bold inline-block relative pb-4 sm:pb-5">
           {t(lang, "contact_us")}

@@ -1,20 +1,25 @@
 "use client";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import OptimizedImage from "../../ui/OptimizedImage";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import { useShopSidebar } from "../../../hooks/useShopSidebar";
-import { useHighlights } from "../../../context/HighlightsContext";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
+import { transformMenuItemsToProducts } from "../../../lib/utils/productTransform";
+import { useApiCache } from "../../../hooks/useApiCache";
 
 const ShopSidebar = memo(function ShopSidebar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { prefetchRoute } = usePrefetchRoute();
   const { lang } = useLanguage();
+  const { getSelectedBranchId } = useBranchStore();
+  const { getCachedOrFetch } = useApiCache("HIGHLIGHTS");
 
   const currentCategory = searchParams.get("category");
   
@@ -24,9 +29,42 @@ const ShopSidebar = memo(function ShopSidebar() {
     isLoadingCategories,
   } = useShopSidebar();
 
-  // Use highlights API for recent products (latest)
-  const { latest, isLoading: isLoadingRecent } = useHighlights();
-  const recentProducts = latest || [];
+  // Lazy load highlights - fetch only latest products for recent products section
+  const [latestProducts, setLatestProducts] = useState([]);
+  const [isLoadingRecent, setIsLoadingRecent] = useState(false);
+
+  // Fetch latest products when component mounts (shop page is already visible)
+  useEffect(() => {
+    const fetchLatest = async () => {
+      const branchId = getSelectedBranchId();
+      if (!branchId || latestProducts.length > 0 || isLoadingRecent) {
+        return;
+      }
+
+      setIsLoadingRecent(true);
+      try {
+        const response = await getCachedOrFetch(
+          "/menu-items/highlights",
+          {},
+          () => api.menu.getHighlights()
+        );
+
+        if (response?.success && response.data) {
+          const latestItems = transformMenuItemsToProducts(response.data.latest || [], lang);
+          setLatestProducts(latestItems);
+        }
+      } catch (error) {
+        console.error("Error fetching latest products:", error);
+        setLatestProducts([]);
+      } finally {
+        setIsLoadingRecent(false);
+      }
+    };
+
+    fetchLatest();
+  }, [getSelectedBranchId, getCachedOrFetch, lang, latestProducts.length, isLoadingRecent]);
+
+  const recentProducts = latestProducts || [];
 
   const handleCategoryClick = useCallback((categoryId) => {
     const params = new URLSearchParams(searchParams.toString());

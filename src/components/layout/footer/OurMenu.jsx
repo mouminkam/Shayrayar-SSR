@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ChevronsRight } from "lucide-react";
+import { useInView } from "react-intersection-observer";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
@@ -16,6 +17,12 @@ export default function OurMenu() {
   const { lang } = useLanguage();
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Intersection Observer - defer API call until footer is visible
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    triggerOnce: true, // Only trigger once when it becomes visible
+  });
 
   // Initialize branch if not loaded
   useEffect(() => {
@@ -24,8 +31,12 @@ export default function OurMenu() {
     }
   }, [selectedBranch, initialize]);
 
-  // Fetch categories from API
+  // Fetch categories from API - only when footer is visible
   useEffect(() => {
+    if (!inView) {
+      return; // Don't fetch until footer is visible
+    }
+
     const fetchCategories = async () => {
       if (!selectedBranch) {
         setIsLoading(false);
@@ -47,10 +58,10 @@ export default function OurMenu() {
     };
 
     fetchCategories();
-  }, [selectedBranch, lang]);
+  }, [inView, selectedBranch, lang]);
 
   return (
-    <div className="mt-6 sm:mt-8 md:mt-0 lg:pl-6 xl:pl-12">
+    <div ref={ref} className="mt-6 sm:mt-8 md:mt-0 lg:pl-6 xl:pl-12">
       <div className="mb-6 sm:mb-8">
         <h3 className="text-white text-xl sm:text-2xl font-bold inline-block relative pb-4 sm:pb-5">
           {t(lang, "our_menu")}

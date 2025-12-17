@@ -80,12 +80,8 @@ export default function HomePage() {
     initialize();
   }, [initialize]);
 
-  // Reload page data when branch changes
-  useEffect(() => {
-    if (selectedBranch) {
-      router.refresh();
-    }
-  }, [selectedBranch, router]);
+  // Branch change is handled by components naturally - no need for full page refresh
+  // Removed router.refresh() to prevent unnecessary re-renders
 
   return (
     <HighlightsProvider>

@@ -21,23 +21,28 @@ export default function BannerSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const { slides: apiSlides, isLoading, error } = useWebsiteSlides();
 
+  // Always use fallback slides immediately - don't wait for API
   // Map API slides to component format
   const slides = useMemo(() => {
+    // Always show fallback slides immediately
+    const fallbackSlides = [
+      {
+        id: 1,
+        subtitle: t(lang, "welcome_fresheat"),
+        title: "SPICY FRIED CHICKEN",
+        image: "/img/banner/bannerThumb1_1.png",
+        bgImage: "/img/bg/bannerBG1_1.jpg",
+        link: "/shop",
+        shape4Float: false,
+      },
+    ];
+
+    // If no API slides or still loading, return fallback immediately
     if (!apiSlides || apiSlides.length === 0) {
-      // Fallback slides if no data
-      return [
-        {
-          id: 1,
-          subtitle: t(lang, "welcome_fresheat"),
-          title: "SPICY FRIED CHICKEN",
-          image: "/img/banner/bannerThumb1_1.png",
-          bgImage: "/img/bg/bannerBG1_1.jpg",
-          link: "/shop",
-          shape4Float: false,
-        },
-      ];
+      return fallbackSlides;
     }
 
+    // Map API slides when available
     return apiSlides.map((slide, index) => ({
       id: slide.id,
       subtitle: slide.description || t(lang, "welcome_fresheat"),
@@ -51,25 +56,8 @@ export default function BannerSection() {
 
   const currentSlide = slides[activeIndex] || slides[0];
 
-  // Show loading skeleton
-  if (isLoading) {
-    return (
-      <section className="banner-section fix mb-8">
-        <SectionSkeleton variant="default" height="h-[800px]" showCards={false} />
-      </section>
-    );
-  }
-
-  // Show error state or fallback
-  if (error && slides.length === 0) {
-    return (
-      <section className="banner-section fix mb-8">
-        <div className="container mx-auto px-4 py-12 text-center">
-          <p className="text-text">Failed to load banner slides</p>
-        </div>
-      </section>
-    );
-  }
+  // Don't show loading skeleton - always show fallback slides immediately
+  // This prevents delay in initial render
 
   return (
     <section className="banner-section fix mb-8">

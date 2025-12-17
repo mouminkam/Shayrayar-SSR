@@ -61,11 +61,20 @@ const useBranchStore = create(
       },
 
       // Initialize: fetch branches if not loaded
+      // Optimized to avoid blocking initial render - if branch is already selected from localStorage, return early
       initialize: async () => {
-        const { branches } = get();
+        const { branches, selectedBranch } = get();
+        
+        // If branch is already selected (from localStorage), no need to wait
+        if (selectedBranch) {
+          return; // Already initialized
+        }
+        
+        // If branches are not loaded, fetch them
         if (branches.length === 0) {
           await get().fetchBranches();
         }
+        
         // Ensure a branch is selected
         if (!get().selectedBranch && get().branches.length > 0) {
           // TEMPORARY: For testing, prefer branch ID = 1 (Shahrayar Premium)

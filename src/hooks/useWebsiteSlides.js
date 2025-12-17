@@ -13,7 +13,8 @@ export function useWebsiteSlides(params = {}) {
   const { selectedBranch } = useBranchStore();
   const { getCachedOrFetch } = useApiCache("WEBSITE_SLIDES");
   const [slides, setSlides] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Start with true to show loading state
+  // Don't start with loading=true - wait for branch first
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   
   // Use ref to store params and prevent infinite loop
@@ -26,7 +27,8 @@ export function useWebsiteSlides(params = {}) {
   }, [paramsString]);
 
   const fetchWebsiteSlides = useCallback(async () => {
-    const branchId = selectedBranch?.id;
+    const branchId = selectedBranch?.id || selectedBranch?.branch_id;
+    // Don't fetch if no branch - wait for branch to be selected
     if (!branchId) {
       setSlides([]);
       setIsLoading(false);
@@ -58,7 +60,7 @@ export function useWebsiteSlides(params = {}) {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedBranch?.id, paramsString, getCachedOrFetch]);
+  }, [selectedBranch?.id, selectedBranch?.branch_id, paramsString, getCachedOrFetch]);
 
   useEffect(() => {
     fetchWebsiteSlides();

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { MapPin, Mail, Phone } from "lucide-react";
+import { useInView } from "react-intersection-observer";
 import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
 import { useLanguage } from "../../../context/LanguageContext";
@@ -14,6 +15,12 @@ export default function TopBar() {
     email: "info@exmple.com",
     phone: "+88 0123 654 99",
   });
+  
+  // Intersection Observer - defer API call until footer is visible
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    triggerOnce: true, // Only trigger once when it becomes visible
+  });
 
   // Initialize branch if not loaded
   useEffect(() => {
@@ -22,8 +29,12 @@ export default function TopBar() {
     }
   }, [selectedBranch, initialize]);
 
-  // Fetch branch contact information
+  // Fetch branch contact information - only when footer is visible
   useEffect(() => {
+    if (!inView) {
+      return; // Don't fetch until footer is visible
+    }
+
     const fetchContactInfo = async () => {
       if (!selectedBranch) {
         return;
@@ -55,9 +66,9 @@ export default function TopBar() {
     };
 
     fetchContactInfo();
-  }, [selectedBranch]);
+  }, [inView, selectedBranch]);
   return (
-    <div className="bg-theme3 rounded-2xl px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-10 md:py-12 mb-8 md:mb-10">
+    <div ref={ref} className="bg-theme3 rounded-2xl px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-10 md:py-12 mb-8 md:mb-10">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Address */}
         <div className="flex items-center gap-3 sm:gap-4">
