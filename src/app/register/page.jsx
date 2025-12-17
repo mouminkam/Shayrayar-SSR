@@ -24,9 +24,9 @@ export default function RegisterPage() {
             <div className="max-w-2xl mx-auto">
               <ErrorBoundary>
                 <Suspense fallback={<SectionSkeleton variant="default" height="h-96" />}>
-                  <AnimatedSection>
-                    <RegisterSection />
-                  </AnimatedSection>
+              <AnimatedSection>
+                <RegisterSection />
+              </AnimatedSection>
                 </Suspense>
               </ErrorBoundary>
             </div>

@@ -42,6 +42,13 @@ export default function OrderActions({
     onCancel();
   };
 
+  // Helper function to check if order is finished (delivered/completed/cancelled)
+  const isOrderDelivered = (order) => {
+    if (!order) return false;
+    const status = order?.status?.toLowerCase();
+    return status === 'delivered' || status === 'completed' || status === 'cancelled';
+  };
+
   // Check if cancel button should be shown
   const shouldShowCancelButton = () => {
     if (!order) return false;
@@ -71,18 +78,21 @@ export default function OrderActions({
 
   return (
     <div className="flex flex-col sm:flex-row gap-3 mt-6 pt-6 border-t border-white/10">
-      <button
-        onClick={onReorder}
-        disabled={isReorderLoading}
-        className="flex items-center justify-center gap-2 px-6 py-3 bg-theme3/20 hover:bg-theme3/30 border border-theme3/30 rounded-xl text-theme3 font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isReorderLoading ? (
-          <Loader2 className="w-5 h-5 animate-spin" />
-        ) : (
-          <RotateCcw className="w-5 h-5" />
-        )}
-        {t(lang, "reorder")}
-      </button>
+      {/* Reorder Button - Only show for delivered/completed orders */}
+      {isOrderDelivered(order) && (
+        <button
+          onClick={onReorder}
+          disabled={isReorderLoading}
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-theme3/20 hover:bg-theme3/30 border border-theme3/30 rounded-xl text-theme3 font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isReorderLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <RotateCcw className="w-5 h-5" />
+          )}
+          {t(lang, "reorder")}
+        </button>
+      )}
       
       {shouldShowCancelButton() && (
         <button

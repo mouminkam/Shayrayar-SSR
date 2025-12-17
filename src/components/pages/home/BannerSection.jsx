@@ -26,16 +26,16 @@ export default function BannerSection() {
   const slides = useMemo(() => {
     // Always show fallback slides immediately
     const fallbackSlides = [
-      {
-        id: 1,
-        subtitle: t(lang, "welcome_fresheat"),
-        title: "SPICY FRIED CHICKEN",
-        image: "/img/banner/bannerThumb1_1.png",
-        bgImage: "/img/bg/bannerBG1_1.jpg",
-        link: "/shop",
-        shape4Float: false,
-      },
-    ];
+        {
+          id: 1,
+          subtitle: t(lang, "welcome_fresheat"),
+          title: "SPICY FRIED CHICKEN",
+          image: "/img/banner/bannerThumb1_1.png",
+          bgImage: "/img/bg/bannerBG1_1.jpg",
+          link: "/shop",
+          shape4Float: false,
+        },
+      ];
 
     // If no API slides or still loading, return fallback immediately
     if (!apiSlides || apiSlides.length === 0) {

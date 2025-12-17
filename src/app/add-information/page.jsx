@@ -24,9 +24,9 @@ export default function AddInformationPage() {
             <div className="max-w-2xl mx-auto">
               <ErrorBoundary>
                 <Suspense fallback={<SectionSkeleton variant="default" height="h-96" />}>
-                  <AnimatedSection>
-                    <AddInformationSection />
-                  </AnimatedSection>
+              <AnimatedSection>
+                <AddInformationSection />
+              </AnimatedSection>
                 </Suspense>
               </ErrorBoundary>
             </div>

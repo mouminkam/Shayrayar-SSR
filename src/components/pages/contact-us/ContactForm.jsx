@@ -60,7 +60,7 @@ export default function ContactForm() {
     // Only fetch if we don't have details for this branch
     if (branchId && currentBranchId !== branchId) {
       fetchBranchDetails(branchId);
-    }
+        }
   }, [selectedBranch, branchDetails, fetchBranchDetails]);
 
   // Get branch email from store with fallback

@@ -24,9 +24,9 @@ export default function ResetPasswordPage() {
             <div className="max-w-2xl mx-auto">
               <ErrorBoundary>
                 <Suspense fallback={<SectionSkeleton variant="default" height="h-96" />}>
-                  <AnimatedSection>
-                    <ResetPasswordSection />
-                  </AnimatedSection>
+              <AnimatedSection>
+                <ResetPasswordSection />
+              </AnimatedSection>
                 </Suspense>
               </ErrorBoundary>
             </div>

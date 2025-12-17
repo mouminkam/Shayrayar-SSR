@@ -26,8 +26,8 @@ export default function TopBar() {
   // Fetch branch details when footer becomes visible (only if not already loaded)
   useEffect(() => {
     if (!inView || !selectedBranch) {
-      return;
-    }
+        return;
+      }
 
     const branchId = selectedBranch.id || selectedBranch.branch_id;
     const currentDetails = branchDetails;
@@ -42,11 +42,11 @@ export default function TopBar() {
   // Get contact info from store with fallback defaults
   const contactInfo = useMemo(() => {
     const info = getBranchContactInfo();
-    const defaultInfo = {
-      address: "4648 Rocky Road Philadelphia",
-      email: "info@exmple.com",
-      phone: "+88 0123 654 99",
-    };
+          const defaultInfo = {
+            address: "4648 Rocky Road Philadelphia",
+            email: "info@exmple.com",
+            phone: "+88 0123 654 99",
+          };
 
     return {
       address: info?.address || defaultInfo.address,

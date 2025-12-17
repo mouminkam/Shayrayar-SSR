@@ -150,10 +150,18 @@ export function useOrderActions(order, orderId, refetchOrder) {
 
   /**
    * Handle reorder action
+   * Only allowed for delivered/completed orders
    */
   const handleReorder = async () => {
     if (!order?.id) {
       toastError(t(lang, "invalid_order"));
+      return;
+    }
+
+    // Check if order is finished (delivered/completed/cancelled)
+    const status = order?.status?.toLowerCase();
+    if (status !== 'delivered' && status !== 'completed' && status !== 'cancelled') {
+      toastError(t(lang, "can_only_reorder_delivered_orders") || "You can only reorder finished orders");
       return;
     }
 

@@ -97,16 +97,16 @@ export default function RootLayout({ children }) {
 
       <body suppressHydrationWarning className={oswald.className}>
         <LanguageProvider>
-          <HtmlLangUpdater />
-          <LenisScrollProvider>
-            <BranchInitializer />
-            <FreshHeatHeader />
-            <main id="main" role="main" className="pt-15 md:pt-15 lg:pt-0">
-              {children}
-            </main>
-            <FreshHeatFooter />
-            <Toast />
-          </LenisScrollProvider>
+            <HtmlLangUpdater />
+            <LenisScrollProvider>
+              <BranchInitializer />
+              <FreshHeatHeader />
+              <main id="main" role="main" className="pt-15 md:pt-15 lg:pt-0">
+                {children}
+              </main>
+              <FreshHeatFooter />
+              <Toast />
+            </LenisScrollProvider>
         </LanguageProvider>
         <SpeedInsights />
       </body>

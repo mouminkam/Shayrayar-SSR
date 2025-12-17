@@ -24,9 +24,9 @@ export default function AddPhonePage() {
             <div className="max-w-2xl mx-auto">
               <ErrorBoundary>
                 <Suspense fallback={<SectionSkeleton variant="default" height="h-96" />}>
-                  <AnimatedSection>
-                    <PhoneInputSection />
-                  </AnimatedSection>
+              <AnimatedSection>
+                <PhoneInputSection />
+              </AnimatedSection>
                 </Suspense>
               </ErrorBoundary>
             </div>

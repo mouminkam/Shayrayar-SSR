@@ -24,9 +24,9 @@ export default function EnterOTPPage() {
             <div className="max-w-2xl mx-auto">
               <ErrorBoundary>
                 <Suspense fallback={<SectionSkeleton variant="default" height="h-96" />}>
-                  <AnimatedSection>
-                    <OTPSection />
-                  </AnimatedSection>
+              <AnimatedSection>
+                <OTPSection />
+              </AnimatedSection>
                 </Suspense>
               </ErrorBoundary>
             </div>

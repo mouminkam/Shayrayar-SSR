@@ -24,9 +24,9 @@ export default function ConfirmInformationPage() {
             <div className="max-w-2xl mx-auto">
               <ErrorBoundary>
                 <Suspense fallback={<SectionSkeleton variant="default" height="h-96" />}>
-                  <AnimatedSection>
-                    <ConfirmPasswordSection />
-                  </AnimatedSection>
+              <AnimatedSection>
+                <ConfirmPasswordSection />
+              </AnimatedSection>
                 </Suspense>
               </ErrorBoundary>
             </div>

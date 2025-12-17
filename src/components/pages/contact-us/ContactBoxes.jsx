@@ -50,9 +50,9 @@ export default function ContactBoxes() {
 
   // Fetch branch details when component mounts (only if not already loaded)
   useEffect(() => {
-    if (!selectedBranch) {
-      return;
-    }
+      if (!selectedBranch) {
+        return;
+      }
 
     const branchId = selectedBranch.id || selectedBranch.branch_id;
     const currentDetails = branchDetails;
@@ -66,22 +66,22 @@ export default function ContactBoxes() {
 
   // Get contact info from store with fallback defaults
   const contactInfo = useMemo(() => {
-    const defaultInfo = {
-      address: "4517 Washington Ave. Manchester, Kentucky 39495",
-      email: "info@example.com",
-      phone: "+208-666-01112",
-      workingHours: t(lang, "default_opening_hours"),
-    };
+          const defaultInfo = {
+            address: "4517 Washington Ave. Manchester, Kentucky 39495",
+            email: "info@example.com",
+            phone: "+208-666-01112",
+            workingHours: t(lang, "default_opening_hours"),
+          };
 
     const contact = getBranchContactInfo();
     const rawWorkingHours = getBranchWorkingHours();
-    const formattedWorkingHours = formatWorkingHours(rawWorkingHours) || defaultInfo.workingHours;
+          const formattedWorkingHours = formatWorkingHours(rawWorkingHours) || defaultInfo.workingHours;
 
     return {
       address: contact?.address || defaultInfo.address,
       email: contact?.email || defaultInfo.email,
       phone: contact?.phone || defaultInfo.phone,
-      workingHours: formattedWorkingHours,
+            workingHours: formattedWorkingHours,
     };
   }, [getBranchContactInfo, getBranchWorkingHours, branchDetails, lang]);
 

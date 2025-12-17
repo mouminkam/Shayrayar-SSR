@@ -84,7 +84,7 @@ export default function OurMenu() {
         {isLoading ? (
           <li className="text-white/70 text-sm">{t(lang, "loading_categories")}</li>
         ) : categories.length > 0 ? (
-          categories.map((category) => {
+          categories.slice(0, 5).map((category) => {
             const href = `/shop?category=${category.id}`;
             return (
               <li key={category.id} className="transition-all duration-300 hover:translate-x-1">

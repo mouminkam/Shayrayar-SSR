@@ -51,8 +51,8 @@ export default function ContactSection() {
   // Fetch branch details when footer becomes visible (only if not already loaded)
   useEffect(() => {
     if (!inView || !selectedBranch) {
-      return;
-    }
+        return;
+      }
 
     const branchId = selectedBranch.id || selectedBranch.branch_id;
     const currentDetails = branchDetails;
@@ -66,38 +66,38 @@ export default function ContactSection() {
 
   // Parse working hours from store with fallback defaults
   const contactInfo = useMemo(() => {
-    const defaultInfo = {
-      workingHours: {
-        weekdays: "8am – 4pm",
-        saturday: "8am – 12am",
-      },
-    };
+          const defaultInfo = {
+            workingHours: {
+              weekdays: "8am – 4pm",
+              saturday: "8am – 12am",
+            },
+          };
 
     const rawWorkingHours = getBranchWorkingHours();
-    const formattedWorkingHours = formatWorkingHours(rawWorkingHours);
+          const formattedWorkingHours = formatWorkingHours(rawWorkingHours);
 
-    // Parse working hours to extract weekdays and saturday if formatted
-    let weekdaysHours = defaultInfo.workingHours.weekdays;
-    let saturdayHours = defaultInfo.workingHours.saturday;
+          // Parse working hours to extract weekdays and saturday if formatted
+          let weekdaysHours = defaultInfo.workingHours.weekdays;
+          let saturdayHours = defaultInfo.workingHours.saturday;
 
-    if (formattedWorkingHours) {
-      // Try to extract Monday-Friday and Saturday from formatted string
-      const mondayFridayMatch = formattedWorkingHours.match(/Monday.*?Friday[:\s]+([^|]+)/i);
-      const saturdayMatch = formattedWorkingHours.match(/Saturday[:\s]+([^|]+)/i);
-      
-      if (mondayFridayMatch) {
-        weekdaysHours = mondayFridayMatch[1].trim();
-      }
-      if (saturdayMatch) {
-        saturdayHours = saturdayMatch[1].trim();
-      }
-    }
+          if (formattedWorkingHours) {
+            // Try to extract Monday-Friday and Saturday from formatted string
+            const mondayFridayMatch = formattedWorkingHours.match(/Monday.*?Friday[:\s]+([^|]+)/i);
+            const saturdayMatch = formattedWorkingHours.match(/Saturday[:\s]+([^|]+)/i);
+            
+            if (mondayFridayMatch) {
+              weekdaysHours = mondayFridayMatch[1].trim();
+            }
+            if (saturdayMatch) {
+              saturdayHours = saturdayMatch[1].trim();
+            }
+          }
 
     return {
-      workingHours: {
-        weekdays: weekdaysHours,
-        saturday: saturdayHours,
-      },
+            workingHours: {
+              weekdays: weekdaysHours,
+              saturday: saturdayHours,
+            },
     };
   }, [getBranchWorkingHours, branchDetails]);
   return (

@@ -126,8 +126,8 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   // Fetch branch details when sidebar is opened (only if not already loaded)
   useEffect(() => {
     if (!isOpen || !selectedBranch) {
-      return;
-    }
+        return;
+      }
 
     const branchId = selectedBranch.id || selectedBranch.branch_id;
     const currentDetails = branchDetails;
@@ -141,22 +141,22 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
   // Get contact info from store with fallback defaults
   const contactInfo = useMemo(() => {
-    const defaultInfo = {
-      address: "Main Street, Melbourne, Australia",
-      email: "info@fresheat.com",
-      phone: "+11002345909",
-      workingHours: "Mon-Friday, 09am - 05pm",
-    };
+          const defaultInfo = {
+            address: "Main Street, Melbourne, Australia",
+            email: "info@fresheat.com",
+            phone: "+11002345909",
+            workingHours: "Mon-Friday, 09am - 05pm",
+          };
 
     const contact = getBranchContactInfo();
     const rawWorkingHours = getBranchWorkingHours();
-    const formattedWorkingHours = formatWorkingHours(rawWorkingHours) || defaultInfo.workingHours;
+          const formattedWorkingHours = formatWorkingHours(rawWorkingHours) || defaultInfo.workingHours;
 
     return {
       address: contact?.address || defaultInfo.address,
       email: contact?.email || defaultInfo.email,
       phone: contact?.phone || defaultInfo.phone,
-      workingHours: formattedWorkingHours,
+            workingHours: formattedWorkingHours,
     };
   }, [getBranchContactInfo, getBranchWorkingHours, branchDetails]);
 

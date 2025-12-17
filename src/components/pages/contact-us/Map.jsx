@@ -24,9 +24,9 @@ export default function Map() {
 
   // Fetch branch details when component mounts (only if not already loaded)
   useEffect(() => {
-    if (!selectedBranch) {
-      return;
-    }
+      if (!selectedBranch) {
+        return;
+      }
 
     const branchId = selectedBranch.id || selectedBranch.branch_id;
     const currentDetails = branchDetails;
@@ -47,7 +47,7 @@ export default function Map() {
     }
 
     const { latitude, longitude } = location;
-    // Build Google Maps embed URL with branch coordinates
+            // Build Google Maps embed URL with branch coordinates
     return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022!2d${longitude}!3d${latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${latitude}%2C${longitude}!5e0!3m2!1sen!2sbd!4v${Date.now()}!5m2!1sen!2sbd`;
   }, [getBranchLocation, branchDetails]);
 

@@ -35,6 +35,13 @@ const OrderCard = memo(function OrderCard({ order }) {
       return;
     }
 
+    // Check if order is finished (delivered/completed/cancelled)
+    const status = order?.status?.toLowerCase();
+    if (status !== 'delivered' && status !== 'completed' && status !== 'cancelled') {
+      toastError(t(lang, "can_only_reorder_delivered_orders") || "You can only reorder finished orders");
+      return;
+    }
+
     setIsReorderLoading(true);
     try {
       // Call reorder API endpoint
@@ -171,7 +178,7 @@ const OrderCard = memo(function OrderCard({ order }) {
               sauces: Array.isArray(fallbackOrderItem.selected_sauces) 
                 ? fallbackOrderItem.selected_sauces 
                 : (fallbackOrderItem.selected_sauces ? [fallbackOrderItem.selected_sauces] : [])
-            };
+          };
           }
 
           // Calculate final price with all customizations
@@ -220,6 +227,12 @@ const OrderCard = memo(function OrderCard({ order }) {
     } finally {
       setIsReorderLoading(false);
     }
+  };
+
+  // Helper function to check if order is finished (delivered/completed/cancelled)
+  const isOrderDelivered = (order) => {
+    const status = order?.status?.toLowerCase();
+    return status === 'delivered' || status === 'completed' || status === 'cancelled';
   };
 
   const getStatusColor = (status) => {
@@ -313,8 +326,8 @@ const OrderCard = memo(function OrderCard({ order }) {
                     </p>
                   )}
                   <p>
-                    {t(lang, "quantity")}: {item.quantity || 1} × {formatCurrency(item.price || 0)}
-                  </p>
+                  {t(lang, "quantity")}: {item.quantity || 1} × {formatCurrency(item.price || 0)}
+                </p>
                 </div>
               </div>
               <p className="text-theme3 font-bold">
@@ -339,20 +352,22 @@ const OrderCard = memo(function OrderCard({ order }) {
           </span>
         </p>
         <div className="flex items-center gap-3">
-          {/* Reorder Button */}
-          <button
-            onClick={handleReorder}
-            disabled={isReorderLoading}
-            className="flex items-center gap-2 px-4 py-2 bg-theme3/20 hover:bg-theme3/30 border border-theme3/50 rounded-lg text-theme3 text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            title={t(lang, "reorder")}
-          >
-            {isReorderLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <RotateCcw className="w-4 h-4" />
-            )}
-            <span>{t(lang, "reorder")}</span>
-          </button>
+          {/* Reorder Button - Only show for delivered/completed orders */}
+          {isOrderDelivered(order) && (
+            <button
+              onClick={handleReorder}
+              disabled={isReorderLoading}
+              className="flex items-center gap-2 px-4 py-2 bg-theme3/20 hover:bg-theme3/30 border border-theme3/50 rounded-lg text-theme3 text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              title={t(lang, "reorder")}
+            >
+              {isReorderLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <RotateCcw className="w-4 h-4" />
+              )}
+              <span>{t(lang, "reorder")}</span>
+            </button>
+          )}
           
           {/* View Details Link */}
           <div className="flex items-center gap-2 text-theme3 group-hover:text-theme text-sm font-medium transition-colors cursor-pointer" onClick={handleCardClick}>
