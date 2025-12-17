@@ -146,5 +146,6 @@ export const CACHE_DURATION = {
   PRODUCT_DETAIL: 10 * 60 * 1000, // 10 minutes
   HIGHLIGHTS: 10 * 60 * 1000, // 10 minutes (highlights don't change often)
   WEBSITE_SLIDES: 15 * 60 * 1000, // 15 minutes (slides don't change often)
+  BRANCHES: 10 * 60 * 1000, // 10 minutes (branches don't change often)
 };
 

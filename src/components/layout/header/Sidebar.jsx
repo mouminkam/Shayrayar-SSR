@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -41,7 +41,15 @@ const formatWorkingHours = (hours) => {
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const router = useRouter();
-  const { selectedBranch, initialize, getSelectedBranchId } = useBranchStore();
+  const { 
+    selectedBranch, 
+    initialize, 
+    getSelectedBranchId,
+    branchDetails,
+    getBranchContactInfo,
+    getBranchWorkingHours,
+    fetchBranchDetails
+  } = useBranchStore();
   const { prefetchRoute } = usePrefetchRoute();
   const { lang } = useLanguage();
   const { getCachedOrFetch } = useApiCache("HIGHLIGHTS");
@@ -53,13 +61,6 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     chefSpecial: [],
   });
   const [isLoadingHighlights, setIsLoadingHighlights] = useState(false);
-  
-  const [contactInfo, setContactInfo] = useState({
-    address: "Main Street, Melbourne, Australia",
-    email: "info@fresheat.com",
-    phone: "+11002345909",
-    workingHours: "Mon-Friday, 09am - 05pm",
-  });
 
   // Fetch highlights only when sidebar is opened
   useEffect(() => {
@@ -122,46 +123,42 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     }
   }, [selectedBranch, initialize]);
 
-  // Fetch branch contact information
+  // Fetch branch details when sidebar is opened (only if not already loaded)
   useEffect(() => {
-    const fetchContactInfo = async () => {
-      if (!selectedBranch) {
-        return;
-      }
+    if (!isOpen || !selectedBranch) {
+      return;
+    }
 
-      try {
-        const response = await api.branches.getBranchById(selectedBranch.id || selectedBranch.branch_id);
+    const branchId = selectedBranch.id || selectedBranch.branch_id;
+    const currentDetails = branchDetails;
+    const currentBranchId = currentDetails?.id || currentDetails?.branch_id;
 
-        if (response && response.success && response.data) {
-          const branchData = response.data.branch || response.data;
+    // Only fetch if we don't have details for this branch
+    if (branchId && currentBranchId !== branchId) {
+      fetchBranchDetails(branchId);
+    }
+  }, [isOpen, selectedBranch, branchDetails, fetchBranchDetails]);
 
-          // Default values
-          const defaultInfo = {
-            address: "Main Street, Melbourne, Australia",
-            email: "info@fresheat.com",
-            phone: "+11002345909",
-            workingHours: "Mon-Friday, 09am - 05pm",
-          };
-
-          // Format working hours
-          const rawWorkingHours = branchData.working_hours || branchData.opening_hours || branchData.hours;
-          const formattedWorkingHours = formatWorkingHours(rawWorkingHours) || defaultInfo.workingHours;
-
-          setContactInfo({
-            address: branchData.address || branchData.location || defaultInfo.address,
-            email: branchData.email || branchData.contact_email || defaultInfo.email,
-            phone: branchData.phone || branchData.contact_phone || branchData.telephone || defaultInfo.phone,
-            workingHours: formattedWorkingHours,
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching contact info:", error);
-        // Keep default values on error
-      }
+  // Get contact info from store with fallback defaults
+  const contactInfo = useMemo(() => {
+    const defaultInfo = {
+      address: "Main Street, Melbourne, Australia",
+      email: "info@fresheat.com",
+      phone: "+11002345909",
+      workingHours: "Mon-Friday, 09am - 05pm",
     };
 
-    fetchContactInfo();
-  }, [selectedBranch]);
+    const contact = getBranchContactInfo();
+    const rawWorkingHours = getBranchWorkingHours();
+    const formattedWorkingHours = formatWorkingHours(rawWorkingHours) || defaultInfo.workingHours;
+
+    return {
+      address: contact?.address || defaultInfo.address,
+      email: contact?.email || defaultInfo.email,
+      phone: contact?.phone || defaultInfo.phone,
+      workingHours: formattedWorkingHours,
+    };
+  }, [getBranchContactInfo, getBranchWorkingHours, branchDetails]);
 
   return (
     <AnimatePresence>

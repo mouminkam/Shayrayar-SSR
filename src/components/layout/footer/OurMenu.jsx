@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChevronsRight } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
+import { useApiCache } from "../../../hooks/useApiCache";
 import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
 import { transformCategories } from "../../../lib/utils/productTransform";
@@ -15,6 +16,7 @@ export default function OurMenu() {
   const { prefetchRoute } = usePrefetchRoute();
   const { selectedBranch, initialize } = useBranchStore();
   const { lang } = useLanguage();
+  const { getCachedOrFetch } = useApiCache("CATEGORIES");
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -45,7 +47,14 @@ export default function OurMenu() {
 
       setIsLoading(true);
       try {
-        const response = await api.menu.getMenuCategories();
+        // Use cache to avoid redundant API calls
+        const response = await getCachedOrFetch(
+          "/menu-categories",
+          {},
+          () => api.menu.getMenuCategories(),
+          // 10 minutes TTL for categories (same as useShopSidebar)
+          10 * 60 * 1000
+        );
         const categoriesData = extractCategoriesFromResponse(response);
         const transformed = transformCategories(categoriesData, lang);
         setCategories(transformed);
@@ -58,7 +67,7 @@ export default function OurMenu() {
     };
 
     fetchCategories();
-  }, [inView, selectedBranch, lang]);
+  }, [inView, selectedBranch, lang, getCachedOrFetch]);
 
   return (
     <div ref={ref} className="mt-6 sm:mt-8 md:mt-0 lg:pl-6 xl:pl-12">

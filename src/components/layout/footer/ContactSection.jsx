@@ -1,9 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useInView } from "react-intersection-observer";
-import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
@@ -33,19 +32,13 @@ const formatWorkingHours = (hours) => {
 };
 
 export default function ContactSection() {
-  const { selectedBranch, initialize } = useBranchStore();
+  const { selectedBranch, initialize, branchDetails, getBranchWorkingHours, fetchBranchDetails } = useBranchStore();
   const { lang } = useLanguage();
-  const [contactInfo, setContactInfo] = useState({
-    workingHours: {
-      weekdays: "8am – 4pm",
-      saturday: "8am – 12am",
-    },
-  });
   
-  // Intersection Observer - defer API call until footer is visible
+  // Intersection Observer - trigger fetch when footer is visible
   const { ref, inView } = useInView({
     threshold: 0.1,
-    triggerOnce: true, // Only trigger once when it becomes visible
+    triggerOnce: true,
   });
 
   // Initialize branch if not loaded
@@ -55,67 +48,58 @@ export default function ContactSection() {
     }
   }, [selectedBranch, initialize]);
 
-  // Fetch branch contact information - only when footer is visible
+  // Fetch branch details when footer becomes visible (only if not already loaded)
   useEffect(() => {
-    if (!inView) {
-      return; // Don't fetch until footer is visible
+    if (!inView || !selectedBranch) {
+      return;
     }
 
-    const fetchContactInfo = async () => {
-      if (!selectedBranch) {
-        return;
-      }
+    const branchId = selectedBranch.id || selectedBranch.branch_id;
+    const currentDetails = branchDetails;
+    const currentBranchId = currentDetails?.id || currentDetails?.branch_id;
 
-      try {
-        const response = await api.branches.getBranchById(selectedBranch.id || selectedBranch.branch_id);
+    // Only fetch if we don't have details for this branch
+    if (branchId && currentBranchId !== branchId) {
+      fetchBranchDetails(branchId);
+    }
+  }, [inView, selectedBranch, branchDetails, fetchBranchDetails]);
 
-        if (response && response.success && response.data) {
-          const branchData = response.data.branch || response.data;
-
-          // Default values
-          const defaultInfo = {
-            workingHours: {
-              weekdays: "8am – 4pm",
-              saturday: "8am – 12am",
-            },
-          };
-
-          // Format working hours if it's an object
-          const rawWorkingHours = branchData.working_hours || branchData.opening_hours || branchData.hours;
-          const formattedWorkingHours = formatWorkingHours(rawWorkingHours);
-
-          // Parse working hours to extract weekdays and saturday if formatted
-          let weekdaysHours = defaultInfo.workingHours.weekdays;
-          let saturdayHours = defaultInfo.workingHours.saturday;
-
-          if (formattedWorkingHours) {
-            // Try to extract Monday-Friday and Saturday from formatted string
-            const mondayFridayMatch = formattedWorkingHours.match(/Monday.*?Friday[:\s]+([^|]+)/i);
-            const saturdayMatch = formattedWorkingHours.match(/Saturday[:\s]+([^|]+)/i);
-            
-            if (mondayFridayMatch) {
-              weekdaysHours = mondayFridayMatch[1].trim();
-            }
-            if (saturdayMatch) {
-              saturdayHours = saturdayMatch[1].trim();
-            }
-          }
-
-          setContactInfo({
-            workingHours: {
-              weekdays: weekdaysHours,
-              saturday: saturdayHours,
-            },
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching contact info:", error);
-        // Keep default values on error
-      }
+  // Parse working hours from store with fallback defaults
+  const contactInfo = useMemo(() => {
+    const defaultInfo = {
+      workingHours: {
+        weekdays: "8am – 4pm",
+        saturday: "8am – 12am",
+      },
     };
 
-    fetchContactInfo();
-  }, [inView, selectedBranch]);
+    const rawWorkingHours = getBranchWorkingHours();
+    const formattedWorkingHours = formatWorkingHours(rawWorkingHours);
+
+    // Parse working hours to extract weekdays and saturday if formatted
+    let weekdaysHours = defaultInfo.workingHours.weekdays;
+    let saturdayHours = defaultInfo.workingHours.saturday;
+
+    if (formattedWorkingHours) {
+      // Try to extract Monday-Friday and Saturday from formatted string
+      const mondayFridayMatch = formattedWorkingHours.match(/Monday.*?Friday[:\s]+([^|]+)/i);
+      const saturdayMatch = formattedWorkingHours.match(/Saturday[:\s]+([^|]+)/i);
+      
+      if (mondayFridayMatch) {
+        weekdaysHours = mondayFridayMatch[1].trim();
+      }
+      if (saturdayMatch) {
+        saturdayHours = saturdayMatch[1].trim();
+      }
+    }
+
+    return {
+      workingHours: {
+        weekdays: weekdaysHours,
+        saturday: saturdayHours,
+      },
+    };
+  }, [getBranchWorkingHours, branchDetails]);
   return (
     <div ref={ref} className="mt-6 sm:mt-8 md:mt-0 lg:pl-6 xl:pl-12 sm:col-span-2 lg:col-span-1">
       <div className="mb-6 sm:mb-8">

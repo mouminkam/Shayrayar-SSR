@@ -1,7 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import { MapPin, Mail, Phone, Clock, Loader2 } from "lucide-react";
-import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
@@ -31,15 +30,16 @@ const formatWorkingHours = (hours) => {
 };
 
 export default function ContactBoxes() {
-  const { selectedBranch, initialize } = useBranchStore();
+  const { 
+    selectedBranch, 
+    initialize, 
+    branchDetails,
+    isLoadingDetails,
+    getBranchContactInfo,
+    getBranchWorkingHours,
+    fetchBranchDetails
+  } = useBranchStore();
   const { lang } = useLanguage();
-  const [contactInfo, setContactInfo] = useState({
-    address: "4517 Washington Ave. Manchester, Kentucky 39495",
-    email: "info@example.com",
-    phone: "+208-666-01112",
-    workingHours: "Sunday-Fri: 9 AM – 6 PM Saturday: 9 AM – 4 PM",
-  });
-  const [isLoading, setIsLoading] = useState(true);
 
   // Initialize branch if not loaded
   useEffect(() => {
@@ -48,51 +48,44 @@ export default function ContactBoxes() {
     }
   }, [selectedBranch, initialize]);
 
-  // Fetch branch contact information
+  // Fetch branch details when component mounts (only if not already loaded)
   useEffect(() => {
-    const fetchContactInfo = async () => {
-      if (!selectedBranch) {
-        setIsLoading(false);
-        return;
-      }
+    if (!selectedBranch) {
+      return;
+    }
 
-      setIsLoading(true);
-      try {
-        // Try to get detailed branch info
-        const response = await api.branches.getBranchById(selectedBranch.id || selectedBranch.branch_id);
+    const branchId = selectedBranch.id || selectedBranch.branch_id;
+    const currentDetails = branchDetails;
+    const currentBranchId = currentDetails?.id || currentDetails?.branch_id;
 
-        if (response && response.success && response.data) {
-          const branchData = response.data.branch || response.data;
+    // Only fetch if we don't have details for this branch
+    if (branchId && currentBranchId !== branchId) {
+      fetchBranchDetails(branchId);
+    }
+  }, [selectedBranch, branchDetails, fetchBranchDetails]);
 
-          // Extract contact information from branch data with fallback to defaults
-          const defaultInfo = {
-            address: "4517 Washington Ave. Manchester, Kentucky 39495",
-            email: "info@example.com",
-            phone: "+208-666-01112",
-            workingHours: t(lang, "default_opening_hours"),
-          };
-
-          // Format working hours if it's an object
-          const rawWorkingHours = branchData.working_hours || branchData.opening_hours || branchData.hours;
-          const formattedWorkingHours = formatWorkingHours(rawWorkingHours) || defaultInfo.workingHours;
-
-          setContactInfo({
-            address: branchData.address || branchData.location || defaultInfo.address,
-            email: branchData.email || branchData.contact_email || defaultInfo.email,
-            phone: branchData.phone || branchData.contact_phone || branchData.telephone || defaultInfo.phone,
-            workingHours: formattedWorkingHours,
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching contact info:", error);
-        // Keep default values on error
-      } finally {
-        setIsLoading(false);
-      }
+  // Get contact info from store with fallback defaults
+  const contactInfo = useMemo(() => {
+    const defaultInfo = {
+      address: "4517 Washington Ave. Manchester, Kentucky 39495",
+      email: "info@example.com",
+      phone: "+208-666-01112",
+      workingHours: t(lang, "default_opening_hours"),
     };
 
-    fetchContactInfo();
-  }, [selectedBranch]);
+    const contact = getBranchContactInfo();
+    const rawWorkingHours = getBranchWorkingHours();
+    const formattedWorkingHours = formatWorkingHours(rawWorkingHours) || defaultInfo.workingHours;
+
+    return {
+      address: contact?.address || defaultInfo.address,
+      email: contact?.email || defaultInfo.email,
+      phone: contact?.phone || defaultInfo.phone,
+      workingHours: formattedWorkingHours,
+    };
+  }, [getBranchContactInfo, getBranchWorkingHours, branchDetails, lang]);
+
+  const isLoading = isLoadingDetails && !branchDetails;
 
   const contactBoxes = [
     {

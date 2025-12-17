@@ -1,25 +1,19 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import { MapPin, Mail, Phone } from "lucide-react";
 import { useInView } from "react-intersection-observer";
-import api from "../../../api";
 import useBranchStore from "../../../store/branchStore";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
 
 export default function TopBar() {
-  const { selectedBranch, initialize } = useBranchStore();
+  const { selectedBranch, initialize, branchDetails, isLoadingDetails, getBranchContactInfo, fetchBranchDetails } = useBranchStore();
   const { lang } = useLanguage();
-  const [contactInfo, setContactInfo] = useState({
-    address: "4648 Rocky Road Philadelphia",
-    email: "info@exmple.com",
-    phone: "+88 0123 654 99",
-  });
   
-  // Intersection Observer - defer API call until footer is visible
+  // Intersection Observer - trigger fetch when footer is visible
   const { ref, inView } = useInView({
     threshold: 0.1,
-    triggerOnce: true, // Only trigger once when it becomes visible
+    triggerOnce: true,
   });
 
   // Initialize branch if not loaded
@@ -29,44 +23,37 @@ export default function TopBar() {
     }
   }, [selectedBranch, initialize]);
 
-  // Fetch branch contact information - only when footer is visible
+  // Fetch branch details when footer becomes visible (only if not already loaded)
   useEffect(() => {
-    if (!inView) {
-      return; // Don't fetch until footer is visible
+    if (!inView || !selectedBranch) {
+      return;
     }
 
-    const fetchContactInfo = async () => {
-      if (!selectedBranch) {
-        return;
-      }
+    const branchId = selectedBranch.id || selectedBranch.branch_id;
+    const currentDetails = branchDetails;
+    const currentBranchId = currentDetails?.id || currentDetails?.branch_id;
 
-      try {
-        const response = await api.branches.getBranchById(selectedBranch.id || selectedBranch.branch_id);
+    // Only fetch if we don't have details for this branch
+    if (branchId && currentBranchId !== branchId) {
+      fetchBranchDetails(branchId);
+    }
+  }, [inView, selectedBranch, branchDetails, fetchBranchDetails]);
 
-        if (response && response.success && response.data) {
-          const branchData = response.data.branch || response.data;
-
-          // Default values
-          const defaultInfo = {
-            address: "4648 Rocky Road Philadelphia",
-            email: "info@exmple.com",
-            phone: "+88 0123 654 99",
-          };
-
-          setContactInfo({
-            address: branchData.address || branchData.location || defaultInfo.address,
-            email: branchData.email || branchData.contact_email || defaultInfo.email,
-            phone: branchData.phone || branchData.contact_phone || branchData.telephone || defaultInfo.phone,
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching contact info:", error);
-        // Keep default values on error
-      }
+  // Get contact info from store with fallback defaults
+  const contactInfo = useMemo(() => {
+    const info = getBranchContactInfo();
+    const defaultInfo = {
+      address: "4648 Rocky Road Philadelphia",
+      email: "info@exmple.com",
+      phone: "+88 0123 654 99",
     };
 
-    fetchContactInfo();
-  }, [inView, selectedBranch]);
+    return {
+      address: info?.address || defaultInfo.address,
+      email: info?.email || defaultInfo.email,
+      phone: info?.phone || defaultInfo.phone,
+    };
+  }, [getBranchContactInfo, branchDetails]);
   return (
     <div ref={ref} className="bg-theme3 rounded-2xl px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-10 md:py-12 mb-8 md:mb-10">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

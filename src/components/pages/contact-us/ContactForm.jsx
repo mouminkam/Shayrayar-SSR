@@ -1,11 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { contactSchema } from "../../../lib/validations/contactSchemas";
-import { branchesAPI } from "../../../api";
 import useToastStore from "../../../store/toastStore";
 import useBranchStore from "../../../store/branchStore";
 import { useLanguage } from "../../../context/LanguageContext";
@@ -13,9 +12,14 @@ import { t } from "../../../locales/i18n/getTranslation";
 
 export default function ContactForm() {
   const { success: toastSuccess, error: toastError } = useToastStore();
-  const { selectedBranch, initialize } = useBranchStore();
+  const { 
+    selectedBranch, 
+    initialize, 
+    branchDetails,
+    getBranchContactInfo,
+    fetchBranchDetails
+  } = useBranchStore();
   const { lang } = useLanguage();
-  const [branchEmail, setBranchEmail] = useState("info@example.com");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -43,27 +47,27 @@ export default function ContactForm() {
     }
   }, [selectedBranch, initialize]);
 
-  // Fetch branch email
+  // Fetch branch details when component mounts (only if not already loaded)
   useEffect(() => {
-    const fetchBranchEmail = async () => {
-      if (!selectedBranch) return;
+    if (!selectedBranch) {
+      return;
+    }
 
-      try {
-        const response = await branchesAPI.getBranchById(selectedBranch.id || selectedBranch.branch_id);
-        
-        if (response && response.success && response.data) {
-          const branchData = response.data.branch || response.data;
-          const email = branchData.email || branchData.contact_email || "info@example.com";
-          setBranchEmail(email);
-        }
-      } catch (error) {
-        console.error("Error fetching branch email:", error);
-        // Keep default email
-      }
-    };
+    const branchId = selectedBranch.id || selectedBranch.branch_id;
+    const currentDetails = branchDetails;
+    const currentBranchId = currentDetails?.id || currentDetails?.branch_id;
 
-    fetchBranchEmail();
-  }, [selectedBranch]);
+    // Only fetch if we don't have details for this branch
+    if (branchId && currentBranchId !== branchId) {
+      fetchBranchDetails(branchId);
+    }
+  }, [selectedBranch, branchDetails, fetchBranchDetails]);
+
+  // Get branch email from store with fallback
+  const branchEmail = useMemo(() => {
+    const contact = getBranchContactInfo();
+    return contact?.email || "info@example.com";
+  }, [getBranchContactInfo, branchDetails]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
