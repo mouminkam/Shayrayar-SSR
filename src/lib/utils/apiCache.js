@@ -138,11 +138,13 @@ export function getCacheStats() {
 
 /**
  * Cache duration constants (in milliseconds)
+ * Optimized for better performance - longer cache for static/semi-static data
  */
 export const CACHE_DURATION = {
   PRODUCTS: 5 * 60 * 1000, // 5 minutes
-  CATEGORIES: 10 * 60 * 1000, // 10 minutes
-  PRODUCT_DETAIL: 5 * 60 * 1000, // 5 minutes
-  HIGHLIGHTS: 5 * 60 * 1000, // 5 minutes
+  CATEGORIES: 15 * 60 * 1000, // 15 minutes (categories don't change often)
+  PRODUCT_DETAIL: 10 * 60 * 1000, // 10 minutes
+  HIGHLIGHTS: 10 * 60 * 1000, // 10 minutes (highlights don't change often)
+  WEBSITE_SLIDES: 15 * 60 * 1000, // 15 minutes (slides don't change often)
 };
 

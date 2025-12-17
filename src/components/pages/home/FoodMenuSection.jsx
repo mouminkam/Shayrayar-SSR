@@ -11,11 +11,19 @@ import { extractMenuItemsFromResponse, extractCategoriesFromResponse } from "../
 import { IMAGE_PATHS } from "../../../data/constants";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import { useInView } from "react-intersection-observer";
 
 export default function FoodMenuSection() {
   const { prefetchRoute } = usePrefetchRoute();
   const { selectedBranch, getSelectedBranchId, initialize } = useBranchStore();
   const { lang } = useLanguage();
+  
+  // Intersection Observer - Defer API calls until section is visible
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    rootMargin: "200px", // Start loading 200px before section is visible
+    triggerOnce: true,
+  });
   
   // State for categories
   const [categories, setCategories] = useState([]);
@@ -35,8 +43,12 @@ export default function FoodMenuSection() {
     }
   }, [selectedBranch, initialize]);
 
-  // Fetch categories from API
+  // Fetch categories from API - Only when section is in view
   useEffect(() => {
+    if (!inView) {
+      return; // Don't fetch until section is visible
+    }
+
     const fetchCategories = async () => {
       if (!selectedBranch) {
         setIsLoadingCategories(false);
@@ -63,7 +75,7 @@ export default function FoodMenuSection() {
     };
 
     fetchCategories();
-  }, [selectedBranch, lang]);
+  }, [selectedBranch, lang, inView]);
 
   // Fetch menu items when activeTab (category) changes
   const fetchMenuItems = useCallback(async (categoryId) => {
@@ -100,7 +112,7 @@ export default function FoodMenuSection() {
   }, [activeTab, fetchMenuItems]);
 
   return (
-    <section className="food-menu-section fix section-padding py-12 sm:py-16 md:py-20 lg:py-24">
+    <section ref={ref} className="food-menu-section fix section-padding py-12 sm:py-16 md:py-20 lg:py-24">
       <div className="food-menu-wrapper style1">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="food-menu-tab-wrapper">

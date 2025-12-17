@@ -79,6 +79,21 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://shahrayar.peaklink.pro" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://shahrayar.peaklink.pro" />
+        
+        {/* Preload LCP images for faster initial render */}
+        <link
+          rel="preload"
+          as="image"
+          href="/img/bg/bannerBG1_1.jpg"
+          fetchPriority="high"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/img/banner/bannerThumb1_1.png"
+          fetchPriority="high"
+        />
       </head>
 
       <body suppressHydrationWarning className={oswald.className}>

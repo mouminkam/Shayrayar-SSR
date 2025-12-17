@@ -176,6 +176,7 @@ export default function BannerSection() {
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: "100%", opacity: 0 }}
                     transition={{ type: "tween", duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+                    style={{ willChange: "transform, opacity" }}
                     className="banner-thumb-area relative z-50 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl pointer-events-auto"
                   >
                     <Image
@@ -184,7 +185,7 @@ export default function BannerSection() {
                       width={1200}
                       height={1200}
                       className="w-full h-auto object-contain"
-                      quality={75}
+                      quality={80}
                       priority={activeIndex === 0}
                       fetchPriority={activeIndex === 0 ? "high" : "auto"}
                       loading={activeIndex === 0 ? "eager" : "lazy"}
@@ -204,6 +205,7 @@ export default function BannerSection() {
                       animate={{ x: 0, opacity: 1 }}
                       exit={{ x: "-100%", opacity: 0 }}
                       transition={{ type: "tween", duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+                      style={{ willChange: "transform, opacity" }}
                       className="banner-style1 w-full lg:w-auto pointer-events-auto"
                     >
                       <div className="section-title text-center lg:text-left w-full lg:w-auto">
