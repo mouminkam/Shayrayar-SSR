@@ -92,7 +92,6 @@ const getLanguage = () => {
  * Check if URL should exclude branch_id
  * URLs that don't need branch_id:
  * - /branches (getting all branches - exact match or query params only)
- * - /auth/rbranches (registration branches)
  * - /auth/google/web-login (Google OAuth web login)
  * - /customer/* (customer data)
  * - /notifications/* (notifications)
@@ -110,7 +109,6 @@ const shouldExcludeBranchId = (url) => {
   
   // Pattern matches
   const excludePatterns = [
-    '/auth/rbranches', // Registration branches
     '/auth/google/web-login', // Google OAuth web login
     '/customer/', // Customer endpoints
     '/notifications/', // Notifications

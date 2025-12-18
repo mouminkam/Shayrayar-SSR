@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import api from "../api";
 import useBranchStore from "../store/branchStore";
 import { transformMenuItemsToProducts } from "../lib/utils/productTransform";
@@ -8,7 +8,6 @@ import { extractMenuItemsFromResponse } from "../lib/utils/responseExtractor";
 import useToastStore from "../store/toastStore";
 import { ITEMS_PER_PAGE_GRID, ITEMS_PER_PAGE_LIST } from "../data/constants";
 import { useApiCache } from "./useApiCache";
-import { debounce } from "../lib/utils/debounce";
 import { useLanguage } from "../context/LanguageContext";
 
 /**
@@ -18,6 +17,7 @@ import { useLanguage } from "../context/LanguageContext";
  */
 export function useShopProducts(viewMode = "grid") {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { selectedBranch, initialize } = useBranchStore();
   const { error: toastError } = useToastStore();
   const { getCachedOrFetch } = useApiCache("PRODUCTS");
@@ -34,15 +34,16 @@ export function useShopProducts(viewMode = "grid") {
   const categoryId = searchParams.get("category");
   const searchQuery = searchParams.get("search") || "";
   const sortBy = searchParams.get("sort") || "menu_order";
+  const pageParam = searchParams.get("page");
+  const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
 
   const itemsPerPage = viewMode === "grid" ? ITEMS_PER_PAGE_GRID : ITEMS_PER_PAGE_LIST;
 
   const [products, setProducts] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalItems, setTotalItems] = useState(0);
-  const [useClientPagination, setUseClientPagination] = useState(false);
+  const [pagination, setPagination] = useState(null);
 
   // Debounced search query state
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
@@ -63,20 +64,26 @@ export function useShopProducts(viewMode = "grid") {
       return;
     }
 
+    // جعل category مطلوب
+    if (!categoryId) {
+      setIsLoading(false);
+      setError("Please select a category");
+      setProducts([]);
+      setTotalItems(0);
+      setPagination(null);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      // Step 1: Try server-side pagination with requested limit
       const params = {
-        page: 1,
+        page: currentPage,
         limit: itemsPerPage,
+        category_id: categoryId, // مطلوب دائماً
       };
 
-      // Add filters
-      if (categoryId) {
-        params.category_id = categoryId;
-      }
       if (debouncedSearchQuery) {
         params.search = debouncedSearchQuery;
       }
@@ -91,100 +98,58 @@ export function useShopProducts(viewMode = "grid") {
         () => api.menu.getMenuItems(params)
       );
 
-      const { menuItems, totalCount } = extractMenuItemsFromResponse(response);
-      const apiPerPage = response?.data?.items?.per_page;
-
-      // Check if API respects the limit parameter
-      const apiRespectsLimit = apiPerPage && apiPerPage === itemsPerPage;
-
+      const { menuItems, totalCount, pagination: paginationInfo } = extractMenuItemsFromResponse(response);
+      
       if (Array.isArray(menuItems) && menuItems.length > 0) {
         const transformedProducts = transformMenuItemsToProducts(menuItems, lang);
-
-        if (apiRespectsLimit) {
-          // ✅ Server-side pagination works!
-          setUseClientPagination(false);
-          setProducts(transformedProducts);
-          setAllProducts([]);
-          setTotalItems(totalCount || transformedProducts.length);
-        } else {
-          // ❌ API doesn't respect limit - use client-side pagination
-          setUseClientPagination(true);
-
-          // Fetch all products for client-side pagination (with cache)
-          const allParams = { ...params, limit: 1000 };
-          const allResponse = await getCachedOrFetch(
-            "/menu-items",
-            allParams,
-            () => api.menu.getMenuItems(allParams)
-          );
-          const { menuItems: allMenuItems } = extractMenuItemsFromResponse(allResponse);
-          const allTransformed = transformMenuItemsToProducts(allMenuItems, lang);
-
-          setAllProducts(allTransformed);
-          setProducts(allTransformed.slice(0, itemsPerPage));
-          setTotalItems(allTransformed.length);
-        }
+        setProducts(transformedProducts);
+        setTotalItems(totalCount);
+        setPagination(paginationInfo);
         setError(null);
       } else if (totalCount > 0) {
         setError("No products found");
         setProducts([]);
-        setAllProducts([]);
         setTotalItems(totalCount);
+        setPagination(paginationInfo);
       } else {
         const errorMsg = response?.message || response?.error || "No products found";
         setError(errorMsg);
         setProducts([]);
-        setAllProducts([]);
         setTotalItems(0);
+        setPagination(null);
       }
     } catch (err) {
       const errorMessage = err.message || "An error occurred while loading products";
       setError(errorMessage);
       toastError(errorMessage);
       setProducts([]);
-      setAllProducts([]);
       setTotalItems(0);
+      setPagination(null);
     } finally {
       setIsLoading(false);
     }
-  }, [selectedBranch, itemsPerPage, categoryId, debouncedSearchQuery, sortBy, toastError, getCachedOrFetch, lang]);
+  }, [selectedBranch, currentPage, itemsPerPage, categoryId, debouncedSearchQuery, sortBy, toastError, getCachedOrFetch, lang]);
 
   // Fetch products when filters change
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Handle view mode change
-  const handleViewModeChange = useCallback(
-    (newViewMode) => {
-      if (useClientPagination) {
-        const newItemsPerPage = newViewMode === "grid" ? ITEMS_PER_PAGE_GRID : ITEMS_PER_PAGE_LIST;
-        setProducts(allProducts.slice(0, newItemsPerPage));
-      }
-    },
-    [useClientPagination, allProducts]
-  );
-
-  // Handle show more button (only for client-side pagination)
-  const handleShowMore = useCallback(() => {
-    if (useClientPagination) {
-      const currentCount = products.length;
-      const currentItemsPerPage = viewMode === "grid" ? ITEMS_PER_PAGE_GRID : ITEMS_PER_PAGE_LIST;
-      const nextCount = currentCount + currentItemsPerPage;
-      setProducts(allProducts.slice(0, nextCount));
-    }
-  }, [useClientPagination, products.length, allProducts, viewMode]);
-
-  const hasMore = useClientPagination && products.length < allProducts.length;
+  // Handle page change
+  const handlePageChange = useCallback((page) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page);
+    router.push(`/shop?${params.toString()}`, { scroll: false });
+  }, [searchParams, router]);
 
   return {
     products,
     isLoading,
     error,
     totalItems,
-    hasMore,
-    handleViewModeChange,
-    handleShowMore,
+    pagination,
+    currentPage,
+    handlePageChange,
     refetch: fetchProducts,
   };
 }

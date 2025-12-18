@@ -66,16 +66,24 @@ const ShopSidebar = memo(function ShopSidebar() {
 
   const recentProducts = latestProducts || [];
 
+  // Auto-select first category if no category is selected
+  useEffect(() => {
+    if (!currentCategory && categories.length > 0) {
+      const firstCategoryId = categories[0].id;
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("category", firstCategoryId);
+      router.replace(`/shop?${params.toString()}`, { scroll: false });
+    }
+  }, [currentCategory, categories, searchParams, router]);
+
   const handleCategoryClick = useCallback((categoryId) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (categoryId && categoryId !== currentCategory) {
+    if (categoryId) {
       params.set("category", categoryId);
-    } else {
-      params.delete("category");
     }
     params.delete("page");
     router.push(`/shop?${params.toString()}`, { scroll: false });
-  }, [router, searchParams, currentCategory]);
+  }, [router, searchParams]);
 
   // Category button style
   const categoryBtnClass = (isActive) => 
@@ -97,11 +105,6 @@ const ShopSidebar = memo(function ShopSidebar() {
           <p className="text-text text-sm">{t(lang, "no_categories_available")}</p>
         ) : (
           <ul className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <li>
-              <button onClick={() => handleCategoryClick(null)} className={categoryBtnClass(!currentCategory)}>
-                {t(lang, "all")}
-              </button>
-            </li>
             {categories.map((category) => (
               <li key={category.id}>
                 <button onClick={() => handleCategoryClick(category.id)} className={categoryBtnClass(currentCategory === String(category.id))}>

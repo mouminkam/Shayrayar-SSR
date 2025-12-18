@@ -545,30 +545,6 @@ const useAuthStore = create(
         }
       },
 
-      getRegistrationBranches: async (lang = 'ar') => {
-        // Don't update global isLoading to avoid re-renders
-        // This is a lightweight call that shouldn't affect the global loading state
-        try {
-          const response = await api.auth.getRegistrationBranches(lang);
-          
-          if (response.success && response.data) {
-            return { 
-              success: true, 
-              branches: response.data.branches || response.data 
-            };
-          } else {
-            return { 
-              success: false, 
-              error: response.message || "Failed to fetch branches" 
-            };
-          }
-        } catch (error) {
-          return { 
-            success: false, 
-            error: error.message || "An error occurred while fetching branches" 
-          };
-        }
-      },
 
       // Build Google OAuth URL directly
       buildGoogleOAuthUrl: () => {

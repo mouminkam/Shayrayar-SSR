@@ -6,7 +6,6 @@ import SortBar from "./SortBar";
 import ProductCardSkeleton from "../../ui/ProductCardSkeleton";
 import LazyProductCard from "../../ui/LazyProductCard";
 import AnimatedSection from "../../ui/AnimatedSection";
-import { ChevronDown } from "lucide-react";
 import { useShopProducts } from "../../../hooks/useShopProducts";
 import { ITEMS_PER_PAGE_GRID, ITEMS_PER_PAGE_LIST } from "../../../data/constants";
 import { useLanguage } from "../../../context/LanguageContext";
@@ -25,16 +24,15 @@ export default function ShopSection() {
     isLoading,
     error,
     totalItems,
-    hasMore,
-    handleViewModeChange: hookHandleViewModeChange,
-    handleShowMore,
+    pagination,
+    currentPage,
+    handlePageChange,
     refetch,
   } = useShopProducts(viewMode);
 
-  // Handle view mode change with hook
+  // Handle view mode change
   const handleViewModeChange = (newViewMode) => {
     setViewMode(newViewMode);
-    hookHandleViewModeChange(newViewMode);
   };
 
   return (
@@ -46,7 +44,7 @@ export default function ShopSection() {
             <div className="mb-6 lg:mb-8">
               <SortBar
                 totalItems={totalItems}
-                currentPage={1}
+                currentPage={currentPage || 1}
                 itemsPerPage={itemsPerPage}
                 onViewChange={handleViewModeChange}
                 viewMode={viewMode}
@@ -101,14 +99,52 @@ export default function ShopSection() {
                         />
                       ))}
                     </div>
-                    {hasMore && (
-                      <div className="flex justify-center mt-8">
+                    {/* Pagination */}
+                    {pagination && pagination.last_page > 1 && (
+                      <div className="mt-8 flex items-center justify-center gap-2">
                         <button
-                          onClick={handleShowMore}
-                          className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white  text-sm font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                          disabled={currentPage === 1}
+                          className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >
-                          {t(lang, "show_more")}
-                          <ChevronDown className="w-5 h-5" />
+                          {t(lang, "previous")}
+                        </button>
+                        
+                        <div className="flex items-center gap-2">
+                          {Array.from({ length: Math.min(5, pagination.last_page) }, (_, i) => {
+                            let pageNum;
+                            if (pagination.last_page <= 5) {
+                              pageNum = i + 1;
+                            } else if (currentPage <= 3) {
+                              pageNum = i + 1;
+                            } else if (currentPage >= pagination.last_page - 2) {
+                              pageNum = pagination.last_page - 4 + i;
+                            } else {
+                              pageNum = currentPage - 2 + i;
+                            }
+                            
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => handlePageChange(pageNum)}
+                                className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+                                  currentPage === pageNum
+                                    ? 'bg-theme3 text-white'
+                                    : 'bg-white/5 text-text hover:bg-white/10'
+                                }`}
+                              >
+                                {pageNum}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        
+                        <button
+                          onClick={() => handlePageChange(Math.min(pagination.last_page, currentPage + 1))}
+                          disabled={currentPage === pagination.last_page}
+                          className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >
+                          {t(lang, "next")}
                         </button>
                       </div>
                     )}
@@ -125,14 +161,52 @@ export default function ShopSection() {
                         />
                       ))}
                     </div>
-                    {hasMore && (
-                      <div className="flex justify-center mt-8">
+                    {/* Pagination */}
+                    {pagination && pagination.last_page > 1 && (
+                      <div className="mt-8 flex items-center justify-center gap-2">
                         <button
-                          onClick={handleShowMore}
-                          className="inline-flex items-center gap-2 px-8 py-3 bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white  text-sm font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                          disabled={currentPage === 1}
+                          className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >
-                          {t(lang, "show_more")}
-                          <ChevronDown className="w-5 h-5" />
+                          {t(lang, "previous")}
+                        </button>
+                        
+                        <div className="flex items-center gap-2">
+                          {Array.from({ length: Math.min(5, pagination.last_page) }, (_, i) => {
+                            let pageNum;
+                            if (pagination.last_page <= 5) {
+                              pageNum = i + 1;
+                            } else if (currentPage <= 3) {
+                              pageNum = i + 1;
+                            } else if (currentPage >= pagination.last_page - 2) {
+                              pageNum = pagination.last_page - 4 + i;
+                            } else {
+                              pageNum = currentPage - 2 + i;
+                            }
+                            
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => handlePageChange(pageNum)}
+                                className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+                                  currentPage === pageNum
+                                    ? 'bg-theme3 text-white'
+                                    : 'bg-white/5 text-text hover:bg-white/10'
+                                }`}
+                              >
+                                {pageNum}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        
+                        <button
+                          onClick={() => handlePageChange(Math.min(pagination.last_page, currentPage + 1))}
+                          disabled={currentPage === pagination.last_page}
+                          className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >
+                          {t(lang, "next")}
                         </button>
                       </div>
                     )}

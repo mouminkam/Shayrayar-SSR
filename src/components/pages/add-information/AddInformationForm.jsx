@@ -4,11 +4,13 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { User, Mail, MapPin, ArrowRight } from "lucide-react";
 import useAuthStore from "../../../store/authStore";
+import useBranchStore from "../../../store/branchStore";
 import useToastStore from "../../../store/toastStore";
 
 export default function AddInformationForm() {
   const router = useRouter();
-  const { completeRegistration, getRegistrationBranches, isLoading } = useAuthStore();
+  const { completeRegistration, isLoading } = useAuthStore();
+  const { branches, fetchBranches, isLoading: isLoadingBranches } = useBranchStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
 
   const [formData, setFormData] = useState({
@@ -18,7 +20,6 @@ export default function AddInformationForm() {
     location: "",
     branch_id: "",
   });
-  const [branches, setBranches] = useState([]);
   const [loadingBranches, setLoadingBranches] = useState(true);
   const [errors, setErrors] = useState({});
 
@@ -35,19 +36,20 @@ export default function AddInformationForm() {
         return;
       }
 
-      // Load branches
+      // Load branches using branchStore
       setLoadingBranches(true);
-        const result = await getRegistrationBranches("ar");
+      const result = await fetchBranches();
       if (result.success) {
-        setBranches(result.branches || []);
-        } else {
+        // branches سيتم تحديثها تلقائياً في branchStore
+        setLoadingBranches(false);
+      } else {
         toastError(result.error || "Failed to load branches");
+        setLoadingBranches(false);
       }
-      setLoadingBranches(false);
     };
 
     loadBranches();
-  }, [router, getRegistrationBranches, toastError]);
+  }, [router, fetchBranches, toastError]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -224,7 +226,7 @@ export default function AddInformationForm() {
             <option value="" disabled className="bg-bg3 text-white/50">
             {loadingBranches ? "Loading branches..." : "Select a branch"}
           </option>
-          {branches.map((branch) => (
+          {(branches || []).map((branch) => (
             <option key={branch.id} value={branch.id} className="bg-bg3 text-white">
               {branch.name || branch.title || `Branch ${branch.id}`}
             </option>
@@ -263,7 +265,7 @@ export default function AddInformationForm() {
       {/* Submit Button */}
       <motion.button
         type="submit"
-        disabled={isLoading || loadingBranches}
+        disabled={isLoading || loadingBranches || isLoadingBranches}
         whileHover={!isLoading && !loadingBranches ? { scale: 1.02 } : {}}
         whileTap={!isLoading && !loadingBranches ? { scale: 0.98 } : {}}
         className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-6"

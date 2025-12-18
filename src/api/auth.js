@@ -154,16 +154,6 @@ export const completeRegistration = async (userData) => {
 };
 
 /**
- * Get registration branches
- * @param {string} lang - Language code (default: 'ar')
- * @returns {Promise<Object>} Response with branches list for registration
- */
-export const getRegistrationBranches = async (lang = 'ar') => {
-  const response = await axiosInstance.get('/auth/rbranches', { params: { lang } });
-  return response;
-};
-
-/**
  * Login with Google ID token
  * @param {string} idToken - Google ID token from mobile app
  * @returns {Promise<Object>} Response with user data and token
@@ -207,7 +197,6 @@ const authAPI = {
   registerPhone,
   verifyPhone,
   completeRegistration,
-  getRegistrationBranches,
   googleLogin,
   googleWebLogin,
 };
