@@ -11,6 +11,7 @@ import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
 import { useWebsiteSlides } from "../../../hooks/useWebsiteSlides";
 import SectionSkeleton from "../../ui/SectionSkeleton";
+import { getProxiedImageUrl } from "../../../lib/utils/imageProxy";
 
 // Import Swiper CSS - Next.js will handle optimization
 import "swiper/swiper-bundle.css";
@@ -31,7 +32,7 @@ export default function BannerSection() {
       id: slide.id,
       subtitle: slide.description || t(lang, "welcome_fresheat"),
       title: slide.title || "",
-      image: slide.desktop_image || "",
+      image: getProxiedImageUrl(slide.desktop_image || ""),
       bgImage: "/img/bg/bannerBG1_1.jpg",
       link: slide.menu_item_id ? `/shop/${slide.menu_item_id}` : "/shop",
       shape4Float: index % 2 === 0,

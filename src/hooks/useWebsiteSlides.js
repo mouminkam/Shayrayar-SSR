@@ -4,6 +4,7 @@ import api from "../api";
 import useBranchStore from "../store/branchStore";
 import { useApiCache } from "./useApiCache";
 import { generateCacheKey, getCachedData, setCachedData, getPendingRequest, setPendingRequest, CACHE_DURATION } from "../lib/utils/apiCache";
+import { proxyObjectImages } from "../lib/utils/imageProxy";
 
 /**
  * Prefetch website slides using Fetch API with high priority
@@ -158,7 +159,11 @@ export function useWebsiteSlides(params = {}) {
       if (cached !== null) {
         // Use cached data immediately
         if (cached?.success && cached?.data?.slides) {
-          setSlides(cached.data.slides);
+          // Convert image URLs to proxy URLs
+          const proxiedSlides = cached.data.slides.map(slide => 
+            proxyObjectImages(slide, ['desktop_image', 'mobile_image', 'image'])
+          );
+          setSlides(proxiedSlides);
         } else {
           setSlides([]);
         }
@@ -171,7 +176,11 @@ export function useWebsiteSlides(params = {}) {
       if (pending) {
         const response = await pending;
         if (response?.success && response?.data?.slides) {
-          setSlides(response.data.slides);
+          // Convert image URLs to proxy URLs
+          const proxiedSlides = response.data.slides.map(slide => 
+            proxyObjectImages(slide, ['desktop_image', 'mobile_image', 'image'])
+          );
+          setSlides(proxiedSlides);
         } else {
           setSlides([]);
         }
@@ -261,7 +270,11 @@ export function useWebsiteSlides(params = {}) {
       const response = await fetchPromise;
 
       if (response?.success && response?.data?.slides) {
-        setSlides(response.data.slides);
+        // Convert image URLs to proxy URLs
+        const proxiedSlides = response.data.slides.map(slide => 
+          proxyObjectImages(slide, ['desktop_image', 'mobile_image', 'image'])
+        );
+        setSlides(proxiedSlides);
       } else {
         setSlides([]);
       }
