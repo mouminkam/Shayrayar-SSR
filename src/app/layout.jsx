@@ -77,6 +77,7 @@ export default function RootLayout({ children }) {
         {/* Preconnect to external domains for faster resource loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* API endpoint preconnect for banner slides - high priority */}
         <link rel="preconnect" href="https://shahrayar.peaklink.pro" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://shahrayar.peaklink.pro" />
         

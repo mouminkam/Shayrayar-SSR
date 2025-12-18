@@ -8,6 +8,7 @@ import AnimatedSection from "../components/ui/AnimatedSection";
 import ErrorBoundary from "../components/ui/ErrorBoundary";
 import SectionSkeleton from "../components/ui/SectionSkeleton";
 import PageSEO from "../components/seo/PageSEO";
+import { prefetchWebsiteSlides } from "../hooks/useWebsiteSlides";
 
 // Above the fold - Load immediately (no lazy loading)
 import BannerSection from "../components/pages/home/BannerSection";
@@ -79,6 +80,18 @@ export default function HomePage() {
   useEffect(() => {
     initialize();
   }, [initialize]);
+
+  // Early prefetch for banner slides - high priority
+  useEffect(() => {
+    const branchId = selectedBranch?.id || selectedBranch?.branch_id;
+    if (branchId) {
+      // Prefetch slides early to improve LCP
+      prefetchWebsiteSlides(branchId).catch((error) => {
+        // Silently fail - prefetch is not critical
+        console.warn('Early prefetch of website slides failed:', error);
+      });
+    }
+  }, [selectedBranch?.id, selectedBranch?.branch_id]);
 
   // Branch change is handled by components naturally - no need for full page refresh
   // Removed router.refresh() to prevent unnecessary re-renders

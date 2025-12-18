@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade } from "swiper/modules";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,43 +21,101 @@ export default function BannerSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const { slides: apiSlides, isLoading, error } = useWebsiteSlides();
 
-  // Always use fallback slides immediately - don't wait for API
   // Map API slides to component format
   const slides = useMemo(() => {
-    // Always show fallback slides immediately
-    const fallbackSlides = [
-        {
-          id: 1,
-          subtitle: t(lang, "welcome_fresheat"),
-          title: "SPICY FRIED CHICKEN",
-          image: "/img/banner/bannerThumb1_1.png",
-          bgImage: "/img/bg/bannerBG1_1.jpg",
-          link: "/shop",
-          shape4Float: false,
-        },
-      ];
-
-    // If no API slides or still loading, return fallback immediately
     if (!apiSlides || apiSlides.length === 0) {
-      return fallbackSlides;
+      return [];
     }
 
-    // Map API slides when available
     return apiSlides.map((slide, index) => ({
       id: slide.id,
       subtitle: slide.description || t(lang, "welcome_fresheat"),
       title: slide.title || "",
-      image: slide.desktop_image || "/img/banner/bannerThumb1_1.png",
-      bgImage: "/img/bg/bannerBG1_1.jpg", // Keep default background
+      image: slide.desktop_image || "",
+      bgImage: "/img/bg/bannerBG1_1.jpg",
       link: slide.menu_item_id ? `/shop/${slide.menu_item_id}` : "/shop",
-      shape4Float: index % 2 === 0, // Alternate float animation
+      shape4Float: index % 2 === 0,
     }));
   }, [apiSlides, lang]);
 
   const currentSlide = slides[activeIndex] || slides[0];
+  const preloadedImagesRef = useRef(new Set());
 
-  // Don't show loading skeleton - always show fallback slides immediately
-  // This prevents delay in initial render
+  // Preload first slide image for better LCP
+  useEffect(() => {
+    if (slides.length > 0 && slides[0]?.image) {
+      const firstImage = slides[0].image;
+      
+      // Skip if already preloaded
+      if (preloadedImagesRef.current.has(firstImage)) {
+        return;
+      }
+
+      // Create preload link
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = firstImage;
+      link.fetchPriority = 'high';
+      
+      // Add crossorigin if image is from external domain
+      if (firstImage.startsWith('http')) {
+        link.crossOrigin = 'anonymous';
+      }
+      
+      document.head.appendChild(link);
+      preloadedImagesRef.current.add(firstImage);
+
+      // Cleanup function
+      return () => {
+        if (document.head.contains(link)) {
+          document.head.removeChild(link);
+        }
+      };
+    }
+  }, [slides]);
+
+  // Show skeleton loader when loading or no slides
+  if (isLoading || !slides || slides.length === 0) {
+    return (
+      <section className="banner-section fix mb-8">
+        <div className="slider-area relative">
+          <div className="relative bg-cover bg-center min-h-[800px]" style={{ backgroundImage: `url(/img/bg/bannerBG1_1.jpg)` }}>
+            <div className="overlay absolute inset-0 bg-title opacity-30"></div>
+          </div>
+
+          {/* Fixed Content Container */}
+          <div className="banner-container absolute inset-0 z-50 py-12 sm:py-16 md:py-20 lg:py-32 xl:py-40 mt-18 sm:mt-20 md:mt-24 lg:mt-0">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 h-full">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-12 items-center h-full">
+                {/* Image Skeleton - Right Side */}
+                <div className="col-span-1 lg:col-span-1 order-1 lg:order-2 flex justify-center lg:justify-end items-center">
+                  <div className="banner-thumb-area relative z-50 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl animate-pulse">
+                    <div className="w-full aspect-square bg-gray-700/50 rounded-2xl"></div>
+                  </div>
+                </div>
+
+                {/* Text Content Skeleton - Left Side */}
+                <div className="col-span-1 lg:col-span-1 order-2 lg:order-1 mt-4 sm:mt-0 md:mt-0 w-full lg:w-auto">
+                  <div className="banner-title-area w-full lg:w-auto relative min-h-[200px] sm:min-h-[250px] md:min-h-[280px] lg:min-h-[300px] space-y-4 animate-pulse">
+                    {/* Subtitle Skeleton */}
+                    <div className="h-6 sm:h-8 bg-gray-700/50 rounded w-1/3 lg:w-1/4"></div>
+                    {/* Title Skeleton */}
+                    <div className="space-y-3">
+                      <div className="h-8 sm:h-10 md:h-12 lg:h-16 bg-gray-700/50 rounded w-3/4"></div>
+                      <div className="h-8 sm:h-10 md:h-12 lg:h-16 bg-gray-700/50 rounded w-2/3"></div>
+                    </div>
+                    {/* Button Skeleton */}
+                    <div className="h-12 sm:h-14 bg-gray-700/50 rounded w-32 sm:w-40"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="banner-section fix mb-8">
@@ -176,7 +234,7 @@ export default function BannerSection() {
                       quality={80}
                       priority={activeIndex === 0}
                       fetchPriority={activeIndex === 0 ? "high" : "auto"}
-                      loading={activeIndex === 0 ? "eager" : "lazy"}
+                      loading="eager"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px"
                     />
                   </motion.div>

@@ -3,6 +3,117 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import api from "../api";
 import useBranchStore from "../store/branchStore";
 import { useApiCache } from "./useApiCache";
+import { generateCacheKey, getCachedData, setCachedData, getPendingRequest, setPendingRequest, CACHE_DURATION } from "../lib/utils/apiCache";
+
+/**
+ * Prefetch website slides using Fetch API with high priority
+ * This function can be called early (e.g., in layout/page) to start fetching before component renders
+ * @param {string|number} branchId - Branch ID
+ * @param {Object} params - Query parameters
+ * @returns {Promise<Object|null>} Promise that resolves with slides data or null
+ */
+export async function prefetchWebsiteSlides(branchId, params = {}) {
+  if (!branchId || typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://shahrayar.peaklink.pro/api/v1';
+    const url = `${API_BASE_URL}/website-slides`;
+    
+    // Build query params
+    const queryParams = new URLSearchParams({
+      branch_id: branchId,
+      ...params,
+    });
+    
+    const fullUrl = `${url}?${queryParams.toString()}`;
+    const cacheKey = generateCacheKey('/website-slides', params, branchId);
+    const ttl = CACHE_DURATION.WEBSITE_SLIDES || CACHE_DURATION.PRODUCTS;
+
+    // Check cache first
+    const cached = getCachedData(cacheKey);
+    if (cached !== null) {
+      return cached;
+    }
+
+    // Check for pending request
+    const pending = getPendingRequest(cacheKey);
+    if (pending) {
+      return pending;
+    }
+
+    // Get token and language for headers
+    const getToken = () => {
+      try {
+        const authStorage = localStorage.getItem('auth-storage');
+        if (authStorage) {
+          const parsed = JSON.parse(authStorage);
+          return parsed.state?.user?.token || parsed.state?.token || null;
+        }
+        return sessionStorage.getItem('registrationToken');
+      } catch {
+        return null;
+      }
+    };
+
+    const getLanguage = () => {
+      try {
+        return localStorage.getItem('language') || 'bg';
+      } catch {
+        return 'bg';
+      }
+    };
+
+    const token = getToken();
+    const language = getLanguage();
+
+    // Use Fetch API with high priority
+    const abortController = new AbortController();
+    const timeoutId = setTimeout(() => abortController.abort(), 30000); // 30 seconds timeout
+    
+    const fetchPromise = fetch(fullUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Accept-Language': language,
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      priority: 'high', // High priority for banner slides
+      signal: abortController.signal,
+    })
+      .finally(() => {
+        clearTimeout(timeoutId);
+      })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        // Transform to match axios response format
+        const transformedData = data && typeof data === 'object' && 'success' in data 
+          ? data 
+          : { success: true, data: data };
+        
+        // Cache the response
+        setCachedData(cacheKey, transformedData, ttl);
+        return transformedData;
+      })
+      .catch((error) => {
+        // Don't cache errors, but don't throw - return null for graceful degradation
+        console.warn('Prefetch website slides failed:', error);
+        return null;
+      });
+
+    setPendingRequest(cacheKey, fetchPromise);
+    return fetchPromise;
+  } catch (error) {
+    console.warn('Prefetch website slides error:', error);
+    return null;
+  }
+}
 
 /**
  * Hook to fetch and manage website slides
@@ -40,11 +151,114 @@ export function useWebsiteSlides(params = {}) {
 
     try {
       // Use paramsRef.current to avoid stale closure
-      const response = await getCachedOrFetch(
-        '/website-slides',
-        paramsRef.current,
-        () => api.slides.getWebsiteSlides(paramsRef.current)
-      );
+      // Try to use fetch API with priority for better performance
+      const cacheKey = generateCacheKey('/website-slides', paramsRef.current, branchId);
+      const cached = getCachedData(cacheKey);
+      
+      if (cached !== null) {
+        // Use cached data immediately
+        if (cached?.success && cached?.data?.slides) {
+          setSlides(cached.data.slides);
+        } else {
+          setSlides([]);
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // Check for pending request
+      const pending = getPendingRequest(cacheKey);
+      if (pending) {
+        const response = await pending;
+        if (response?.success && response?.data?.slides) {
+          setSlides(response.data.slides);
+        } else {
+          setSlides([]);
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // Use Fetch API with high priority for banner slides
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://shahrayar.peaklink.pro/api/v1';
+      const url = `${API_BASE_URL}/website-slides`;
+      
+      // Build query params
+      const queryParams = new URLSearchParams({
+        branch_id: branchId,
+        ...paramsRef.current,
+      });
+      
+      const fullUrl = `${url}?${queryParams.toString()}`;
+      const ttl = CACHE_DURATION.WEBSITE_SLIDES || CACHE_DURATION.PRODUCTS;
+
+      // Get token and language for headers
+      const getToken = () => {
+        if (typeof window === 'undefined') return null;
+        try {
+          const authStorage = localStorage.getItem('auth-storage');
+          if (authStorage) {
+            const parsed = JSON.parse(authStorage);
+            return parsed.state?.user?.token || parsed.state?.token || null;
+          }
+          return sessionStorage.getItem('registrationToken');
+        } catch {
+          return null;
+        }
+      };
+
+      const getLanguage = () => {
+        if (typeof window === 'undefined') return 'bg';
+        try {
+          return localStorage.getItem('language') || 'bg';
+        } catch {
+          return 'bg';
+        }
+      };
+
+      const token = getToken();
+      const language = getLanguage();
+
+      // Use Fetch API with high priority
+      const abortController = new AbortController();
+      const timeoutId = setTimeout(() => abortController.abort(), 30000); // 30 seconds timeout
+      
+      const fetchPromise = fetch(fullUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Accept-Language': language,
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        priority: 'high', // High priority for banner slides
+        signal: abortController.signal,
+      })
+        .then(async (response) => {
+          clearTimeout(timeoutId);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          
+          // Transform to match axios response format
+          const transformedData = data && typeof data === 'object' && 'success' in data 
+            ? data 
+            : { success: true, data: data };
+          
+          // Cache the response
+          setCachedData(cacheKey, transformedData, ttl);
+          return transformedData;
+        })
+        .catch((error) => {
+          clearTimeout(timeoutId);
+          // Fallback to axios if fetch fails
+          console.warn('Fetch API failed, falling back to axios:', error);
+          return api.slides.getWebsiteSlides(paramsRef.current);
+        });
+
+      setPendingRequest(cacheKey, fetchPromise);
+      const response = await fetchPromise;
 
       if (response?.success && response?.data?.slides) {
         setSlides(response.data.slides);
@@ -60,7 +274,7 @@ export function useWebsiteSlides(params = {}) {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedBranch?.id, selectedBranch?.branch_id, paramsString, getCachedOrFetch]);
+  }, [selectedBranch?.id, selectedBranch?.branch_id, paramsString]);
 
   useEffect(() => {
     fetchWebsiteSlides();
