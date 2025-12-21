@@ -4,17 +4,18 @@ import { Lock } from "lucide-react";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
 
-export default function PlaceOrderButton({ isProcessing, onClick }) {
+export default function PlaceOrderButton({ isProcessing, onClick, isDisabled }) {
   const { lang } = useLanguage();
+  const disabled = isProcessing || isDisabled;
   return (
     <motion.button
       type="submit"
-      disabled={isProcessing}
+      disabled={disabled}
       onClick={onClick}
-      whileHover={{ scale: isProcessing ? 1 : 1.02 }}
-      whileTap={{ scale: isProcessing ? 1 : 0.98 }}
+      whileHover={{ scale: disabled ? 1 : 1.02 }}
+      whileTap={{ scale: disabled ? 1 : 0.98 }}
       className="w-full bg-linear-to-r from-theme to-theme3 hover:from-theme3 hover:to-theme text-white py-4 px-6 transition-all duration-300 text-base  font-semibold uppercase rounded-xl shadow-lg hover:shadow-xl hover:shadow-theme3/40 border border-theme3/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-    >
+      >
       {isProcessing ? (
         <>
           <motion.div

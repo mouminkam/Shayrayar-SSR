@@ -125,6 +125,15 @@ export function clearPendingRequests() {
 }
 
 /**
+ * Clear all cache entries and pending requests
+ * Useful when language changes to ensure fresh data with new Accept-Language header
+ */
+export function clearAllCache() {
+  cache.clear();
+  pendingRequests.clear();
+}
+
+/**
  * Get cache statistics (for debugging)
  * @returns {Object} Cache stats
  */

@@ -265,6 +265,7 @@
   "pickup_type": "Pickup",
   "stripe": "Stripe",
   "cash": "Cash",
+  "cash_coming_soon": "Coming soon",
   "place_order": "Place Order",
   "saved_addresses": "Saved Addresses",
   "new_address": "New Address",

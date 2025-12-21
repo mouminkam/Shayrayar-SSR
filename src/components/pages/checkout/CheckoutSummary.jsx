@@ -1,6 +1,6 @@
 "use client";
 import { memo, useMemo } from "react";
-import Image from "next/image";
+import OptimizedImage from "../../ui/OptimizedImage";
 import { motion } from "framer-motion";
 import { ShoppingCart, Package, Tag, Truck } from "lucide-react";
 import useCartStore, { getCartItemKey } from "../../../store/cartStore";
@@ -83,7 +83,7 @@ const CheckoutSummary = memo(() => {
             className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10"
           >
             <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
-              <Image
+              <OptimizedImage
                 src={item.image || IMAGE_PATHS.placeholder}
                 alt={item.name}
                 fill

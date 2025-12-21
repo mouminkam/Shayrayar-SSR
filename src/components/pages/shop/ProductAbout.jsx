@@ -69,7 +69,7 @@ export default function ProductAbout({ product }) {
           {product?.title || t(lang, "product")}
         </h2>
         <div className="price text-theme  text-4xl sm:text-5xl lg:text-6xl font-black">
-          {formatCurrency(customization.finalPrice)}
+          {formatCurrency(product?.price || product?.base_price || 0)}
         </div>
       </div>
 

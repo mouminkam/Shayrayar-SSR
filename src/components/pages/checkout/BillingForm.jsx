@@ -1,5 +1,5 @@
 "use client";
-import { useState, memo, useMemo } from "react";
+import { useState, memo, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -66,6 +66,11 @@ const BillingForm = memo(() => {
   });
 
   const formData = watch();
+
+  // Reset payment method when order type changes
+  useEffect(() => {
+    setValue('paymentMethod', undefined);
+  }, [orderType, setValue]);
 
   // Validate user data exists (from authStore)
   const validateUser = () => {
@@ -365,7 +370,11 @@ const BillingForm = memo(() => {
         <p className="mb-4 text-red-400 text-sm">{errors.address.message}</p>
       )}
 
-      <PlaceOrderButton isProcessing={isProcessing} onClick={handleSubmit(onSubmit)} />
+      <PlaceOrderButton 
+        isProcessing={isProcessing} 
+        onClick={handleSubmit(onSubmit)} 
+        isDisabled={!formData.paymentMethod}
+      />
     </motion.form>
   );
 });

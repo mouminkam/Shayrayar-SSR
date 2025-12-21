@@ -17,8 +17,8 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://shahrayar.peaklink.pro/api/v1';
 const API_DOMAIN = API_BASE_URL.replace('/api/v1', '');
 
-// Timeout for image fetch (30 seconds)
-const FETCH_TIMEOUT = 30000;
+// Timeout for image fetch (reduced to 10 seconds for faster failures)
+const FETCH_TIMEOUT = 10000;
 
 // Cache duration (1 year for immutable images)
 const CACHE_MAX_AGE = 31536000;
@@ -76,11 +76,17 @@ export async function GET(request, { params }) {
     const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
 
     try {
+      // Use Next.js fetch caching for better performance
       const imageResponse = await fetch(fullImageUrl, {
         method: 'GET',
         signal: controller.signal,
         headers: {
           'User-Agent': 'Next.js Image Proxy',
+        },
+        // Add Next.js caching
+        cache: 'force-cache', // Cache the response
+        next: { 
+          revalidate: 31536000, // Revalidate after 1 year
         },
       });
 

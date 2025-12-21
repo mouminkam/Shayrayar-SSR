@@ -26,6 +26,7 @@ export default function PaymentMethodSection({ formData, setFormData }) {
       <PaymentMethodSelector
         paymentMethod={formData.paymentMethod}
         setPaymentMethod={(method) => setFormData((prev) => ({ ...prev, paymentMethod: method }))}
+        orderType={orderType}
       />
 
       {formData.paymentMethod === "stripe" && (

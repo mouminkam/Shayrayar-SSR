@@ -103,7 +103,8 @@ const shouldExcludeBranchId = (url) => {
   const urlPath = url.split('?')[0].replace(/^https?:\/\/[^\/]+/, '');
   
   // Exact matches
-  if (urlPath === '/branches' || urlPath === '/v1/branches') {
+  if (urlPath === '/branches' || urlPath === '/v1/branches' || 
+      urlPath === '/branches/default' || urlPath === '/v1/branches/default') {
     return true;
   }
   

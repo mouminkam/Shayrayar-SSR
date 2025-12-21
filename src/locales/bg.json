@@ -265,6 +265,7 @@
   "pickup_type": "Вземане",
   "stripe": "Stripe",
   "cash": "В брой",
+  "cash_coming_soon": "Скоро",
   "place_order": "Направи поръчка",
   "saved_addresses": "Запазени адреси",
   "new_address": "Нов адрес",

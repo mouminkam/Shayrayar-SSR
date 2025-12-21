@@ -17,17 +17,14 @@
 export function calculateProductPrice(product, selectedSizeId = null, selectedIngredientIds = []) {
   if (!product) return 0;
 
-  let price = 0;
+  let price = product?.base_price || product?.price || 0;
 
-  // If a size is selected, use its price directly (it's the full price for that size)
+  // If a size is selected, add its price to the base price
   if (selectedSizeId && product?.sizes) {
     const selectedSize = product.sizes.find((s) => s.id === selectedSizeId);
     if (selectedSize) {
-      price = parseFloat(selectedSize.price || 0);
+      price += parseFloat(selectedSize.price || 0);
     }
-  } else {
-    // If no size selected, use base_price (fallback for products without sizes)
-    price = product?.base_price || product?.price || 0;
   }
 
   // Add ingredients prices (these are additions, not full prices)
@@ -69,7 +66,7 @@ export function calculateProductPriceWithCustomizations(
   if (selectedSizeId && product.sizes) {
     const selectedSize = product.sizes.find(s => s.id === selectedSizeId);
     if (selectedSize) {
-      price = parseFloat(selectedSize.price || 0);
+      price += parseFloat(selectedSize.price || 0);
     }
   }
 

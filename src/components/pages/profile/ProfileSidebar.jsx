@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, Phone, MapPin, Package, LogOut, Edit, Camera } from "lucide-react";
-import Image from "next/image";
+import OptimizedImage from "../../ui/OptimizedImage";
 import dynamic from "next/dynamic";
 import useAuthStore from "../../../store/authStore";
 import { useRouter } from "next/navigation";
@@ -55,7 +55,7 @@ export default function ProfileSidebar({ user, totalOrders = 0 }) {
             className="w-24 h-24 rounded-full bg-theme3 flex items-center justify-center mx-auto mb-4 shadow-xl overflow-hidden relative"
           >
             {userImageUrl ? (
-              <Image
+              <OptimizedImage
                 src={userImageUrl}
                 alt={user.name || "Profile"}
                 width={96}

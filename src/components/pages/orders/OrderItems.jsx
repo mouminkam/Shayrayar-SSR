@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import Image from "next/image";
+import OptimizedImage from "../../ui/OptimizedImage";
 import { IMAGE_PATHS } from "../../../data/constants";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { useLanguage } from "../../../context/LanguageContext";
@@ -110,7 +110,7 @@ export default function OrderItems({ orderItems, order }) {
             className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10"
           >
             <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0">
-              <Image
+              <OptimizedImage
                 src={imageUrl}
                 alt={itemName}
                 fill

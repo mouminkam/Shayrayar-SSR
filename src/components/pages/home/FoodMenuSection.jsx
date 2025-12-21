@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
+import OptimizedImage from "../../ui/OptimizedImage";
 import Link from "next/link";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
@@ -205,7 +205,7 @@ export default function FoodMenuSection() {
                         className="single-menu-items border-2 border-bgimg flex items-center gap-6 p-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
                       >
                         <div className="menu-item-thumb shrink-0">
-                          <Image
+                          <OptimizedImage
                             src={item.image || IMAGE_PATHS.placeholder}
                             alt={item.title}
                             width={96}

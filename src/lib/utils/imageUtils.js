@@ -8,6 +8,8 @@
  * to avoid naming conflicts with the DOM Image constructor.
  */
 
+import { getProxiedImageUrl } from './imageProxy';
+
 /**
  * Creates a blur placeholder data URL from an image URL
  * This generates a tiny base64 image that can be used as a placeholder
@@ -156,18 +158,14 @@ export async function isImageLoaded(imageUrl) {
 /**
  * Converts a relative image path from API to a full URL
  * Handles both relative paths (e.g., "avatars/...") and full URLs
+ * Automatically uses proxy for API images to solve CORS issues
  * 
  * @param {string} imagePath - Image path from API (can be relative, full URL, or data URL)
- * @returns {string|null} - Full URL for Next.js Image component, or null if no path
+ * @returns {string|null} - Full URL for Next.js Image component (proxied if from API), or null if no path
  */
 export function getFullImageUrl(imagePath) {
   if (!imagePath) {
     return null;
-  }
-
-  // If already a full URL (http:// or https://), return as is
-  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
-    return imagePath;
   }
 
   // If data URL (from FileReader), return as is
@@ -175,17 +173,24 @@ export function getFullImageUrl(imagePath) {
     return imagePath;
   }
 
-  // If starts with /storage/, add base URL
+  // If already a full URL, use proxy if it's from API domain
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    return getProxiedImageUrl(imagePath);
+  }
+
+  // If starts with /storage/, construct full URL then proxy it
   if (imagePath.startsWith("/storage/")) {
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://shahrayar.peaklink.pro/api/v1";
     const storageBaseUrl = API_BASE_URL.replace("/api/v1", "");
-    return `${storageBaseUrl}${imagePath}`;
+    const fullUrl = `${storageBaseUrl}${imagePath}`;
+    return getProxiedImageUrl(fullUrl);
   }
 
-  // If relative path (e.g., "avatars/..."), construct full URL
+  // If relative path (e.g., "avatars/..."), construct full URL then proxy it
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://shahrayar.peaklink.pro/api/v1";
   const storageBaseUrl = API_BASE_URL.replace("/api/v1", "");
   const cleanPath = imagePath.startsWith("/") ? imagePath.slice(1) : imagePath;
-  return `${storageBaseUrl}/storage/${cleanPath}`;
+  const fullUrl = `${storageBaseUrl}/storage/${cleanPath}`;
+  return getProxiedImageUrl(fullUrl);
 }
 

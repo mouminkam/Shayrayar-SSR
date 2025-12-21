@@ -7,7 +7,7 @@ import { t } from "../../../locales/i18n/getTranslation";
 
 /**
  * ProductSizes Component
- * Displays available sizes for a product as radio buttons
+ * Displays available sizes for a product as a selected list (checkboxes style)
  * @param {Object} props
  * @param {Array} props.sizes - Array of size objects
  * @param {number|null} props.selectedSizeId - Currently selected size ID
@@ -25,43 +25,63 @@ const ProductSizes = memo(({ sizes = [], selectedSizeId = null, onSizeChange }) 
       <h4 className="text-white  text-lg font-semibold mb-4">
         {t(lang, "select_size")}
       </h4>
-      <div className="flex flex-wrap gap-3">
+      <div className="space-y-4">
         {sizes.map((size) => {
           const isSelected = selectedSizeId === size.id;
           const sizePrice = parseFloat(size.price || 0);
-          const hasPriceDifference = sizePrice !== 0;
+          const hasPrice = sizePrice !== 0;
 
           return (
-            <button
+            <div
               key={size.id}
-              type="button"
-              onClick={() => onSizeChange(size.id)}
-              className={`
-                relative px-4 py-3 rounded-xl border-2 transition-all duration-300
- text-sm font-semibold
-                ${
-                  isSelected
-                    ? "bg-theme3 border-theme3 text-white shadow-lg shadow-theme3/30"
-                    : "bg-white/10 border-white/20 text-white hover:border-theme3/50 hover:bg-white/15"
-                }
-              `}
-              aria-label={`Select size ${size.name}`}
-              aria-pressed={isSelected}
+              className="mb-3"
             >
-              <div className="flex items-center gap-2">
-                <span>{size.name}</span>
-                {hasPriceDifference && (
-                  <span className={`text-xs ${isSelected ? "text-white/90" : "text-theme3"}`}>
-                    ({sizePrice > 0 ? "+" : ""}{formatCurrency(sizePrice)})
-                  </span>
-                )}
-              </div>
-              {isSelected && (
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-theme rounded-full flex items-center justify-center border-2 border-white">
-                  <Check className="w-3 h-3 text-white" />
+              <button
+                type="button"
+                onClick={() => onSizeChange(size.id)}
+                className={`
+                  w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-300
+                  ${
+                    isSelected
+                      ? "bg-theme3/20 border-theme3 text-white"
+                      : "bg-white/5 border-white/10 text-white hover:border-theme3/50 hover:bg-white/10"
+                  }
+                `}
+                aria-label={`${isSelected ? "Deselect" : "Select"} size ${size.name}`}
+                aria-pressed={isSelected}
+              >
+                <div className="flex items-center gap-3 flex-1">
+                  <div
+                    className={`
+                      w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300
+                      ${
+                        isSelected
+                          ? "bg-theme3 border-theme3"
+                          : "bg-transparent border-white/30"
+                      }
+                    `}
+                  >
+                    {isSelected && (
+                      <div>
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <span className=" text-base font-semibold block">
+                      {size.name}
+                    </span>
+                  </div>
                 </div>
-              )}
-            </button>
+                {hasPrice && (
+                  <div className="ml-4">
+                    <span className="text-theme3  text-sm font-bold">
+                      +{formatCurrency(sizePrice)}
+                    </span>
+                  </div>
+                )}
+              </button>
+            </div>
           );
         })}
       </div>

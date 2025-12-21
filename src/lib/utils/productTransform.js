@@ -2,6 +2,7 @@
  * Utility functions to transform API menu item data to frontend product structure
  */
 import { IMAGE_PATHS } from "../../data/constants";
+import { getProxiedImageUrl } from "./imageProxy";
 
 /**
  * Get localized field value based on language
@@ -75,24 +76,31 @@ export const transformCustomizations = (customizations, lang = 'bg') => {
 };
 
 /**
- * Get full image URL from API response
+ * Get full image URL from API response with proxy support
  * API provides image_url as full URL, fallback to constructing from image path
+ * Automatically uses proxy for API images to solve CORS issues
  */
 const getImageUrl = (menuItem) => {
+  let imageUrl = null;
+  
   // API provides image_url as full URL
   if (menuItem.image_url) {
-    return menuItem.image_url;
+    imageUrl = menuItem.image_url;
   }
-  
   // Fallback: construct URL from relative image path
-  if (menuItem.image) {
+  else if (menuItem.image) {
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://shahrayar.peaklink.pro/api/v1";
     const storageBaseUrl = API_BASE_URL.replace("/api/v1", "");
     const cleanPath = menuItem.image.startsWith("/") ? menuItem.image.slice(1) : menuItem.image;
-    return `${storageBaseUrl}/storage/${cleanPath}`;
+    imageUrl = `${storageBaseUrl}/storage/${cleanPath}`;
+  }
+  // No image available
+  else {
+    return IMAGE_PATHS.placeholder;
   }
   
-  return IMAGE_PATHS.placeholder;
+  // Use proxy for API images
+  return getProxiedImageUrl(imageUrl);
 };
 
 export const transformMenuItemToProduct = (menuItem, optionGroups = [], lang = 'bg', customizations = null) => {

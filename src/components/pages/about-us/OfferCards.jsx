@@ -1,12 +1,13 @@
 "use client";
 import { useMemo } from "react";
-import Image from "next/image";
+import OptimizedImage from "../../ui/OptimizedImage";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
 import { useWebsiteSlides } from "../../../hooks/useWebsiteSlides";
+import { getProxiedImageUrl } from "../../../lib/utils/imageProxy";
 import SectionSkeleton from "../../ui/SectionSkeleton";
 
 export default function OfferCards() {
@@ -50,7 +51,7 @@ export default function OfferCards() {
       title: slide.title || "",
       subtitle: t(lang, "on_this_week"),
       description: slide.description || t(lang, "limited_time_offer"),
-      image: slide.desktop_image || "/img/offer/offerThumb1_1.png",
+      image: getProxiedImageUrl(slide.desktop_image || "/img/offer/offerThumb1_1.png"),
       bgImage: "/img/bg/offerBG1_1.jpg",
       link: slide.menu_item_id ? `/shop/${slide.menu_item_id}` : "/shop",
     }));
@@ -127,7 +128,7 @@ export default function OfferCards() {
               {/* Image */}
               <div className="absolute right-0 bottom-10 z-0">
                 <div className="relative">
-                  <Image
+                  <OptimizedImage
                     key={`${offer.image}-${index}`}
                     src={offer.image || "/img/offer/offerThumb1_1.png"}
                     alt={offer.title || "offer"}

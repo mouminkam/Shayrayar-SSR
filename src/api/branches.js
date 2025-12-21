@@ -54,12 +54,22 @@ export const getChefs = async (branchId) => {
   return response;
 };
 
+/**
+ * Get default branch (main branch)
+ * @returns {Promise<Object>} Response with default branch data
+ */
+export const getDefaultBranch = async () => {
+  const response = await axiosInstance.get('/branches/default');
+  return response;
+};
+
 // Default export with all branch functions
 const branchesAPI = {
   getAllBranches,
   getBranchById,
   getUpsellItems,
   getChefs,
+  getDefaultBranch,
 };
 
 export default branchesAPI;

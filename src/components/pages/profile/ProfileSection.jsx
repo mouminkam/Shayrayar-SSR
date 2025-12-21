@@ -39,13 +39,13 @@ export default function ProfileSection() {
   // Transform API order item to match OrderCard expected format
   // order_items structure: { id, item_name, item_price, quantity, menu_item: { image_url, ... } }
   const transformOrderItem = (item) => {
-    // Use menu_item.image_url directly from API response
+    // Images will be proxied automatically by OptimizedImage component
     const imageUrl = item.menu_item?.image_url || IMAGE_PATHS.placeholder;
     
     return {
       id: String(item.id || ''),
       name: item.item_name || item.menu_item?.name || 'Unknown Item',
-      image: imageUrl,
+      image: imageUrl, // Will be proxied by OptimizedImage
       price: parseFloat(item.item_price || 0),
       quantity: item.quantity || 1,
     };

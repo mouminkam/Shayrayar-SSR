@@ -30,6 +30,7 @@ export default function OrdersSection() {
 
   // Transform API order item to match OrderCard expected format
   const transformOrderItem = (item) => {
+    // Images will be proxied automatically by OptimizedImage component
     const imageUrl = item.menu_item?.image_url || 
                     item.menu_item?.image || 
                     item.image || 
@@ -38,7 +39,7 @@ export default function OrdersSection() {
     return {
       id: item.id || item.order_item_id || String(item.id || ''),
       name: item.item_name || item.menu_item?.name || item.name || 'Unknown Item',
-      image: imageUrl,
+      image: imageUrl, // Will be proxied by OptimizedImage
       price: parseFloat(item.item_price || item.price || item.menu_item?.price || 0),
       quantity: item.quantity || item.qty || 1,
     };

@@ -44,7 +44,7 @@ export function useProductCustomization(product, onCustomizationChange) {
     if (selectedSizeId && product.sizes) {
       const selectedSize = product.sizes.find(s => s.id === selectedSizeId);
       if (selectedSize) {
-        price = parseFloat(selectedSize.price || 0);
+        price += parseFloat(selectedSize.price || 0);
       }
     }
 

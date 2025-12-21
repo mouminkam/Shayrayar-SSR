@@ -45,6 +45,8 @@ export const createStripePaymentIntent = async (orderId, amount, currency = 'BGN
 
 /**
  * Open Stripe Payment Popup Window
+ * @deprecated This function is not currently used. The current implementation uses router.push() for redirect instead of popup.
+ * The code in BillingForm.jsx uses createStripePaymentIntent() directly and then redirects to the payment page.
  * @param {number} orderId - Order ID
  * @param {string} clientSecret - Stripe payment intent client secret
  * @returns {Window|null} Popup window object or null if blocked
@@ -83,6 +85,9 @@ export const openStripePaymentPopup = (orderId, clientSecret) => {
  * Main function to process Stripe payment
  * Creates payment intent and opens popup
  * Payment result is handled via redirect URLs (success/failed pages)
+ * @deprecated This function is not currently used. The current implementation uses createStripePaymentIntent() directly
+ * and then router.push() to redirect to the payment page instead of using a popup window.
+ * The code in BillingForm.jsx handles payment flow with redirects.
  * @param {number} orderId - Order ID
  * @param {number} amount - Payment amount (decimal)
  * @returns {Promise<Object>} { success: boolean, popup?: Window, error?: string }

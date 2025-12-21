@@ -8,6 +8,7 @@ import api from "../../../api";
 import OptimizedImage from "../../ui/OptimizedImage";
 import ProductCardSkeleton from "../../ui/ProductCardSkeleton";
 import { useInView } from "react-intersection-observer";
+import { getProxiedImageUrl } from "../../../lib/utils/imageProxy";
 
 export default function ChefeSection() {
   const { lang } = useLanguage();
@@ -15,18 +16,30 @@ export default function ChefeSection() {
   const [chefs, setChefs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Get base URL for images
+  // Get image URL with proxy support
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return "/img/chefe/chefeThumb1_1.png";
-    if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+    
+    // If it's a local path, return as is
+    if (imageUrl.startsWith("/") && !imageUrl.startsWith("/storage")) {
       return imageUrl;
     }
+    
+    // For API images, construct full URL then proxy it
     if (imageUrl.startsWith("/storage")) {
       const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://shahrayar.peaklink.pro/api/v1";
       const cleanBaseURL = baseURL.replace(/\/api\/v1$/, "");
-      return `${cleanBaseURL}${imageUrl}`;
+      const fullUrl = `${cleanBaseURL}${imageUrl}`;
+      return getProxiedImageUrl(fullUrl);
     }
-    return imageUrl;
+    
+    // For full URLs, use proxy
+    if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+      return getProxiedImageUrl(imageUrl);
+    }
+    
+    // Fallback: try to proxy it anyway
+    return getProxiedImageUrl(imageUrl);
   };
 
   // Initialize branch if not loaded

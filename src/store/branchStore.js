@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import api from "../api";
 import { generateCacheKey, getCachedData, setCachedData, getPendingRequest, setPendingRequest, CACHE_DURATION } from "../lib/utils/apiCache";
+import useAuthStore from "./authStore";
 
 const useBranchStore = create(
   persist(
@@ -27,13 +28,6 @@ const useBranchStore = create(
             : cached.data?.branches || [];
           
           set({ branches, isLoading: false });
-
-          // If no branch is selected, set the first one as default
-          if (!get().selectedBranch && branches.length > 0) {
-            const testBranch = branches.find(b => b.id === 1 || b.branch_id === 1);
-            const mainBranch = branches.find(b => b.is_main === true) || branches[0];
-            set({ selectedBranch: testBranch || mainBranch });
-          }
 
           return { success: true, branches };
         }
@@ -76,15 +70,6 @@ const useBranchStore = create(
               : response.data.branches || [];
             
             set({ branches, isLoading: false });
-
-            // If no branch is selected, set the first one as default
-            if (!get().selectedBranch && branches.length > 0) {
-              // TEMPORARY: For testing, prefer branch ID = 1 (Shahrayar Premium)
-              // Try to find branch with ID = 1, then main branch (is_main: true), or use first branch
-              const testBranch = branches.find(b => b.id === 1 || b.branch_id === 1);
-              const mainBranch = branches.find(b => b.is_main === true) || branches[0];
-              set({ selectedBranch: testBranch || mainBranch });
-            }
 
             return { success: true, branches };
           } else {
@@ -218,13 +203,79 @@ const useBranchStore = create(
         };
       },
 
+      // Set branch from user profile (called when user logs in or profile is fetched)
+      setBranchFromUserProfile: async (branchId) => {
+        if (!branchId) return { success: false, error: "Branch ID is required" };
+
+        try {
+          // First, try to find branch in existing branches list
+          const branches = get().branches;
+          const existingBranch = branches.find(
+            (b) => b.id === branchId || b.branch_id === branchId
+          );
+
+          if (existingBranch) {
+            // Branch found in list, use it
+            set({ selectedBranch: existingBranch });
+            // Fetch details for this branch
+            await get().fetchBranchDetails(branchId);
+            return { success: true, branch: existingBranch };
+          } else {
+            // Branch not in list, fetch it directly
+            const response = await get().fetchBranchDetails(branchId);
+            if (response.success && response.data) {
+              const branch = response.data;
+              set({ selectedBranch: branch });
+              return { success: true, branch };
+            } else {
+              return { success: false, error: "Failed to fetch branch details" };
+            }
+          }
+        } catch (error) {
+          return {
+            success: false,
+            error: error.message || "An error occurred while setting branch from user profile",
+          };
+        }
+      },
+
+      // Sync branch with user profile (check if user is authenticated and update branch)
+      syncWithUserProfile: async () => {
+        const authStore = useAuthStore.getState();
+        
+        if (!authStore.isAuthenticated || !authStore.user) {
+          return { success: false, error: "User is not authenticated" };
+        }
+
+        const userBranchId = authStore.user.branch_id;
+        if (!userBranchId) {
+          return { success: false, error: "User does not have a branch_id" };
+        }
+
+        // Check if current selected branch matches user's branch
+        const currentBranchId = get().getSelectedBranchId();
+        if (currentBranchId === userBranchId) {
+          return { success: true, message: "Branch already matches user profile" };
+        }
+
+        // Update branch to match user profile
+        return await get().setBranchFromUserProfile(userBranchId);
+      },
+
       // Initialize: fetch branches if not loaded
       // Optimized to avoid blocking initial render - if branch is already selected from localStorage, return early
       initialize: async () => {
         const { branches, selectedBranch } = get();
         
-        // If branch is already selected (from localStorage), no need to wait
+        // If branch is already selected (from localStorage), fetch details if needed
         if (selectedBranch) {
+          const branchId = selectedBranch.id || selectedBranch.branch_id;
+          const currentDetails = get().branchDetails;
+          const currentBranchId = currentDetails?.id || currentDetails?.branch_id;
+          
+          if (branchId && currentBranchId !== branchId) {
+            get().fetchBranchDetails(branchId);
+          }
           return; // Already initialized
         }
         
@@ -233,28 +284,49 @@ const useBranchStore = create(
           await get().fetchBranches();
         }
         
-        // Ensure a branch is selected
-        if (!get().selectedBranch && get().branches.length > 0) {
-          // TEMPORARY: For testing, prefer branch ID = 1 (Shahrayar Premium)
-          // Try to find branch with ID = 1, then main branch (is_main: true), or use first branch
-          const testBranch = get().branches.find(b => b.id === 1 || b.branch_id === 1);
-          const mainBranch = get().branches.find(b => b.is_main === true) || get().branches[0];
-          const selected = testBranch || mainBranch;
-          set({ selectedBranch: selected });
-          
-          // Auto-fetch details for selected branch
-          const branchId = selected?.id || selected?.branch_id;
-          if (branchId) {
-            get().fetchBranchDetails(branchId);
-          }
-        } else if (get().selectedBranch) {
-          // If branch is already selected, fetch details if not already loaded
-          const branchId = get().selectedBranch.id || get().selectedBranch.branch_id;
-          const currentDetails = get().branchDetails;
-          const currentBranchId = currentDetails?.id || currentDetails?.branch_id;
-          
-          if (branchId && currentBranchId !== branchId) {
-            get().fetchBranchDetails(branchId);
+        // Check if user is authenticated
+        const authStore = useAuthStore.getState();
+        
+        if (authStore.isAuthenticated && authStore.user?.branch_id) {
+          // User is authenticated - use branch_id from user profile
+          const userBranchId = authStore.user.branch_id;
+          await get().setBranchFromUserProfile(userBranchId);
+        } else {
+          // User is not authenticated - use default branch
+          try {
+            const response = await api.branches.getDefaultBranch();
+            if (response.success && response.data?.branch) {
+              const defaultBranch = response.data.branch;
+              set({ selectedBranch: defaultBranch });
+              // Fetch full details for default branch
+              const branchId = defaultBranch.id || defaultBranch.branch_id;
+              if (branchId) {
+                await get().fetchBranchDetails(branchId);
+              }
+            } else {
+              // Fallback: use first branch or main branch if default branch API fails
+              const branches = get().branches;
+              if (branches.length > 0) {
+                const mainBranch = branches.find(b => b.is_main === true) || branches[0];
+                set({ selectedBranch: mainBranch });
+                const branchId = mainBranch.id || mainBranch.branch_id;
+                if (branchId) {
+                  await get().fetchBranchDetails(branchId);
+                }
+              }
+            }
+          } catch (error) {
+            console.warn("Failed to fetch default branch, using fallback:", error);
+            // Fallback: use first branch or main branch
+            const branches = get().branches;
+            if (branches.length > 0) {
+              const mainBranch = branches.find(b => b.is_main === true) || branches[0];
+              set({ selectedBranch: mainBranch });
+              const branchId = mainBranch.id || mainBranch.branch_id;
+              if (branchId) {
+                await get().fetchBranchDetails(branchId);
+              }
+            }
           }
         }
       },

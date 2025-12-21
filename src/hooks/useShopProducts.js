@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import api from "../api";
 import useBranchStore from "../store/branchStore";
@@ -9,6 +9,7 @@ import useToastStore from "../store/toastStore";
 import { ITEMS_PER_PAGE_GRID, ITEMS_PER_PAGE_LIST } from "../data/constants";
 import { useApiCache } from "./useApiCache";
 import { useLanguage } from "../context/LanguageContext";
+import { debounce } from "../lib/utils/debounce";
 
 /**
  * Hook to manage shop products fetching, pagination, and filtering
@@ -48,14 +49,18 @@ export function useShopProducts(viewMode = "grid") {
   // Debounced search query state
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
 
-  // Debounce search query updates
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 300);
+  // Create debounced function using debounce utility
+  const debouncedSetSearchQuery = useMemo(
+    () => debounce((value) => {
+      setDebouncedSearchQuery(value);
+    }, 300),
+    []
+  );
 
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+  // Update debounced search query when searchQuery changes
+  useEffect(() => {
+    debouncedSetSearchQuery(searchQuery);
+  }, [searchQuery, debouncedSetSearchQuery]);
 
   // Fetch products with caching
   const fetchProducts = useCallback(async () => {

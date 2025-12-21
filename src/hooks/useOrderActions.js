@@ -149,6 +149,20 @@ export function useOrderActions(order, orderId, refetchOrder) {
   };
 
   /**
+   * Helper function to check if item has any customizations
+   * @param {Object} item - Item from reorder API response
+   * @returns {boolean} True if item has any customizations
+   */
+  const hasCustomizations = (item) => {
+    return (
+      (item.selected_drinks && Array.isArray(item.selected_drinks) && item.selected_drinks.length > 0) ||
+      (item.selected_toppings && Array.isArray(item.selected_toppings) && item.selected_toppings.length > 0) ||
+      (item.selected_sauces && Array.isArray(item.selected_sauces) && item.selected_sauces.length > 0) ||
+      (item.selected_allergens && Array.isArray(item.selected_allergens) && item.selected_allergens.length > 0)
+    );
+  };
+
+  /**
    * Handle reorder action
    * Only allowed for delivered/completed orders
    */
@@ -270,7 +284,7 @@ export function useOrderActions(order, orderId, refetchOrder) {
 
           // Handle selected_customizations (use from item or fallback)
           let selectedCustomizations = null;
-          if (item.selected_drinks || item.selected_toppings || item.selected_sauces || item.selected_allergens) {
+          if (hasCustomizations(item)) {
             selectedCustomizations = {
               allergens: Array.isArray(item.selected_allergens) 
                 ? item.selected_allergens 

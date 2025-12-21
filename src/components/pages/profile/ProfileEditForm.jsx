@@ -6,7 +6,7 @@ import useAuthStore from "../../../store/authStore";
 import useToastStore from "../../../store/toastStore";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
-import Image from "next/image";
+import OptimizedImage from "../../ui/OptimizedImage";
 import { getFullImageUrl } from "../../../lib/utils/imageUtils";
 
 export default function ProfileEditForm({ onClose }) {
@@ -176,7 +176,7 @@ export default function ProfileEditForm({ onClose }) {
               className="w-32 h-32 rounded-full bg-theme3 flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity shadow-xl relative overflow-hidden group"
             >
               {imagePreview ? (
-                <Image
+                <OptimizedImage
                   src={imagePreview}
                   alt="Profile"
                   width={128}

@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import api from "../api";
 import useCartStore from "./cartStore";
+import useBranchStore from "./branchStore";
 
 
 // User structure
@@ -39,6 +40,16 @@ const useAuthStore = create(
               isAuthenticated: true,
               isLoading: false,
             });
+
+            // Update branch store if user has branch_id
+            if (userDataWithToken.branch_id) {
+              try {
+                await useBranchStore.getState().setBranchFromUserProfile(userDataWithToken.branch_id);
+              } catch (branchError) {
+                console.warn("Failed to update branch from user profile after login:", branchError);
+                // Don't fail the login if branch update fails
+              }
+            }
 
             return { success: true, user: userDataWithToken };
           } else {
@@ -91,6 +102,16 @@ const useAuthStore = create(
               isAuthenticated: true,
               isLoading: false,
             });
+
+            // Update branch store if user has branch_id
+            if (userDataWithToken.branch_id) {
+              try {
+                await useBranchStore.getState().setBranchFromUserProfile(userDataWithToken.branch_id);
+              } catch (branchError) {
+                console.warn("Failed to update branch from user profile after registration:", branchError);
+                // Don't fail the registration if branch update fails
+              }
+            }
 
             return { success: true, user: userDataWithToken };
           } else {
@@ -317,6 +338,16 @@ const useAuthStore = create(
               isLoading: false,
             });
 
+            // Update branch store if user has branch_id
+            if (updatedUser.branch_id) {
+              try {
+                await useBranchStore.getState().setBranchFromUserProfile(updatedUser.branch_id);
+              } catch (branchError) {
+                console.warn("Failed to update branch from user profile:", branchError);
+                // Don't fail the profile fetch if branch update fails
+              }
+            }
+
             return { success: true, user: updatedUser };
           } else {
             set({ isLoading: false });
@@ -518,6 +549,16 @@ const useAuthStore = create(
               isLoading: false,
             });
 
+            // Update branch store if user has branch_id
+            if (userDataWithToken.branch_id) {
+              try {
+                await useBranchStore.getState().setBranchFromUserProfile(userDataWithToken.branch_id);
+              } catch (branchError) {
+                console.warn("Failed to update branch from user profile after completing registration:", branchError);
+                // Don't fail the registration if branch update fails
+              }
+            }
+
             // Clean up session storage
             if (typeof window !== "undefined") {
               sessionStorage.removeItem("registrationToken");
@@ -681,6 +722,16 @@ const useAuthStore = create(
               isAuthenticated: true,
               isLoading: false,
             });
+
+            // Update branch store if user has branch_id
+            if (userData.branch_id) {
+              try {
+                await useBranchStore.getState().setBranchFromUserProfile(userData.branch_id);
+              } catch (branchError) {
+                console.warn("Failed to update branch from user profile after Google login:", branchError);
+                // Don't fail the login if branch update fails
+              }
+            }
 
             return { success: true, user: userData };
           } else {

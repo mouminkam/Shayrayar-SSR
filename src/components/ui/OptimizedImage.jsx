@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import NextImage from "next/image";
 import { getBlurPlaceholder } from "../../lib/utils/imageUtils";
+import { getProxiedImageUrl } from "../../lib/utils/imageProxy";
 import { IMAGE_PATHS } from "../../data/constants";
 
 /**
@@ -148,7 +149,12 @@ export default function OptimizedImage({
     );
   }
 
-  const imageSrc = src;
+  // Use proxy for API images automatically
+  const imageSrc = useMemo(() => {
+    if (!src) return src;
+    return getProxiedImageUrl(src);
+  }, [src]);
+  
   const isFill = rest.fill === true;
 
   // If using fill prop, the parent container should handle positioning

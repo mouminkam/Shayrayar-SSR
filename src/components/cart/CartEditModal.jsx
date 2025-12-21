@@ -138,17 +138,14 @@ export default function CartEditModal({ isOpen, onClose, cartItem, onSave }) {
   const finalPrice = useMemo(() => {
     if (!product) return cartItem?.final_price || cartItem?.price || 0;
 
-    let price = 0;
+    let price = product.base_price || product.price || 0;
 
-    // Legacy: If a size is selected, use its price directly
+    // Legacy: If a size is selected, add its price to the base price
     if (selectedSizeId && product.sizes && !product.has_option_groups) {
       const selectedSize = product.sizes.find((s) => s.id === selectedSizeId);
       if (selectedSize) {
-        price = parseFloat(selectedSize.price || 0);
+        price += parseFloat(selectedSize.price || 0);
       }
-    } else {
-      // If no size selected or using option groups, use base_price
-      price = product.base_price || product.price || 0;
     }
 
     // Legacy: Add ingredients prices

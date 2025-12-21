@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
+import OptimizedImage from "../../ui/OptimizedImage";
 import { X } from "lucide-react";
 import { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -173,7 +173,7 @@ export default function CartDropdown({
                       <div className="flex items-center space-x-3 flex-1 min-w-0">
                         <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center shrink-0 overflow-hidden">
                           {item.image ? (
-                            <Image
+                            <OptimizedImage
                               src={item.image || IMAGE_PATHS.placeholder}
                               alt={item.name}
                               width={48}
