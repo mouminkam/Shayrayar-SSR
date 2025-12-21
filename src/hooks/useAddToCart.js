@@ -1,6 +1,5 @@
 "use client";
 import { useCallback } from "react";
-import { useRouter } from "next/navigation";
 import useCartStore from "../store/cartStore";
 import useToastStore from "../store/toastStore";
 import useAuthStore from "../store/authStore";
@@ -13,7 +12,6 @@ import { t } from "../locales/i18n/getTranslation";
  * @returns {Function} handleAddToCart function
  */
 export function useAddToCart() {
-  const router = useRouter();
   const { addToCart } = useCartStore();
   const { success: toastSuccess, error: toastError } = useToastStore();
   const { isAuthenticated } = useAuthStore();
@@ -21,13 +19,6 @@ export function useAddToCart() {
 
   const handleAddToCart = useCallback(
     (product, customization = {}, quantity = 1) => {
-      // Check authentication
-      if (!isAuthenticated) {
-        toastError(t(lang, "please_login_add_cart"));
-        router.push("/login");
-        return;
-      }
-
       // Validate product (use isValid from customization if available, otherwise validate)
       const isValid = customization.isValid !== undefined 
         ? customization.isValid 
@@ -59,11 +50,19 @@ export function useAddToCart() {
         toastSuccess(
           `${quantity} x ${product.title}${customizationText} ${t(lang, "added_to_cart")}`
         );
+
+        // Show reminder to login if not authenticated
+        if (!isAuthenticated) {
+          // Use a small delay to show the login reminder after the success message
+          setTimeout(() => {
+            toastError(t(lang, "please_login_before_checkout") || "Please login before checkout");
+          }, 500);
+        }
       } catch (error) {
         toastError(t(lang, "failed_add_cart"));
       }
     },
-    [addToCart, toastSuccess, toastError, isAuthenticated, router, lang]
+    [addToCart, toastSuccess, toastError, isAuthenticated, lang]
   );
 
   return handleAddToCart;

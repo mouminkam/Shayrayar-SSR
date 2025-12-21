@@ -5,6 +5,7 @@ import useBranchStore from "../store/branchStore";
 import { useApiCache } from "./useApiCache";
 import { generateCacheKey, getCachedData, setCachedData, getPendingRequest, setPendingRequest, CACHE_DURATION } from "../lib/utils/apiCache";
 import { proxyObjectImages } from "../lib/utils/imageProxy";
+import { useLanguage } from "../context/LanguageContext";
 
 /**
  * Prefetch website slides using Fetch API with high priority
@@ -29,21 +30,7 @@ export async function prefetchWebsiteSlides(branchId, params = {}) {
     });
     
     const fullUrl = `${url}?${queryParams.toString()}`;
-    const cacheKey = generateCacheKey('/website-slides', params, branchId);
-    const ttl = CACHE_DURATION.WEBSITE_SLIDES || CACHE_DURATION.PRODUCTS;
-
-    // Check cache first
-    const cached = getCachedData(cacheKey);
-    if (cached !== null) {
-      return cached;
-    }
-
-    // Check for pending request
-    const pending = getPendingRequest(cacheKey);
-    if (pending) {
-      return pending;
-    }
-
+    
     // Get token and language for headers
     const getToken = () => {
       try {
@@ -68,6 +55,20 @@ export async function prefetchWebsiteSlides(branchId, params = {}) {
 
     const token = getToken();
     const language = getLanguage();
+    const cacheKey = generateCacheKey('/website-slides', params, branchId, language);
+    const ttl = CACHE_DURATION.WEBSITE_SLIDES || CACHE_DURATION.PRODUCTS;
+
+    // Check cache first
+    const cached = getCachedData(cacheKey);
+    if (cached !== null) {
+      return cached;
+    }
+
+    // Check for pending request
+    const pending = getPendingRequest(cacheKey);
+    if (pending) {
+      return pending;
+    }
 
     // Use Fetch API with high priority
     const abortController = new AbortController();
@@ -124,6 +125,7 @@ export async function prefetchWebsiteSlides(branchId, params = {}) {
 export function useWebsiteSlides(params = {}) {
   const { selectedBranch } = useBranchStore();
   const { getCachedOrFetch } = useApiCache("WEBSITE_SLIDES");
+  const { lang } = useLanguage();
   const [slides, setSlides] = useState([]);
   // Don't start with loading=true - wait for branch first
   const [isLoading, setIsLoading] = useState(false);
@@ -153,7 +155,7 @@ export function useWebsiteSlides(params = {}) {
     try {
       // Use paramsRef.current to avoid stale closure
       // Try to use fetch API with priority for better performance
-      const cacheKey = generateCacheKey('/website-slides', paramsRef.current, branchId);
+      const cacheKey = generateCacheKey('/website-slides', paramsRef.current, branchId, lang);
       const cached = getCachedData(cacheKey);
       
       if (cached !== null) {
@@ -287,7 +289,7 @@ export function useWebsiteSlides(params = {}) {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedBranch?.id, selectedBranch?.branch_id, paramsString]);
+  }, [selectedBranch?.id, selectedBranch?.branch_id, paramsString, lang]);
 
   useEffect(() => {
     fetchWebsiteSlides();

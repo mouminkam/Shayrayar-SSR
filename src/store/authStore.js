@@ -375,12 +375,12 @@ const useAuthStore = create(
           if (response.success) {
             return { 
               success: true, 
-              message: response.message || "OTP sent to your email" 
+              message: response.message || "Password reset link has been sent to your email" 
             };
           } else {
             return { 
               success: false, 
-              error: response.message || "Failed to send OTP" 
+              error: response.message || "Failed to send reset link" 
             };
           }
         } catch (error) {
@@ -395,36 +395,6 @@ const useAuthStore = create(
         }
       },
 
-      verifyOTP: async (email, otp) => {
-        // Note: The API doesn't have a separate verifyOTP endpoint
-        // We use the OTP as the token in reset-password endpoint
-        // Save OTP to sessionStorage for use in reset password step
-        set({ isLoading: true });
-        try {
-          if (!email || !otp) {
-            set({ isLoading: false });
-            return { success: false, error: "Email and OTP are required" };
-          }
-
-          // Validate OTP format (should be 4 digits)
-          if (otp.length !== 4 || !/^\d{4}$/.test(otp)) {
-            set({ isLoading: false });
-            return { success: false, error: "OTP must be 4 digits" };
-          }
-
-          // Save OTP as token in sessionStorage for reset password step
-          if (typeof window !== "undefined") {
-            sessionStorage.setItem("resetToken", otp);
-            sessionStorage.setItem("resetEmail", email);
-          }
-
-          set({ isLoading: false });
-          return { success: true, token: otp };
-        } catch (error) {
-          set({ isLoading: false });
-          return { success: false, error: error.message || "Failed to verify OTP" };
-        }
-      },
 
       resetPassword: async (resetData) => {
         set({ isLoading: true });

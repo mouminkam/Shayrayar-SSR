@@ -10,6 +10,7 @@ import {
   CACHE_DURATION,
 } from "../lib/utils/apiCache";
 import useBranchStore from "../store/branchStore";
+import { useLanguage } from "../context/LanguageContext";
 
 /**
  * Hook to use API caching with automatic branch invalidation
@@ -18,6 +19,7 @@ import useBranchStore from "../store/branchStore";
  */
 export function useApiCache(cacheType = "PRODUCTS") {
   const { selectedBranch } = useBranchStore();
+  const { lang } = useLanguage();
   const branchId = selectedBranch?.id || selectedBranch?.branch_id || null;
   const previousBranchIdRef = useRef(branchId);
 
@@ -45,7 +47,7 @@ export function useApiCache(cacheType = "PRODUCTS") {
    */
   const getCachedOrFetch = useCallback(
     async (url, params = {}, fetchFn, customTTL = null) => {
-      const cacheKey = generateCacheKey(url, params, branchId);
+      const cacheKey = generateCacheKey(url, params, branchId, lang);
       const ttl = customTTL || getTTL();
 
       // Check cache first
@@ -74,7 +76,7 @@ export function useApiCache(cacheType = "PRODUCTS") {
       setPendingRequest(cacheKey, fetchPromise);
       return fetchPromise;
     },
-    [branchId, getTTL]
+    [branchId, lang, getTTL]
   );
 
   /**
@@ -84,13 +86,13 @@ export function useApiCache(cacheType = "PRODUCTS") {
    */
   const invalidateCache = useCallback(
     (url, params = {}) => {
-      const cacheKey = generateCacheKey(url, params, branchId);
+      const cacheKey = generateCacheKey(url, params, branchId, lang);
       const cached = getCachedData(cacheKey);
       if (cached !== null) {
         setCachedData(cacheKey, null, 0); // Expire immediately
       }
     },
-    [branchId]
+    [branchId, lang]
   );
 
   /**

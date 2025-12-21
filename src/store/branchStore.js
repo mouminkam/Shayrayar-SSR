@@ -17,8 +17,19 @@ const useBranchStore = create(
 
       // Actions
       fetchBranches: async () => {
+        // Get language from localStorage
+        const getLanguage = () => {
+          if (typeof window === 'undefined') return 'bg';
+          try {
+            return localStorage.getItem('language') || 'bg';
+          } catch {
+            return 'bg';
+          }
+        };
+        
         // Check cache first
-        const cacheKey = generateCacheKey("/branches", {}, null);
+        const language = getLanguage();
+        const cacheKey = generateCacheKey("/branches", {}, null, language);
         const ttl = CACHE_DURATION.BRANCHES || 10 * 60 * 1000; // 10 minutes default
         
         const cached = getCachedData(cacheKey);
@@ -114,8 +125,19 @@ const useBranchStore = create(
           return { success: true, data: currentDetails };
         }
 
+        // Get language from localStorage
+        const getLanguage = () => {
+          if (typeof window === 'undefined') return 'bg';
+          try {
+            return localStorage.getItem('language') || 'bg';
+          } catch {
+            return 'bg';
+          }
+        };
+        
         // Check cache first
-        const cacheKey = generateCacheKey(`/branches/${branchId}`, {}, branchId);
+        const language = getLanguage();
+        const cacheKey = generateCacheKey(`/branches/${branchId}`, {}, branchId, language);
         const ttl = CACHE_DURATION.BRANCHES || 10 * 60 * 1000; // 10 minutes default
         
         const cached = getCachedData(cacheKey);

@@ -9,6 +9,7 @@ import useToastStore from "../../../store/toastStore";
 import useBranchStore from "../../../store/branchStore";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import LegalModal from "../../ui/LegalModal";
 
 export default function ContactForm() {
   const { success: toastSuccess, error: toastError } = useToastStore();
@@ -21,6 +22,8 @@ export default function ContactForm() {
   } = useBranchStore();
   const { lang } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   const {
     register,
@@ -117,6 +120,16 @@ ${t(lang, "email_footer")}`;
       toastError(t(lang, "failed_open_email_client"));
       setIsSubmitting(false);
     }
+  };
+
+  const handleTermsClick = (e) => {
+    e.preventDefault();
+    setIsTermsOpen(true);
+  };
+
+  const handlePrivacyClick = (e) => {
+    e.preventDefault();
+    setIsPrivacyOpen(true);
   };
 
   return (
@@ -242,7 +255,22 @@ ${t(lang, "email_footer")}`;
                       htmlFor="reviewcheck"
                       className="text-text  text-sm sm:text-base leading-relaxed cursor-pointer"
                     >
-                      {t(lang, "terms_agreement_text")}
+                      {t(lang, "agree_to_terms")}{" "}
+                      <button
+                        type="button"
+                        onClick={handleTermsClick}
+                        className="text-theme3 hover:text-theme underline font-medium"
+                      >
+                        {t(lang, "terms_and_conditions_link")}
+                      </button>{" "}
+                      {t(lang, "and_privacy_policy_link")}{" "}
+                      <button
+                        type="button"
+                        onClick={handlePrivacyClick}
+                        className="text-theme3 hover:text-theme underline font-medium"
+                      >
+                        {t(lang, "privacy_policy_link")}
+                      </button>
                       <span className="checkmark"></span>
                     </label>
                   </div>
@@ -276,6 +304,18 @@ ${t(lang, "email_footer")}`;
           </div>
         </div>
       </div>
+
+      {/* Legal Modals */}
+      <LegalModal
+        isOpen={isTermsOpen}
+        onClose={() => setIsTermsOpen(false)}
+        type="terms-conditions"
+      />
+      <LegalModal
+        isOpen={isPrivacyOpen}
+        onClose={() => setIsPrivacyOpen(false)}
+        type="privacy-policy"
+      />
     </section>
   );
 }

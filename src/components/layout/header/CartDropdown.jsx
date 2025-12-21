@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import OptimizedImage from "../../ui/OptimizedImage";
 import { X } from "lucide-react";
 import { useRef } from "react";
@@ -11,6 +12,8 @@ import { getCartItemKey } from "../../../store/cartStore";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
 import { hasAnyCustomization, getCustomizationDisplayText } from "../../../lib/utils/cartHelpers";
+import useAuthStore from "../../../store/authStore";
+import useToastStore from "../../../store/toastStore";
 
 export default function CartDropdown({
   cartOpen,
@@ -19,6 +22,9 @@ export default function CartDropdown({
   const cartTimeoutRef = useRef(null);
   const { items: cartItems, subtotal, removeFromCart } = useCart();
   const { lang } = useLanguage();
+  const { isAuthenticated } = useAuthStore();
+  const { error: toastError } = useToastStore();
+  const router = useRouter();
 
   const handleMouseEnter = () => {
     if (cartTimeoutRef.current) {
@@ -100,6 +106,18 @@ export default function CartDropdown({
         duration: 0.2,
       }
     },
+  };
+
+  const handleCheckoutClick = (e) => {
+    e.preventDefault();
+    setCartOpen(false);
+    
+    if (!isAuthenticated) {
+      toastError(t(lang, "please_login_before_checkout") || "Please login before checkout");
+      router.push("/login");
+    } else {
+      router.push("/checkout");
+    }
   };
 
   return (
@@ -237,13 +255,12 @@ export default function CartDropdown({
                   className="space-y-2"
                 >
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Link
-                      href="/checkout"
+                    <button
+                      onClick={handleCheckoutClick}
                       className="w-full bg-theme3 hover:bg-theme text-white py-3 px-4 transition-colors duration-300 text-sm font-medium block text-center rounded-md shadow-lg"
-                      onClick={() => setCartOpen(false)}
                     >
                       {t(lang, "checkout")}
-                    </Link>
+                    </button>
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Link

@@ -63,6 +63,7 @@
   "quantity": "Количество",
   "share_with_friends": "Сподели с приятели",
   "please_login_add_cart": "Моля, влезте в профила си, за да добавите продукти в количката",
+  "please_login_before_checkout": "Моля, влезте в профила си преди плащане",
   "please_select_size": "Моля, изберете размер",
   "failed_add_cart": "Неуспешно добавяне на продукт в количката",
   "failed_to_load_product": "Неуспешно зареждане на продукт",
@@ -337,6 +338,17 @@
   "special_instructions": "Специални инструкции",
   "unavailable": "Недостъпно",
   "required": "Задължително",
-  "optional": "По избор"
+  "optional": "По избор",
+  "terms_conditions": "Условия и правила",
+  "privacy_policy": "Политика за поверителност",
+  "last_updated": "Последна актуализация",
+  "loading_legal_content": "Зареждане на съдържание...",
+  "error_loading_content": "Неуспешно зареждане на съдържание. Моля, опитайте отново.",
+  "terms_conditions_description": "Прочетете нашите Условия и правила, за да разберете правилата и разпоредбите за използване на нашите услуги.",
+  "privacy_policy_description": "Прочетете нашата Политика за поверителност, за да разберете как събираме, използваме и защитаваме вашата лична информация.",
+  "agree_to_terms": "Съгласен съм с",
+  "terms_and_conditions_link": "Условия и правила",
+  "and_privacy_policy_link": "и",
+  "privacy_policy_link": "Политика за поверителност"
 }
 

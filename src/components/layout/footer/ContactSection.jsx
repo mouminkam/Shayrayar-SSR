@@ -1,11 +1,12 @@
 "use client";
-import { useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import useBranchStore from "../../../store/branchStore";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import LegalModal from "../../ui/LegalModal";
 
 // Helper function to format working hours from object to string
 const formatWorkingHours = (hours) => {
@@ -34,6 +35,8 @@ const formatWorkingHours = (hours) => {
 export default function ContactSection() {
   const { selectedBranch, initialize, branchDetails, getBranchWorkingHours, fetchBranchDetails } = useBranchStore();
   const { lang } = useLanguage();
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   
   // Intersection Observer - trigger fetch when footer is visible
   const { ref, inView } = useInView({
@@ -100,6 +103,17 @@ export default function ContactSection() {
             },
     };
   }, [getBranchWorkingHours, branchDetails]);
+
+  const handleTermsClick = (e) => {
+    e.preventDefault();
+    setIsTermsOpen(true);
+  };
+
+  const handlePrivacyClick = (e) => {
+    e.preventDefault();
+    setIsPrivacyOpen(true);
+  };
+
   return (
     <div ref={ref} className="mt-6 sm:mt-8 md:mt-0 lg:pl-6 xl:pl-12 sm:col-span-2 lg:col-span-1">
       <div className="mb-6 sm:mb-8">
@@ -156,10 +170,37 @@ export default function ContactSection() {
             htmlFor="privacy-checkbox"
             className="text-white text-xs sm:text-sm leading-6 sm:leading-7 cursor-pointer"
           >
-            {t(lang, "agree_terms_conditions")}
+            {t(lang, "agree_to_terms")}{" "}
+            <button
+              type="button"
+              onClick={handleTermsClick}
+              className="text-theme3 hover:text-theme underline font-medium"
+            >
+              {t(lang, "terms_and_conditions_link")}
+            </button>{" "}
+            {t(lang, "and_privacy_policy_link")}{" "}
+            <button
+              type="button"
+              onClick={handlePrivacyClick}
+              className="text-theme3 hover:text-theme underline font-medium"
+            >
+              {t(lang, "privacy_policy_link")}
+            </button>
           </label>
         </div>
       </form>
+
+      {/* Legal Modals */}
+      <LegalModal
+        isOpen={isTermsOpen}
+        onClose={() => setIsTermsOpen(false)}
+        type="terms-conditions"
+      />
+      <LegalModal
+        isOpen={isPrivacyOpen}
+        onClose={() => setIsPrivacyOpen(false)}
+        type="privacy-policy"
+      />
     </div>
   );
 }

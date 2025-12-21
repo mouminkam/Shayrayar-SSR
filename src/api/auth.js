@@ -92,12 +92,27 @@ export const changePassword = async (passwordData) => {
 };
 
 /**
- * Request password reset (sends OTP to email)
+ * Request password reset (sends reset link to email)
  * @param {string} email - User's email address
- * @returns {Promise<Object>} Response confirming OTP sent
+ * @returns {Promise<Object>} Response confirming reset link sent
  */
 export const forgotPassword = async (email) => {
-  const response = await axiosInstance.post('/auth/forgot-password', { email });
+  const response = await axiosInstance.post('/auth/forgot-password', { 
+    email,
+    app_type: 'web' 
+  });
+  return response;
+};
+
+/**
+ * Verify reset token
+ * @param {string} token - Reset token from email link
+ * @returns {Promise<Object>} Response with token, email, and valid status
+ */
+export const verifyResetToken = async (token) => {
+  const response = await axiosInstance.get('/auth/verify-reset-token', {
+    params: { token }
+  });
   return response;
 };
 
@@ -193,6 +208,7 @@ const authAPI = {
   uploadProfileImage,
   changePassword,
   forgotPassword,
+  verifyResetToken,
   resetPassword,
   registerPhone,
   verifyPhone,

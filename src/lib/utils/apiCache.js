@@ -13,18 +13,30 @@ const pendingRequests = new Map(); // For request deduplication
  * @param {string} url - API endpoint URL
  * @param {Object} params - Request parameters
  * @param {string|number} branchId - Branch ID (optional)
+ * @param {string} language - Language code (optional, will be read from localStorage if not provided)
  * @returns {string} Cache key
  */
-export function generateCacheKey(url, params = {}, branchId = null) {
+export function generateCacheKey(url, params = {}, branchId = null, language = null) {
+  // If language not provided, read from localStorage
+  if (language === null && typeof window !== 'undefined') {
+    try {
+      language = localStorage.getItem('language') || 'bg';
+    } catch {
+      language = 'bg';
+    }
+  }
+  
   const sortedParams = Object.keys(params)
     .sort()
     .map((key) => `${key}=${JSON.stringify(params[key])}`)
     .join("&");
   
   const branchPart = branchId ? `branch=${branchId}` : "";
+  const langPart = language ? (branchPart ? `&lang=${language}` : `lang=${language}`) : "";
   const paramsPart = sortedParams ? `&${sortedParams}` : "";
   
-  return `${url}?${branchPart}${paramsPart}`;
+  // Format: url?branch=X&lang=Y&params or url?lang=Y&params or url?params
+  return `${url}?${branchPart}${langPart}${paramsPart}`;
 }
 
 /**
@@ -156,5 +168,6 @@ export const CACHE_DURATION = {
   HIGHLIGHTS: 10 * 60 * 1000, // 10 minutes (highlights don't change often)
   WEBSITE_SLIDES: 15 * 60 * 1000, // 15 minutes (slides don't change often)
   BRANCHES: 10 * 60 * 1000, // 10 minutes (branches don't change often)
+  LEGAL_CONTENT: 24 * 60 * 60 * 1000, // 24 hours (legal content rarely changes)
 };
 

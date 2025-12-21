@@ -1,5 +1,6 @@
 "use client";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import AnimatedSection from "../../components/ui/AnimatedSection";
 import ErrorBoundary from "../../components/ui/ErrorBoundary";
@@ -15,6 +16,32 @@ const ResetPasswordSection = dynamic(
   }
 );
 
+function ResetPasswordContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const token = searchParams.get("token");
+  const email = searchParams.get("email");
+
+  useEffect(() => {
+    // If token or email is missing, redirect to forgot-password
+    if (!token || !email) {
+      router.replace("/forgot-password");
+    }
+  }, [token, email, router]);
+
+  // Show loading while checking params or redirecting
+  if (!token || !email) {
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-theme3 mx-auto mb-4"></div>
+        <p className="text-text text-lg">Redirecting...</p>
+      </div>
+    );
+  }
+
+  return <ResetPasswordSection token={token} email={email} />;
+}
+
 export default function ResetPasswordPage() {
   return (
     <GuestOnly>
@@ -24,9 +51,9 @@ export default function ResetPasswordPage() {
             <div className="max-w-2xl mx-auto">
               <ErrorBoundary>
                 <Suspense fallback={<SectionSkeleton variant="default" height="h-96" />}>
-              <AnimatedSection>
-                <ResetPasswordSection />
-              </AnimatedSection>
+                  <AnimatedSection>
+                    <ResetPasswordContent />
+                  </AnimatedSection>
                 </Suspense>
               </ErrorBoundary>
             </div>

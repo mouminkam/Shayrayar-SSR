@@ -18,6 +18,7 @@ import couponsAPI from "./coupons";
 import paymentsAPI from "./payments";
 import deliveryAPI from "./delivery";
 import slidesAPI from "./slides";
+import legalAPI from "./legal";
 import axiosInstance from "./config/axios";
 
 // Export all API modules
@@ -30,6 +31,7 @@ export {
   paymentsAPI,
   deliveryAPI,
   slidesAPI,
+  legalAPI,
 };
 
 // Export axios instance for direct use if needed
@@ -45,6 +47,7 @@ const api = {
   payments: paymentsAPI,
   delivery: deliveryAPI,
   slides: slidesAPI,
+  legal: legalAPI,
 };
 
 export default api;

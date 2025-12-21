@@ -1,7 +1,6 @@
 "use client";
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { i18n } from "../locales/i18n/config";
-import { clearAllCache } from "../lib/utils/apiCache";
 
 const LanguageContext = createContext();
 
@@ -10,7 +9,6 @@ export function LanguageProvider({ children }) {
   // We'll read from localStorage in useEffect after mount
   const [lang, setLangState] = useState(i18n.defaultLocale);
   const [isMounted, setIsMounted] = useState(false);
-  const previousLangRef = useRef(i18n.defaultLocale);
 
   // Read from localStorage after mount to avoid hydration mismatch
   useEffect(() => {
@@ -20,12 +18,9 @@ export function LanguageProvider({ children }) {
       // Validate that saved language is one of the supported locales
       if (savedLang && i18n.locales.includes(savedLang)) {
         setLangState(savedLang);
-        // Update previousLangRef to match saved language to prevent infinite loop
-        previousLangRef.current = savedLang;
       } else {
         // If no valid language in localStorage, save default
         localStorage.setItem('language', i18n.defaultLocale);
-        previousLangRef.current = i18n.defaultLocale;
       }
     }
   }, []); // Only run on mount
@@ -44,33 +39,6 @@ export function LanguageProvider({ children }) {
   useEffect(() => {
     if (isMounted && typeof window !== 'undefined') {
       localStorage.setItem('language', lang);
-    }
-  }, [lang, isMounted]);
-
-  // Clear cache and refresh when language changes
-  useEffect(() => {
-    // Skip on initial mount
-    if (!isMounted) {
-      return;
-    }
-
-    // Read current language from localStorage to avoid race conditions
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const currentLang = localStorage.getItem('language') || i18n.defaultLocale;
-    
-    // Only trigger if language actually changed (compare with previous value)
-    if (previousLangRef.current !== currentLang) {
-      // Update previous language reference first to prevent infinite loop
-      previousLangRef.current = currentLang;
-      
-      // Clear all cache to ensure fresh data with new Accept-Language header
-      clearAllCache();
-      
-      // Reload the page completely to re-fetch all data with new language
-      window.location.reload();
     }
   }, [lang, isMounted]);
 

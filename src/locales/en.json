@@ -63,6 +63,7 @@
   "quantity": "Quantity",
   "share_with_friends": "Share with friends",
   "please_login_add_cart": "Please login to add items to cart",
+  "please_login_before_checkout": "Please login before checkout",
   "please_select_size": "Please select a size",
   "failed_add_cart": "Failed to add product to cart",
   "failed_to_load_product": "Failed to load product",
@@ -353,6 +354,17 @@
   "image_too_large": "Image is too large. Maximum size is 5MB",
   "please_select_image": "Please select an image",
   "name_required": "Name is required",
-  "cannot_be_changed": "cannot be changed"
+  "cannot_be_changed": "cannot be changed",
+  "terms_conditions": "Terms & Conditions",
+  "privacy_policy": "Privacy Policy",
+  "last_updated": "Last Updated",
+  "loading_legal_content": "Loading content...",
+  "error_loading_content": "Failed to load content. Please try again.",
+  "terms_conditions_description": "Read our Terms & Conditions to understand the rules and regulations for using our services.",
+  "privacy_policy_description": "Read our Privacy Policy to understand how we collect, use, and protect your personal information.",
+  "agree_to_terms": "I agree to",
+  "terms_and_conditions_link": "Terms & Conditions",
+  "and_privacy_policy_link": "and",
+  "privacy_policy_link": "Privacy Policy"
 }
 
