@@ -8,6 +8,7 @@ import LenisScrollProvider from "../components/layout/LenisScrollProvider";
 import ScrollToTopHandler from "../components/layout/ScrollToTopHandler";
 import HtmlLangUpdater from "../components/layout/HtmlLangUpdater";
 import AuthTokenInjector from "../components/layout/AuthTokenInjector";
+import DecorativeYellowCircles from "../components/ui/DecorativeYellowCircles";
 import { LanguageProvider } from "../context/LanguageContext";
 import "./globals.css";
 
@@ -100,6 +101,7 @@ export default function RootLayout({ children }) {
 
       <body suppressHydrationWarning className={oswald.className}>
         <LanguageProvider>
+            <DecorativeYellowCircles />
             <HtmlLangUpdater />
             <AuthTokenInjector />
             <LenisScrollProvider>

@@ -160,6 +160,23 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     };
   }, [getBranchContactInfo, getBranchWorkingHours, branchDetails]);
 
+  // Map NAV_LINKS to translated labels
+  const translatedNavLinks = useMemo(() => {
+    return NAV_LINKS.map(link => {
+      let translatedLabel = link.label;
+      if (link.href === '/') {
+        translatedLabel = t(lang, "home");
+      } else if (link.href === '/shop') {
+        translatedLabel = t(lang, "shop");
+      } else if (link.href === '/contact-us') {
+        translatedLabel = t(lang, "contact_us");
+      } else if (link.href === '/about-us') {
+        translatedLabel = t(lang, "about_us");
+      }
+      return { ...link, label: translatedLabel };
+    });
+  }, [lang]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -371,40 +388,26 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   <div className="mobile-menu fix mb-6 lg:hidden">
                     <nav>
                       <ul className="flex flex-col  gap-5 py-4 ">
-                        {NAV_LINKS.map((item, index) => {
-                          // Map NAV_LINKS to translated labels
-                          let translatedLabel = item.label;
-                          if (item.href === '/') {
-                            translatedLabel = t(lang, "home");
-                          } else if (item.href === '/shop') {
-                            translatedLabel = t(lang, "shop");
-                          } else if (item.href === '/contact-us') {
-                            translatedLabel = t(lang, "contact_us");
-                          } else if (item.href === '/about-us') {
-                            translatedLabel = t(lang, "about_us");
-                          }
-                          
-                          return (
-                            <motion.li
-                              key={index}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.3 + index * 0.05, duration: 0.4, ease: "easeOut" }}
+                        {translatedNavLinks.map((item, index) => (
+                          <motion.li
+                            key={index}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3 + index * 0.05, duration: 0.4, ease: "easeOut" }}
+                          >
+                            <Link
+                              href={item.href}
+                              onMouseEnter={() => prefetchRoute(item.href)}
+                              onClick={() => {
+                                setIsOpen(false);
+                                router.push(item.href, { scroll: true });
+                              }}
+                              className="block text-white  text-lg font-normal hover:text-theme3 transition-colors duration-300 py-2"
                             >
-                              <Link
-                                href={item.href}
-                                onMouseEnter={() => prefetchRoute(item.href)}
-                                onClick={() => {
-                                  setIsOpen(false);
-                                  router.push(item.href, { scroll: true });
-                                }}
-                                className="block text-white  text-lg font-normal hover:text-theme3 transition-colors duration-300 py-2"
-                              >
-                                {translatedLabel}
-                              </Link>
-                            </motion.li>
-                          );
-                        })}
+                              {item.label}
+                            </Link>
+                          </motion.li>
+                        ))}
                       </ul>
                     </nav>
                   </div>

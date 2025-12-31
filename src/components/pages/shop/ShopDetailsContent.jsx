@@ -48,7 +48,7 @@ export default function ShopDetailsContent({ rawProductData, lang: serverLang = 
         type="product"
         keywords={[product.title, "food", "restaurant", "order online", "delivery", "pickup"]}
       />
-      <section className="bg-bg3 py-12 relative">
+      <section className="py-12 relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-8 bg-linear-to-br from-bgimg/90 via-bgimg to-bgimg/95 rounded-3xl p-6 sm:p-8 lg:p-12 border border-white/10 shadow-xl max-w-6xl mx-auto">
             {/* Product Image - Top */}
