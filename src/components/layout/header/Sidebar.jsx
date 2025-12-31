@@ -383,7 +383,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                               onMouseEnter={() => prefetchRoute(item.href)}
                               onClick={() => {
                                 setIsOpen(false);
-                                router.push(item.href, { scroll: false });
+                                router.push(item.href, { scroll: true });
                               }}
                               className="block text-white  text-lg font-normal hover:text-theme3 transition-colors duration-300 py-2"
                             >
@@ -501,7 +501,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                         onMouseEnter={() => prefetchRoute("/shop")}
                         onClick={() => {
                           setIsOpen(false);
-                          router.push("/shop", { scroll: false });
+                          router.push("/shop", { scroll: true });
                         }}
                         className="theme-btn px-6 py-3 bg-theme3 text-gray-900 text-sm font-normal hover:bg-theme hover:text-white transition-colors duration-300 rounded-md flex items-center justify-center gap-2 shadow-lg"
                       >

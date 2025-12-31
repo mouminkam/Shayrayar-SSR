@@ -24,7 +24,7 @@ const OrderCard = memo(function OrderCard({ order }) {
   const [isReorderLoading, setIsReorderLoading] = useState(false);
 
   const handleCardClick = () => {
-    router.push(`/orders/${order.id}`, { scroll: false });
+    router.push(`/orders/${order.id}`, { scroll: true });
   };
 
   /**

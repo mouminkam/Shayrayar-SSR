@@ -87,17 +87,17 @@ export default function TopBar() {
           </div>
         </div>
 
-        {/* Call Emergency */}
+        {/* Call */}
         <div className="flex items-center gap-3 sm:gap-4 sm:justify-start lg:justify-end sm:col-span-2 lg:col-span-1">
           <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shrink-0">
             <Phone className="w-5 h-5 text-theme3" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-gray-900 text-xs sm:text-sm font-medium mb-1 sm:mb-2 capitalize">
-              {t(lang, "call_emergency")}
+              {t(lang, "call")}
             </p>
             <p className="text-gray-900 text-base sm:text-lg md:text-xl font-medium">
-              +88 0123 654 99
+              {contactInfo.phone}
             </p>
           </div>
         </div>

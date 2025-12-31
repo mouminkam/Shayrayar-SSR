@@ -141,10 +141,11 @@ export function useShopProducts(viewMode = "grid") {
   }, [fetchProducts]);
 
   // Handle page change
+  // ScrollToTopHandler will ensure scroll to top on route change
   const handlePageChange = useCallback((page) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page);
-    router.push(`/shop?${params.toString()}`, { scroll: false });
+    router.push(`/shop?${params.toString()}`, { scroll: true });
   }, [searchParams, router]);
 
   return {

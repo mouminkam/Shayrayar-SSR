@@ -3,37 +3,86 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
-import { useHighlights } from "../../../context/HighlightsContext";
 import OptimizedImage from "../../ui/OptimizedImage";
 import ProductCardSkeleton from "../../ui/ProductCardSkeleton";
 import { useInView } from "react-intersection-observer";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { transformMenuItemsToProducts } from "../../../lib/utils/productTransform";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
 
-export default function LatestItemsSection() {
+export default function LatestItemsSection({ rawLatestData = null, lang: serverLang = null }) {
   const { prefetchRoute } = usePrefetchRoute();
-  const { latest, isLoading } = useHighlights();
-  const { lang } = useLanguage();
+  const { lang: clientLang } = useLanguage();
+  const { getSelectedBranchId } = useBranchStore();
+  const [lang, setLang] = useState(serverLang || clientLang || 'bg');
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [latestData, setLatestData] = useState(rawLatestData);
+  const prevLangRef = useRef(serverLang);
 
-  if (isLoading) {
-    return (
-      <section className="latest-items-section py-10 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-          <div className="title-area mb-12 sm:mb-14">
-            <div className="sub-title text-center text-theme3 text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
-              {t(lang, "latest_items")}
-            </div>
-            <div className="title text-center text-white text-3xl sm:text-5xl font-black capitalize">
-              {t(lang, "new_arrivals")}
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            <ProductCardSkeleton viewMode="grid" count={3} />
-          </div>
-        </div>
-      </section>
-    );
-  }
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (isHydrated && clientLang) {
+      setLang(clientLang);
+    }
+  }, [clientLang, isHydrated]);
+
+  // Update latestData when rawLatestData changes (from server)
+  useEffect(() => {
+    if (rawLatestData) {
+      setLatestData(rawLatestData);
+    }
+  }, [rawLatestData]);
+
+  // Re-fetch data when language changes after hydration
+  useEffect(() => {
+    if (!isHydrated || !clientLang) {
+      // Initialize prevLangRef on first render
+      if (clientLang) {
+        prevLangRef.current = clientLang;
+      }
+      return;
+    }
+
+    // Only re-fetch if language actually changed (not initial render)
+    if (prevLangRef.current && prevLangRef.current !== clientLang) {
+      const fetchLatestItems = async () => {
+        const branchId = getSelectedBranchId();
+        if (!branchId) {
+          prevLangRef.current = clientLang;
+          return;
+        }
+
+        try {
+          const response = await api.menu.getHighlights({ branch_id: branchId });
+          if (response?.success && response.data) {
+            setLatestData(response.data.latest || []);
+          }
+        } catch (error) {
+          console.error('Error fetching latest items:', error);
+        } finally {
+          // Update prevLangRef after fetch completes
+          prevLangRef.current = clientLang;
+        }
+      };
+
+      fetchLatestItems();
+    } else if (!prevLangRef.current) {
+      // Initialize on first render
+      prevLangRef.current = clientLang;
+    }
+  }, [isHydrated, clientLang, getSelectedBranchId]);
+
+  // Transform latest items based on current language
+  const latest = useMemo(() => {
+    if (!latestData || !Array.isArray(latestData)) return [];
+    return transformMenuItemsToProducts(latestData, lang);
+  }, [latestData, lang]);
 
   if (!latest || latest.length === 0) {
     return null;

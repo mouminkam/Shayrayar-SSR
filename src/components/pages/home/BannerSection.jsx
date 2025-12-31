@@ -9,26 +9,87 @@ import { ArrowRight } from "lucide-react";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
-import { useWebsiteSlides } from "../../../hooks/useWebsiteSlides";
 import SectionSkeleton from "../../ui/SectionSkeleton";
 import { getProxiedImageUrl } from "../../../lib/utils/imageProxy";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
 
 // Import Swiper CSS - Next.js will handle optimization
 import "swiper/swiper-bundle.css";
 
-export default function BannerSection() {
+export default function BannerSection({ slides: apiSlides = [], lang: serverLang = null }) {
   const { prefetchRoute } = usePrefetchRoute();
-  const { lang } = useLanguage();
+  const { lang: clientLang } = useLanguage();
+  const { getSelectedBranchId } = useBranchStore();
   const [activeIndex, setActiveIndex] = useState(0);
-  const { slides: apiSlides, isLoading, error } = useWebsiteSlides();
+  const [lang, setLang] = useState(serverLang || clientLang || 'bg');
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [slidesData, setSlidesData] = useState(apiSlides);
+  const prevLangRef = useRef(serverLang);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (isHydrated && clientLang) {
+      setLang(clientLang);
+    }
+  }, [clientLang, isHydrated]);
+
+  // Update slidesData when apiSlides changes (from server)
+  useEffect(() => {
+    if (apiSlides) {
+      setSlidesData(apiSlides);
+    }
+  }, [apiSlides]);
+
+  // Re-fetch data when language changes after hydration
+  useEffect(() => {
+    if (!isHydrated || !clientLang) {
+      // Initialize prevLangRef on first render
+      if (clientLang) {
+        prevLangRef.current = clientLang;
+      }
+      return;
+    }
+
+    // Only re-fetch if language actually changed (not initial render)
+    if (prevLangRef.current && prevLangRef.current !== clientLang) {
+      const fetchSlides = async () => {
+        const branchId = getSelectedBranchId();
+        if (!branchId) {
+          prevLangRef.current = clientLang;
+          return;
+        }
+
+        try {
+          const response = await api.slides.getWebsiteSlides({ branch_id: branchId });
+          if (response?.success && response.data) {
+            setSlidesData(response.data.slides || []);
+          }
+        } catch (error) {
+          console.error('Error fetching website slides:', error);
+        } finally {
+          // Update prevLangRef after fetch completes
+          prevLangRef.current = clientLang;
+        }
+      };
+
+      fetchSlides();
+    } else if (!prevLangRef.current) {
+      // Initialize on first render
+      prevLangRef.current = clientLang;
+    }
+  }, [isHydrated, clientLang, getSelectedBranchId]);
 
   // Map API slides to component format
   const slides = useMemo(() => {
-    if (!apiSlides || apiSlides.length === 0) {
+    if (!slidesData || slidesData.length === 0) {
       return [];
     }
 
-    return apiSlides.map((slide, index) => ({
+    return slidesData.map((slide, index) => ({
       id: slide.id,
       subtitle: slide.description || t(lang, "welcome_fresheat"),
       title: slide.title || "",
@@ -37,7 +98,7 @@ export default function BannerSection() {
       link: slide.menu_item_id ? `/shop/${slide.menu_item_id}` : "/shop",
       shape4Float: index % 2 === 0,
     }));
-  }, [apiSlides, lang]);
+  }, [slidesData, lang]);
 
   const currentSlide = slides[activeIndex] || slides[0];
   const preloadedImagesRef = useRef(new Set());
@@ -76,8 +137,8 @@ export default function BannerSection() {
     }
   }, [slides]);
 
-  // Show skeleton loader when loading or no slides
-  if (isLoading || !slides || slides.length === 0) {
+  // Show skeleton loader when no slides
+  if (!slides || slides.length === 0) {
     return (
       <section className="banner-section fix mb-8">
         <div className="slider-area relative">

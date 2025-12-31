@@ -1,22 +1,82 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import OptimizedImage from "../../ui/OptimizedImage";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
-import { useWebsiteSlides } from "../../../hooks/useWebsiteSlides";
 import { getProxiedImageUrl } from "../../../lib/utils/imageProxy";
-import SectionSkeleton from "../../ui/SectionSkeleton";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
 
-export default function OfferCards() {
-  const { lang } = useLanguage();
-  const { slides: apiSlides, isLoading, error } = useWebsiteSlides();
+export default function OfferCards({ slides: apiSlides = [], lang: serverLang = null }) {
+  const { lang: clientLang } = useLanguage();
+  const { getSelectedBranchId } = useBranchStore();
+  const [lang, setLang] = useState(serverLang || clientLang || 'bg');
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [slidesData, setSlidesData] = useState(apiSlides);
+  const prevLangRef = useRef(serverLang);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (isHydrated && clientLang) {
+      setLang(clientLang);
+    }
+  }, [clientLang, isHydrated]);
+
+  // Update slidesData when apiSlides changes (from server)
+  useEffect(() => {
+    if (apiSlides) {
+      setSlidesData(apiSlides);
+    }
+  }, [apiSlides]);
+
+  // Re-fetch data when language changes after hydration
+  useEffect(() => {
+    if (!isHydrated || !clientLang) {
+      // Initialize prevLangRef on first render
+      if (clientLang) {
+        prevLangRef.current = clientLang;
+      }
+      return;
+    }
+
+    // Only re-fetch if language actually changed (not initial render)
+    if (prevLangRef.current && prevLangRef.current !== clientLang) {
+      const fetchSlides = async () => {
+        const branchId = getSelectedBranchId();
+        if (!branchId) {
+          prevLangRef.current = clientLang;
+          return;
+        }
+
+        try {
+          const response = await api.slides.getWebsiteSlides({ branch_id: branchId });
+          if (response?.success && response.data) {
+            setSlidesData(response.data.slides || []);
+          }
+        } catch (error) {
+          console.error('Error fetching website slides:', error);
+        } finally {
+          // Update prevLangRef after fetch completes
+          prevLangRef.current = clientLang;
+        }
+      };
+
+      fetchSlides();
+    } else if (!prevLangRef.current) {
+      // Initialize on first render
+      prevLangRef.current = clientLang;
+    }
+  }, [isHydrated, clientLang, getSelectedBranchId]);
 
   // Take first 3 slides and map to offer format
   const offers = useMemo(() => {
-    if (!apiSlides || apiSlides.length === 0) {
+    if (!slidesData || slidesData.length === 0) {
       // Fallback offers if no data
       return [
         {
@@ -47,7 +107,7 @@ export default function OfferCards() {
     }
 
     // Take first 3 slides only
-    return apiSlides.slice(0, 3).map((slide) => ({
+    return slidesData.slice(0, 3).map((slide) => ({
       title: slide.title || "",
       subtitle: t(lang, "on_this_week"),
       description: slide.description || t(lang, "limited_time_offer"),
@@ -55,19 +115,10 @@ export default function OfferCards() {
       bgImage: "/img/bg/offerBG1_1.jpg",
       link: slide.menu_item_id ? `/shop/${slide.menu_item_id}` : "/shop",
     }));
-  }, [apiSlides, lang]);
-
-  // Show loading skeleton
-  if (isLoading) {
-    return (
-      <section className="py-12 mb-12 sm:mb-0 sm:py-16 bg-bg3">
-        <SectionSkeleton variant="default" cardCount={3} height="h-80" />
-      </section>
-    );
-  }
+  }, [slidesData, lang]);
 
   // Show error state or fallback
-  if (error && offers.length === 0) {
+  if (offers.length === 0) {
     return (
       <section className="py-12 mb-12 sm:mb-0 sm:py-16 bg-bg3">
         <div className="container mx-auto px-4 text-center">

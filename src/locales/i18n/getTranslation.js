@@ -6,6 +6,6 @@ const languages = {
   bg,
 };
 
-export function t(lang = "en", key) {
+export function t(lang = "bg", key) {
   return languages?.[lang]?.[key] || key;
 }

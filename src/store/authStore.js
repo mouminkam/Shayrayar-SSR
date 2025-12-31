@@ -249,6 +249,26 @@ const useAuthStore = create(
               isLoading: false,
             });
 
+            // If branch_id was updated, update branch store and clear cart
+            if (updates.branch_id !== undefined) {
+              const currentBranchId = currentUser?.branch_id;
+              const newBranchId = updatedUser?.branch_id;
+              
+              // Only update if branch actually changed
+              if (currentBranchId !== newBranchId) {
+                try {
+                  // Clear cart (products may differ between branches)
+                  useCartStore.getState().clearCart();
+                  
+                  // Update branch store
+                  await useBranchStore.getState().setBranchFromUserProfile(newBranchId);
+                } catch (branchError) {
+                  console.warn("Failed to update branch store after profile update:", branchError);
+                  // Don't fail the profile update if branch update fails
+                }
+              }
+            }
+
             return { success: true, user: updatedUser };
           } else {
             set({ isLoading: false });

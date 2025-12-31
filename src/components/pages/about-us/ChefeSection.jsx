@@ -1,20 +1,78 @@
 "use client";
-import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
-import useBranchStore from "../../../store/branchStore";
-import api from "../../../api";
 import OptimizedImage from "../../ui/OptimizedImage";
 import ProductCardSkeleton from "../../ui/ProductCardSkeleton";
 import { useInView } from "react-intersection-observer";
 import { getProxiedImageUrl } from "../../../lib/utils/imageProxy";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
 
-export default function ChefeSection() {
-  const { lang } = useLanguage();
-  const { selectedBranch, getSelectedBranchId, initialize } = useBranchStore();
-  const [chefs, setChefs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default function ChefeSection({ chefs: serverChefs = [], lang: serverLang = null }) {
+  const { lang: clientLang } = useLanguage();
+  const { getSelectedBranchId } = useBranchStore();
+  const [lang, setLang] = useState(serverLang || clientLang || 'bg');
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [chefsData, setChefsData] = useState(serverChefs);
+  const prevLangRef = useRef(serverLang);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (isHydrated && clientLang) {
+      setLang(clientLang);
+    }
+  }, [clientLang, isHydrated]);
+
+  // Update chefsData when serverChefs changes (from server)
+  useEffect(() => {
+    if (serverChefs) {
+      setChefsData(serverChefs);
+    }
+  }, [serverChefs]);
+
+  // Re-fetch data when language changes after hydration
+  useEffect(() => {
+    if (!isHydrated || !clientLang) {
+      // Initialize prevLangRef on first render
+      if (clientLang) {
+        prevLangRef.current = clientLang;
+      }
+      return;
+    }
+
+    // Only re-fetch if language actually changed (not initial render)
+    if (prevLangRef.current && prevLangRef.current !== clientLang) {
+      const fetchChefs = async () => {
+        const branchId = getSelectedBranchId();
+        if (!branchId) {
+          prevLangRef.current = clientLang;
+          return;
+        }
+
+        try {
+          const response = await api.branches.getChefs(branchId);
+          if (response?.success && response.data) {
+            setChefsData(response.data.chefs || []);
+          }
+        } catch (error) {
+          console.error('Error fetching chefs:', error);
+        } finally {
+          // Update prevLangRef after fetch completes
+          prevLangRef.current = clientLang;
+        }
+      };
+
+      fetchChefs();
+    } else if (!prevLangRef.current) {
+      // Initialize on first render
+      prevLangRef.current = clientLang;
+    }
+  }, [isHydrated, clientLang, getSelectedBranchId]);
 
   // Get image URL with proxy support
   const getImageUrl = (imageUrl) => {
@@ -42,45 +100,6 @@ export default function ChefeSection() {
     return getProxiedImageUrl(imageUrl);
   };
 
-  // Initialize branch if not loaded
-  useEffect(() => {
-    if (!selectedBranch) {
-      initialize();
-    }
-  }, [selectedBranch, initialize]);
-
-  // Fetch chefs when branch is available
-  useEffect(() => {
-    const fetchChefs = async () => {
-      const branchId = getSelectedBranchId();
-      
-      // If no branch, keep loading state true to wait for branch initialization
-      if (!branchId) {
-        // Don't set loading to false - wait for branch to be initialized
-        return;
-      }
-
-      setIsLoading(true);
-
-      try {
-        const response = await api.branches.getChefs(branchId);
-        
-        if (response?.success && response?.data?.chefs) {
-          setChefs(response.data.chefs);
-        } else {
-          setChefs([]);
-        }
-      } catch (err) {
-        console.error("Error fetching chefs:", err);
-        setChefs([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchChefs();
-  }, [selectedBranch, getSelectedBranchId]);
-
   return (
     <section className="chef-section py-10 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
       <div className="chef-wrapper style1">
@@ -94,17 +113,13 @@ export default function ChefeSection() {
             </div>
           </div>
 
-          {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              <ProductCardSkeleton viewMode="grid" count={3} />
-            </div>
-          ) : !chefs || chefs.length === 0 ? (
+          {!chefsData || chefsData.length === 0 ? (
             <div className="flex items-center justify-center py-20">
               <p className="text-text text-lg">{t(lang, "no_chefs_available") || "No chefs available"}</p>
             </div>
           ) : (
             <div className="chef-card-wrap style1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 ">
-              {chefs.map((chef, index) => {
+              {chefsData.map((chef, index) => {
                 return (
                   <LazyChefCard
                     key={chef.id}

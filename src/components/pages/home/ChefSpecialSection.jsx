@@ -4,39 +4,86 @@ import Link from "next/link";
 import { ChefHat } from "lucide-react";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
-import { useHighlights } from "../../../context/HighlightsContext";
 import OptimizedImage from "../../ui/OptimizedImage";
 import ProductCardSkeleton from "../../ui/ProductCardSkeleton";
 import { useInView } from "react-intersection-observer";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { transformMenuItemsToProducts } from "../../../lib/utils/productTransform";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
 
-export default function ChefSpecialSection() {
+export default function ChefSpecialSection({ rawChefSpecialData = null, lang: serverLang = null }) {
   const { prefetchRoute } = usePrefetchRoute();
-  const { chefSpecial, isLoading } = useHighlights();
-  const { lang } = useLanguage();
+  const { lang: clientLang } = useLanguage();
+  const { getSelectedBranchId } = useBranchStore();
+  const [lang, setLang] = useState(serverLang || clientLang || 'bg');
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [chefSpecialData, setChefSpecialData] = useState(rawChefSpecialData);
+  const prevLangRef = useRef(serverLang);
 
-  if (isLoading) {
-    return (
-      <section className="chef-special-section py-10 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-          <div className="title-area mb-12 sm:mb-14">
-            <div className="sub-title text-center text-theme3 text-2xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
-              <ChefHat className="w-6 h-6" />
-              {t(lang, "chef_special")}
-              <ChefHat className="w-6 h-6" />
-            </div>
-            <div className="title text-center text-white text-3xl sm:text-5xl font-black capitalize">
-              {t(lang, "chef_recommendations")}
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            <ProductCardSkeleton viewMode="grid" count={3} />
-          </div>
-        </div>
-      </section>
-    );
-  }
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (isHydrated && clientLang) {
+      setLang(clientLang);
+    }
+  }, [clientLang, isHydrated]);
+
+  // Update chefSpecialData when rawChefSpecialData changes (from server)
+  useEffect(() => {
+    if (rawChefSpecialData) {
+      setChefSpecialData(rawChefSpecialData);
+    }
+  }, [rawChefSpecialData]);
+
+  // Re-fetch data when language changes after hydration
+  useEffect(() => {
+    if (!isHydrated || !clientLang) {
+      // Initialize prevLangRef on first render
+      if (clientLang) {
+        prevLangRef.current = clientLang;
+      }
+      return;
+    }
+
+    // Only re-fetch if language actually changed (not initial render)
+    if (prevLangRef.current && prevLangRef.current !== clientLang) {
+      const fetchChefSpecial = async () => {
+        const branchId = getSelectedBranchId();
+        if (!branchId) {
+          prevLangRef.current = clientLang;
+          return;
+        }
+
+        try {
+          const response = await api.menu.getHighlights({ branch_id: branchId });
+          if (response?.success && response.data) {
+            setChefSpecialData(response.data.chef_special || []);
+          }
+        } catch (error) {
+          console.error('Error fetching chef special:', error);
+        } finally {
+          // Update prevLangRef after fetch completes
+          prevLangRef.current = clientLang;
+        }
+      };
+
+      fetchChefSpecial();
+    } else if (!prevLangRef.current) {
+      // Initialize on first render
+      prevLangRef.current = clientLang;
+    }
+  }, [isHydrated, clientLang, getSelectedBranchId]);
+
+  // Transform chef special items based on current language
+  const chefSpecial = useMemo(() => {
+    if (!chefSpecialData || !Array.isArray(chefSpecialData)) return [];
+    return transformMenuItemsToProducts(chefSpecialData, lang);
+  }, [chefSpecialData, lang]);
 
   if (!chefSpecial || chefSpecial.length === 0) {
     return null;

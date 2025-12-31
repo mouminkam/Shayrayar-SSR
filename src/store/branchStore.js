@@ -5,6 +5,16 @@ import api from "../api";
 import { generateCacheKey, getCachedData, setCachedData, getPendingRequest, setPendingRequest, CACHE_DURATION } from "../lib/utils/apiCache";
 import useAuthStore from "./authStore";
 
+// Helper function to get language from localStorage
+const getLanguage = () => {
+  if (typeof window === 'undefined') return 'bg';
+  try {
+    return localStorage.getItem('language') || 'bg';
+  } catch {
+    return 'bg';
+  }
+};
+
 const useBranchStore = create(
   persist(
     (set, get) => ({
@@ -17,16 +27,6 @@ const useBranchStore = create(
 
       // Actions
       fetchBranches: async () => {
-        // Get language from localStorage
-        const getLanguage = () => {
-          if (typeof window === 'undefined') return 'bg';
-          try {
-            return localStorage.getItem('language') || 'bg';
-          } catch {
-            return 'bg';
-          }
-        };
-        
         // Check cache first
         const language = getLanguage();
         const cacheKey = generateCacheKey("/branches", {}, null, language);
@@ -125,16 +125,6 @@ const useBranchStore = create(
           return { success: true, data: currentDetails };
         }
 
-        // Get language from localStorage
-        const getLanguage = () => {
-          if (typeof window === 'undefined') return 'bg';
-          try {
-            return localStorage.getItem('language') || 'bg';
-          } catch {
-            return 'bg';
-          }
-        };
-        
         // Check cache first
         const language = getLanguage();
         const cacheKey = generateCacheKey(`/branches/${branchId}`, {}, branchId, language);

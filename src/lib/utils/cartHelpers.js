@@ -113,7 +113,7 @@ export function hasAnyCustomization(item) {
  * @param {string} lang - Language code
  * @returns {Object} Object with customization parts: { size, ingredients, options, customizations }
  */
-export function getCustomizationDisplayText(item, product = null, t = null, lang = 'en') {
+export function getCustomizationDisplayText(item, product = null, t = null, lang = 'bg') {
   if (!item) return { size: null, ingredients: null, options: null, customizations: null };
 
   const parts = {

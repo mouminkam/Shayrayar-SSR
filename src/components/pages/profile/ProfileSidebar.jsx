@@ -1,10 +1,12 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, Phone, MapPin, Package, LogOut, Edit, Camera } from "lucide-react";
+import { User, Mail, Phone, MapPin, Package, LogOut, Edit, Camera, ChevronDown } from "lucide-react";
 import OptimizedImage from "../../ui/OptimizedImage";
 import dynamic from "next/dynamic";
 import useAuthStore from "../../../store/authStore";
+import useBranchStore from "../../../store/branchStore";
+import useToastStore from "../../../store/toastStore";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
@@ -20,15 +22,68 @@ const ProfileEditModal = dynamic(
 
 export default function ProfileSidebar({ user, totalOrders = 0 }) {
   const router = useRouter();
-  const { logout } = useAuthStore();
+  const { logout, updateProfile, isLoading: isUpdatingProfile } = useAuthStore();
+  const { 
+    selectedBranch, 
+    branches, 
+    isLoading: isLoadingBranches, 
+    fetchBranches, 
+    initialize 
+  } = useBranchStore();
+  const { success: toastSuccess, error: toastError } = useToastStore();
   const { lang } = useLanguage();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
 
   // Convert relative image path to full URL for Next.js Image component
   const userImageUrl = useMemo(() => {
     const imagePath = user?.image || user?.image_url || user?.avatar;
     return imagePath ? getFullImageUrl(imagePath) : null;
   }, [user?.image, user?.image_url, user?.avatar]);
+
+  // Initialize branches on mount
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  // Fetch branches if empty
+  useEffect(() => {
+    if (branches.length === 0 && !isLoadingBranches) {
+      fetchBranches();
+    }
+  }, [branches.length, isLoadingBranches, fetchBranches]);
+
+  const handleBranchChange = async (branchId) => {
+    const branch = branches.find(b => (b.id || b.branch_id) === branchId);
+    if (!branch) return;
+
+    const currentBranchId = user?.branch_id || selectedBranch?.id || selectedBranch?.branch_id;
+    const newBranchId = branch.id || branch.branch_id;
+
+    // If same branch, do nothing
+    if (currentBranchId === newBranchId) {
+      setIsBranchDropdownOpen(false);
+      return;
+    }
+
+    setIsBranchDropdownOpen(false);
+
+    try {
+      // Update branch_id in user profile
+      const result = await updateProfile({ branch_id: newBranchId });
+      
+      if (result.success) {
+        // Show success notification
+        const branchName = branch.name || branch.title || t(lang, "select_branch");
+        toastSuccess(t(lang, "branch_changed_cart_cleared")?.replace("{name}", branchName) || `Branch changed to ${branchName}`);
+      } else {
+        toastError(result.error || t(lang, "failed_to_update_branch") || "Failed to update branch");
+      }
+    } catch (error) {
+      console.error("Error updating branch:", error);
+      toastError(error.message || t(lang, "failed_to_update_branch") || "Failed to update branch");
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -130,6 +185,69 @@ export default function ProfileSidebar({ user, totalOrders = 0 }) {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Branch Selector */}
+      <div className="mb-6 pt-6 border-t border-white/10">
+        <label className="block text-text text-xs font-medium mb-2">
+          {t(lang, "branch") || "Branch"}
+        </label>
+        <div className="relative">
+          <button
+            onClick={() => setIsBranchDropdownOpen(!isBranchDropdownOpen)}
+            disabled={isLoadingBranches || isUpdatingProfile || branches.length === 0}
+            className="w-full flex items-center justify-between gap-2 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white text-sm font-medium transition-all duration-300 hover:bg-white/20 focus:outline-none focus:border-theme3 focus:ring-2 focus:ring-theme3/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <MapPin className="w-4 h-4 text-theme3 shrink-0" />
+              <span className="truncate">
+                {selectedBranch?.name || selectedBranch?.title || user?.branch_id 
+                  ? `${t(lang, "branch")} ${user?.branch_id || selectedBranch?.id || selectedBranch?.branch_id}`
+                  : t(lang, "select_branch") || "Select Branch"}
+              </span>
+            </div>
+            <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-300 ${isBranchDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {isBranchDropdownOpen && (
+            <>
+              <div 
+                className="fixed inset-0 z-[10000]" 
+                onClick={() => setIsBranchDropdownOpen(false)}
+              />
+              <div className="absolute top-full left-0 right-0 mt-2 bg-bgimg border border-white/20 rounded-xl shadow-2xl z-[10001] max-h-64 overflow-y-auto">
+                {isLoadingBranches ? (
+                  <div className="p-4 text-center text-text text-sm">{t(lang, "loading_branches") || "Loading branches..."}</div>
+                ) : branches.length === 0 ? (
+                  <div className="p-4 text-center text-text text-sm">{t(lang, "no_branches_available") || "No branches available"}</div>
+                ) : (
+                  <ul className="py-2">
+                    {branches.map((branch) => {
+                      const branchId = branch.id || branch.branch_id;
+                      const currentBranchId = user?.branch_id || selectedBranch?.id || selectedBranch?.branch_id;
+                      const isSelected = branchId === currentBranchId;
+                      return (
+                        <li key={branchId}>
+                          <button
+                            onClick={() => handleBranchChange(branchId)}
+                            disabled={isUpdatingProfile}
+                            className={`w-full text-left px-4 py-2 text-sm transition-colors duration-200 ${
+                              isSelected
+                                ? 'bg-theme3/20 text-theme3 font-medium'
+                                : 'text-text hover:bg-white/10'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                          >
+                            {branch.name || branch.title || `Branch ${branchId}`}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Quick Stats */}

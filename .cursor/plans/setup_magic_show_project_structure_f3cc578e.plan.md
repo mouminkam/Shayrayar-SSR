@@ -1,9 +1,3 @@
----
-name: ""
-overview: ""
-todos: []
----
-
 # خطة إعداد مشروع Magic Show
 
 ## الهدف
@@ -21,7 +15,7 @@ todos: []
 
 ### 1. إضافة المجلدات الأساسية
 
-```
+```javascript
 src/
 ├── api/                    # API calls structure (فارغ حالياً)
 │   ├── config/
@@ -56,9 +50,11 @@ src/
         └── getTranslation.js
 ```
 
+
+
 ### 2. إضافة UI Components المشتركة
 
-```
+```javascript
 src/components/
 ├── ui/
 │   ├── AnimatedSection.jsx      # Animation wrapper
@@ -73,6 +69,8 @@ src/components/
 └── seo/
     └── PageSEO.jsx              # SEO component
 ```
+
+
 
 ### 3. تحديث package.json
 
@@ -201,4 +199,3 @@ export default function CategoryPage() {
 3. تحديث package.json وتثبيت dependencies
 4. تحديث layout.jsx وglobals.css
 5. إعادة هيكلة صفحة واحدة كـ example (مثل home)
-6. تطبيق نفس النمط على باقي الصفحات

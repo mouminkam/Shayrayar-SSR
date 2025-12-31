@@ -50,10 +50,11 @@ export function usePrefetchRoute() {
       prefetchRoute(href);
     }
 
-    // Navigate with transition (no scroll)
+    // Navigate with transition (scroll to top)
+    // ScrollToTopHandler will ensure scroll to top on route change
     startTransition(() => {
       try {
-        router.push(href, { scroll: false });
+        router.push(href, { scroll: true });
       } catch (error) {
         console.error("Navigation error:", error);
       }

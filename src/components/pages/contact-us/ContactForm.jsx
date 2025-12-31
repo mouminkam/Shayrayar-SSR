@@ -6,21 +6,28 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { contactSchema } from "../../../lib/validations/contactSchemas";
 import useToastStore from "../../../store/toastStore";
-import useBranchStore from "../../../store/branchStore";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
 import LegalModal from "../../ui/LegalModal";
 
-export default function ContactForm() {
+export default function ContactForm({ branchDetails = null, lang: serverLang = null }) {
   const { success: toastSuccess, error: toastError } = useToastStore();
-  const { 
-    selectedBranch, 
-    initialize, 
-    branchDetails,
-    getBranchContactInfo,
-    fetchBranchDetails
-  } = useBranchStore();
-  const { lang } = useLanguage();
+  const { lang: clientLang } = useLanguage();
+  // Use server lang for SSR to match server render, then use client lang after hydration
+  const [lang, setLang] = useState(serverLang || clientLang || 'bg');
+  const [isHydrated, setIsHydrated] = useState(false);
+  
+  useEffect(() => {
+    // Mark as hydrated after first render
+    setIsHydrated(true);
+  }, []);
+  
+  useEffect(() => {
+    // After hydration, always use client language when it changes
+    if (isHydrated && clientLang) {
+      setLang(clientLang);
+    }
+  }, [clientLang, isHydrated]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
@@ -43,34 +50,10 @@ export default function ContactForm() {
     },
   });
 
-  // Initialize branch if not loaded
-  useEffect(() => {
-    if (!selectedBranch) {
-      initialize();
-    }
-  }, [selectedBranch, initialize]);
-
-  // Fetch branch details when component mounts (only if not already loaded)
-  useEffect(() => {
-    if (!selectedBranch) {
-      return;
-    }
-
-    const branchId = selectedBranch.id || selectedBranch.branch_id;
-    const currentDetails = branchDetails;
-    const currentBranchId = currentDetails?.id || currentDetails?.branch_id;
-
-    // Only fetch if we don't have details for this branch
-    if (branchId && currentBranchId !== branchId) {
-      fetchBranchDetails(branchId);
-        }
-  }, [selectedBranch, branchDetails, fetchBranchDetails]);
-
-  // Get branch email from store with fallback
+  // Get branch email from branchDetails with fallback
   const branchEmail = useMemo(() => {
-    const contact = getBranchContactInfo();
-    return contact?.email || "info@example.com";
-  }, [getBranchContactInfo, branchDetails]);
+    return branchDetails?.email || "info@example.com";
+  }, [branchDetails]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);

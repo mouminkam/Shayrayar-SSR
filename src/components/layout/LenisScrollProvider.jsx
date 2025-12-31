@@ -38,6 +38,11 @@ const LenisScrollProvider = ({ children }) => {
 
         lenisRef.current = lenisInstance;
 
+        // Expose Lenis instance on window for ScrollToTopHandler to access
+        if (typeof window !== "undefined") {
+          window.lenis = lenisInstance;
+        }
+
         // Animation frame function
         function raf(time) {
           if (lenisInstance && isMounted) {

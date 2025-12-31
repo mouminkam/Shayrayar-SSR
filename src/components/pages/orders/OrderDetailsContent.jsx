@@ -61,7 +61,7 @@ export default function OrderDetailsContent({ orderId }) {
               onMouseEnter={() => prefetchRoute("/profile")}
               onClick={(e) => {
                 e.preventDefault();
-                router.push("/profile", { scroll: false });
+                router.push("/profile", { scroll: true });
               }}
               className="px-6 py-3 bg-theme3 text-white rounded-xl hover:bg-theme transition-colors"
             >
@@ -91,7 +91,7 @@ export default function OrderDetailsContent({ orderId }) {
               onMouseEnter={() => prefetchRoute("/profile")}
               onClick={(e) => {
                 e.preventDefault();
-                router.push("/profile", { scroll: false });
+                router.push("/profile", { scroll: true });
               }}
               className="inline-flex items-center gap-2 text-text hover:text-theme3 transition-colors"
             >

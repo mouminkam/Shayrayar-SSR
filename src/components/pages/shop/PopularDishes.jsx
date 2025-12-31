@@ -1,69 +1,90 @@
 "use client";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import OptimizedImage from "../../ui/OptimizedImage";
 import ProductCardSkeleton from "../../ui/ProductCardSkeleton";
 import { usePrefetchRoute } from "../../../hooks/usePrefetchRoute";
-import { HighlightsContext } from "../../../context/HighlightsContext";
-import api from "../../../api";
-import useBranchStore from "../../../store/branchStore";
-import { transformMenuItemsToProducts } from "../../../lib/utils/productTransform";
 import { formatCurrency } from "../../../lib/utils/formatters";
 import { useInView } from "react-intersection-observer";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
+import { transformMenuItemsToProducts } from "../../../lib/utils/productTransform";
+import api from "../../../api";
+import useBranchStore from "../../../store/branchStore";
 
-export default function PopularDishes() {
-  // Always call useContext first (before any other hooks) to maintain hook order
-  const contextData = useContext(HighlightsContext);
-  
+export default function PopularDishes({ rawPopularData = null, lang: serverLang = null }) {
   const { prefetchRoute } = usePrefetchRoute();
-  const { selectedBranch, getSelectedBranchId } = useBranchStore();
-  const { lang } = useLanguage();
-  
-  const [dishes, setDishes] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { lang: clientLang } = useLanguage();
+  const { getSelectedBranchId } = useBranchStore();
+  const [lang, setLang] = useState(serverLang || clientLang || 'bg');
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [dishesData, setDishesData] = useState(rawPopularData);
+  const prevLangRef = useRef(serverLang);
 
-  // If context is available, use it; otherwise fetch directly
   useEffect(() => {
-    if (contextData) {
-      // Use context data
-      setDishes(contextData.popular || []);
-      setIsLoading(contextData.isLoading);
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (isHydrated && clientLang) {
+      setLang(clientLang);
+    }
+  }, [clientLang, isHydrated]);
+
+  // Update dishesData when rawPopularData changes (from server)
+  useEffect(() => {
+    if (rawPopularData) {
+      setDishesData(rawPopularData);
+    }
+  }, [rawPopularData]);
+
+  // Re-fetch data when language changes after hydration
+  useEffect(() => {
+    if (!isHydrated || !clientLang) {
+      // Initialize prevLangRef on first render
+      if (clientLang) {
+        prevLangRef.current = clientLang;
+      }
       return;
     }
 
-    // Fetch directly if no context
-    const fetchDishes = async () => {
-      const branchId = getSelectedBranchId();
-      if (!branchId) {
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const response = await api.menu.getHighlights();
-        
-        if (!response?.success || !response.data) {
-          setDishes([]);
+    // Only re-fetch if language actually changed (not initial render)
+    if (prevLangRef.current && prevLangRef.current !== clientLang) {
+      const fetchPopularDishes = async () => {
+        const branchId = getSelectedBranchId();
+        if (!branchId) {
+          prevLangRef.current = clientLang;
           return;
         }
 
-        const popularItems = response.data.popular || [];
-        const transformed = transformMenuItemsToProducts(popularItems, lang);
-        setDishes(transformed);
-      } catch (error) {
-        console.error("Error fetching popular dishes:", error);
-        setDishes([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+        try {
+          const response = await api.menu.getHighlights({ branch_id: branchId });
+          if (response?.success && response.data) {
+            setDishesData(response.data.popular || []);
+          }
+        } catch (error) {
+          console.error('Error fetching popular dishes:', error);
+        } finally {
+          // Update prevLangRef after fetch completes
+          prevLangRef.current = clientLang;
+        }
+      };
 
-    fetchDishes();
-  }, [contextData, selectedBranch, getSelectedBranchId, lang]);
+      fetchPopularDishes();
+    } else if (!prevLangRef.current) {
+      // Initialize on first render
+      prevLangRef.current = clientLang;
+    }
+  }, [isHydrated, clientLang, getSelectedBranchId]);
+
+  // Transform popular dishes based on current language
+  const dishes = useMemo(() => {
+    if (!dishesData || !Array.isArray(dishesData)) return [];
+    return transformMenuItemsToProducts(dishesData, lang);
+  }, [dishesData, lang]);
+
+  const isLoading = !dishesData || (Array.isArray(dishesData) && dishesData.length === 0);
 
   return (
     <section className="popular-dishes-section py-10 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">

@@ -1,190 +1,162 @@
-"use client";
-import { useEffect, Suspense } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense } from "react";
 import dynamic from "next/dynamic";
-import useBranchStore from "../store/branchStore";
-import { HighlightsProvider } from "../context/HighlightsContext";
-import AnimatedSection from "../components/ui/AnimatedSection";
 import ErrorBoundary from "../components/ui/ErrorBoundary";
 import SectionSkeleton from "../components/ui/SectionSkeleton";
 import PageSEO from "../components/seo/PageSEO";
-import { prefetchWebsiteSlides } from "../hooks/useWebsiteSlides";
+import { getLanguage } from "../lib/getLanguage";
+import { getAuthToken } from "../lib/getAuthToken";
+import { createServerAxios } from "../api/config/serverAxios";
 
-// Above the fold - Load immediately (no lazy loading)
-import BannerSection from "../components/pages/home/BannerSection";
-
-// Priority 1: High Priority - Lazy load with SSR disabled (client-only)
-const PopularDishes = dynamic(
-  () => import("../components/pages/shop/PopularDishes"),
+// Lazy load HomeSection
+const HomeSection = dynamic(
+  () => import("../components/pages/home/HomeSection"),
   {
-    loading: () => <SectionSkeleton variant="grid" cardCount={5} height="h-96" />,
-    ssr: false,
+    loading: () => <SectionSkeleton variant="default" height="h-screen" />,
+    ssr: true,
   }
 );
 
-const FoodMenuSection = dynamic(
-  () => import("../components/pages/home/FoodMenuSection"),
-  {
-    loading: () => <SectionSkeleton variant="default" cardCount={10} height="h-96" />,
-    ssr: false,
-  }
-);
-
-// Priority 3: Medium Priority - Lazy load
-const LatestItemsSection = dynamic(
-  () => import("../components/pages/home/LatestItemsSection"),
-  {
-    loading: () => <SectionSkeleton variant="slider" cardCount={4} height="h-80" />,
-    ssr: false,
-  }
-);
-
-const ChefSpecialSection = dynamic(
-  () => import("../components/pages/home/ChefSpecialSection"),
-  {
-    loading: () => <SectionSkeleton variant="grid" cardCount={3} height="h-96" />,
-    ssr: false,
-  }
-);
-
-const ChefeSection = dynamic(
-  () => import("../components/pages/about-us/ChefeSection"),
-  {
-    loading: () => <SectionSkeleton variant="grid" cardCount={3} height="h-96" />,
-    ssr: false,
-  }
-);
-
-const OfferCards = dynamic(
-  () => import("../components/pages/about-us/OfferCards"),
-  {
-    loading: () => <SectionSkeleton variant="default" cardCount={3} height="h-80" />,
-    ssr: false,
-  }
-);
-
-// Lightweight sections - Can be lazy loaded but low impact
-const AboutUsSection = dynamic(
-  () => import("../components/pages/home/AboutUsSection"),
-  {
-    loading: () => <SectionSkeleton variant="default" showCards={false} height="h-64" />,
-    ssr: true, // Can be SSR as it's lightweight
-  }
-);
-
-export default function HomePage() {
-  const router = useRouter();
-  const { selectedBranch, initialize } = useBranchStore();
-
-  // Initialize branch store on mount
-  useEffect(() => {
-    initialize();
-  }, [initialize]);
-
-  // Early prefetch for banner slides - high priority
-  useEffect(() => {
-    const branchId = selectedBranch?.id || selectedBranch?.branch_id;
-    if (branchId) {
-      // Prefetch slides early to improve LCP
-      prefetchWebsiteSlides(branchId).catch((error) => {
-        // Silently fail - prefetch is not critical
-        console.warn('Early prefetch of website slides failed:', error);
-      });
+// Data fetching functions
+async function getDefaultBranch() {
+  try {
+    const token = await getAuthToken();
+    const serverAxios = await createServerAxios();
+    
+    // If user is authenticated, try to get branch from user profile
+    if (token) {
+      try {
+        const profileResponse = await serverAxios.get('/auth/profile');
+        if (profileResponse?.data?.success && profileResponse.data.data?.user?.branch_id) {
+          const userBranchId = profileResponse.data.data.user.branch_id;
+          // Fetch branch details using branch_id
+          const branchResponse = await serverAxios.get(`/branches/${userBranchId}`);
+          if (branchResponse?.data?.success && branchResponse.data.data?.branch) {
+            return branchResponse.data.data.branch;
+          }
+        }
+      } catch (profileError) {
+        // If profile fetch fails, fallback to default branch
+        console.warn('Failed to fetch user profile, using default branch:', profileError);
+      }
     }
-  }, [selectedBranch?.id, selectedBranch?.branch_id]);
+    
+    // Fallback to default branch (if no token or profile fetch failed)
+    const response = await serverAxios.get('/branches/default');
+    return response?.data?.success ? response.data.data?.branch : null;
+  } catch (error) {
+    console.error('Error fetching default branch:', error);
+    return null;
+  }
+}
 
-  // Branch change is handled by components naturally - no need for full page refresh
-  // Removed router.refresh() to prevent unnecessary re-renders
+async function getWebsiteSlides(branchId) {
+  if (!branchId) return [];
+  
+  try {
+    const serverAxios = await createServerAxios();
+    const response = await serverAxios.get('/website-slides', {
+      params: { branch_id: branchId },
+    });
+    
+    return response?.data?.success ? response.data.data?.slides || [] : [];
+  } catch (error) {
+    console.error('Error fetching website slides:', error);
+    return [];
+  }
+}
+
+async function getHighlights(branchId) {
+  if (!branchId) {
+    return {
+      popular: [],
+      latest: [],
+      chefSpecial: [],
+    };
+  }
+  
+  try {
+    const serverAxios = await createServerAxios();
+    const response = await serverAxios.get('/menu-items/highlights', {
+      params: { branch_id: branchId },
+    });
+    
+    if (!response?.data?.success || !response.data.data) {
+      return {
+        popular: [],
+        latest: [],
+        chefSpecial: [],
+      };
+    }
+
+    const data = response.data.data;
+    
+    // Return raw data (not transformed) - transformation will happen on client side
+    return {
+      popular: data.popular || [],
+      latest: data.latest || [],
+      chefSpecial: data.chef_special || [],
+    };
+  } catch (error) {
+    console.error('Error fetching highlights:', error);
+    return {
+      popular: [],
+      latest: [],
+      chefSpecial: [],
+    };
+  }
+}
+
+async function getChefs(branchId) {
+  if (!branchId) return [];
+  
+  try {
+    const serverAxios = await createServerAxios();
+    const response = await serverAxios.get('/chefs', {
+      params: { branch_id: branchId },
+    });
+    
+    return response?.data?.success ? response.data.data?.chefs || [] : [];
+  } catch (error) {
+    console.error('Error fetching chefs:', error);
+    return [];
+  }
+}
+
+export default async function HomePage() {
+  // Get language from Accept-Language header
+  const lang = await getLanguage();
+  
+  // Get default branch
+  const defaultBranch = await getDefaultBranch();
+  const branchId = defaultBranch?.id || defaultBranch?.branch_id;
+  
+  // Fetch all data in parallel
+  const [slides, highlights, chefs] = await Promise.all([
+    getWebsiteSlides(branchId),
+    getHighlights(branchId),
+    getChefs(branchId),
+  ]);
 
   return (
-    <HighlightsProvider>
+    <div className="bg-bg3 min-h-screen">
       <PageSEO
         title="Shahrayar Restaurant - Authentic Middle Eastern Cuisine"
         description="Experience authentic Middle Eastern flavors at Shahrayar Restaurant. Fresh ingredients, traditional recipes, and genuine hospitality. Order online for delivery or pickup."
         url="/"
         keywords={["Middle Eastern food", "restaurant", "delivery", "pickup", "authentic cuisine", "Shahrayar"]}
       />
-      <div className="bg-bg3 min-h-screen">
-        {/* Banner Section - Above the fold, load immediately */}
-        <AnimatedSection>
-          <BannerSection />
-        </AnimatedSection>
-
-        {/* Latest Items Section - Priority 3 */}
-        <ErrorBoundary>
-          <Suspense fallback={<SectionSkeleton variant="slider" cardCount={4} height="h-80" />}>
-            <AnimatedSection>
-              <LatestItemsSection />
-            </AnimatedSection>
-          </Suspense>
-        </ErrorBoundary>
-
-        {/* Offer Cards Section - Priority 3 */}
-        <ErrorBoundary>
-          <Suspense fallback={<SectionSkeleton variant="default" cardCount={3} height="h-80" />}>
-            <AnimatedSection>
-              <OfferCards />
-            </AnimatedSection>
-          </Suspense>
-        </ErrorBoundary>
-
-        {/* About Us Section - Lightweight */}
-        <ErrorBoundary>
-          <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-64" />}>
-            <AnimatedSection>
-              <AboutUsSection />
-            </AnimatedSection>
-          </Suspense>
-        </ErrorBoundary>
-
-        {/* Popular Dishes Section - Priority 1 (High) */}
-        <ErrorBoundary>
-          <Suspense fallback={<SectionSkeleton variant="grid" cardCount={5} height="h-96" />}>
-            <AnimatedSection>
-              <PopularDishes />
-            </AnimatedSection>
-          </Suspense>
-        </ErrorBoundary>
-
-
-
-        {/* Food Menu Section - Priority 1 (High) */}
-        <ErrorBoundary>
-          <Suspense fallback={<SectionSkeleton variant="default" cardCount={10} height="h-96" />}>
-            <AnimatedSection>
-              <FoodMenuSection />
-            </AnimatedSection>
-          </Suspense>
-        </ErrorBoundary>
-
-        {/* Chef Special Section - Priority 1 (High) */}
-        <ErrorBoundary>
-          <Suspense fallback={<SectionSkeleton variant="grid" cardCount={3} height="h-96" />}>
-            <AnimatedSection>
-              <ChefSpecialSection />
-            </AnimatedSection>
-          </Suspense>
-        </ErrorBoundary>
-
-        {/* Chef Section - Priority 3 */}
-        <ErrorBoundary>
-          <Suspense fallback={<SectionSkeleton variant="grid" cardCount={3} height="h-96" />}>
-            <AnimatedSection>
-              <ChefeSection />
-            </AnimatedSection>
-          </Suspense>
-        </ErrorBoundary>
-
-        {/* Testimonial Section - Priority 2 (High) */}
-        {/* <ErrorBoundary>
-        <Suspense fallback={<SectionSkeleton variant="testimonial" height="h-96" />}>
-          <AnimatedSection>
-            <TestimonialSection />
-          </AnimatedSection>
+      <ErrorBoundary>
+        <Suspense fallback={<SectionSkeleton variant="default" height="h-screen" />}>
+          <HomeSection
+            slides={slides}
+            rawPopularData={highlights.popular}
+            rawLatestData={highlights.latest}
+            rawChefSpecialData={highlights.chefSpecial}
+            chefs={chefs}
+            lang={lang}
+          />
         </Suspense>
-      </ErrorBoundary> */}
-
-      </div>
-    </HighlightsProvider>
+      </ErrorBoundary>
+    </div>
   );
 }

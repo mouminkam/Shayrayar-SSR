@@ -5,7 +5,9 @@ import FreshHeatFooter from "../components/layout/Footer";
 import Toast from "../components/ui/Toast";
 import BranchInitializer from "../components/layout/BranchInitializer";
 import LenisScrollProvider from "../components/layout/LenisScrollProvider";
+import ScrollToTopHandler from "../components/layout/ScrollToTopHandler";
 import HtmlLangUpdater from "../components/layout/HtmlLangUpdater";
+import AuthTokenInjector from "../components/layout/AuthTokenInjector";
 import { LanguageProvider } from "../context/LanguageContext";
 import "./globals.css";
 
@@ -69,7 +71,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={oswald.variable}>
+    <html lang="bg" className={oswald.variable}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -99,7 +101,9 @@ export default function RootLayout({ children }) {
       <body suppressHydrationWarning className={oswald.className}>
         <LanguageProvider>
             <HtmlLangUpdater />
+            <AuthTokenInjector />
             <LenisScrollProvider>
+              <ScrollToTopHandler />
               <BranchInitializer />
               <FreshHeatHeader />
               <main id="main" role="main" className="pt-15 md:pt-15 lg:pt-0">
