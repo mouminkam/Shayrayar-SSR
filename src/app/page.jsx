@@ -188,8 +188,8 @@ async function getChefs(branchId, lang) {
   }
 }
 
-// Cache configuration for SSR
-export const revalidate = 300; // Revalidate every 5 minutes
+// Cache configuration for SSR - Optimized for performance
+export const revalidate = 180; // Revalidate every 3 minutes - balance between freshness and performance
 
 export default async function HomePage() {
   // Get language from Accept-Language header

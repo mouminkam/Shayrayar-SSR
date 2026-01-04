@@ -32,10 +32,24 @@ const nextConfig: NextConfig = {
       exclude: ["error", "warn"],
     } : false,
   },
+  // Production optimizations
+  // Note: Next.js 16 uses SWC minification by default, targeting modern browsers
+  productionBrowserSourceMaps: false, // Disable source maps in production for better performance
+  poweredByHeader: false, // Remove X-Powered-By header for security and performance
   // Experimental features for better performance
   // Note: Turbopack (Next.js 16 default) handles bundle optimization automatically
   experimental: {
-    optimizePackageImports: ["lucide-react", "framer-motion", "swiper", "react-icons"],
+    optimizePackageImports: [
+      "lucide-react", 
+      "framer-motion", 
+      "swiper", 
+      "react-icons",
+      "@stripe/react-stripe-js",
+      "@stripe/stripe-js",
+      "react-hook-form",
+      "zod",
+      "@hookform/resolvers",
+    ],
   },
   // Turbopack configuration (empty config to silence the warning)
   // Turbopack handles bundle splitting and optimization automatically

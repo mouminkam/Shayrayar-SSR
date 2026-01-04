@@ -68,7 +68,7 @@ export default function ProductAbout({ product }) {
         <h2 className="product-title text-white  text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">
           {product?.title || t(lang, "product")}
         </h2>
-        <div className="price text-theme  text-4xl sm:text-5xl lg:text-6xl font-black">
+        <div className="price text-white  text-4xl sm:text-5xl lg:text-6xl font-black">
           {formatCurrency(product?.price || product?.base_price || 0)}
         </div>
       </div>

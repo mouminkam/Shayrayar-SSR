@@ -160,11 +160,14 @@ const FreshHeatHeader = () => {
               <Image
                 src={IMAGE_PATHS.logo}
                 alt="logo"
-                width={100}
-                height={100}
+                width={120}
+                height={120}
                 className="w-24 h-auto object-cover"
+                quality={85}
                 loading="eager"
                 priority
+                decoding="async"
+                sizes="(max-width: 640px) 80px, (max-width: 1024px) 100px, 120px"
               />
             </Link>
           </div>
@@ -331,9 +334,10 @@ const FreshHeatHeader = () => {
                 width={120}
                 height={120}
                 className="h-12 sm:h-14 lg:h-16 xl:h-20 w-auto object-contain transition-transform duration-300 hover:scale-105"
-                quality={90}
+                quality={85}
                 priority
                 loading="eager"
+                decoding="async"
                 sizes="(max-width: 640px) 80px, (max-width: 1024px) 100px, 120px"
               />
             </Link>
