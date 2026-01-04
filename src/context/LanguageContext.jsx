@@ -1,46 +1,42 @@
 "use client";
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { i18n } from "../locales/i18n/config";
+import { getCookie, setCookie } from "../lib/utils/cookies";
 
 const LanguageContext = createContext();
 
+const LANGUAGE_COOKIE_NAME = 'language';
+
 export function LanguageProvider({ children }) {
   // Always start with default locale to avoid hydration mismatch
-  // We'll read from localStorage in useEffect after mount
+  // We'll read from cookie in useEffect after mount
   const [lang, setLangState] = useState(i18n.defaultLocale);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Read from localStorage after mount to avoid hydration mismatch
+  // Read from cookie after mount to avoid hydration mismatch
   useEffect(() => {
     setIsMounted(true);
     if (typeof window !== 'undefined') {
-      const savedLang = localStorage.getItem('language');
-      // Validate that saved language is one of the supported locales
-      if (savedLang && i18n.locales.includes(savedLang)) {
-        setLangState(savedLang);
+      const cookieLang = getCookie(LANGUAGE_COOKIE_NAME);
+      if (cookieLang && i18n.locales.includes(cookieLang)) {
+        setLangState(cookieLang);
       } else {
-        // If no valid language in localStorage, save default
-        localStorage.setItem('language', i18n.defaultLocale);
+        // Default to Bulgarian and set cookie
+        setLangState(i18n.defaultLocale);
+        setCookie(LANGUAGE_COOKIE_NAME, i18n.defaultLocale);
       }
     }
-  }, []); // Only run on mount
+  }, []); // Only run once on mount
 
-  // Wrapper function that saves to localStorage immediately when language changes
+  // Wrapper function that saves to cookie when language changes
   const setLang = useCallback((newLang) => {
     if (typeof window !== 'undefined' && i18n.locales.includes(newLang)) {
-      // Save to localStorage immediately
-      localStorage.setItem('language', newLang);
-      // Update state
+      // Update state immediately
       setLangState(newLang);
+      // Save to cookie (365 days expiration)
+      setCookie(LANGUAGE_COOKIE_NAME, newLang);
     }
   }, []);
-
-  // Also save to localStorage whenever lang changes (backup)
-  useEffect(() => {
-    if (isMounted && typeof window !== 'undefined') {
-      localStorage.setItem('language', lang);
-    }
-  }, [lang, isMounted]);
 
   return (
     <LanguageContext.Provider value={{ lang, setLang }}>
@@ -49,4 +45,18 @@ export function LanguageProvider({ children }) {
   );
 }
 
-export const useLanguage = () => useContext(LanguageContext);
+export const useLanguage = () => {
+  const context = useContext(LanguageContext);
+  
+  // Fallback if context is not available (SSR or component outside LanguageProvider)
+  if (!context) {
+    return {
+      lang: i18n.defaultLocale,
+      setLang: () => {
+        console.warn('setLang called but LanguageProvider is not available');
+      },
+    };
+  }
+  
+  return context;
+};

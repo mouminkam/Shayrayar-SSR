@@ -112,6 +112,7 @@ export default function ChefSpecialSection({ rawChefSpecialData = null, lang: se
                   dish={dish}
                   index={index}
                   prefetchRoute={prefetchRoute}
+                  lang={lang}
                 />
               );
             })}
@@ -123,8 +124,7 @@ export default function ChefSpecialSection({ rawChefSpecialData = null, lang: se
 }
 
 // Lazy Chef Card Component - Loads only when in viewport
-function LazyChefCard({ dish, index, prefetchRoute }) {
-  const { lang } = useLanguage();
+function LazyChefCard({ dish, index, prefetchRoute, lang }) {
   const shouldLoadImmediately = index < 3; // Load first 3 immediately
   const { ref, inView } = useInView({
     threshold: 0.1,

@@ -132,6 +132,7 @@ export default function PopularDishes({ rawPopularData = null, lang: serverLang 
                     dish={dish}
                     index={index}
                     prefetchRoute={prefetchRoute}
+                    lang={lang}
                   />
                 );
               })}
@@ -144,8 +145,7 @@ export default function PopularDishes({ rawPopularData = null, lang: serverLang 
 }
 
 // Lazy Popular Card Component - Loads only when in viewport
-function LazyPopularCard({ dish, index, prefetchRoute }) {
-  const { lang } = useLanguage();
+function LazyPopularCard({ dish, index, prefetchRoute, lang }) {
   const shouldLoadImmediately = index < 3; // Load first 3 immediately
   const { ref, inView } = useInView({
     threshold: 0.1,

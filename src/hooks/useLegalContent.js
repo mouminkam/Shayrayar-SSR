@@ -7,13 +7,14 @@ import { useLanguage } from "../context/LanguageContext";
 /**
  * Hook to fetch and manage legal content (Terms & Conditions or Privacy Policy)
  * @param {string} type - Content type: 'terms-conditions' or 'privacy-policy'
+ * @param {boolean} enabled - Whether to fetch the content (default: false)
  * @returns {Object} Content data, loading state, and error
  */
-export function useLegalContent(type = 'terms-conditions') {
+export function useLegalContent(type = 'terms-conditions', enabled = false) {
   const { lang } = useLanguage();
   const { getCachedOrFetch } = useApiCache("LEGAL_CONTENT");
   const [content, setContent] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchContent = useCallback(async () => {
@@ -50,8 +51,13 @@ export function useLegalContent(type = 'terms-conditions') {
   }, [type, lang, getCachedOrFetch]);
 
   useEffect(() => {
-    fetchContent();
-  }, [fetchContent]);
+    if (enabled) {
+      fetchContent();
+    } else {
+      // Reset loading state when disabled
+      setIsLoading(false);
+    }
+  }, [enabled, fetchContent]);
 
   return {
     content,

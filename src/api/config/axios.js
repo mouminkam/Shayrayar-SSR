@@ -4,6 +4,7 @@
  */
 
 import axios from 'axios';
+import { getLanguageFromCookie } from '../../lib/utils/language';
 
 // Get base URL from environment variable
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://shahrayar.peaklink.pro/api/v1';
@@ -72,21 +73,10 @@ const getBranchId = () => {
 };
 
 /**
- * Get selected language from localStorage
- * Language is stored in localStorage under 'language'
- * Default value: 'bg' (Bulgarian)
+ * Get selected language from cookie
+ * Uses unified language utility
  */
-const getLanguage = () => {
-  if (typeof window === 'undefined') return 'bg';
-  
-  try {
-    const language = localStorage.getItem('language');
-    return language || 'bg';
-  } catch (error) {
-    console.error('Error reading language from storage:', error);
-    return 'bg';
-  }
-};
+const getLanguage = getLanguageFromCookie;
 
 /**
  * Check if URL should exclude branch_id
@@ -138,7 +128,7 @@ axiosInstance.interceptors.request.use(
       }
     }
     
-    // Add Accept-Language header based on selected language
+    // Add Accept-Language header based on selected language from cookie
     const language = getLanguage();
     config.headers['Accept-Language'] = language;
     

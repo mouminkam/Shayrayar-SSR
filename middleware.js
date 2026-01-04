@@ -4,6 +4,8 @@ import { NextResponse } from 'next/server';
  * Next.js Middleware to forward Authorization header from request
  * This allows server components to access user authentication token
  * The token is injected by AuthTokenInjector component on client-side
+ * 
+ * Note: Language is handled via cookie, which is automatically sent with all requests
  */
 export function middleware(request) {
   const response = NextResponse.next();
@@ -31,4 +33,3 @@ export const config = {
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
-

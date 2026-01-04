@@ -45,15 +45,26 @@ export async function prefetchWebsiteSlides(branchId, params = {}) {
       }
     };
 
+    const token = getToken();
+    
+    // Get language from cookie
     const getLanguage = () => {
+      if (typeof document === 'undefined') return 'bg';
       try {
-        return localStorage.getItem('language') || 'bg';
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; language=`);
+        
+        if (parts.length === 2) {
+          const lang = parts.pop().split(';').shift();
+          return lang === 'en' ? 'en' : 'bg';
+        }
+        
+        return 'bg';
       } catch {
         return 'bg';
       }
     };
-
-    const token = getToken();
+    
     const language = getLanguage();
     const cacheKey = generateCacheKey('/website-slides', params, branchId, language);
     const ttl = CACHE_DURATION.WEBSITE_SLIDES || CACHE_DURATION.PRODUCTS;
@@ -218,16 +229,27 @@ export function useWebsiteSlides(params = {}) {
         }
       };
 
+
+      const token = getToken();
+      
+      // Get language from cookie
       const getLanguage = () => {
-        if (typeof window === 'undefined') return 'bg';
+        if (typeof document === 'undefined') return 'bg';
         try {
-          return localStorage.getItem('language') || 'bg';
+          const value = `; ${document.cookie}`;
+          const parts = value.split(`; language=`);
+          
+          if (parts.length === 2) {
+            const lang = parts.pop().split(';').shift();
+            return lang === 'en' ? 'en' : 'bg';
+          }
+          
+          return 'bg';
         } catch {
           return 'bg';
         }
       };
-
-      const token = getToken();
+      
       const language = getLanguage();
 
       // Use Fetch API with high priority

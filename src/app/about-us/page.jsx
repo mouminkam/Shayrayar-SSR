@@ -9,6 +9,23 @@ import { getAuthToken } from "../../lib/getAuthToken";
 import { t } from "../../locales/i18n/getTranslation";
 import { createServerAxios } from "../../api/config/serverAxios";
 
+// Server-side cache for SSR functions
+const cache = new Map();
+const CACHE_TTL = 300000; // 5 minutes in milliseconds
+
+function getCached(key) {
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+  cache.delete(key);
+  return null;
+}
+
+function setCached(key, data) {
+  cache.set(key, { data, timestamp: Date.now() });
+}
+
 // Lazy load AboutUsSection
 const AboutUsSection = dynamic(
   () => import("../../components/pages/about-us/AboutUsSection"),
@@ -20,6 +37,14 @@ const AboutUsSection = dynamic(
 
 // Data fetching functions
 async function getDefaultBranch() {
+  const cacheKey = 'default-branch';
+  
+  // Check cache first
+  const cached = getCached(cacheKey);
+  if (cached !== null) {
+    return cached;
+  }
+  
   try {
     const token = await getAuthToken();
     const serverAxios = await createServerAxios();
@@ -33,7 +58,9 @@ async function getDefaultBranch() {
           // Fetch branch details using branch_id
           const branchResponse = await serverAxios.get(`/branches/${userBranchId}`);
           if (branchResponse?.data?.success && branchResponse.data.data?.branch) {
-            return branchResponse.data.data.branch;
+            const result = branchResponse.data.data.branch;
+            setCached(cacheKey, result);
+            return result;
           }
         }
       } catch (profileError) {
@@ -44,15 +71,27 @@ async function getDefaultBranch() {
     
     // Fallback to default branch (if no token or profile fetch failed)
     const response = await serverAxios.get('/branches/default');
-    return response?.data?.success ? response.data.data?.branch : null;
+    const result = response?.data?.success ? response.data.data?.branch : null;
+    if (result) {
+      setCached(cacheKey, result);
+    }
+    return result;
   } catch (error) {
     console.error('Error fetching default branch:', error);
     return null;
   }
 }
 
-async function getChefs(branchId) {
+async function getChefs(branchId, lang) {
   if (!branchId) return [];
+  
+  const cacheKey = `chefs-${branchId}-${lang}`;
+  
+  // Check cache first
+  const cached = getCached(cacheKey);
+  if (cached !== null) {
+    return cached;
+  }
   
   try {
     const serverAxios = await createServerAxios();
@@ -60,15 +99,27 @@ async function getChefs(branchId) {
       params: { branch_id: branchId },
     });
     
-    return response?.data?.success ? response.data.data?.chefs || [] : [];
+    const result = response?.data?.success ? response.data.data?.chefs || [] : [];
+    if (result.length > 0) {
+      setCached(cacheKey, result);
+    }
+    return result;
   } catch (error) {
     console.error('Error fetching chefs:', error);
     return [];
   }
 }
 
-async function getWebsiteSlides(branchId) {
+async function getWebsiteSlides(branchId, lang) {
   if (!branchId) return [];
+  
+  const cacheKey = `website-slides-${branchId}-${lang}`;
+  
+  // Check cache first
+  const cached = getCached(cacheKey);
+  if (cached !== null) {
+    return cached;
+  }
   
   try {
     const serverAxios = await createServerAxios();
@@ -76,12 +127,19 @@ async function getWebsiteSlides(branchId) {
       params: { branch_id: branchId },
     });
     
-    return response?.data?.success ? response.data.data?.slides || [] : [];
+    const result = response?.data?.success ? response.data.data?.slides || [] : [];
+    if (result.length > 0) {
+      setCached(cacheKey, result);
+    }
+    return result;
   } catch (error) {
     console.error('Error fetching website slides:', error);
     return [];
   }
 }
+
+// Cache configuration for SSR
+export const revalidate = 300; // Revalidate every 5 minutes
 
 export default async function AboutUsPage() {
   // Get language from Accept-Language header
@@ -93,8 +151,8 @@ export default async function AboutUsPage() {
   
   // Fetch all data in parallel
   const [chefs, slides] = await Promise.all([
-    getChefs(branchId),
-    getWebsiteSlides(branchId),
+    getChefs(branchId, lang),
+    getWebsiteSlides(branchId, lang),
   ]);
   
   return (

@@ -36,6 +36,6 @@ export const ITEMS_PER_PAGE = 12; // Default for backward compatibility
 export const IMAGE_PATHS = {
   logo: '/img/logo/mainlogo.png',
   breadcrumb: '/img/bg/breadcumb.jpg',
-  placeholder: '/img/placeholder.png',
+  placeholder: '/img/placeholder.svg',
 };
 

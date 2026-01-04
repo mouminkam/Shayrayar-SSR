@@ -19,18 +19,27 @@ const oswald = Oswald({
   display: "swap",
 });
 
-
 export const metadata = {
   title: {
     default: "Shahrayar Restaurant - Authentic Middle Eastern Cuisine",
     template: "%s | Shahrayar Restaurant",
   },
-  description: "Experience authentic Middle Eastern flavors at Shahrayar Restaurant. Fresh ingredients, traditional recipes, and genuine hospitality. Order online for delivery or pickup.",
-  keywords: ["Middle Eastern food", "restaurant", "delivery", "pickup", "authentic cuisine", "Shahrayar"],
+  description:
+    "Experience authentic Middle Eastern flavors at Shahrayar Restaurant. Fresh ingredients, traditional recipes, and genuine hospitality. Order online for delivery or pickup.",
+  keywords: [
+    "Middle Eastern food",
+    "restaurant",
+    "delivery",
+    "pickup",
+    "authentic cuisine",
+    "Shahrayar",
+  ],
   authors: [{ name: "Shahrayar Restaurant" }],
   creator: "Shahrayar Restaurant",
   publisher: "Shahrayar Restaurant",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://shahrayar.peaklink.pro"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://shahrayar.peaklink.pro"
+  ),
   alternates: {
     canonical: "/",
   },
@@ -40,7 +49,8 @@ export const metadata = {
     url: "/",
     siteName: "Shahrayar Restaurant",
     title: "Shahrayar Restaurant - Authentic Middle Eastern Cuisine",
-    description: "Experience authentic Middle Eastern flavors at Shahrayar Restaurant. Fresh ingredients, traditional recipes, and genuine hospitality.",
+    description:
+      "Experience authentic Middle Eastern flavors at Shahrayar Restaurant. Fresh ingredients, traditional recipes, and genuine hospitality.",
     images: [
       {
         url: "/img/logo/mainlogo.png",
@@ -53,7 +63,8 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Shahrayar Restaurant - Authentic Middle Eastern Cuisine",
-    description: "Experience authentic Middle Eastern flavors at Shahrayar Restaurant.",
+    description:
+      "Experience authentic Middle Eastern flavors at Shahrayar Restaurant.",
     images: ["/img/logo/mainlogo.png"],
   },
   robots: {
@@ -69,7 +80,6 @@ export const metadata = {
   },
 };
 
-
 export default function RootLayout({ children }) {
   return (
     <html lang="bg" className={oswald.variable}>
@@ -79,11 +89,19 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/img/logo/mainlogo.png" type="image/png" />
         {/* Preconnect to external domains for faster resource loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
         {/* API endpoint preconnect for banner slides - high priority */}
-        <link rel="preconnect" href="https://shahrayar.peaklink.pro" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://shahrayar.peaklink.pro"
+          crossOrigin="anonymous"
+        />
         <link rel="dns-prefetch" href="https://shahrayar.peaklink.pro" />
-        
+
         {/* Preload LCP images for faster initial render */}
         <link
           rel="preload"
@@ -101,19 +119,19 @@ export default function RootLayout({ children }) {
 
       <body suppressHydrationWarning className={oswald.className}>
         <LanguageProvider>
-            <DecorativeYellowCircles />
-            <HtmlLangUpdater />
-            <AuthTokenInjector />
-            <LenisScrollProvider>
-              <ScrollToTopHandler />
-              <BranchInitializer />
-              <FreshHeatHeader />
-              <main id="main" role="main" className="pt-15 md:pt-15 lg:pt-0">
-                {children}
-              </main>
-              <FreshHeatFooter />
-              <Toast />
-            </LenisScrollProvider>
+          <DecorativeYellowCircles />
+          <HtmlLangUpdater />
+          <AuthTokenInjector />
+          <LenisScrollProvider>
+            <ScrollToTopHandler />
+            <BranchInitializer />
+            <FreshHeatHeader />
+            <main id="main" role="main" className="pt-15 md:pt-15 lg:pt-0">
+              {children}
+            </main>
+            <FreshHeatFooter />
+            <Toast />
+          </LenisScrollProvider>
         </LanguageProvider>
         <SpeedInsights />
       </body>

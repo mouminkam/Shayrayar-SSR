@@ -1,39 +1,30 @@
-import { headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { i18n } from '../locales/i18n/config';
 
+const LANGUAGE_COOKIE_NAME = 'language';
+
 /**
- * Server-side function to get language from Accept-Language header
- * Falls back to default locale if header not found or not supported
+ * Server-side function to get language from cookie
+ * Falls back to default locale ('bg') if not found
+ * 
+ * IMPORTANT: We use cookie for language preference.
+ * The default language is always 'bg' for first-time visitors.
+ * 
  * @returns {Promise<string>} Language code ('en' or 'bg')
  */
 export async function getLanguage() {
   try {
-    const headersList = await headers();
-    const acceptLanguage = headersList.get('accept-language');
+    const cookieStore = await cookies();
+    const languageCookie = cookieStore.get(LANGUAGE_COOKIE_NAME);
     
-    if (acceptLanguage) {
-      // Parse Accept-Language header
-      // Format: "en-US,en;q=0.9,bg;q=0.8" -> ["en", "bg"]
-      const languages = acceptLanguage
-        .split(',')
-        .map(lang => lang.split(';')[0].trim().toLowerCase().substring(0, 2));
-      
-      // Always prioritize default locale (bg) if it exists in the header
-      if (languages.includes(i18n.defaultLocale)) {
-        return i18n.defaultLocale;
-      }
-      
-      // If default locale not in header, still use it as default
-      // Only use other languages if explicitly requested and default not available
-      // This ensures bg is always the default language
-      return i18n.defaultLocale;
+    if (languageCookie?.value && i18n.locales.includes(languageCookie.value)) {
+      return languageCookie.value;
     }
     
-    // Fallback to default locale
+    // Always fallback to default locale ('bg') for first-time visitors
     return i18n.defaultLocale;
   } catch (error) {
-    console.error('Error reading Accept-Language header:', error);
+    console.error('Error reading language cookie:', error);
     return i18n.defaultLocale;
   }
 }
-

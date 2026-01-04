@@ -1,12 +1,25 @@
 "use client";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
 
-export default function AboutUsSection() {
-  const { lang } = useLanguage();
+export default function AboutUsSection({ lang: serverLang = null }) {
+  const { lang: clientLang } = useLanguage();
+  const [lang, setLang] = useState(serverLang || clientLang || 'bg');
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (isHydrated && clientLang) {
+      setLang(clientLang);
+    }
+  }, [clientLang, isHydrated]);
   return (
     <section className="about-us-section  section-padding pb-0 py-0 sm:py-12  relative overflow-hidden">
       <div className="about-wrapper style1 relative h-[450px]">
@@ -25,8 +38,8 @@ export default function AboutUsSection() {
           <Image
             src="/img/shape/shawerma.png"
             alt="shape"
-            width={300}
-            height={300}
+            width={400}
+            height={400}
             quality={100}
             className="w-full h-130 object-contain"
             sizes="300px"

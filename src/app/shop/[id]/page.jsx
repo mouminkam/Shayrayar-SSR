@@ -7,6 +7,23 @@ import { getLanguage } from "../../../lib/getLanguage";
 import { getAuthToken } from "../../../lib/getAuthToken";
 import { createServerAxios } from "../../../api/config/serverAxios";
 
+// Server-side cache for SSR functions
+const cache = new Map();
+const CACHE_TTL = 300000; // 5 minutes in milliseconds
+
+function getCached(key) {
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+  cache.delete(key);
+  return null;
+}
+
+function setCached(key, data) {
+  cache.set(key, { data, timestamp: Date.now() });
+}
+
 const ShopDetailsContent = dynamic(
   () => import("../../../components/pages/shop/ShopDetailsContent"),
   {
@@ -23,25 +40,36 @@ const PopularDishes = dynamic(
   }
 );
 
-async function getProductDetails(productId) {
+async function getProductDetails(productId, lang) {
   if (!productId) return null;
+  
+  const cacheKey = `product-details-${productId}-${lang}`;
+  
+  // Check cache first
+  const cached = getCached(cacheKey);
+  if (cached !== null) {
+    return cached;
+  }
+  
   try {
     const serverAxios = await createServerAxios();
     const response = await serverAxios.get(`/menu-items/${productId}`);
     if (!response?.data?.success || !response.data.data) return null;
     const data = response.data.data;
-    return {
+    const result = {
       item: data.item || data,
       optionGroups: data.option_groups || [],
       customizations: data.customizations || null,
     };
+    setCached(cacheKey, result);
+    return result;
   } catch (error) {
     console.error('Error fetching product details:', error);
     return null;
   }
 }
 
-async function getPopularDishes() {
+async function getPopularDishes(lang) {
   try {
     const token = await getAuthToken();
     const serverAxios = await createServerAxios();
@@ -70,11 +98,23 @@ async function getPopularDishes() {
     
     if (!branchId) return [];
     
+    const cacheKey = `popular-dishes-${branchId}-${lang}`;
+    
+    // Check cache first
+    const cached = getCached(cacheKey);
+    if (cached !== null) {
+      return cached;
+    }
+    
     const response = await serverAxios.get('/menu-items/highlights', {
       params: { branch_id: branchId },
     });
     
-    return response?.data?.success ? response.data.data?.popular || [] : [];
+    const result = response?.data?.success ? response.data.data?.popular || [] : [];
+    if (result.length > 0) {
+      setCached(cacheKey, result);
+    }
+    return result;
   } catch (error) {
     console.error('Error fetching popular dishes:', error);
     return [];
@@ -89,8 +129,8 @@ export default async function ShopDetailsPage({ params }) {
   if (!productId) notFound();
 
   const [productData, popularRawData] = await Promise.all([
-    getProductDetails(productId),
-    getPopularDishes(),
+    getProductDetails(productId, lang),
+    getPopularDishes(lang),
   ]);
 
   if (!productData?.item) notFound();

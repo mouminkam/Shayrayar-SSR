@@ -118,42 +118,21 @@ export default function OptimizedImage({
     }
   }, [src, imageLoaded, imageError, retryCount]);
 
-  // Check if src exists before render
-  if (!src) {
-    const minHeight = rest.height || 200;
-    const minWidth = rest.width || 200;
-    return (
-      <div 
-        className={`bg-gray-800/50 flex items-center justify-center animate-pulse ${className}`}
-        style={{
-          minHeight: `${minHeight}px`,
-          minWidth: `${minWidth}px`,
-        }}
-      >
-        <span className="text-gray-500 text-sm">Loading...</span>
-      </div>
-    );
-  }
-
-  // After max retries, show fallback image
-  if (imageError && retryCount >= maxRetries) {
-    return (
-      <div className="relative">
-        <NextImage
-          src={fallbackSrc}
-          alt={alt || "Image not available"}
-          className={className}
-          {...rest}
-        />
-      </div>
-    );
-  }
-
-  // Use proxy for API images automatically
+  // Use proxy for API images automatically - must be called before any early returns
   const imageSrc = useMemo(() => {
-    if (!src) return src;
-    return getProxiedImageUrl(src);
+    if (!src) return null;
+    try {
+      return getProxiedImageUrl(src);
+    } catch (error) {
+      console.warn("Error processing image URL:", error);
+      return src; // Fallback to original src
+    }
   }, [src]);
+
+  // Safe source: use fallback if imageSrc is null/undefined
+  const safeSrc = imageSrc || fallbackSrc;
+  const showFallback = imageError && retryCount >= maxRetries;
+  const hasNoSource = !src || !imageSrc;
   
   const isFill = rest.fill === true;
 
@@ -162,16 +141,23 @@ export default function OptimizedImage({
   if (isFill) {
     return (
       <div className="absolute inset-0">
-        {/* Skeleton/Placeholder while loading */}
-        {!imageLoaded && (
+        {/* Skeleton/Placeholder while loading or no source */}
+        {(!imageLoaded || hasNoSource) && (
           <div 
             className={`absolute inset-0 bg-gray-800/50 animate-pulse z-0`}
           />
         )}
         
+        {/* Loading text if no source */}
+        {hasNoSource && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <span className="text-gray-500 text-sm">Loading...</span>
+          </div>
+        )}
+        
         <NextImage
-          key={`${imageSrc}-${imageKey}`} // Force re-render when URL or key changes (for retry)
-          src={imageSrc}
+          key={`${showFallback ? fallbackSrc : safeSrc}-${imageKey}`} // Force re-render when URL or key changes (for retry)
+          src={showFallback ? fallbackSrc : safeSrc}
           alt={alt || "Image"}
           blurDataURL={blurPlaceholder}
           fill
@@ -216,8 +202,8 @@ export default function OptimizedImage({
 
   return (
     <div className="relative">
-      {/* Skeleton/Placeholder while loading */}
-      {!imageLoaded && (
+      {/* Skeleton/Placeholder while loading or no source */}
+      {(!imageLoaded || hasNoSource) && (
         <div 
           className={`absolute inset-0 bg-gray-800/50 animate-pulse ${className}`}
           style={{
@@ -227,9 +213,16 @@ export default function OptimizedImage({
         />
       )}
       
+      {/* Loading text if no source */}
+      {hasNoSource && (
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <span className="text-gray-500 text-sm">Loading...</span>
+        </div>
+      )}
+      
       <NextImage
-        key={`${imageSrc}-${imageKey}`} // Force re-render when URL or key changes (for retry)
-        src={imageSrc}
+        key={`${showFallback ? fallbackSrc : safeSrc}-${imageKey}`} // Force re-render when URL or key changes (for retry)
+        src={showFallback ? fallbackSrc : safeSrc}
         alt={alt || "Image"}
         blurDataURL={blurPlaceholder}
         className={`${className} ${!imageLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}

@@ -84,8 +84,18 @@ export default function LatestItemsSection({ rawLatestData = null, lang: serverL
     return transformMenuItemsToProducts(latestData, lang);
   }, [latestData, lang]);
 
+  // Always render something to maintain hook order consistency
+  // Return empty section instead of null to avoid hooks order issues
   if (!latest || latest.length === 0) {
-    return null;
+    return (
+      <section className="latest-items-section py-10 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
+        <div className="latest-items-wrapper style1">
+          <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
+            {/* Empty state - maintains component structure */}
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -109,6 +119,7 @@ export default function LatestItemsSection({ rawLatestData = null, lang: serverL
                   dish={dish}
                   index={index}
                   prefetchRoute={prefetchRoute}
+                  lang={lang}
                 />
               );
             })}
@@ -120,82 +131,83 @@ export default function LatestItemsSection({ rawLatestData = null, lang: serverL
 }
 
 // Lazy Card Component - Loads only when in viewport
-function LazyCard({ dish, index, prefetchRoute }) {
-  const { lang } = useLanguage();
+function LazyCard({ dish, index, prefetchRoute, lang }) {
+  // Always call hooks unconditionally to maintain hook order
   const shouldLoadImmediately = index < 3; // Load first 3 immediately
   const { ref, inView } = useInView({
     threshold: 0.1,
     rootMargin: "100px",
     triggerOnce: true,
+    skip: false, // Always enable the hook
   });
 
   const shouldLoad = shouldLoadImmediately || inView;
 
-  if (!shouldLoad) {
-    return (
-      <div ref={ref} className="latest-items-card style2 p-6 sm:p-7 mt-38 rounded-2xl bg-bgimg min-h-[280px]">
-        <ProductCardSkeleton viewMode="grid" count={1} />
-      </div>
-    );
-  }
-
+  // Always render the same wrapper structure to maintain consistency
   return (
-    <div
-      className="latest-items-card style2 p-6 sm:p-7 mt-38 rounded-2xl bg-bgimg shadow-lg hover:shadow-xl text-center transition-all duration-300 hover:-translate-y-2 relative min-h-[280px] flex flex-col"
+    <div 
+      ref={ref} 
+      className="latest-items-card style2 p-6 sm:p-7 mt-38 rounded-2xl bg-bgimg min-h-[280px]"
     >
-      {/* Product Image */}
-      <div 
-        className="absolute -top-20 left-1/2 -translate-x-1/2 flex justify-center items-center shrink-0 w-full"
-        onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
-      >
-        <Image
-          src="/img/food-items/circleShape.png"
-          alt="shape"
-          width={150}
-          height={150}
-          className="w-51 h-51 -top-[46px] absolute z-0 animate-spin-slow"
-          unoptimized={true}
-        />
-        <OptimizedImage
-          src={dish.image}
-          alt={dish.title}
-          width={192}
-          height={192}
-          className="w-48 h-48 object-cover rounded-full -top-10 relative z-10"
-          quality={75}
-          loading="lazy"
-          sizes="192px"
-        />
-      </div>
+      {shouldLoad ? (
+        <div className="shadow-lg hover:shadow-xl text-center transition-all duration-300 hover:-translate-y-2 relative flex flex-col h-full">
+          {/* Product Image */}
+          <div 
+            className="absolute -top-20 left-1/2 -translate-x-1/2 flex justify-center items-center shrink-0 w-full"
+            onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
+          >
+            <Image
+              src="/img/food-items/circleShape.png"
+              alt="shape"
+              width={150}
+              height={150}
+              className="w-51 h-51 -top-[46px] absolute z-0 animate-spin-slow"
+              unoptimized={true}
+            />
+            <OptimizedImage
+              src={dish.image}
+              alt={dish.title}
+              width={192}
+              height={192}
+              className="w-48 h-48 object-cover rounded-full -top-10 relative z-10"
+              quality={75}
+              loading="lazy"
+              sizes="192px"
+            />
+          </div>
 
-      {/* Content */}
-      <div className="item-content mt-20 flex flex-col grow justify-between">
-        <div>
-          <Link 
-            href={`/shop/${dish.id}`}
-            onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
-          >
-            <h2 className="text-white text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
-              {dish.title}
-            </h2>
-          </Link>
-          <p className="text-text text-sm sm:text-base mb-4 line-clamp-2">
-            {dish.description || t(lang, "delicious_food_item")}
-          </p>
+          {/* Content */}
+          <div className="item-content mt-20 flex flex-col grow justify-between">
+            <div>
+              <Link 
+                href={`/shop/${dish.id}`}
+                onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
+              >
+                <h2 className="text-white text-lg sm:text-xl font-bold mb-2 hover:text-theme transition-colors duration-300 line-clamp-2">
+                  {dish.title}
+                </h2>
+              </Link>
+              <p className="text-text text-sm sm:text-base mb-4 line-clamp-2">
+                {dish.description || t(lang, "delicious_food_item")}
+              </p>
+            </div>
+            <div className="mt-auto">
+              <p className="text-theme text-base sm:text-lg font-bold mb-4">
+                {formatCurrency(dish.price)}
+              </p>
+              <Link
+                href={`/shop/${dish.id}`}
+                onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
+                className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 w-full"
+              >
+                {t(lang, "order")}
+              </Link>
+            </div>
+          </div>
         </div>
-        <div className="mt-auto">
-          <p className="text-theme text-base sm:text-lg font-bold mb-4">
-            {formatCurrency(dish.price)}
-          </p>
-          <Link
-            href={`/shop/${dish.id}`}
-            onMouseEnter={() => prefetchRoute(`/shop/${dish.id}`)}
-            className="theme-btn style6 inline-flex items-center justify-center px-6 sm:px-8 py-3 bg-theme2 text-white text-sm font-semibold uppercase rounded-full hover:bg-theme hover:text-white transition-all duration-300 w-full"
-          >
-            {t(lang, "order")}
-          </Link>
-        </div>
-      </div>
+      ) : (
+        <ProductCardSkeleton viewMode="grid" count={1} />
+      )}
     </div>
   );
 }

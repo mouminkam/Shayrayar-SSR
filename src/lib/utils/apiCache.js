@@ -13,15 +13,23 @@ const pendingRequests = new Map(); // For request deduplication
  * @param {string} url - API endpoint URL
  * @param {Object} params - Request parameters
  * @param {string|number} branchId - Branch ID (optional)
- * @param {string} language - Language code (optional, will be read from localStorage if not provided)
+ * @param {string} language - Language code (optional, will be read from cookie if not provided)
  * @returns {string} Cache key
  */
 export function generateCacheKey(url, params = {}, branchId = null, language = null) {
-  // If language not provided, read from localStorage
-  if (language === null && typeof window !== 'undefined') {
+  // If language not provided, read from cookie
+  if (language === null && typeof document !== 'undefined') {
     try {
-      language = localStorage.getItem('language') || 'bg';
-    } catch {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; language=`);
+      
+      if (parts.length === 2) {
+        const lang = parts.pop().split(';').shift();
+        language = lang === 'en' ? 'en' : 'bg';
+      } else {
+        language = 'bg';
+      }
+    } catch (error) {
       language = 'bg';
     }
   }

@@ -87,7 +87,7 @@ export default function HomeSection({
       <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="default" showCards={false} height="h-64" />}>
           <AnimatedSection>
-            <AboutUsSection />
+            <AboutUsSection lang={lang} />
           </AnimatedSection>
         </Suspense>
       </ErrorBoundary>
@@ -105,7 +105,7 @@ export default function HomeSection({
       <ErrorBoundary>
         <Suspense fallback={<SectionSkeleton variant="default" cardCount={10} height="h-96" />}>
           <AnimatedSection>
-            <FoodMenuSection />
+            <FoodMenuSection lang={lang} />
           </AnimatedSection>
         </Suspense>
       </ErrorBoundary>

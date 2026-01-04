@@ -3,17 +3,8 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import api from "../api";
 import { generateCacheKey, getCachedData, setCachedData, getPendingRequest, setPendingRequest, CACHE_DURATION } from "../lib/utils/apiCache";
+import { getLanguageFromCookie } from "../lib/utils/language";
 import useAuthStore from "./authStore";
-
-// Helper function to get language from localStorage
-const getLanguage = () => {
-  if (typeof window === 'undefined') return 'bg';
-  try {
-    return localStorage.getItem('language') || 'bg';
-  } catch {
-    return 'bg';
-  }
-};
 
 const useBranchStore = create(
   persist(
@@ -28,7 +19,7 @@ const useBranchStore = create(
       // Actions
       fetchBranches: async () => {
         // Check cache first
-        const language = getLanguage();
+        const language = getLanguageFromCookie();
         const cacheKey = generateCacheKey("/branches", {}, null, language);
         const ttl = CACHE_DURATION.BRANCHES || 10 * 60 * 1000; // 10 minutes default
         
@@ -126,7 +117,7 @@ const useBranchStore = create(
         }
 
         // Check cache first
-        const language = getLanguage();
+        const language = getLanguageFromCookie();
         const cacheKey = generateCacheKey(`/branches/${branchId}`, {}, branchId, language);
         const ttl = CACHE_DURATION.BRANCHES || 10 * 60 * 1000; // 10 minutes default
         

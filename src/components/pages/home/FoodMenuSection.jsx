@@ -13,11 +13,23 @@ import { useLanguage } from "../../../context/LanguageContext";
 import { t } from "../../../locales/i18n/getTranslation";
 import { useInView } from "react-intersection-observer";
 
-export default function FoodMenuSection() {
+export default function FoodMenuSection({ lang: serverLang = null }) {
   const { prefetchRoute } = usePrefetchRoute();
   const { selectedBranch, getSelectedBranchId, initialize } = useBranchStore();
-  const { lang } = useLanguage();
+  const { lang: clientLang } = useLanguage();
+  const [lang, setLang] = useState(serverLang || clientLang || 'bg');
+  const [isHydrated, setIsHydrated] = useState(false);
   
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (isHydrated && clientLang) {
+      setLang(clientLang);
+    }
+  }, [clientLang, isHydrated]);
+
   // Intersection Observer - Defer API calls until section is visible
   const { ref, inView } = useInView({
     threshold: 0.1,

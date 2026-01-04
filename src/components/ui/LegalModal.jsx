@@ -18,7 +18,7 @@ import LegalContentSection from "../pages/legal/LegalContentSection";
  */
 export default function LegalModal({ isOpen, onClose, type = "terms-conditions" }) {
   const { lang } = useLanguage();
-  const { content, isLoading, error, refetch } = useLegalContent(type);
+  const { content, isLoading, error, refetch } = useLegalContent(type, isOpen);
 
   useEffect(() => {
     if (isOpen) {
