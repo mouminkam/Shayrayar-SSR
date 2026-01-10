@@ -69,7 +69,7 @@ const ProductCard = memo(function ProductCard({ product, viewMode = "grid" }) {
             {product.longDescription || "Neque porro est qui dolorem ipsum quia quaed inventor veritatis et quasi architecto beatae vitae dicta sunt explicabo. Aelltes port lacus quis enim var sed efficitur turpis gilla sed sit amet finibus eros. Lorem Ipsum is simply dummy text of the printing and typesetting industry.When an unknown printer took a galley of type"}
           </div>
         <div className="flex items-center justify-between gap-3">
-          <p className="text-white  text-lg font-bold">
+          <p className="text-theme  text-lg font-bold">
             {formatCurrency(product.price)}
           </p>
           <Link
@@ -131,7 +131,7 @@ const ProductCard = memo(function ProductCard({ product, viewMode = "grid" }) {
           </p>
         </div>
         <div className="mt-auto">
-          <p className="text-white  text-base sm:text-lg font-bold mb-4">
+          <p className="text-theme  text-base sm:text-lg font-bold mb-4">
             {formatCurrency(product.price)}
           </p>
           <Link

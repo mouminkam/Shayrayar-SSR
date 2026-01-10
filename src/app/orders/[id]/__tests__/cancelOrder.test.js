@@ -1,6 +1,6 @@
 /**
  * Tests for Order Cancellation Logic
- * اختبار منطق إلغاء الطلبات بناءً على payment_method و status
+ * Test order cancellation logic based on payment_method and status
  */
 
 describe('Order Cancellation Logic', () => {
@@ -9,33 +9,33 @@ describe('Order Cancellation Logic', () => {
     const status = order?.status?.toLowerCase();
     const paymentMethod = order?.payment_method?.toLowerCase();
     
-    // لا يمكن الإلغاء إذا كان الطلب مكتمل أو ملغي أو تم تسليمه
+    // Cannot cancel if order is completed, cancelled, or delivered
     if (status === 'completed' || status === 'cancelled' || status === 'delivered') {
       return false;
     }
     
-    // Stripe orders: لا يمكن الإلغاء أبداً (بغض النظر عن الحالة)
-    // لأن Stripe orders يتم الدفع فوراً وتصير confirmed مباشرة
+    // Stripe orders: Cannot be cancelled ever (regardless of status)
+    // Because Stripe orders are paid immediately and become confirmed right away
     if (paymentMethod === 'stripe') {
       return false;
     }
     
-    // Cash orders: لا يمكن الإلغاء إذا كان confirmed (تم الدفع فعلياً)
+    // Cash orders: Cannot cancel if confirmed (payment actually received)
     if (paymentMethod === 'cash' && status === 'confirmed') {
       return false;
     }
     
-    // Cash orders: يمكن الإلغاء إذا كان pending (لم يتم الدفع بعد)
+    // Cash orders: Can cancel if pending (payment not yet received)
     if (paymentMethod === 'cash' && status === 'pending') {
       return true;
     }
     
-    // Cash orders: يمكن الإلغاء إذا كان processing (قبل البدء بالتحضير الفعلي)
+    // Cash orders: Can cancel if processing (before actual preparation starts)
     if (paymentMethod === 'cash' && status === 'processing') {
       return true;
     }
     
-    // Default: لا يمكن الإلغاء
+    // Default: Cannot cancel
     return false;
   };
 

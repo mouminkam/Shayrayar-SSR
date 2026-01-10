@@ -29,7 +29,7 @@ export function useOrderActions(order, orderId, refetchOrder) {
    * @returns {boolean} True if order can be cancelled
    */
   const canCancelOrder = () => {
-    // إذا لم يتم تحميل البيانات بعد، لا نسمح بالإلغاء
+    // If data is not loaded yet, don't allow cancellation
     if (!order) {
       return false;
     }
@@ -39,38 +39,38 @@ export function useOrderActions(order, orderId, refetchOrder) {
     const paymentIntentId = order?.payment_intent_id;
     const paymentStatus = order?.payment_status?.toLowerCase();
     
-    // لا يمكن الإلغاء إذا كان الطلب مكتمل أو ملغي أو تم تسليمه
+    // Cannot cancel if order is completed, cancelled, or delivered
     if (status === 'completed' || status === 'cancelled' || status === 'delivered') {
       return false;
     }
     
-    // Stripe orders: لا يمكن الإلغاء أبداً (بغض النظر عن الحالة)
-    // التحقق من payment_method === 'stripe' أو وجود payment_intent_id
+    // Stripe orders: Cannot be cancelled ever (regardless of status)
+    // Check if payment_method === 'stripe' or payment_intent_id exists
     if (paymentMethod === 'stripe' || paymentIntentId) {
       return false;
     }
     
-    // أيضاً: إذا كان payment_status === 'paid' و payment_method === 'stripe'
+    // Also: if payment_status === 'paid' and payment_method === 'stripe'
     if (paymentStatus === 'paid' && paymentMethod === 'stripe') {
       return false;
     }
     
-    // Cash orders: لا يمكن الإلغاء إذا كان confirmed (تم الدفع فعلياً)
+    // Cash orders: Cannot cancel if confirmed (payment actually received)
     if (paymentMethod === 'cash' && status === 'confirmed') {
       return false;
     }
     
-    // Cash orders: يمكن الإلغاء إذا كان pending (لم يتم الدفع بعد)
+    // Cash orders: Can cancel if pending (payment not yet received)
     if (paymentMethod === 'cash' && status === 'pending') {
       return true;
     }
     
-    // Cash orders: يمكن الإلغاء إذا كان processing (قبل البدء بالتحضير الفعلي)
+    // Cash orders: Can cancel if processing (before actual preparation starts)
     if (paymentMethod === 'cash' && status === 'processing') {
       return true;
     }
     
-    // Default: لا يمكن الإلغاء
+    // Default: Cannot cancel
     return false;
   };
 

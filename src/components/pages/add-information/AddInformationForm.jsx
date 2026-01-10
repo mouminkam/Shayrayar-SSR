@@ -40,7 +40,7 @@ export default function AddInformationForm() {
       setLoadingBranches(true);
       const result = await fetchBranches();
       if (result.success) {
-        // branches سيتم تحديثها تلقائياً في branchStore
+        // branches will be updated automatically in branchStore
         setLoadingBranches(false);
       } else {
         toastError(result.error || "Failed to load branches");

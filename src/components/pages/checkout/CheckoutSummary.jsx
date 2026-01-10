@@ -29,9 +29,9 @@ const CheckoutSummary = memo(() => {
   const subtotal = useMemo(() => getSubtotal(), [items, getSubtotal]);
   const tax = useMemo(() => getTax(), [subtotal, getTax]);
   const discount = useMemo(() => getDiscount(), [coupon, subtotal, getDiscount]);
-  // إزالة getDeliveryCharge من dependencies لأنه function ثابتة - يعتمد فقط على deliveryCharge state
+  // Remove getDeliveryCharge from dependencies as it's a static function - depends only on deliveryCharge state
   const delivery = useMemo(() => getDeliveryCharge(), [orderType, deliveryCharge, coupon]);
-  // إزالة getTotal من dependencies لأنه function ثابتة - يعتمد على القيم المحسوبة
+  // Remove getTotal from dependencies as it's a static function - depends on computed values
   const total = useMemo(() => getTotal(), [subtotal, discount, tax, delivery]);
   const itemCount = useMemo(() => getItemCount(), [items, getItemCount]);
 

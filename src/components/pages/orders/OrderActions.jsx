@@ -57,22 +57,22 @@ export default function OrderActions({
     const paymentIntentId = order?.payment_intent_id;
     const status = order?.status?.toLowerCase();
     
-    // لا نعرض الزر إذا كان Stripe (بغض النظر عن الحالة)
+    // Don't show button if Stripe (regardless of status)
     if (paymentMethod === 'stripe' || paymentIntentId) {
       return false;
     }
     
-    // لا نعرض الزر إذا كان Cash + confirmed
+    // Don't show button if Cash + confirmed
     if (paymentMethod === 'cash' && status === 'confirmed') {
       return false;
     }
     
-    // لا نعرض الزر إذا كان الطلب مكتمل أو ملغي أو تم تسليمه
+    // Don't show button if order is completed, cancelled, or delivered
     if (status === 'completed' || status === 'cancelled' || status === 'delivered') {
       return false;
     }
     
-    // فقط إذا كان canCancelOrder() يعيد true
+    // Only if canCancelOrder() returns true
     return canCancelOrder();
   };
 

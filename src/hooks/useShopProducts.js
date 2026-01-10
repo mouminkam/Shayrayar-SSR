@@ -69,7 +69,7 @@ export function useShopProducts(viewMode = "grid") {
       return;
     }
 
-    // جعل category مطلوب
+    // Make category required
     if (!categoryId) {
       setIsLoading(false);
       setError("Please select a category");
@@ -86,7 +86,7 @@ export function useShopProducts(viewMode = "grid") {
       const params = {
         page: currentPage,
         limit: itemsPerPage,
-        category_id: categoryId, // مطلوب دائماً
+        category_id: categoryId, // Always required
       };
 
       if (debouncedSearchQuery) {

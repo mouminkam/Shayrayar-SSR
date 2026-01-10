@@ -167,7 +167,7 @@ const ShopSidebar = memo(function ShopSidebar() {
 
 
                       <div className="flex flex-col items-center justify-center gap-2 lg:gap-3">
-                        <span className="text-white text-sm lg:text-base font-black bg-linear-to-r from-theme/10 to-theme3/10 px-2 lg:px-3 py-1 rounded-full">
+                        <span className="text-theme text-sm lg:text-base font-black bg-linear-to-r from-theme/10 to-theme3/10 px-2 lg:px-3 py-1 rounded-full">
                           {formatCurrency(product.price)}
                         </span>
 
