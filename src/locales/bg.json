@@ -350,6 +350,10 @@
   "agree_to_terms": "Съгласен съм с",
   "terms_and_conditions_link": "Условия и правила",
   "and_privacy_policy_link": "и",
-  "privacy_policy_link": "Политика за поверителност"
+  "privacy_policy_link": "Политика за поверителност",
+  "please_enter_valid_email": "Моля, въведете валиден имейл адрес",
+  "newsletter_subscription": "Абонамент за бюлетин",
+  "newsletter_subscription_request": "Бих искал да се абонирам за вашия бюлетин.",
+  "newsletter_terms_confirmation": "Съгласен съм с Условията и правилата и Политиката за поверителност."
 }
 

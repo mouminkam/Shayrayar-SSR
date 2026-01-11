@@ -2,7 +2,7 @@ import TopBar from "./footer/TopBar";
 import CompanyInfo from "./footer/CompanyInfo";
 import QuickLinks from "./footer/QuickLinks";
 import OurMenu from "./footer/OurMenu";
-import ContactSection from "./footer/ContactSection";
+import ContactInfo from "./footer/ContactInfo";
 import BottomBar from "./footer/BottomBar";
 import ScrollToTop from "./footer/ScrollToTop";
 import BackgroundShapes from "./footer/BackgroundShapes";
@@ -23,7 +23,7 @@ function FreshHeatFooter() {
             <CompanyInfo />
             <QuickLinks />
             <OurMenu />
-            <ContactSection />
+            <ContactInfo />
           </div>
         </div>
       </div>

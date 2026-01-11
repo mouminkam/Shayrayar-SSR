@@ -72,7 +72,7 @@ const ShopSidebar = memo(function ShopSidebar() {
       const firstCategoryId = categories[0].id;
       const params = new URLSearchParams(searchParams.toString());
       params.set("category", firstCategoryId);
-      router.replace(`/shop?${params.toString()}`, { scroll: true });
+      router.replace(`/shop?${params.toString()}`, { scroll: false });
     }
   }, [currentCategory, categories, searchParams, router]);
 
@@ -82,7 +82,7 @@ const ShopSidebar = memo(function ShopSidebar() {
       params.set("category", categoryId);
     }
     params.delete("page");
-    router.push(`/shop?${params.toString()}`, { scroll: true });
+    router.push(`/shop?${params.toString()}`, { scroll: false });
   }, [router, searchParams]);
 
   // Category button style

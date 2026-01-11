@@ -40,6 +40,16 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# IDE settings
+.cursor/
+.vscode/
+.idea/
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
 # documentation files
 CART_STORE_EXPLANATION.md
 RESTRUCTURING_DOCUMENTATION.md

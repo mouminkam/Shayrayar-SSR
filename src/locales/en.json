@@ -366,6 +366,10 @@
   "agree_to_terms": "I agree to",
   "terms_and_conditions_link": "Terms & Conditions",
   "and_privacy_policy_link": "and",
-  "privacy_policy_link": "Privacy Policy"
+  "privacy_policy_link": "Privacy Policy",
+  "please_enter_valid_email": "Please enter a valid email address",
+  "newsletter_subscription": "Newsletter Subscription",
+  "newsletter_subscription_request": "I would like to subscribe to your newsletter.",
+  "newsletter_terms_confirmation": "I agree to the Terms & Conditions and Privacy Policy."
 }
 
